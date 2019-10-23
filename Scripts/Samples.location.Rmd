@@ -1,0 +1,256 @@
+---
+title: "Samples location"
+output: html_notebook
+---
+A first step is to place on a map the location of the CTD casts and eDNA samples. THe idea is to have a visualization of the depth, latitude and longitude of the samples, and use it to prioritize which samples are to be analyzed
+
+Start with libraries
+```{r}
+library (tidyverse)
+library(rnaturalearth)
+library(marmap)
+```
+
+
+# Data files
+
+We have three starting datasets: 
+
+* a file with the eDNA samples - with the field `Transect-Station` as the link point
+* a file with the CTD stations - with the field `Transect-Station` and the field `CTD cast` as link points
+* a folder with all CTD casts, in which the filename is the `CTD cast` field from above
+
+```{r eDNA file}
+
+eDNA.samples <- read_csv("../Data/eDNA hake water samples.csv")
+
+#  Let's tidy this a little bit:
+
+# DATE UTC - rename to Date_UTC, format as date
+eDNA.samples %>% 
+  group_by(`Date UTC`) %>% 
+  tally # All date formats, m/d/y
+
+
+# CTD cast - see if format is the same as the other file
+eDNA.samples %>% 
+  group_by(`CTD cast`) %>% 
+  tally # Some anomalies: 77-MT505, 78-MT506, 53 without stations - NTC samples
+
+eDNA.samples %>% 
+  filter (`CTD cast` == "-") # Change CTD cast to NTC
+eDNA.samples %>% 
+  filter(str_detect(`CTD cast`, "M")) # Those are method stations, change it to 77-0 and 78-0 (as they appear on the main spreadsheet)
+
+eDNA.samples %>% 
+  filter(str_detect(`CTD cast`, "81"))
+
+# Niskin - use to create a Niskin / flow variable
+
+eDNA.samples %>% 
+  group_by(Niskin) %>% tally # - ~ NTC; 5-Apr? ~ Two depths in one tube ; sfc ~ flow
+
+eDNA.samples %>% 
+  filter(str_detect(Niskin, "Apr")) # Two Niskins and filters in one tube -  Keep depth as 300; Add column Contamination?
+
+# depth - Change to Depth, code like if flow ~ 0, if surface niskin, ~ 3
+eDNA.samples %>% 
+  group_by(depth) %>% tally # "-" prob are the NTCs change to 0; 300/150 change to 300, change sfc to 0, 4 NAs
+
+eDNA.samples %>% 
+  filter(depth == "-") # All NTCs cahnge to NA_real
+
+eDNA.samples %>% 
+  filter(depth == "sfc", Niskin != "sfc") # those are probably surface, change depth to 3
+
+eDNA.samples %>% 
+  filter (is.na(depth)) # Those are flow, so change depth to 0
+
+eDNA.samples %>% 
+  select (Date = `Date UTC`,
+          Sample = `Tube #`,
+          Station = `CTD cast`,
+          Origin = Niskin,
+          Depth = depth) %>% 
+  mutate(Date = lubridate::mdy(Date),
+         Station = case_when(Station == "-"        ~ "NTC",
+                             Station == "77-MT505" ~ "77-0",
+                             Station == "78-MT506" ~ "78-0",
+                             TRUE                  ~ Station),
+         Origin = case_when (Origin == "sfc" ~ "Flow",
+                             Origin == "-"   ~ "NTC",
+                             TRUE            ~ "Niskin"),
+         Depth = case_when (Origin == "Flow"  ~ 0,
+                            Depth == "sfc"   ~ 3,
+                            Depth == "-"     ~ NA_real_,
+                            TRUE             ~ as.numeric (Depth))) -> eDNA.samples
+ 
+```
+### Transect stations
+
+```{r transect stations}
+
+CTD.stations <- read_csv("../Data/CTD_hake_data_10-2019.csv")
+
+# Tidy_up the data in a similar way
+
+CTD.stations %>% 
+  mutate(Date = lubridate::mdy(Date), 
+         lat = as.numeric(str_sub(`SciGPS-Lat`,1,2 ) ) +
+           as.numeric(str_sub(`SciGPS-Lat`,3,9 ))/60,
+         lon = -(as.numeric(str_sub(`SciGPS-Lon`,1,3 ) ) +
+           as.numeric(str_sub(`SciGPS-Lon`,4,10 ))/60)) %>% 
+  select(Date,Time,Button,Station=`Station #`,lat,lon, CTD_Cast = `CTD Cast #`) %>% 
+  mutate(Station=as.character(Station)) %>%
+  filter(Button=="CTD at Depth") -> CTD.stations
+
+CTD.stations %>% 
+  right_join(eDNA.samples) %>% 
+  group_by(Sample, Station) %>% tally() %>% filter ( n ==2 ) %>% 
+  ungroup() %>% 
+  distinct(Station)# Duplicated entries on CTD Stations - refer to the same CTD_Cast - Keep only descending
+
+  
+  CTD.stations %>% 
+#  filter (Station %in% duplicated.entries) %>% 
+  group_by(CTD_Cast) %>% 
+  slice(1)  %>% 
+  semi_join(eDNA.samples) -> list.of.stations.to.keep
+  
+  
+  
+  pull -> duplicated.entries
+
+CTD.stations %>% 
+  filter (Station %in% duplicated.entries)
+
+# let's look at them 
+
+list.of.files <- list.files(path = "../Data/1_converted",
+                            pattern = "*.csv")
+CTD.stations %>% 
+  filter (Station %in% duplicated.entries) %>% 
+  group_by(CTD_Cast) %>% 
+  nest() %>% 
+  mutate(CTD = map(CTD_Cast, ~ read_csv(file = glue::glue("../Data/1_converted/", .x, ".csv")))) %>% 
+  mutate(plot = map2(CTD_Cast, CTD, ~ .y %>% rownames_to_column("Order") %>% mutate(Order = as.numeric(Order)) %>% ggplot () + geom_point(aes(x = `Temperature (degC)`, y = Order)))) %>% pull(plot)
+
+
+list.of.stations.to.keep %>% 
+  write_csv("cleaned_CTD_stations.csv")
+  
+```
+# Make a Plot
+
+## Start with the location of the samples
+
+```{r samples}
+
+named_pull <- function(x, values_from, names_from){
+names.output<- pull(x, {{names_from}})
+output <- pull(x, {{values_from}})
+names(output)<- names.output
+return(output)
+}
+
+
+list.of.stations.to.keep %>% 
+  ungroup() %>% 
+  summarise_at(c("lat", "lon"), .funs = list( Max = ~ round( max(.x) + 1,0) ,
+                                              Min = ~ round( min(.x) - 1,0))) %>%
+  pivot_longer(cols = everything(),
+               names_to = "Corner",
+               values_to = "Coordinates") %>%
+  # mutate (Corner = str_replace(Corner, "lat_", "y"),
+  #         Corner = str_replace(Corner, "lon_", "x")) %>% 
+  # arrange(Corner) %>% 
+          
+          named_pull(Coordinates, Corner)-> limits.for.map # So it can be used directly by st_crop
+
+
+```
+
+## Now with the bathymetry
+```{r}
+b = getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
+                  lon2 = limits.for.map[ "lon_Min" ],
+                  lat1 = limits.for.map["lat_Min"], 
+                  lat2 = limits.for.map["lat_Max"], 
+                  resolution = 1)
+
+b <- fortify(b)
+b
+
+library(raster)
+
+slope <- terrain(rasterFromXYZ(b, crs = "+proj=longlat +datum=WGS84 +no_defs"), opt = "slope")
+str(slope)
+as.data.frame(as(slope, "SpatialPixelsDataFrame")) -> slope
+```
+
+## Base map
+```{r}
+world <- ne_countries(scale="large",returnclass="sf")
+sf::st_crs(world)
+```
+
+## Plot
+```{r}
+
+
+ggplot(data=world) +
+  
+  # geom_contour(data = b %>%  filter (z < 0), 
+  #              aes(x=x, y=y, z=z),
+  #              breaks=c( -100, -500),
+  #              size=c(0.3),
+  #              colour="grey")  +
+  
+  geom_raster(data = b %>%  filter (z < 0),
+              aes(x=x, y=y, fill=z)) +
+  # geom_raster(data = slope,
+  #             aes(x = x, y = y , fill = slope)) +
+  geom_sf() +
+  # scale_fill_gradient2(low = "darkblue",
+  #                      mid = "white",
+  #                      high = "yellow",
+  #                      midpoint = -500) +
+  
+  # geom_text_contour (data = b %>%  filter (z < 0, y < 47), 
+  #                    aes(x=x, y=y,   z = z),
+  #                    breaks=c(-100, -500),
+  #                    colour = "black") +
+  
+  coord_sf(xlim=c(limits.for.map["lon_Max"], limits.for.map["lon_Min"]),ylim=c(limits.for.map["lat_Max"], limits.for.map["lat_Min"]),expand=F) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw() -> base_map_hake
+base_map_hake +  
+
+geom_point(data=list.of.stations.to.keep,aes(y=lat,x=lon),col="red",alpha=0.75) +
+  theme(axis.text.x = element_text(angle=90,vjust= 0.5)) -> plot
+```
+
+```{r get the transect number}
+
+list.of.stations.to.keep %>% 
+  ungroup() %>% 
+  separate(Station, into = c("Transect", "Stop"), remove = F) %>% 
+  group_by(Transect, Date) %>% 
+  summarise(xstart = max(lon),
+            xend = min(lon),
+            ystart = mean(lat),
+            yend  = mean(lat)) %>% 
+  mutate(MonthDay = paste(lubridate::month(Date, label = T), 
+                          lubridate::day(Date), sep = "-")) -> Transects
+
+```
+
+## Add them to the plot
+```{r}
+plot +
+  geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
+  geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transects), color = "yellow", fontface = "bold") +
+  ggsave("../Plots and figures/Samples_with_Transects_depth.png",height=10,dpi = 300 )
+```
+

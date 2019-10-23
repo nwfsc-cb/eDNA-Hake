@@ -29,17 +29,37 @@ dat.water <- dat.water %>% rename(Station=CTD.cast) %>%
 dat.loc <- left_join(dat.water,dat.ctd)
 
 
-
-dat.loc %>% filter(is.na(lon)==T)
+dat.loc %>% filter(is.na(lon))
 
 
 
 ### Make a simple plot of the locations that were sampled for eDNA.
 
 world <- ne_countries(scale="large",returnclass="sf")
-
+sf::st_crs(world)
 plot.loc <- ggplot(data=world) +
+  
+  # geom_contour(data = b %>%  filter (z < 0), 
+  #              aes(x=x, y=y, z=z),
+  #              breaks=c( -100, -500),
+  #              size=c(0.3),
+  #              colour="grey")  +
+  
+  # geom_raster(data = b %>%  filter (z < 0), 
+  #             aes(x=x, y=y, fill=z)) +
+  geom_raster(data = slope,
+              aes(x = x, y = y , fill = slope)) +
   geom_sf() +
+  # scale_fill_gradient2(low = "darkblue",
+  #                      mid = "white",
+  #                      high = "yellow",
+  #                      midpoint = -500) +
+  
+  geom_text_contour (data = b %>%  filter (z < 0, y < 47), 
+                     aes(x=x, y=y,   z = z),
+                     breaks=c(-100, -500),
+                     colour = "black") +
+  
   coord_sf(xlim=c(-127,-122),ylim=c(36,50),expand=F) +
   xlab("Longitude") +
   ylab("Latitude") +
@@ -50,7 +70,7 @@ plot.loc <- ggplot(data=world) +
 plot.loc
 quartz(file="./Plots and Figures/CTD Locations.pdf",height=8,width=3,type="pdf",dpi=300)
   print(plot.loc)
-dev.off()
+dev.off()+
 
 
 tm_shape(us_states) + tm_polygons() +
