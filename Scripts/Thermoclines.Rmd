@@ -1,0 +1,137 @@
+---
+title: "Thermoclines"
+output: html_notebook
+---
+
+We want to map  which stations have a marked thermocline, and which don't. We want to choose a few stations from each and build a test like so
+
+
+
+```{r}
+library(tidyverse)
+library(rLakeAnalyzer)
+library(castr)
+```
+
+
+Import all the CTD casts we need
+
+```{r List of CTD casts to import}
+
+all.CTDS.to.keep <- read_csv("cleaned_CTD_stations.csv")
+
+files.inCTD <- list.files(path = "../Data/1_converted/", pattern = "*.csv")
+
+# Are they all present
+
+files.inCTD <- tibble (file.name = list.files(path = "../Data/1_converted/", pattern = "*.csv"),
+                       path = list.files(path = "../Data/1_converted/", pattern = "*.csv", full.names = T))
+
+safe_read <- possibly(read_csv, otherwise = NA)
+
+all.CTDS.to.keep %>% 
+  
+  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast),
+                              TRUE           ~ as.character(CTD_Cast))) %>% 
+  group_by(CTD_Cast) %>% 
+  nest() %>%
+  mutate(CTD_Data = map (CTD_Cast, ~ safe_read(file = glue::glue("../Data/1_converted/", .x, ".csv")))) -> all.CTDS.to.keep
+
+
+```
+
+# Calculate the thermocline
+
+```{r}
+
+
+all.CTDS.to.keep %>% #mutate (clas = map (CTD_Data, class))
+  filter (!is.na(CTD_Data)) %>%  # Takes forever
+  mutate (CTD_Data = map (CTD_Data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)"), .funs = despike)),
+          Thermocline = map_dbl (CTD_Data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermocline2
+
+thermocline2 %>% 
+  mutate(Thermocline = map_dbl (Thermocline, ~ .x %>% pull)) -> thermocline2
+
+list.of.stations.to.keep <- read_csv("cleaned_CTD_stations.csv")
+
+list.of.stations.to.keep %>% mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0("0",CTD_Cast),
+                                                         TRUE           ~ as.character(CTD_Cast))) -> list.of.stations.to.keep
+```
+
+## Join thermocline depths with lat lon
+
+```{r}
+thermocline2 %>% 
+  mutate(Temp_above = map2_dbl(CTD_Data, Thermocline,~ .x %>%
+                                 filter(`Depth (m)` < .y) %>%
+                                 summarise(mean(`Temperature (degC)`, na.rm = T)) %>%
+                                 pull),
+         Temp_below = map2_dbl(CTD_Data, Thermocline,~ .x %>%
+                                 filter(`Depth (m)` > .y, `Depth (m)` < .y + 20) %>% 
+                                 summarise(mean(`Temperature (degC)`, na.rm = T)) %>% 
+                                 pull),
+         SST = map_dbl(CTD_Data , ~.x %>% 
+                          filter (`Depth (m)` < 10) %>% 
+                          summarise(mean (`Temperature (degC)`, na.rm = T)) %>% 
+                          pull)) %>% 
+  mutate (Temp_diff = map2_dbl (Temp_above, Temp_below, ~.x - .y)) %>% 
+  dplyr::select(CTD_Cast, Thermocline, Temp_diff, SST) %>% 
+  left_join(list.of.stations.to.keep) -> data.with.lat
+```
+
+```{r}
+data.with.lat %>% 
+  ggplot(aes(x = Thermocline, y = lat, size = Temp_diff)) +
+  geom_point(alpha = 0.5)
+
+data.with.lat %>% 
+  ggplot(aes(x = Thermocline, y = Temp_diff))+
+  geom_smooth() +
+  geom_jitter()
+
+data.with.lat %>% 
+  ggplot(aes(x = lat, y = Temp_diff))+
+  geom_smooth()
+
+data.with.lat %>% 
+   mutate_at(c("lat", "lon"), ~round(.x, 1)) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = as.factor(lat), y  = SST))
+
+data.with.lat %>% 
+  mutate_at(c("lat", "lon"), ~round(.x, 1)) %>% 
+  
+  ggplot(aes(x = lon, y = lat))+
+  geom_point(aes(fill = Temp_diff, color = Thermocline < 20 ), shape = 21, size = 3, stroke =1.5) +
+  scale_color_viridis_c(aesthetics = "fill")+
+  scale_color_brewer(palette = "Accent") +theme_minimal() +coord_equal()
+
+data.with.lat %>% 
+  mutate_at(c("lat", "lon"), ~round(.x, 1)) %>% 
+  
+  ggplot(aes(x = lon, y = lat))+
+  geom_point(aes(fill = SST), shape = 21, size = 3, stroke =1.5) +
+  scale_color_viridis_c(aesthetics = "fill")+
+  scale_color_brewer(palette = "Accent") +theme_minimal() +coord_equal()
+
+base_map_hake +
+  geom_point(data = data.with.lat %>% filter(Thermocline < 20), aes(x = lon, y = lat ), size = 4, color = "red")+
+  geom_point(data = data.with.lat, aes(x = lon, y = lat, color = Temp_diff ) ,size = 2.5) +
+  
+  scale_color_viridis_c() -> Temp.diff.plot
+  
+base_map_hake +
+  geom_point(data = data.with.lat, aes(x = lon, y = lat), color = "black", size = 3) +
+  geom_point(data = data.with.lat, aes(x = lon, y = lat, color = SST ) ,size = 2.5) +
+  
+  scale_color_distiller(palette = "Spectral") -> sst.plot
+
+library(patchwork)
+
+Temp.diff.plot +
+  sst.plot +
+  ggsave("../Plots and figures/SST_and_Thermocline_intensity.png", height=10,dpi = 300 )
+
+```
+
