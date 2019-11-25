@@ -21,18 +21,31 @@ dat.ctd.raw$lat <- as.numeric(substr(dat.ctd.raw$SciGPS.Lat,1,2)) +
 dat.ctd.raw$lon <- - (as.numeric(substr(dat.ctd.raw$SciGPS.Lon,1,3)) +
                       as.numeric(substr(dat.ctd.raw$SciGPS.Lon,4,10))/60)
 
-dat.ctd <- dat.ctd.raw %>% dplyr::select(Date,Time,Button,Station=Station..,lat,lon) %>% mutate(Station=as.character(Station)) %>%
-            filter(Button=="CTD at Depth")
+dat.ctd <- dat.ctd.raw %>% dplyr::select(Date,Time,Button,Station=Station..,lat,lon) %>% 
+            mutate(Station=as.character(Station)) %>%
+            filter(Button=="CTD at Depth") 
+# This adds in location for 
+dat.ctd <- dat.ctd.raw %>% dplyr::select(Date,Time,Button,Station=Station..,lat,lon) %>% 
+              mutate(Station=as.character(Station)) %>%
+              filter(Station=="49-9") %>% bind_rows(.,dat.ctd) 
+
+# Manually add back in two stations not associated with CTD casts.
+
+dat.ctd.extra <- data.frame(Station= c("78-MT506", "77-MT505"),
+                            lat= c(47.13849,47.0382), 
+                            lon=c(-124.54172, -124.57494))
+dat.ctd <- full_join(dat.ctd,dat.ctd.extra)
+
+
 dat.water <- dat.water %>% rename(Station=CTD.cast) %>% 
                 mutate(depth.mod = depth,depth.mod = ifelse(depth.mod=="sfc",0,depth.mod))
 
 dat.loc <- left_join(dat.water,dat.ctd)
 
 
-
 dat.loc %>% filter(is.na(lon)==T)
 
-
+### NEED to figure out locations for "49-9", "78-MT506", "77-MT505"
 
 ### Make a simple plot of the locations that were sampled for eDNA.
 
