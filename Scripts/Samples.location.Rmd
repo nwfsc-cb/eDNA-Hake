@@ -137,7 +137,7 @@ CTD.stations %>%
 
 
 list.of.stations.to.keep %>% 
-  write_csv("cleaned_CTD_stations.csv")
+  write_csv("../Data/cleaned_CTD_stations.csv")
   
 ```
 # Make a Plot
