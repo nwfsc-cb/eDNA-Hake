@@ -1,0 +1,178 @@
+---
+title: "Hake 2019 Survey"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## eDNA from the 2019 Hake cruise 
+
+```{r pressure, echo=FALSE,warning=FALSE,include=FALSE}
+library(tidyverse)
+library(knitr)
+
+# Read in the output from the Stan model
+base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
+setwd(base.dir)
+load("qPCR Hake 2019 hake Fitted.RData")
+
+### Get some of the output from file.
+dat.samp <- Output.qpcr$dat.obs.bin
+dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,Output.qpcr$field_neg_out)
+
+dat.summary <- dat.samp %>%
+                      group_by(date,transect,station,station.depth,depth,station_depth_idx) %>%
+                      dplyr::summarise(N=length(unique(sample_idx)))
+dat.summary <- left_join(dat.summary,Output.qpcr$station_depth_out)
+dat.summary <- dat.summary %>% mutate(depth_cat=case_when(depth < 25~0,
+                                                          depth == 25~ 25,  
+                                                          depth > 25 & depth <=50 ~ 50,
+                                                          depth > 50 & depth <=100 ~ 100,
+                                                          depth > 120 & depth <=150 ~ 150,
+                                                          depth > 151 & depth <=200 ~ 200,
+                                                          depth > 250 & depth <=350 ~ 300,
+                                                          depth > 400 & depth <=500 ~ 500))
+
+dat.inhibit <- Output.qpcr$dat.inhibit %>% mutate(depth_cat=case_when(depth < 25~ 0,
+                                                          depth == 25~ 25,            
+                                                          depth > 25 & depth <=50 ~ 50,
+                                                          depth > 50 & depth <=100 ~ 100,
+                                                          depth > 120 & depth <=150 ~ 150,
+                                                          depth > 151 & depth <=200 ~ 200,
+                                                          depth > 250 & depth <=350 ~ 300,
+                                                          depth > 400 & depth <=500 ~ 500))
+
+##### Calculate some info about the field negative controls
+field.neg.summ <- Output.qpcr$field_neg_out 
+
+
+N.station.run       <- length(unique(c(dat.inhibit$station,dat.samp$station)))
+N.station.depth.run <- length(unique(c(dat.inhibit$station.depth,dat.samp$station.depth)))
+N.sample.run        <- length(unique(c(dat.inhibit$sample,dat.samp$sample)))
+
+```
+
+### Sampling and processing to date.
+
+In total we have processed qPCR for pacific hake, pacific lamprey, and eulachon from `r N.station.run` CTD stations representing `r N.station.depth.run` station-depth combinations for `r N.sample.run` individual 2.5L water samples.   
+
+```{r, echo=FALSE,warning=FALSE,include=FALSE}
+# Make a map of where we have samples.
+library(ggmap)
+library(maps)
+library(mapdata)
+library(ggplot2)
+
+dat.id <- Output.qpcr$dat.id
+dat.station.id.trim <- Output.qpcr$dat.station.id.trim
+dat.sample.id <- Output.qpcr$dat.sample.id
+
+# combine ids into stations, samples outstanding, and processed samples
+
+dat.A <- dat.station.id.trim %>% dplyr::select(lat,lon) %>% mutate(Level="CTD Stations")
+dat.B <- left_join(dat.sample.id,dat.id) %>% dplyr::select(lat,lon) %>% mutate(Level="Sampled Stations")
+dat.C <- dat.samp %>% dplyr::select(lat,lon) %>% mutate(Level="Processed Stations")
+
+
+dat.process <- bind_rows(dat.A,dat.B,dat.C)
+
+dat.process$Level <- factor(dat.process$Level, levels=c("CTD Stations","Sampled Stations","Processed Stations"))
+
+#### Plotting information
+states <- map_data("state")
+west_coast <- subset(states, region %in% c("california", "oregon", "washington"))
+
+# Plot for all samples
+lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
+lon.lims <- c(min(dat.id$lon,na.rm=T),max(dat.id$lon,na.rm=T))
+
+base_map <-ggplot(data = west_coast) + 
+            geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
+            coord_fixed(xlim=lon.lims,ylim=lat.lims,ratio=1.3) +
+            scale_color_manual(values=c(grey(0.6),"blue","red"))+
+            xlab("Longitude") +
+            ylab("Latitude") +
+            theme_bw()
+
+sample.process <- base_map + 
+                   geom_point(data=dat.process,aes(x=lon,y=lat,color=Level),size=0.8) 
+
+sample.process.facet <- sample.process +
+                        facet_wrap(~Level)
+
+#print(sample.process)
+
+```
+
+```{r,echo=FALSE,warning=FALSE, fig.height=7}
+print(sample.process)
+```
+
+```{r,echo=FALSE,warning=FALSE, fig.height=6}
+print(sample.process.facet)
+```
+
+
+\newpage
+
+### Inhibition
+
+There are a lot of samples that show signs of inhibition. They are concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters (insert stuff about non-template controls here) 
+
+```{r,echo=FALSE,warning=FALSE,results="asis"}
+##### Calculate some inhibition characteristics.
+inhibit.summ <- dat.inhibit %>% group_by(date,transect,station,station.depth,depth,depth_cat) %>%
+                summarise(N_pcr=length(unique(qPCR)),N_sample=length(unique(sample)),N_rep=length(sample)) %>%
+                mutate(inhibited = "Y")
+good.summ <- dat.summary %>%
+                    dplyr::select(date,transect,station,station.depth,depth,depth_cat,N_sample=N) %>%
+                    mutate(inhibited = "N")
+
+g_i_dat <- bind_rows(inhibit.summ %>% dplyr::select(-N_pcr,-N_rep),good.summ) %>%
+                  group_by(depth_cat,station.depth,inhibited) %>%
+                  dplyr::summarise(N_inhibited=length(inhibited)) %>%
+                  pivot_wider(.,names_from=c("inhibited"),values_from=c("N_inhibited")) %>%
+                  mutate(N=ifelse(is.na(N),0,N),
+                         Y=ifelse(is.na(Y),0,Y),
+                         Both=ifelse(N==1 & Y==1,1,0)) %>%
+                  group_by(depth_cat) %>% 
+                  summarise(Total=length(station.depth),
+                            Not_inhibited=Total-sum(Y),
+                            Partially_inhibited = sum(Both),
+                            Completely_inhibited = Total-sum(N)) %>%
+                  filter(is.na(depth_cat)==F)
+
+g_i_dat <- bind_rows(g_i_dat %>% mutate(depth_cat=as.character(depth_cat)),
+                     colSums(g_i_dat)%>%t()%>%as.data.frame()%>%mutate(depth_cat="TOTAL")) %>%
+                      rename("Depth Category (m)"=depth_cat,)
+
+g_i_2 <- bind_rows(inhibit.summ %>% dplyr::select(-N_pcr,-N_rep),good.summ) %>%
+                  group_by(depth_cat,station.depth,inhibited) %>%
+                  dplyr::summarise(N_inhibited=length(inhibited)) %>%
+                  pivot_wider(.,names_from=c("inhibited"),values_from=c("N_inhibited")) %>%
+                  mutate(N=ifelse(is.na(N),0,N),
+                         Y=ifelse(is.na(Y),0,Y),
+                         Both=ifelse(N==1 & Y==1,1,0)) %>%
+                  left_join(.,
+                                dat.samp %>% 
+                                  group_by(station.depth,lat,lon) %>% 
+                                  summarise(N=length(lat)) %>% dplyr::select(-N))
+
+
+
+
+
+kable(g_i_dat)
+```
+
+Spatially, the 
+
+
+
+
+
+### Controls
+There are two main types of control: field negative control and extraction controls.  
+
