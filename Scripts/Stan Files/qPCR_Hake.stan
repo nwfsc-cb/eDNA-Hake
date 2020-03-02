@@ -15,8 +15,6 @@ data { /////////////////////////////////////////////////////////////////////////
     int N_control_bin   ;  // Number of observations for binomial part of the sample model
     int N_control_pos ;  // Number of observations for count part of the sample model
 
-
-
     // Observations
     int bin_stand[N_stand_bin]     ;
     vector[N_stand_pos] pos_stand ;
@@ -147,7 +145,7 @@ transformed parameters { ///////////////////////////////////////////////////////
     }
     for(i in 1:N_control_pos){
       kappa_control[i]  = beta_0[pcr_control_pos_idx[i]] + 
-                        beta_1[pcr_control_pos_idx[i]] * (D_control[sample_control_bin_idx[i]] - OFFSET) ;
+                        beta_1[pcr_control_pos_idx[i]] * (D_control[sample_control_pos_idx[i]] - OFFSET) ;
       //kappa_samp[i]  = beta_0 + beta_1 * D[bottle_count_idx[i]] ;
     }
     

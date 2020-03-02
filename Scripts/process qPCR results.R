@@ -70,7 +70,7 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
                                        depth=="" ~ "0",
                                        TRUE ~depth))
 
-dat.id.control <- dat.id %>% filter(!control == "no")
+dat.id.control <- dat.id %>% filter(!control == "no") %>% dplyr::select(sample,volume,control) %>% left_join(.,dat.sample.control.id)
 dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric(as.character(depth)))
 
 ###########################################################################
@@ -426,7 +426,7 @@ stand.plot <- ggplot(dat.stand.pos) +
 stand.plot <- stand.plot +
   geom_line(data=STAND.REG,aes(x=X,y=Y,color=qPCR)) +
   scale_color_discrete(name="qPCR Plate") +
-  ylab("PCR cycle") 
+  ylab("PCR cycle")  +
   xlab("log10 copies DNA") 
 #scale_x_continuous(labels = paste0("1e",LABS),limits = c(-2,4))
 stand.plot
@@ -493,6 +493,7 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     dat.station.id.trim=dat.station.id.trim,
                     dat.sample.id=dat.sample.id,
                     dat.id =dat.id,
+                    dat.id.control=dat.id.control,
                     dat.inhibit=dat.inhibit,
                     dat.control.field.neg = dat.control.field.neg,
                     dat.control=dat.control,
@@ -504,6 +505,7 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     base_params =base_params,
                     STATION.DEPTH=STATION.DEPTH,
                     SAMPLES=SAMPLES,
+                    SAMPLES.CONTROL=SAMPLES.CONTROL,
                     PCR=PCR,
                     N_station_depth=N_station_depth,
                     N_sample = N_sample,   # Number of site-month-bottle combinations.
