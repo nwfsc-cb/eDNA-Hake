@@ -362,7 +362,7 @@ dat.sum.v.control <- bind_rows(dat.summary %>% dplyr::select(date,
 
 
 
-BREAKS <- 10^(c(-4,seq(-2,3,by=0.25)))
+BREAKS <- 10^(c(-4,seq(-1,3,by=0.25)))
 XLIM <- c(0,max(dat.sum.v.control$Mean)*1.01)
 compare.hist <- ggplot(dat.sum.v.control) +
                   geom_histogram(aes(Mean,fill=cat),breaks=BREAKS,alpha=0.5,position="identity",) +
@@ -379,5 +379,49 @@ compare.hist
 ```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
 print(compare.hist)
 ```
+
+Let's make some plots of the spatial distribution of hake DNA.
+
+```{r,echo=FALSE,warning=FALSE,include=FALSE}
+
+dat.hake <- left_join(dat.summary,dat.lat.lon) %>% filter(is.na(depth_cat)==F)
+
+
+BREAKS = c(-100,-2,0,1,2,3,4,5)
+hake.p1 <- base_map + 
+              geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean.log),shape=21) +
+              scale_size("Log Copies",breaks=BREAKS)+
+              scale_shape("Log Copies",solid=FALSE)+
+              facet_wrap(~depth_cat)
+hake.p1
+
+LAB<-c(0.1,1,10,50,100,200,400)
+hake.p2 <- base_map + 
+              geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+              scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
+              scale_shape("Copies",solid=FALSE)+
+              facet_wrap(~depth_cat,nrow=2)
+hake.p2
+
+hake.p3 <- base_map + 
+              geom_point(data=dat.hake%>%filter(depth_cat %in% c(0,50,150,300,500)),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+              scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
+              scale_shape("Copies",solid=FALSE)+
+              facet_wrap(~depth_cat,nrow=2)
+hake.p3
+
+```
+
+```{r,echo=FALSE,fig.height=8,warning=FALSE}
+print(hake.p2)
+```
+
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(hake.p3)
+```
+
+
+
 
 
