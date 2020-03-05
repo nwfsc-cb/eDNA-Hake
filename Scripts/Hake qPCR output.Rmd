@@ -386,7 +386,6 @@ Let's make some plots of the spatial distribution of hake DNA.
 
 dat.hake <- left_join(dat.summary,dat.lat.lon) %>% filter(is.na(depth_cat)==F)
 
-
 BREAKS = c(-100,-2,0,1,2,3,4,5)
 hake.p1 <- base_map + 
               geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean.log),shape=21) +
@@ -401,14 +400,108 @@ hake.p2 <- base_map +
               scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
               scale_shape("Copies",solid=FALSE)+
               facet_wrap(~depth_cat,nrow=2)
-hake.p2
+#hake.p2
 
 hake.p3 <- base_map + 
               geom_point(data=dat.hake%>%filter(depth_cat %in% c(0,50,150,300,500)),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
               scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
               scale_shape("Copies",solid=FALSE)+
               facet_wrap(~depth_cat,nrow=2)
-hake.p3
+#hake.p3
+
+############## Make some marginal plots
+```
+
+```{r,echo=FALSE,warning=FALSE,include=FALSE}
+
+#### NEED TO DIFFERENTIATE AMONG CTDs in very deep water and ~500m.
+max.depth <- dat.hake %>% group_by(station) %>% summarise(max.depth.cat = max(depth_cat)) %>%
+                mutate(max.depth.cat = ifelse(max.depth.cat<50,50,max.depth.cat))
+dat.hake <- dat.hake %>% arrange(station, depth) %>% mutate(neg.depth = -depth) %>%
+              left_join(.,max.depth)
+
+dat.hake.sum.by.depth.cat <- dat.hake %>% group_by(max.depth.cat,depth_cat) %>%
+                    summarise(N=length(Mean),MEAN=mean(Mean),SD=sd(Mean),
+                              MEDIAN=median(Mean),
+                              q.25=quantile(Mean,probs=0.25),
+                              q.75=quantile(Mean,probs=0.75))
+
+LAB<-c(0.1,1,10,50,100,200,400)
+depth.p1 <- ggplot(dat.hake %>% filter(max.depth.cat %in% c(150,300))) +
+              geom_point(aes(x=lat,y=neg.depth,size=Mean),alpha=0.5,color="red",shape=21) +
+              #geom_line(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.3) +
+              #scale_y_continuous(trans="log2") +
+              scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
+              scale_shape("Copies",solid=FALSE) +
+              #scale_scale_color_viridis(begin=0,end=0.8) +
+              xlab("Latitude") +
+              ylab("Depth") +
+              theme_bw()
+print(depth.p1)
+
+
+DEPTH.MAX <- 500
+LABEL = c(0.5,1,2,4,8,16,32,64,128,256) 
+depth.p2 <- ggplot(dat.hake %>% filter(max.depth.cat %in% c(DEPTH.MAX))) +
+              geom_point(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.5) +
+              geom_line(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.3) +
+              geom_point(data= dat.hake.sum.by.depth.cat %>% 
+                                filter(max.depth.cat %in% c(DEPTH.MAX)),
+                          aes(x=-depth_cat,y=MEDIAN),color="red",shape=16,size=3) +
+              geom_point(data= dat.hake.sum.by.depth.cat %>% 
+                                filter(max.depth.cat %in% c(DEPTH.MAX)),
+                          aes(x=-depth_cat,y=MEAN),color="red",shape=22,size=3) +
+              geom_line(data= dat.hake.sum.by.depth.cat %>% 
+                                filter(max.depth.cat %in% c(DEPTH.MAX)),
+                          aes(x=-depth_cat,y=MEDIAN),color="red") +
+              geom_errorbar(data= dat.hake.sum.by.depth.cat %>% 
+                                filter(max.depth.cat %in% c(DEPTH.MAX)),
+                            aes(x=-depth_cat,ymin=q.25,ymax=q.75),color="red",width=0) +
+              scale_color_viridis("Latitude",begin=0,end=0.8) +
+              scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL) +
+              scale_shape(solid=FALSE) +
+              xlab("Depth") +
+              ylab("Copies") +
+              coord_flip() +
+              theme_bw()
+print(depth.p2)
+
+
+# dat.hake.sum.by.depth.cat <- dat.hake.sum.by.depth.cat %>%
+#                               mutate(max.depth.cat.fact=as.factor(max.depth.cat))
+# LEV <- unique(dat.hake.sum.by.depth.cat$max.depth.cat.fact)
+# 
+# dat.hake.sum.by.depth.cat$max.depth.cat.fact <- factor(dat.hake.sum.by.depth.cat$max.depth.cat.fact,
+#                                                        levels=LEV)
+
+d.temp <- dat.hake.sum.by.depth.cat %>% 
+            filter(!max.depth.cat %in% c(0,200)) %>% 
+            arrange(max.depth.cat)
+d.temp$max.depth.cat = factor(d.temp$max.depth.cat,levels=c("50","100","150","300","500"))
+
+LIM <- c(0,max(d.temp$q.75)*1.05)
+depth.p3 <- ggplot(d.temp) +
+              geom_point(aes(x=-depth_cat,y=MEDIAN,color=max.depth.cat),
+                        shape=16,size=3,alpha=0.8) +
+              # geom_point(aes(x=-depth_cat,y=MEAN,color=max.depth.cat.fact),
+              #           shape=16,size=3) +
+              geom_line(aes(x=-depth_cat,y=MEDIAN,color=max.depth.cat),alpha=0.5) + 
+              geom_errorbar(aes(x=-depth_cat,ymin=q.25,ymax=q.75,color=max.depth.cat),
+                            width=10,alpha=0.5) +
+              scale_color_viridis_d("Max \nDepth",begin=0,end=0.8) +
+              #scale_y_continuous(label=LABEL,breaks=LABEL) +
+              scale_shape(solid=FALSE) +
+              xlab("Depth") +
+              ylab("Copies") +
+              coord_flip() +
+              scale_y_continuous(limits=LIM, expand=c(0,0)) +
+              theme_bw()
+print(depth.p3)
+
+depth.p4 <- depth.p3 +
+            scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL,expand=c(0,0.05)) 
+
+print(depth.p4)
 
 ```
 
@@ -421,7 +514,9 @@ print(hake.p2)
 print(hake.p3)
 ```
 
-
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(depth.p2)
+```
 
 
 

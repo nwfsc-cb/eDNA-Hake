@@ -42,9 +42,10 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
                                    transect=case_when(grepl("-",transect) ~ substr(transect,1,1),
                                                       TRUE ~ transect))
 
-  dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date))
+  dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>% 
+                              rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE)
   
-  dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, lat,lon,station, transect)
+  dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, lat,lon,station, transect,water.depth)
                             # mutate(transect = as.numeric(substr(Station,1,2)))\
 
   
