@@ -7,7 +7,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r,echo=FALSE,warning=FALSE, fig.height=7}
+```{r,echo=FALSE,warning=FALSE, include=FALSE}
 source("post-process qPCR STAN Output.R")
 ```
 
@@ -101,5 +101,8 @@ print(hake.p3)
 print(depth.p2)
 ```
 
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(depth.p4)
+```
 
 

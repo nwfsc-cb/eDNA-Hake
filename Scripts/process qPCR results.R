@@ -43,12 +43,18 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
                                                       TRUE ~ transect))
 
   dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>% 
-                              rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE)
-  
-  dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, lat,lon,station, transect,water.depth)
-                            # mutate(transect = as.numeric(substr(Station,1,2)))\
+                              rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE) 
+    
 
-  
+        d.temp <- dat.station.id %>% group_by(date,year,month,day,station, transect) %>%
+                    summarise(m.lat=mean(lat),m.lon=mean(lon),m.water.depth=mean(water.depth)) %>%
+                    rename(lat=m.lat,lon=m.lon,water.depth=m.water.depth)
+
+  dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, station, transect) %>%
+                            # this combines the latitude and longitude to make a single concensus value for each Station.
+                            left_join(d.temp,.)
+
+    
   dat.sample.control.id <- dat.sample.id %>% mutate(date= as.Date(Date.UTC,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>%
                                   dplyr::select(sample=Tube..,date,year,month,day)
   dat.sample.id  <- dat.sample.id %>% dplyr::select(sample=Tube..,
@@ -210,7 +216,6 @@ N_control_sample <- max(SAMPLES.CONTROL$sample_control_idx)
 
 OFFSET = 0 # Value to imrpove Fitting in STAN
 
-
 stan_data = list(
   "bin_stand"     = dat.stand.bin$Ct_bin,
   "pos_stand"     = dat.stand.pos$Ct,
@@ -234,8 +239,7 @@ stan_data = list(
   "N_obs_pos"   = N_obs_pos,
   "N_control_bin"   = N_control_bin,
   "N_control_pos"   = N_control_pos,
-  
-    
+
   # Indices for qPCR plate
   "pcr_stand_bin_idx"   = dat.stand.bin$plate_idx,
   "pcr_stand_pos_idx" = dat.stand.pos$plate_idx,
@@ -243,8 +247,7 @@ stan_data = list(
   "pcr_obs_pos_idx" =   dat.obs.pos$plate_idx,
   "pcr_control_bin_idx"   = dat.control.bin$plate_idx,
   "pcr_control_pos_idx" =   dat.control.pos$plate_idx,
-  
-    
+
   # Indices for sample bottles combination
   "sample_idx" = SAMPLES$sample_idx,
   "sample_control_idx" = SAMPLES.CONTROL$sample_control_idx,
@@ -267,7 +270,6 @@ stan_data = list(
   #Offset of density for improving fitting characteristics
   "OFFSET" = OFFSET
 )
-
 
 stan_pars = c(
   "beta_0", # intercept for standards

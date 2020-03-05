@@ -1,5 +1,5 @@
 ###
-
+rm(list=ls())
 library(tidyverse)
 library(knitr)
 library(reshape2)
@@ -21,22 +21,22 @@ dat.samp <- Output.qpcr$dat.obs.bin
 dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,Output.qpcr$field_neg_out)
 
 dat.summary <- dat.samp %>%
-  group_by(date,transect,station,station.depth,depth,station_depth_idx,) %>%
+  group_by(date,transect,station,station.depth,depth,station_depth_idx) %>%
   dplyr::summarise(N=length(unique(sample_idx)))
 dat.summary <- left_join(dat.summary,Output.qpcr$station_depth_out)
-dat.summary <- dat.summary %>% mutate(depth_cat=case_when(depth < 25~0,
-                                                          depth == 25~ 25,  
-                                                          depth > 25 & depth <=50 ~ 50,
-                                                          depth > 50 & depth <=100 ~ 100,
-                                                          depth > 120 & depth <=150 ~ 150,
-                                                          depth > 151 & depth <=200 ~ 200,
-                                                          depth > 250 & depth <=350 ~ 300,
-                                                          depth > 400 & depth <=500 ~ 500))
+dat.summary <- dat.summary %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
+                                                          depth ==25 ~ 25,  
+                                                          depth > 25  & depth <= 50  ~ 50,
+                                                          depth > 50  & depth <= 100 ~ 100,
+                                                          depth > 120 & depth <= 150 ~ 150,
+                                                          depth > 151 & depth <= 200 ~ 200,
+                                                          depth > 250 & depth <= 350 ~ 300,
+                                                          depth > 400 & depth <= 500 ~ 500))
 
-dat.inhibit <- Output.qpcr$dat.inhibit %>% mutate(depth_cat=case_when(depth < 25~ 0,
-                                                                      depth == 25~ 25,            
-                                                                      depth > 25 & depth <=50 ~ 50,
-                                                                      depth > 50 & depth <=100 ~ 100,
+dat.inhibit <- Output.qpcr$dat.inhibit %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
+                                                                      depth == 25 ~ 25,            
+                                                                      depth > 25  & depth <=50  ~ 50,
+                                                                      depth > 50  & depth <=100 ~ 100,
                                                                       depth > 120 & depth <=150 ~ 150,
                                                                       depth > 151 & depth <=200 ~ 200,
                                                                       depth > 250 & depth <=350 ~ 300,
@@ -63,21 +63,42 @@ dat.sample.id <- Output.qpcr$dat.sample.id
 
 # combine ids into stations, samples outstanding, and processed samples
 
-dat.A <- dat.station.id.trim %>% dplyr::select(station,lat,lon) %>% mutate(Level="CTD Stations")
-dat.B <- left_join(dat.sample.id,dat.id) %>% dplyr::select(station,lat,lon) %>%
-  group_by(station,lat,lon) %>% summarise(N=length(station)) %>% filter(is.na(lat)==F) %>%
+dat.A <- dat.station.id.trim %>% dplyr::select(station,lat,lon,water.depth) %>% mutate(Level="CTD Stations")
+dat.B <- left_join(dat.sample.id,dat.id) %>% dplyr::select(station,lat,lon,water.depth) %>%
+  group_by(station,lat,lon,water.depth) %>% summarise(N=length(station)) %>% dplyr::select(-N) %>% filter(is.na(lat)==F) %>%
   mutate(Level="Sampled Stations")
 dat.C <- dat.samp %>% dplyr::select(station,lat,lon) %>% group_by(station,lat,lon) %>% summarise(N=length(station)) %>%
-  dplyr::select(-N) %>% mutate(Level="Processed Stations")
+  dplyr::select(-N) %>% mutate(Level="Processed Stations") %>% 
+  left_join(.,dat.station.id.trim %>% dplyr::select(station,water.depth) )  
 
 
 ### THIS IS ALL OF THE CTD STATIONS.  IF YOU NEED A LAT LONG FOR EACH STATION, MERGE IN FROM HERE.
-dat.process <- bind_rows(dat.A,dat.B,dat.C)
+dat.process <- bind_rows(dat.A,dat.B,dat.C) %>% filter(!station=="")
 dat.process$Level <- factor(dat.process$Level, levels=c("CTD Stations","Sampled Stations","Processed Stations"))
+  # Calculate a Category for  water depth associated with each station.
 
-dat.lat.lon <- dat.process %>% dplyr::select(station,lat,lon) %>% 
-  group_by(station) %>% summarise(mean.lat=mean(lat),mean.lon=mean(lon)) %>% 
-  filter(!station=="") %>% rename(lat=mean.lat,lon=mean.lon)
+dat.lat.lon.water <- dat.process %>% group_by(station) %>% summarise(lat=mean(lat),lon=mean(lon),water.depth=mean(water.depth)) %>%
+                      mutate(water.depth.cat = case_when(water.depth >=2000 ~ "w_2000_plus",
+                                                         water.depth < 2000 & water.depth >=1250 ~ "w_1250_2000",
+                                                         water.depth < 1250 & water.depth >= 750 ~ "w_750_1250",
+                                                         water.depth < 750 & water.depth >= 400 ~ "w_400_750",
+                                                         water.depth < 400 & water.depth >= 250 ~ "w_250_400",
+                                                         water.depth < 250  & water.depth >= 125 ~ "w_125_250",
+                                                         water.depth < 125 & water.depth >= 75 ~ "w_75_125",
+                                                         water.depth < 75  ~ "w_0_75"), 
+                               water.depth.cat = case_when(station %in% c("26-3","27-8","49-7") ~ "w_2000_plus",
+                                                         station %in% c("47-9") ~ "w_1250_2000",
+                                                         TRUE ~ water.depth.cat )) %>%
+                      mutate(water.depth.cat.2= water.depth.cat, 
+                             water.depth.cat.2 = case_when(water.depth.cat %in% c("w_2000_plus","w_1250_2000","w_750_1250") ~ "1000+",
+                                                          #water.depth.cat %in% c("w_750_1250") ~ "1000",
+                                                          water.depth.cat %in% c("w_400_750") ~ "500",
+                                                          water.depth.cat %in% c("w_250_400") ~ "300",
+                                                          water.depth.cat %in% c("w_125_250") ~ "150",
+                                                          #water.depth.cat %in% c("w_75_125") ~ "100",
+                                                          water.depth.cat %in% c("w_0_75","w_75_125") ~ "50"))
+
+
 
 
 #### Plotting information
@@ -94,6 +115,18 @@ base_map <-ggplot(data = west_coast) +
   xlab("Longitude") +
   ylab("Latitude") +
   theme_bw()
+
+lat.lims.trim <- c(37.5,max(dat.id$lat,na.rm=T))
+lon.lims.trim <- c(min(dat.id$lon,na.rm=T),-122.5)
+
+base_map_trim <-ggplot(data = west_coast) + 
+  geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
+  coord_fixed(xlim=lon.lims.trim,ylim=lat.lims.trim,ratio=1.3) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw()
+
+
 
 sample.process <- base_map + 
   scale_color_manual(values=c(grey(0.6),"blue","red"))+
@@ -146,7 +179,7 @@ g_i_2 <- bind_rows(inhibit.summ %>% dplyr::select(-N_pcr,-N_rep),good.summ) %>%
   mutate(N=ifelse(is.na(N),0,N),
          Y=ifelse(is.na(Y),0,Y),
          Both=ifelse(N==1 & Y==1,1,0)) %>%
-  left_join(.,dat.lat.lon)
+  left_join(.,dat.lat.lon.water)
 
 #####
 g_i_3 <- g_i_2 %>% mutate(inhib_cat=case_when(N==1 & Y==0 ~ "None",
@@ -156,18 +189,18 @@ g_i_3$inhib_cat <- factor(g_i_3$inhib_cat,levels=c("All","Partial","None"))
 
 ### Make a spatial plot of inhibition
 
-inhibit.plot <- base_map +
+inhibit.plot <- base_map_trim +
   geom_point(data=g_i_3,aes(x=lon,y=lat,color=inhib_cat)) +
   scale_color_viridis_d(begin=0,end=0.8)+
   facet_wrap(~inhib_cat)
 
-inhibit.plot.by.depth <- base_map +
+inhibit.plot.by.depth <- base_map_trim +
   geom_point(data=g_i_3 %>% filter(is.na(depth_cat)==F),aes(x=lon,y=lat,color=inhib_cat),alpha=0.5) +
   facet_wrap(~depth_cat,nrow = 2) +
   scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
 
 
-inhibit.plot.by.depth.few <- base_map +
+inhibit.plot.by.depth.few <- base_map_trim +
   geom_point(data=g_i_3 %>% filter(depth_cat %in% c(0,50,100)) ,aes(x=lon,y=lat,color=inhib_cat),alpha=0.5) +
   facet_wrap(~depth_cat,nrow = 1) +
   scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
@@ -312,10 +345,14 @@ compare.hist
 #######################################################
 
 
-dat.hake <- left_join(dat.summary,dat.lat.lon) %>% filter(is.na(depth_cat)==F)
+dat.hake <- left_join(dat.summary,dat.lat.lon.water) %>% filter(is.na(depth_cat)==F) %>% mutate(neg.depth = -depth)
+LEV <- c("50","150","300","500","1000+") #,"1500+")
+dat.hake$water.depth.cat.2 <- factor(dat.hake$water.depth.cat.2,levels=LEV) 
+# drop sample sampled at 200m 
+dat.hake <- dat.hake %>% filter(!depth==200)
 
 BREAKS = c(-100,-2,0,1,2,3,4,5)
-hake.p1 <- base_map + 
+hake.p1 <- base_map_trim + 
   geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean.log),shape=21) +
   scale_size("Log Copies",breaks=BREAKS)+
   scale_shape("Log Copies",solid=FALSE)+
@@ -323,14 +360,14 @@ hake.p1 <- base_map +
 hake.p1
 
 LAB<-c(0.1,1,10,50,100,200,400)
-hake.p2 <- base_map + 
+hake.p2 <- base_map_trim + 
   geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
   scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
   scale_shape("Copies",solid=FALSE)+
   facet_wrap(~depth_cat,nrow=2)
 #hake.p2
 
-hake.p3 <- base_map + 
+hake.p3 <- base_map_trim + 
   geom_point(data=dat.hake%>%filter(depth_cat %in% c(0,50,150,300,500)),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
   scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
   scale_shape("Copies",solid=FALSE)+
@@ -338,51 +375,39 @@ hake.p3 <- base_map +
 #hake.p3
 
 ######################## 
-
+######################################################3
+######################################################3
+##### --------  Make 
+######################################################3
+######################################################3
 
 
 #### NEED TO DIFFERENTIATE AMONG CTDs in very deep water and ~500m.
-max.depth <- dat.hake %>% group_by(station) %>% summarise(max.depth.cat = max(depth_cat)) %>%
-  mutate(max.depth.cat = ifelse(max.depth.cat<50,50,max.depth.cat))
-dat.hake <- dat.hake %>% arrange(station, depth) %>% mutate(neg.depth = -depth) %>%
-  left_join(.,max.depth)
 
-dat.hake.sum.by.depth.cat <- dat.hake %>% group_by(max.depth.cat,depth_cat) %>%
+dat.hake.sum.by.depth.cat <- dat.hake %>% group_by(water.depth.cat.2,depth_cat) %>%
   summarise(N=length(Mean),MEAN=mean(Mean),SD=sd(Mean),
             MEDIAN=median(Mean),
             q.25=quantile(Mean,probs=0.25),
             q.75=quantile(Mean,probs=0.75))
 
 LAB<-c(0.1,1,10,50,100,200,400)
-depth.p1 <- ggplot(dat.hake %>% filter(max.depth.cat %in% c(150,300))) +
-  geom_point(aes(x=lat,y=neg.depth,size=Mean),alpha=0.5,color="red",shape=21) +
-  #geom_line(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.3) +
-  #scale_y_continuous(trans="log2") +
-  scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
-  scale_shape("Copies",solid=FALSE) +
-  #scale_scale_color_viridis(begin=0,end=0.8) +
-  xlab("Latitude") +
-  ylab("Depth") +
-  theme_bw()
-print(depth.p1)
 
-
-DEPTH.MAX <- 500
+DEPTH.MAX <- "500"
 LABEL = c(0.5,1,2,4,8,16,32,64,128,256) 
-depth.p2 <- ggplot(dat.hake %>% filter(max.depth.cat %in% c(DEPTH.MAX))) +
+depth.p2 <- ggplot(dat.hake %>% filter(water.depth.cat.2 %in% DEPTH.MAX)) +
   geom_point(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.5) +
   geom_line(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.3) +
   geom_point(data= dat.hake.sum.by.depth.cat %>% 
-               filter(max.depth.cat %in% c(DEPTH.MAX)),
+               filter(water.depth.cat.2 %in% DEPTH.MAX),
              aes(x=-depth_cat,y=MEDIAN),color="red",shape=16,size=3) +
   geom_point(data= dat.hake.sum.by.depth.cat %>% 
-               filter(max.depth.cat %in% c(DEPTH.MAX)),
+               filter(water.depth.cat.2 %in% DEPTH.MAX),
              aes(x=-depth_cat,y=MEAN),color="red",shape=22,size=3) +
   geom_line(data= dat.hake.sum.by.depth.cat %>% 
-              filter(max.depth.cat %in% c(DEPTH.MAX)),
+              filter(water.depth.cat.2 %in% DEPTH.MAX),
             aes(x=-depth_cat,y=MEDIAN),color="red") +
   geom_errorbar(data= dat.hake.sum.by.depth.cat %>% 
-                  filter(max.depth.cat %in% c(DEPTH.MAX)),
+                  filter(water.depth.cat.2 %in% DEPTH.MAX),
                 aes(x=-depth_cat,ymin=q.25,ymax=q.75),color="red",width=0) +
   scale_color_viridis("Latitude",begin=0,end=0.8) +
   scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL) +
@@ -401,21 +426,18 @@ print(depth.p2)
 # dat.hake.sum.by.depth.cat$max.depth.cat.fact <- factor(dat.hake.sum.by.depth.cat$max.depth.cat.fact,
 #                                                        levels=LEV)
 
-d.temp <- dat.hake.sum.by.depth.cat %>% 
-  filter(!max.depth.cat %in% c(0,200)) %>% 
-  arrange(max.depth.cat)
-d.temp$max.depth.cat = factor(d.temp$max.depth.cat,levels=c("50","100","150","300","500"))
+LIM <- c(0,max(dat.hake.sum.by.depth.cat$q.75)*1.05)
 
-LIM <- c(0,max(d.temp$q.75)*1.05)
-depth.p3 <- ggplot(d.temp) +
-  geom_point(aes(x=-depth_cat,y=MEDIAN,color=max.depth.cat),
+depth.p3 <- ggplot(dat.hake.sum.by.depth.cat) +
+  geom_point(aes(x=-depth_cat,y=MEDIAN,color=water.depth.cat.2),
              shape=16,size=3,alpha=0.8) +
   # geom_point(aes(x=-depth_cat,y=MEAN,color=max.depth.cat.fact),
   #           shape=16,size=3) +
-  geom_line(aes(x=-depth_cat,y=MEDIAN,color=max.depth.cat),alpha=0.5) + 
-  geom_errorbar(aes(x=-depth_cat,ymin=q.25,ymax=q.75,color=max.depth.cat),
-                width=10,alpha=0.5) +
-  scale_color_viridis_d("Max \nDepth",begin=0,end=0.8) +
+  geom_line(aes(x=-depth_cat,y=MEDIAN,color=water.depth.cat.2),alpha=0.6) + 
+  geom_ribbon(aes(x=-depth_cat,ymin=q.25,ymax=q.75,fill=water.depth.cat.2),
+                width=10,alpha=0.1) +
+  scale_color_viridis_d("Water Depth \nCategory(m)",begin=0,end=0.8) +
+  scale_fill_viridis_d("Water Depth \nCategory(m)",begin=0,end=0.8) +
   #scale_y_continuous(label=LABEL,breaks=LABEL) +
   scale_shape(solid=FALSE) +
   xlab("Depth") +
