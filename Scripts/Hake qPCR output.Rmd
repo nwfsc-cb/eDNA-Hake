@@ -98,10 +98,14 @@ print(hake.p3)
 ```
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-print(depth.p2)
+#print(depth.p2)
 ```
 
+\newpage
+This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)
+
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(depth.p3)
 print(depth.p4)
 ```
 
