@@ -23,9 +23,15 @@ data { /////////////////////////////////////////////////////////////////////////
     int bin_control[N_control_bin]      ; 
     vector[N_control_pos] pos_control   ;
     
-    // Covariates (log counts)
+    // Covariates (standards) (log counts)
     vector[N_stand_bin] D_bin_stand     ;
     vector[N_stand_pos] D_pos_stand ;
+    
+    // Covariates (samples) (log10(volume filtered))
+    vector[N_obs_bin] bin_vol_obs ;
+    vector[N_obs_pos] pos_vol_obs ;
+    vector[N_control_bin] bin_vol_control ;
+    vector[N_control_pos] pos_vol_control ;
 
     // Standard Indices
     int pcr_stand_bin_idx[N_stand_bin] ;
@@ -122,13 +128,13 @@ transformed parameters { ///////////////////////////////////////////////////////
     }
     for(i in 1:N_obs_bin){
        theta_obs[i]  = phi_0[pcr_obs_bin_idx[i]] + 
-                      phi_1[pcr_obs_bin_idx[i]] * (D[station_depth_bin_idx[i]] + singleton_bin_idx[i] * delta[sample_bin_idx[i]] - OFFSET) ;
+                      phi_1[pcr_obs_bin_idx[i]] * (D[station_depth_bin_idx[i]] + bin_vol_obs[i] + singleton_bin_idx[i] * delta[sample_bin_idx[i]] - OFFSET) ;
       //theta_samp[i]  = phi_0 + phi_1 * (D[bottle_bin_idx[i]] - OFFSET) ;
     }
 
     for(i in 1:N_control_bin){
        theta_control[i]  = phi_0[pcr_control_bin_idx[i]] + 
-                      phi_1[pcr_control_bin_idx[i]] * (D_control[sample_control_bin_idx[i]] - OFFSET) ;
+                      phi_1[pcr_control_bin_idx[i]] * (D_control[sample_control_bin_idx[i]] + bin_vol_control[i] - OFFSET) ;
       //theta_samp[i]  = phi_0 + phi_1 * (D[bottle_bin_idx[i]] - OFFSET) ;
     }
 
@@ -140,12 +146,12 @@ transformed parameters { ///////////////////////////////////////////////////////
     }
     for(i in 1:N_obs_pos){
       kappa_obs[i]  = beta_0[pcr_obs_pos_idx[i]] + 
-                        beta_1[pcr_obs_pos_idx[i]] * (D[station_depth_pos_idx[i]] + singleton_pos_idx[i] * delta[sample_pos_idx[i]] - OFFSET) ;
+                        beta_1[pcr_obs_pos_idx[i]] * (D[station_depth_pos_idx[i]] + pos_vol_obs[i] + singleton_pos_idx[i] * delta[sample_pos_idx[i]] - OFFSET) ;
       //kappa_samp[i]  = beta_0 + beta_1 * D[bottle_count_idx[i]] ;
     }
     for(i in 1:N_control_pos){
       kappa_control[i]  = beta_0[pcr_control_pos_idx[i]] + 
-                        beta_1[pcr_control_pos_idx[i]] * (D_control[sample_control_pos_idx[i]] - OFFSET) ;
+                        beta_1[pcr_control_pos_idx[i]] * (D_control[sample_control_pos_idx[i]] + pos_vol_control[i] - OFFSET) ;
       //kappa_samp[i]  = beta_0 + beta_1 * D[bottle_count_idx[i]] ;
     }
     

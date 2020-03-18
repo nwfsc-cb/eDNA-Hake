@@ -8,6 +8,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r,echo=FALSE,warning=FALSE, include=FALSE}
+rm(list=ls())
+# This calls both the qPCR results and the acoustic data.
+# define species
+SPECIES <- "hake"
 source("post-process qPCR STAN Output.R")
 ```
 
@@ -49,7 +53,7 @@ print(inhibit.plot.by.depth.few)
 \newpage
 ### Standards
 
-The standards used in the qPCR assay look pretty reasonable good.  Each color represents a different PCR plate.
+The standards used in the qPCR assay look pretty reasonable good.  Each color represents a different PCR plate. They are pretty much on top of each other.
 
 ```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
 print(stand.plot)
@@ -59,21 +63,26 @@ print(stand.plot)
 print(stand.plot.pres)
 ```
 
+```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(stand.plot.facet)
+```
+
+
 
 \newpage
 ### Controls
 
 There are two main types of control: field negative control and extraction controls.  The extraction controls have never produced any measurable amount of hake DNA, so we will ignore them for now.
 
-Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples. Out of the `r N_control_run`, `r N_control_positive` have detectable amounts of hake DNA. In general the amount of detected hake DNA is low  but is non-zero. 
+Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples.  Out of the `r N_control_run`, `r N_control_positive` have detectable amounts (> `r detect.lev` Copies $L^{-1}$) of hake DNA. In general the amount of detected hake DNA is low  but is non-zero. 
 
 ```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
-print(control.hist)
+print(control.hist1)
 ```
 
-We can look at the temporal pattern of the control values too.  This will be more informative when we have more samples analyzed.
+We can look at the temporal pattern of the control values too.  This will be more informative when we have more samples analyzed. The highest levels of contamination seem to come from the Evaporated DI water controls... and occur later in the sampling season. These counts now also account for the amount of water filtered in each negative control.
 
-```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
+```{r,echo=FALSE,fig.height=3,fig.width=6,warning=FALSE}
 print(control.by.time)
 ```
 
@@ -83,23 +92,50 @@ print(control.by.time)
 We can first ask if the distribution of estimated hake DNA compare to the values present in the field samples.  The water samples are substantially larger than the controls... which is good.
 
 ```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
-print(compare.hist)
+print(compare.hist2)
 ```
 
 Let's make some plots of the spatial distribution of hake DNA.
 
 ```{r,echo=FALSE,fig.height=8,warning=FALSE}
-print(hake.p2)
+print(SP.p2)
 ```
 
 
 ```{r,echo=FALSE,fig.height=9,warning=FALSE}
-print(hake.p3)
+print(SP.p3)
+```
+
+\newpage
+## Acoustic Data.  
+
+This is a spatial plot of the biomass from the acoustic surveys. The raw data is in 0.5 nm longitudinal bins. To make things prettier for plotting, I have aggregated the data into `r 0.5*BY` nm bins. Unlike the eDNA data, the acoustic data does not currently have biomass estimated by depth strata.  It does have the mean depth associated with each 0.5 nm bin and the estimated width of the hake layer, though.  I make some of those plots later.
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(hake.acoustic.binned.p1)
+```
+
+## Acoustic and eDNA Data.  
+
+Here are a few plots from individual transects.  Coast is on the right side of the graph
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.27")
+print(SP.transect.plots[[nom]])
 ```
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-#print(depth.p2)
+nom <-as.name("Transect.39")
+print(SP.transect.plots[[nom]])
 ```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.53")
+print(SP.transect.plots[[nom]])
+```
+
+
+
 
 \newpage
 This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)

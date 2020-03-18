@@ -1,5 +1,4 @@
 ###
-rm(list=ls())
 library(tidyverse)
 library(knitr)
 library(reshape2)
@@ -10,20 +9,30 @@ library(mapdata)
 library(ggplot2)
 
 
+script.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Scripts"
+# load and run in the acoustic data.
+setwd(script.dir)
+source("process acoustic data.R")
+# get bathymetry data.
+source("pull NOAA bathy for acoustic data.R")
 
 # Read in the output from the Stan model
-base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
+base.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
 setwd(base.dir)
-load("qPCR Hake 2019 hake Fitted.RData")
+
+# CHANGE THIS FOR switching between species.
+SPECIES <- "hake"
+
+load(paste("qPCR 2019",SPECIES, "Fitted.RData"))
 
 ### Get some of the output on sample and station IDs from file.
 dat.samp <- Output.qpcr$dat.obs.bin
-dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,Output.qpcr$field_neg_out)
+dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,Output.qpcr$field_neg_out_liter)
 
 dat.summary <- dat.samp %>%
   group_by(date,transect,station,station.depth,depth,station_depth_idx) %>%
   dplyr::summarise(N=length(unique(sample_idx)))
-dat.summary <- left_join(dat.summary,Output.qpcr$station_depth_out)
+dat.summary <- left_join(dat.summary,Output.qpcr$station_depth_out_liter)
 dat.summary <- dat.summary %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
                                                           depth ==25 ~ 25,  
                                                           depth > 25  & depth <= 50  ~ 50,
@@ -43,7 +52,7 @@ dat.inhibit <- Output.qpcr$dat.inhibit %>% mutate(depth_cat=case_when(depth < 25
                                                                       depth > 400 & depth <=500 ~ 500))
 
 ##### Calculate some info about the field negative controls
-field.neg.summ <- Output.qpcr$field_neg_out 
+field.neg.summ <- Output.qpcr$field_neg_out_liter 
 
 N.station.run       <- length(unique(c(dat.inhibit$station,dat.samp$station)))
 N.station.depth.run <- length(unique(c(dat.inhibit$station.depth,dat.samp$station.depth)))
@@ -99,34 +108,19 @@ dat.lat.lon.water <- dat.process %>% group_by(station) %>% summarise(lat=mean(la
                                                           water.depth.cat %in% c("w_0_75","w_75_125") ~ "50"))
 
 
-
-
 #### Plotting information
-states <- map_data("state")
-west_coast <- subset(states, region %in% c("california", "oregon", "washington"))
 
 # Plot for all samples
 lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
 lon.lims <- c(min(dat.id$lon,na.rm=T),max(dat.id$lon,na.rm=T))
 
-base_map <-ggplot(data = west_coast) + 
-  geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
-  coord_fixed(xlim=lon.lims,ylim=lat.lims,ratio=1.3) +
-  xlab("Longitude") +
-  ylab("Latitude") +
-  theme_bw()
-
 lat.lims.trim <- c(37.5,max(dat.id$lat,na.rm=T))
 lon.lims.trim <- c(min(dat.id$lon,na.rm=T),-122.5)
 
-base_map_trim <-ggplot(data = west_coast) + 
-  geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
-  coord_fixed(xlim=lon.lims.trim,ylim=lat.lims.trim,ratio=1.3) +
-  xlab("Longitude") +
-  ylab("Latitude") +
-  theme_bw()
 
-
+# Call Base_map.R
+setwd(script.dir)
+source("Base_map.R")
 
 sample.process <- base_map + 
   scale_color_manual(values=c(grey(0.6),"blue","red"))+
@@ -255,6 +249,8 @@ stand.plot <- stand.plot +
 #scale_x_continuous(labels = paste0("1e",LABS),limits = c(-2,4))
 stand.plot
 
+
+
 stand.plot.facet <- stand.plot +facet_wrap(~qPCR,ncol=2)
 
 # Plot occurrence of standard
@@ -288,27 +284,32 @@ SAMPLES.CONTROL <- Output.qpcr$SAMPLES.CONTROL
 dat.id.control <-  Output.qpcr$dat.id.control
 field.neg.summ <- left_join(SAMPLES.CONTROL,field.neg.summ) %>% left_join(.,dat.id.control)
 
-BREAKS <- seq(0,30,by=0.1)
+BREAKS <- seq(0,1000,by=10)
 XLIM <- c(0,max(field.neg.summ$Mean)*1.1)
-control.hist <- ggplot(field.neg.summ) +
-  geom_histogram(aes(Mean),breaks=BREAKS) +
-  xlab("Estimated copies per uL") +
+control.hist1 <- ggplot(field.neg.summ) +
+  geom_histogram(aes(Mean,fill=field.negative.type),breaks=BREAKS) +
+  xlab("Estimated copies per L") +
+  scale_fill_discrete("Type")+
   ylab("Number of negative controls") +
   xlim(XLIM) +
   theme_bw()
 
-ALPHA = 0.5 
+ALPHA = 0.9 
 control.by.time <- ggplot(field.neg.summ) +
-  geom_point(aes(x=date,y=Mean),alpha=ALPHA) +
-  geom_errorbar(aes(x=date,ymin=Val.X5.,ymax=Val.X95.),alpha=ALPHA,width=0) +
+  geom_point(aes(x=date,y=Mean,fill=field.negative.type,color=field.negative.type),alpha=ALPHA,shape=21) +
+  geom_errorbar(aes(x=date,ymin=Val.X5.,ymax=Val.X95.,color=field.negative.type),alpha=ALPHA,width=0) +
   xlab("Date") +
-  ylab("Copies per uL") +
+  ylab("Copies per L") +
+  scale_fill_discrete("Type")+
+  scale_color_discrete("Type")+
+  geom_hline(aes(yintercept = 20),linetype="dashed")+
   theme_bw()
 
-
-N_control_positive <- field.neg.summ %>% filter(Mean>0.10) %>% nrow(.)
+#control.by.time.trim <- control.by.time + ylim(c(0,1000))
+detect.lev = 20
+N_control_positive <- field.neg.summ %>% filter(Mean > detect.lev ) %>% nrow(.)
 N_control_run <- nrow(field.neg.summ)
-N_control_total <- nrow(dat.control.field.neg)
+N_control_total <- dat.id.control %>% filter(control=="field") %>% nrow(.)
 
 #######################################################
 #######################################################
@@ -324,19 +325,17 @@ dat.sum.v.control <- bind_rows(dat.summary %>% dplyr::select(date,
                                                                 Mean,Val.X5.,Val.X95.) %>% mutate(cat="control") %>% as.data.frame()
 )
 
-
-
-BREAKS <- 10^(c(-4,seq(-1,3,by=0.25)))
+BREAKS <- 10^(c(-2,seq(log10(20),5,by=0.25)))
 XLIM <- c(0,max(dat.sum.v.control$Mean)*1.01)
-compare.hist <- ggplot(dat.sum.v.control) +
+compare.hist2 <- ggplot(dat.sum.v.control) +
   geom_histogram(aes(Mean,fill=cat),breaks=BREAKS,alpha=0.5,position="identity",) +
-  xlab("Estimated copies per uL") +
+  xlab("Estimated Copies/L") +
   ylab("Number of Samples") +
   xlim(XLIM) +
   scale_fill_viridis_d("Category",begin=0,end=0.5,) +
   scale_x_log10() +
   theme_bw()
-compare.hist
+compare.hist2
 
 #######################################################
 #######################################################
@@ -345,46 +344,148 @@ compare.hist
 #######################################################
 
 
-dat.hake <- left_join(dat.summary,dat.lat.lon.water) %>% filter(is.na(depth_cat)==F) %>% mutate(neg.depth = -depth)
+dat.SP <- left_join(dat.summary,dat.lat.lon.water) %>% filter(is.na(depth_cat)==F) %>% mutate(neg.depth = -depth)
 LEV <- c("50","150","300","500","1000+") #,"1500+")
-dat.hake$water.depth.cat.2 <- factor(dat.hake$water.depth.cat.2,levels=LEV) 
+dat.SP$water.depth.cat.2 <- factor(dat.SP$water.depth.cat.2,levels=LEV) 
 # drop sample sampled at 200m 
-dat.hake <- dat.hake %>% filter(!depth==200)
+dat.SP <- dat.SP %>% filter(!depth==200)
 
 BREAKS = c(-100,-2,0,1,2,3,4,5)
-hake.p1 <- base_map_trim + 
-  geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean.log),shape=21) +
-  scale_size("Log Copies",breaks=BREAKS)+
+SP.p1 <- base_map_trim + 
+  geom_point(data=dat.SP,aes(x=lon,y=lat,size=Mean.log),shape=21) +
+  scale_size("Log Copies per L",breaks=BREAKS)+
   scale_shape("Log Copies",solid=FALSE)+
   facet_wrap(~depth_cat)
-hake.p1
+SP.p1
 
-LAB<-c(0.1,1,10,50,100,200,400)
-hake.p2 <- base_map_trim + 
-  geom_point(data=dat.hake,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
-  scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
-  scale_shape("Copies",solid=FALSE)+
-  facet_wrap(~depth_cat,nrow=2)
-#hake.p2
 
-hake.p3 <- base_map_trim + 
-  geom_point(data=dat.hake%>%filter(depth_cat %in% c(0,50,150,300,500)),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
-  scale_size("Copies",labels=LAB,breaks=LAB,range=c(0.1,6))+
-  scale_shape("Copies",solid=FALSE)+
+  summary(dat.SP$Mean)
+  lower.lim <- 20
+  LAB<-c(lower.lim,100,1000,10000,20000)
+SP.p2 <- base_map_trim + 
+    geom_point(data=dat.SP,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+    scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+    geom_point(data=dat.SP%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+    scale_shape("Copies / L",solid=FALSE)+
+    facet_wrap(~depth_cat,nrow=2)
+SP.p2
+  
+SP.p3 <- base_map_trim + 
+  geom_point(data=dat.SP %>% filter(!depth_cat==25),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+  geom_point(data=dat.SP%>% filter(Mean<=lower.lim,!depth_cat==25),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_shape("Copies / L",solid=FALSE)+
   facet_wrap(~depth_cat,nrow=2)
-#hake.p3
+SP.p3
 
 ######################## 
 ######################################################3
 ######################################################3
-##### --------  Make 
+##### --------  Make Transect Cross-section plots.
 ######################################################3
 ######################################################3
+if(SPECIES=="hake"){
+## OK.  I'm hoping this is a way of plotting he overlap between the eDNA 
+## and the acoustic data.
+
+coast.ref.point <- dat.acoustic %>% filter(near.coast==1) %>% dplyr::select(transect, lat, lon,near.coast)
+coast.ref.point$transect <- as.character(coast.ref.point$transect)
+
+temp.all <- NULL
+TRANS <-  sort(unique(dat.SP$transect))
+for(i in 1:length(TRANS)){
+  
+  temp <- dat.SP %>% filter(transect == TRANS[i])
+  ref  <- coast.ref.point %>%filter(transect == TRANS[i]) %>% select(lon,lat)
+  D <- distGeo(p1=as.matrix(data.frame(lon=temp$lon,lat=temp$lat)),p2=ref)
+  D <- D / 1000
+  temp <- temp %>% as.data.frame() %>% mutate(dist.km = D) %>% arrange(dist.km) %>% mutate(id.numb = 1:nrow(temp))
+  temp.all <- bind_rows(temp.all,temp)
+}
+
+dat.SP      <- left_join(dat.SP,temp.all)
+
+dat.acoustic  <- dat.acoustic %>% mutate(mean.depth = ifelse(mean.depth==0,NA,mean.depth) )
 
 
+
+#################
+## OK. Make some plots
+#################
+ 
+
+ALP.red =0.5
+ALP.blue = 0.3
+ALP.blue.line = 0.8
+
+
+lower.lim.copies = 10
+BREAK.copies = c(10,100,500,1000,2500,5000,7500,10000,20000)
+LAB.copies= BREAK.copies
+
+dat.acoustic$transect <- as.character(dat.acoustic$transect)
+dat.merge <- full_join(dat.SP %>% dplyr::select(transect,lat,lon,dist.km,neg.depth,Mean) ,
+                       dat.acoustic %>% dplyr::select(transect,lat,lon,dist.km,mean.depth,biomass_mt,layer.thickness))
+
+SP.transect.plots <- list()
+
+for(i in 1:length(TRANS)){
+  nom <- as.name(paste0("Transect.",TRANS[i]))
+  SP.transect.plots[[nom]] <- 
+    ggplot(dat.merge%>% filter( transect== TRANS[i])) +
+    geom_point(aes(x= dist.km, y=mean.depth,size=biomass_mt,shape="Biomass",color="Biomass"),alpha=ALP.blue.line) +  
+    geom_point(aes(x= dist.km, y=depth,size=Mean,shape="Copies / L",color="Copies / L"),alpha=ALP.red) +
+    geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
+                  aes(x= dist.km, y=depth),shape="x") +
+    scale_size(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,NA)) +  
+    # plot the bathymetry
+    geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
+                  aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
+    geom_ribbon(data=dat.acoustic %>% filter( transect== TRANS[i]),
+               aes(x=dist.km,
+                   ymin=mean.depth - 0.5*layer.thickness,
+                   ymax=mean.depth + 0.5*layer.thickness),fill="blue",alpha=ALP.blue)+
+    scale_shape_manual("Type",values=c(21,16),labels=c("Biomass","Copies / L")) +
+    scale_color_manual("Type",values=c("blue","red"),labels=c("Biomass","Copies / L")) +
+    xlab("Distance from start of transect (km)") +
+    ylab("Depth(m)") +
+    ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
+                  dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
+    coord_cartesian(ylim=c(0,500))+
+    scale_x_reverse() +
+    scale_y_reverse() +
+    theme_bw()
+}
+
+
+setwd("../Plots and figures")
+pdf(file="Hake transect profiles.pdf",onefile = T,height=6,width=7)
+  print(SP.transect.plots)
+dev.off()
+
+}else{ #### THIS IS A SECTION FOR non-hake plots
+  
+  
+  
+}
+
+
+
+######################################################3
+######################################################3
+######################################################3
+######################################################3
+######################################################3
+##### --------  Make Some Marginal Plots
+######################################################3
+######################################################3
+######################################################3
+######################################################3
+######################################################3
+######################################################3
 #### NEED TO DIFFERENTIATE AMONG CTDs in very deep water and ~500m.
 
-dat.hake.sum.by.depth.cat <- dat.hake %>% group_by(water.depth.cat.2,depth_cat) %>%
+dat.SP.sum.by.depth.cat <- dat.SP %>% group_by(water.depth.cat.2,depth_cat) %>%
   summarise(N=length(Mean),MEAN=mean(Mean),SD=sd(Mean),
             MEDIAN=median(Mean),
             q.25=quantile(Mean,probs=0.25),
@@ -392,43 +493,48 @@ dat.hake.sum.by.depth.cat <- dat.hake %>% group_by(water.depth.cat.2,depth_cat) 
 
 LAB<-c(0.1,1,10,50,100,200,400)
 
-DEPTH.MAX <- "500"
-LABEL = c(0.5,1,2,4,8,16,32,64,128,256) 
-depth.p2 <- ggplot(dat.hake %>% filter(water.depth.cat.2 %in% DEPTH.MAX)) +
-  geom_point(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.5) +
-  geom_line(aes(x=neg.depth,y=Mean,group=station,color=lat),alpha=0.3) +
-  geom_point(data= dat.hake.sum.by.depth.cat %>% 
-               filter(water.depth.cat.2 %in% DEPTH.MAX),
-             aes(x=-depth_cat,y=MEDIAN),color="red",shape=16,size=3) +
-  geom_point(data= dat.hake.sum.by.depth.cat %>% 
-               filter(water.depth.cat.2 %in% DEPTH.MAX),
-             aes(x=-depth_cat,y=MEAN),color="red",shape=22,size=3) +
-  geom_line(data= dat.hake.sum.by.depth.cat %>% 
-              filter(water.depth.cat.2 %in% DEPTH.MAX),
-            aes(x=-depth_cat,y=MEDIAN),color="red") +
-  geom_errorbar(data= dat.hake.sum.by.depth.cat %>% 
-                  filter(water.depth.cat.2 %in% DEPTH.MAX),
-                aes(x=-depth_cat,ymin=q.25,ymax=q.75),color="red",width=0) +
+
+LABEL = c(8,16,32,64,128,256,512,1024,2048,4096,8188,16376) 
+depth.p2 <- ggplot(dat.SP) +
+  geom_point(aes(x=depth,y=Mean,group=station,color=lat),alpha=0.5) +
+  geom_line(aes(x=depth,y=Mean,group=station,color=lat),alpha=0.3) +
+  geom_point(data= dat.SP.sum.by.depth.cat,
+             aes(x=depth_cat,y=MEDIAN,group=water.depth.cat.2),color="red",shape=16,size=3) +
+  geom_point(data= dat.SP.sum.by.depth.cat,
+             aes(x=depth_cat,y=MEAN,group=water.depth.cat.2),color="red",shape=22,size=3) +
+  geom_line(data= dat.SP.sum.by.depth.cat,
+            aes(x=depth_cat,y=MEDIAN,group=water.depth.cat.2),color="red") +
+  geom_errorbar(data= dat.SP.sum.by.depth.cat,
+                aes(x=depth_cat,ymin=q.25,ymax=q.75,group=water.depth.cat.2),color="red",width=0) +
   scale_color_viridis("Latitude",begin=0,end=0.8) +
-  scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL) +
+  scale_x_reverse() +
+  scale_y_continuous(limits=c(20,25000),trans="log2",label=LABEL,breaks=LABEL) +
   scale_shape(solid=FALSE) +
   xlab("Depth") +
   ylab("Copies") +
   coord_flip() +
+  facet_wrap(~water.depth.cat.2,ncol=2)+
   theme_bw()
 print(depth.p2)
 
 
-# dat.hake.sum.by.depth.cat <- dat.hake.sum.by.depth.cat %>%
+
+
+
+
+
+
+
+# dat.SP.sum.by.depth.cat <- dat.SP.sum.by.depth.cat %>%
 #                               mutate(max.depth.cat.fact=as.factor(max.depth.cat))
-# LEV <- unique(dat.hake.sum.by.depth.cat$max.depth.cat.fact)
+# LEV <- unique(dat.SP.sum.by.depth.cat$max.depth.cat.fact)
 # 
-# dat.hake.sum.by.depth.cat$max.depth.cat.fact <- factor(dat.hake.sum.by.depth.cat$max.depth.cat.fact,
+# dat.SP.sum.by.depth.cat$max.depth.cat.fact <- factor(dat.SP.sum.by.depth.cat$max.depth.cat.fact,
 #                                                        levels=LEV)
 
-LIM <- c(0,max(dat.hake.sum.by.depth.cat$q.75)*1.05)
+LIM <- c(0,max(dat.SP.sum.by.depth.cat$q.75)*1.05)
 
-depth.p3 <- ggplot(dat.hake.sum.by.depth.cat) +
+depth.p3 <- ggplot(dat.SP.sum.by.depth.cat) +
   geom_point(aes(x=-depth_cat,y=MEDIAN,color=water.depth.cat.2),
              shape=16,size=3,alpha=0.8) +
   # geom_point(aes(x=-depth_cat,y=MEAN,color=max.depth.cat.fact),

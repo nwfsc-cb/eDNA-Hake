@@ -56,11 +56,13 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
 
     
   dat.sample.control.id <- dat.sample.id %>% mutate(date= as.Date(Date.UTC,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>%
-                                  dplyr::select(sample=Tube..,date,year,month,day)
+                                  dplyr::select(sample=Tube..,date,year,month,day,drop.sample,field.negative.type,volume = water.filtered..L.,)
   dat.sample.id  <- dat.sample.id %>% dplyr::select(sample=Tube..,
                                                   station=CTD.cast,
                                                   Niskin,
                                                   depth,
+                                                  drop.sample,
+                                                  field.negative.type,
                                                   volume = water.filtered..L.,
                                                   Fluor,
                                                   Zymo=Zymo.columns)
@@ -76,6 +78,7 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
                                        depth=="300/150" ~ "300",
                                        depth=="" ~ "0",
                                        TRUE ~depth))
+
 
 dat.id.control <- dat.id %>% filter(!control == "no") %>% dplyr::select(sample,volume,control) %>% left_join(.,dat.sample.control.id)
 dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric(as.character(depth)))
@@ -100,8 +103,8 @@ dat.stand <- dat.stand %>% dplyr::select(THESE,grep(SP,colnames(dat.stand))) %>%
     # Make sure there are sufficient samples for each qPCR
     stand.summary <- dat.stand %>% group_by(qPCR,copies_ul) %>% summarise(N= length(copies_ul)) %>% as.data.frame()
     PCR <- data.frame(qPCR=unique(dat.stand$qPCR),plate_idx= 1:length(unique(dat.stand$qPCR)))
-    dat.stand <- left_join(dat.stand,PCR) 
-
+    dat.stand <- left_join(dat.stand,PCR)
+    
 
 # SAMPLES, ntc and control
 dat.samp <- dat.all %>% dplyr::select(THESE,useful,Zymo,grep(SP,colnames(dat.all))) %>%
@@ -123,9 +126,12 @@ dat.samp <- dat.all %>% dplyr::select(THESE,useful,Zymo,grep(SP,colnames(dat.all
                         IPC_Ct=ifelse(is.na(IPC_Ct)==T,-99,IPC_Ct), 
                         IPC_Ct=as.numeric(IPC_Ct)) %>%
                   filter(type=="unknowns")
-dat.samp <- left_join(dat.samp,dat.id.samp,by="sample")
+dat.samp <- left_join(dat.samp,dat.id.samp,by="sample") %>%
+                    filter(!drop.sample == "Y") # drop samples that hit the bench top
 
+dat.samp <- dat.samp %>% mutate(vol.standard = volume/2.5)
 
+# Separate out the non-template controls and the field controls.
 dat.ntc <- dat.all %>% filter(type=="ntc") %>% mutate(IPC_Ct = as.numeric(as.character(IPC_Ct))) %>%
                       group_by(qPCR) %>% 
                       dplyr::summarise(mean.ntc = mean(IPC_Ct),sd.ntc=sd(IPC_Ct))
@@ -144,7 +150,10 @@ dat.control <- dat.all %>% filter(grepl("neg",type)|type=="extc") %>%
                               IPC_Ct=ifelse(is.na(IPC_Ct)==T,-99,IPC_Ct), 
                               IPC_Ct=as.numeric(IPC_Ct))
                   
-dat.control <- left_join(dat.control,dat.sample.control.id,by="sample")
+dat.control <- left_join(dat.control,dat.sample.control.id,by="sample") %>% 
+                  filter(!drop.sample == "Y") # drop samples that hit the bench top
+
+dat.control <- dat.control %>% mutate(vol.standard = volume/2.5)
 dat.control.field.neg <-   dat.control %>% filter(type=="field_neg")
 
 
@@ -224,9 +233,13 @@ stan_data = list(
   
   "bin_obs"    = dat.obs.bin$Ct_bin,
   "pos_obs"    = dat.obs.pos$Ct,
+  "bin_vol_obs"= log10(dat.obs.bin$vol.standard),
+  "pos_vol_obs"= log10(dat.obs.pos$vol.standard),  
   
   "bin_control"    = dat.control.bin$Ct_bin,
   "pos_control"    = dat.control.pos$Ct,
+  "bin_vol_control"= log10(dat.control.bin$vol.standard),
+  "pos_vol_control"= log10(dat.control.pos$vol.standard),  
   
   # Indices and counters
   "N_pcr"    = N_pcr,    # Number of PCR plates
@@ -316,7 +329,7 @@ stan_pars = c(
         # phi_0_bar = runif(1,10,25),
         # phi_1_bar = rnorm(1,5,1),
         phi_0  = runif(N_pcr,0,5),
-        phi_1  = rnorm(N_pcr,3,1),
+        phi_1  = rnorm(N_pcr,3,0.5),
         D      = rnorm(N_station_depth,0,2),
         D_control  = rnorm(N_control_sample,0,2),
         # gamma  = rnorm(N_hybrid,0,2)
@@ -336,8 +349,8 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
   
 N_CHAIN = 5
-Warm = 2000
-Iter = 5000
+Warm = 5000
+Iter = 15000
 Treedepth = 11
 Adapt_delta = 0.70
 
@@ -345,7 +358,7 @@ LOC <- paste0(base.dir,"/Scripts/Stan Files/")
 setwd(LOC)
 
 stanMod = stan(file = "qPCR_Hake.stan" ,data = stan_data, 
-               verbose = FALSE, chains = N_CHAIN, thin = 5, 
+               verbose = FALSE, chains = N_CHAIN, thin = 15, 
                warmup = Warm, iter = Warm + Iter, 
                control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                pars = stan_pars,
@@ -384,8 +397,13 @@ base_params <- c(
 ) 
 
 ##### MAKE SOME DIAGNOSTIC PLOTS
+TRACE <- list()
+TRACE[[as.name("Phi0")]] <- traceplot(stanMod,pars=c("lp__","phi_0"),inc_warmup=FALSE)
+TRACE[[as.name("Phi1")]] <- traceplot(stanMod,pars=c("lp__","phi_1"),inc_warmup=FALSE)
+TRACE[[as.name("Beta0")]] <- traceplot(stanMod,pars=c("lp__","beta_0"),inc_warmup=FALSE)
+TRACE[[as.name("Beta1")]] <- traceplot(stanMod,pars=c("lp__","beta_1"),inc_warmup=FALSE)
+TRACE[[as.name("Var")]] <- traceplot(stanMod,pars=c("lp__","tau_sample","sigma_stand_int","sigma_pcr"),inc_warmup=FALSE)
 
-print(traceplot(stanMod,pars=c("lp__",base_params),inc_warmup=FALSE))
 
 #pairs(stanMod, pars = c(base_params), log = FALSE, las = 1)
 
@@ -430,7 +448,8 @@ stand.plot <- stand.plot +
   geom_line(data=STAND.REG,aes(x=X,y=Y,color=qPCR)) +
   scale_color_discrete(name="qPCR Plate") +
   ylab("PCR cycle")  +
-  xlab("log10 copies DNA") 
+  xlab("log10 copies DNA") +
+  facet_wrap(~qPCR)
 #scale_x_continuous(labels = paste0("1e",LABS),limits = c(-2,4))
 stand.plot
 
@@ -462,7 +481,14 @@ stand.plot.pres
 ################################################################################################
 ################################################################################################
 ################################################################################################
-################################################################################################
+###############################################################################################
+
+# THIS IS THE FACTOR FOR EXPANDING FROM COPIES PER ul to COPIES PER L 
+# Based on sampling volume of 2.5 L
+
+EXPAND <- 40
+LOG.EXPAND <- log10(EXPAND)
+
 PROBS <- c(0.025,0.05,0.10,0.25,0.5,0.75,0.9,0.95,0.975)
 Log   <- paste0("log",PROBS)
 station_depth_out <- data.frame(station_depth_idx= 1:ncol(pars$D), 
@@ -473,6 +499,16 @@ station_depth_out <- data.frame(station_depth_idx= 1:ncol(pars$D),
                          Sd=apply(10^pars$D,2,sd),
                          Val=data.frame(t(apply(10^pars$D,2,quantile,probs=PROBS))))
 
+station_depth_out_liter <- data.frame(station_depth_idx= 1:ncol(pars$D), 
+                                Mean.log=apply(pars$D+LOG.EXPAND,2,mean),
+                                Sd.log=apply(pars$D+LOG.EXPAND,2,sd),
+                                Log.Val=data.frame(t(apply(pars$D+LOG.EXPAND,2,quantile,probs=PROBS))),
+                                Mean=apply(10^(pars$D+LOG.EXPAND),2,mean),
+                                Sd=apply(10^(pars$D+LOG.EXPAND),2,sd),
+                                Val=data.frame(t(apply(10^(pars$D+LOG.EXPAND),2,quantile,probs=PROBS))))
+
+
+
 field_neg_out <- data.frame(sample_control_idx= 1:ncol(pars$D_control), 
                                 Mean.log=apply(pars$D_control,2,mean),
                                 Sd.log=apply(pars$D_control,2,sd),
@@ -481,6 +517,13 @@ field_neg_out <- data.frame(sample_control_idx= 1:ncol(pars$D_control),
                                 Sd=apply(10^pars$D_control,2,sd),
                                 Val=data.frame(t(apply(10^pars$D_control,2,quantile,probs=PROBS))))
 
+field_neg_out_liter <- data.frame(sample_control_idx= 1:ncol(pars$D_control), 
+                                  Mean.log=apply(pars$D_control+LOG.EXPAND,2,mean),
+                                  Sd.log=apply(pars$D_control+LOG.EXPAND,2,sd),
+                                  Log.Val=data.frame(t(apply(pars$D_control+LOG.EXPAND,2,quantile,probs=PROBS))),
+                                  Mean=apply(10^(pars$D_control+LOG.EXPAND),2,mean),
+                                  Sd=apply(10^(pars$D_control+LOG.EXPAND),2,sd),
+                                  Val=data.frame(t(apply(10^(pars$D_control+LOG.EXPAND),2,quantile,probs=PROBS))))
 
 delta_out <- data.frame(sample_idx= 1:ncol(pars$delta), 
                                 Mean.log=apply(pars$delta,2,mean) ,
@@ -492,6 +535,7 @@ delta_out <- data.frame(sample_idx= 1:ncol(pars$delta),
 
 
 Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = pars, samp_params=samp_params,
+                    TRACE <- TRACE,
                     SPECIES = SP,
                     dat.station.id.trim=dat.station.id.trim,
                     dat.sample.id=dat.sample.id,
@@ -516,15 +560,13 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     stand.plot = stand.plot,
                     stand.plot.pres = stand.plot.pres,
                     station_depth_out=station_depth_out,
+                    station_depth_out_liter=station_depth_out_liter,
                     field_neg_out=field_neg_out,
-                    delta_out=delta_out
-)
+                    field_neg_out_liter=field_neg_out_liter,
+                    delta_out=delta_out)
 
 setwd(base.dir)
 setwd("./Stan Model Fits/")
-save(Output.qpcr,file=paste("qPCR Hake 2019",SP,"Fitted.RData"))
-####
-# you need to run the above code several times.  once for each species-standard combination.
-
+save(Output.qpcr,file=paste("qPCR 2019",SP,"Fitted.RData"))
 #################################################################
 ##################################
