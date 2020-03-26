@@ -76,7 +76,7 @@ There are two main types of control: field negative control and extraction contr
 
 Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples.  Out of the `r N_control_run`, `r N_control_positive` have detectable amounts (> `r detect.lev` Copies $L^{-1}$) of hake DNA. In general the amount of detected hake DNA is low  but is non-zero. 
 
-```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
+```{r,echo=FALSE,fig.height=3,fig.width=6,warning=FALSE}
 print(control.hist1)
 ```
 
@@ -91,7 +91,7 @@ print(control.by.time)
 
 We can first ask if the distribution of estimated hake DNA compare to the values present in the field samples.  The water samples are substantially larger than the controls... which is good.
 
-```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
 print(compare.hist2)
 ```
 
@@ -138,11 +138,11 @@ print(SP.transect.plots[[nom]])
 
 
 \newpage
-This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)
+This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf.  Points from individual transects are connected.  Note log2 x-axis
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-print(depth.p3)
-print(depth.p4)
+print(depth.p2)
+
 ```
 
 

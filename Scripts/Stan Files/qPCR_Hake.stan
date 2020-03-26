@@ -197,6 +197,6 @@ model {/////////////////////////////////////////////////////////////////////////
       phi_1 ~ normal(4, 2) ;
 
       delta ~ normal(0,tau_sample) ;
-      tau_sample ~ gamma(1,1) ;
+      tau_sample ~ gamma(2,2) ;
 
 }

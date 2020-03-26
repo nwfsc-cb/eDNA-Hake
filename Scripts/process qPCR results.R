@@ -85,7 +85,7 @@ dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric
 
 ###########################################################################
 ## DECLARED SPECIES OF INTEREST
-SP <- "hake" # options: hake, lamprey, eulachon
+SP <- "eulachon" # options: hake, lamprey, eulachon
 ###########################################################################
 
 # STANDARDS 
@@ -535,7 +535,7 @@ delta_out <- data.frame(sample_idx= 1:ncol(pars$delta),
 
 
 Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = pars, samp_params=samp_params,
-                    TRACE <- TRACE,
+                    TRACE = TRACE,
                     SPECIES = SP,
                     dat.station.id.trim=dat.station.id.trim,
                     dat.sample.id=dat.sample.id,

@@ -21,7 +21,7 @@ base.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
 setwd(base.dir)
 
 # CHANGE THIS FOR switching between species.
-SPECIES <- "hake"
+#SPECIES <- "eulachon"
 
 load(paste("qPCR 2019",SPECIES, "Fitted.RData"))
 
@@ -206,7 +206,6 @@ inhibit.plot.by.depth.few <- base_map_trim +
 ###################################################################
 ###################################################################
 
-
 OFFSET <- Output.qpcr$OFFSET
 pars <- Output.qpcr$samp
 PCR <- Output.qpcr$PCR
@@ -384,12 +383,13 @@ SP.p3
 ##### --------  Make Transect Cross-section plots.
 ######################################################3
 ######################################################3
-if(SPECIES=="hake"){
+
 ## OK.  I'm hoping this is a way of plotting he overlap between the eDNA 
 ## and the acoustic data.
 
 coast.ref.point <- dat.acoustic %>% filter(near.coast==1) %>% dplyr::select(transect, lat, lon,near.coast)
 coast.ref.point$transect <- as.character(coast.ref.point$transect)
+
 
 temp.all <- NULL
 TRANS <-  sort(unique(dat.SP$transect))
@@ -407,27 +407,24 @@ dat.SP      <- left_join(dat.SP,temp.all)
 
 dat.acoustic  <- dat.acoustic %>% mutate(mean.depth = ifelse(mean.depth==0,NA,mean.depth) )
 
-
-
-#################
-## OK. Make some plots
-#################
- 
-
-ALP.red =0.5
-ALP.blue = 0.3
-ALP.blue.line = 0.8
-
-
-lower.lim.copies = 10
-BREAK.copies = c(10,100,500,1000,2500,5000,7500,10000,20000)
-LAB.copies= BREAK.copies
-
 dat.acoustic$transect <- as.character(dat.acoustic$transect)
 dat.merge <- full_join(dat.SP %>% dplyr::select(transect,lat,lon,dist.km,neg.depth,Mean) ,
                        dat.acoustic %>% dplyr::select(transect,lat,lon,dist.km,mean.depth,biomass_mt,layer.thickness))
 
 SP.transect.plots <- list()
+
+#################
+## OK. Make some plots
+#################
+if(SPECIES=="hake"){ 
+
+ALP.red =0.5
+ALP.blue = 0.3
+ALP.blue.line = 0.8
+
+lower.lim.copies = 20
+BREAK.copies = c(20,100,500,1000,2500,5000,7500,10000,20000,30000)
+LAB.copies= BREAK.copies
 
 for(i in 1:length(TRANS)){
   nom <- as.name(paste0("Transect.",TRANS[i]))
@@ -437,7 +434,7 @@ for(i in 1:length(TRANS)){
     geom_point(aes(x= dist.km, y=depth,size=Mean,shape="Copies / L",color="Copies / L"),alpha=ALP.red) +
     geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
                   aes(x= dist.km, y=depth),shape="x") +
-    scale_size(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,NA)) +  
+    scale_size_continuous(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,max(BREAK.copies))) +  
     # plot the bathymetry
     geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
                   aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
@@ -466,7 +463,42 @@ dev.off()
 }else{ #### THIS IS A SECTION FOR non-hake plots
   
   
+  ALP.red =0.5
+  ALP.blue = 0.3
+  ALP.blue.line = 0.8
   
+  lower.lim.copies = 20
+  BREAK.copies = c(20,100,500,1000,2500,5000,7500,10000,20000,40000)
+  LAB.copies= BREAK.copies
+  
+  for(i in 1:length(TRANS)){
+    nom <- as.name(paste0("Transect.",TRANS[i]))
+    SP.transect.plots[[nom]] <- 
+      ggplot(dat.merge%>% filter( transect== TRANS[i])) +
+
+      geom_point(aes(x= dist.km, y=depth,size=Mean),alpha=ALP.red,color="red",shape=16) +
+      geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
+                 aes(x= dist.km, y=depth),shape="x") +
+      scale_size_continuous(name="Copies / L",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,max(BREAK.copies))) +  
+      # plot the bathymetry
+      geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
+                   aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
+      # scale_shape_manual("Copies / L",values=c(16),labels=c("Copies / L")) +
+      # scale_color_manual("Copies / L",values=c("red"),labels=c("Copies / L")) +
+      xlab("Distance from start of transect (km)") +
+      ylab("Depth(m)") +
+      ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
+                     dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
+      coord_cartesian(ylim=c(0,500))+
+      scale_x_reverse() +
+      scale_y_reverse() +
+      theme_bw()
+  }
+
+  setwd("../Plots and figures")
+  pdf(file=paste(SPECIES,"transect profiles.pdf"),onefile = T,height=6,width=7)
+  print(SP.transect.plots)
+  dev.off()
 }
 
 
@@ -482,7 +514,6 @@ dev.off()
 ######################################################3
 ######################################################3
 ######################################################3
-######################################################3
 #### NEED TO DIFFERENTIATE AMONG CTDs in very deep water and ~500m.
 
 dat.SP.sum.by.depth.cat <- dat.SP %>% group_by(water.depth.cat.2,depth_cat) %>%
@@ -491,13 +522,13 @@ dat.SP.sum.by.depth.cat <- dat.SP %>% group_by(water.depth.cat.2,depth_cat) %>%
             q.25=quantile(Mean,probs=0.25),
             q.75=quantile(Mean,probs=0.75))
 
-LAB<-c(0.1,1,10,50,100,200,400)
+MIN.bin <- 10
+dat.SP <- dat.SP %>% mutate(Mean.binned = ifelse(Mean<=MIN.bin,MIN.bin,Mean))
+LIM <- c(MIN.bin,max(dat.SP$Mean.binned))
 
-
-LABEL = c(8,16,32,64,128,256,512,1024,2048,4096,8188,16376) 
 depth.p2 <- ggplot(dat.SP) +
-  geom_point(aes(x=depth,y=Mean,group=station,color=lat),alpha=0.5) +
-  geom_line(aes(x=depth,y=Mean,group=station,color=lat),alpha=0.3) +
+  geom_point(aes(x=depth,y=Mean.binned,group=station,color=lat),alpha=0.5) +
+  geom_line(aes(x=depth,y=Mean.binned,group=station,color=lat),alpha=0.3) +
   geom_point(data= dat.SP.sum.by.depth.cat,
              aes(x=depth_cat,y=MEDIAN,group=water.depth.cat.2),color="red",shape=16,size=3) +
   geom_point(data= dat.SP.sum.by.depth.cat,
@@ -506,12 +537,13 @@ depth.p2 <- ggplot(dat.SP) +
             aes(x=depth_cat,y=MEDIAN,group=water.depth.cat.2),color="red") +
   geom_errorbar(data= dat.SP.sum.by.depth.cat,
                 aes(x=depth_cat,ymin=q.25,ymax=q.75,group=water.depth.cat.2),color="red",width=0) +
+  geom_hline(yintercept=20, linetype="dashed") +
   scale_color_viridis("Latitude",begin=0,end=0.8) +
   scale_x_reverse() +
-  scale_y_continuous(limits=c(20,25000),trans="log2",label=LABEL,breaks=LABEL) +
+  scale_y_continuous(limits=LIM,trans="log2") +
   scale_shape(solid=FALSE) +
   xlab("Depth") +
-  ylab("Copies") +
+  ylab(expression("Copies L"^-1)) +
   coord_flip() +
   facet_wrap(~water.depth.cat.2,ncol=2)+
   theme_bw()

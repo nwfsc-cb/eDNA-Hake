@@ -15,7 +15,7 @@ SPECIES <- "eulachon"
 source("post-process qPCR STAN Output.R")
 ```
 
-## eDNA from the 2019 Hake cruise 
+## eDNA from the 2019 Hake cruise, `r SPECIES` 
 
 ### Sampling and processing to date.
 
@@ -74,7 +74,7 @@ print(stand.plot.facet)
 
 There are two main types of control: field negative control and extraction controls.  The extraction controls have never produced any measurable amount of DNA, so we will ignore them for now.
 
-Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples. Out of the `r N_control_run`, `r N_control_positive` have detectable amounts of eulachon DNA. In general the amount of detected eulachon DNA is low  but is non-zero. 
+Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples.  Out of the `r N_control_run`, `r N_control_positive` have detectable amounts (> `r detect.lev` Copies $L^{-1}$) of eulachon DNA. In general the amount of detected eulachon DNA is pretty much zero. 
 
 ```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
 print(control.hist1)
@@ -87,22 +87,18 @@ print(control.by.time)
 ```
 
 
-And here is one with the crazy outlier removed. Dashed line is the detection threshold (1 copy per uL)
 
-```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
-print(control.by.time.trim)
-```
 
 \newpage
 ## Eulachon eDNA
 
-We can first ask if the distribution of estimated DNA compare to the values present in the field samples.  The water samples are substantially larger than the controls... which is good.
+We can first ask if the distribution of estimated DNA compare to the values present in the field samples. The vast majority of samples have effectively 0 eulachon DNA. 
 
 ```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
 print(compare.hist2)
 ```
 
-Let's make some plots of the spatial distribution of eulachon DNA.
+Let's make some plots of the spatial distribution of eulachon DNA.  I think that it is clear that the major problem is with inhibition in the surface samples for eulachon. There are a lot of missing data points for eulachon.
 
 ```{r,echo=FALSE,fig.height=8,warning=FALSE}
 print(SP.p2)
@@ -120,28 +116,29 @@ There is no acoustic information for eulachon.
 
 ## eDNA transects.  
 
-Here are a few plots from individual transects.  Coast is on the right side of the graph
-
+Here are a few plots from individual transects.  Coast is on the right side of the graph. 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
 nom <-as.name("Transect.27")
 print(SP.transect.plots[[nom]])
 ```
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-nom <-as.name("Transect.39")
+nom <-as.name("Transect.61")
 print(SP.transect.plots[[nom]])
 ```
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-nom <-as.name("Transect.53")
+nom <-as.name("Transect.65")
 print(SP.transect.plots[[nom]])
 ```
 
-
-
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.67")
+print(SP.transect.plots[[nom]])
+```
 
 \newpage
-This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)
+This is a plot of median (plus interquartile range) for eulachon DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
 print(depth.p3)
