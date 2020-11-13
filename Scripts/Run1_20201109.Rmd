@@ -1,0 +1,66 @@
+---
+title: "Preview Run 1"
+author: "Ramon Gallego"
+date: "11/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library (tidyverse)
+library (here)
+library (insect)
+```
+
+
+
+# Load run 
+```{r load data}
+set_here(here("Data", "Pipeline_output", "Run1", "noprimers", "outputs"))
+eDNA.samples <- read_csv(file = here("Data", "eDNA hake water samples.csv")) %>% 
+  rename(Station = `CTD cast`, Tube = `Tube #`) %>% 
+  mutate(Tube = as.character(Tube))
+
+ASV.table <- read_csv(here("Data", "Pipeline_output", "Run1", "noprimers", "outputs", "ASV_table.csv"))
+
+ASV.table %>% 
+  separate(Sample_name, into = c("Tube", "Rep"), sep = "\\.") %>% 
+  left_join(eDNA.samples) -> ASV.table
+
+insect.tree <- read_rds(here("Data", "classifier_16S_all_node05.rds"))
+salmon.tree <- read_rds (here("Data", "Salmon_tree_with_added_seqs.rds"))
+Input_fasta <- readFASTA(here("Data", "Pipeline_output", "Run1", "noprimers", "outputs", "hash_key.fasta"))  
+```
+
+
+## Classify all Hashes
+
+```{r}
+Hashes.clas.1 <- classify(Input_fasta, insect.tree)
+# A separate tree for salmon
+Hashes.clas2 <- classify(Input_fasta, salmon.tree)
+
+
+```
+
+
+# Read depth
+
+```{r}
+ASV.table %>% 
+  group_by(Tube, Station, depth) %>% 
+  summarise (n_Hash = n_distinct(Hash),
+             n_Reads =sum(nReads))
+```
+
+
+
