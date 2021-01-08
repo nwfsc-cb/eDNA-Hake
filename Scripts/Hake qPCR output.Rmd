@@ -30,7 +30,7 @@ print(sample.process.facet)
 
 ### Inhibition
 
-There are a lot of samples that show signs of inhibition. They are concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. 
+There were a lot of samples that show signs of inhibition. They were concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. 
 
 ```{r,echo=FALSE}
 kable(g_i_dat)
