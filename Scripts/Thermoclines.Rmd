@@ -80,6 +80,8 @@ thermocline2 %>%
   mutate (Temp_diff = map2_dbl (Temp_above, Temp_below, ~.x - .y)) %>% 
   dplyr::select(CTD_Cast, Thermocline, Temp_diff, SST) %>% 
   left_join(list.of.stations.to.keep) -> data.with.lat
+
+write_rds(data.with.lat, here("Data", "thermocline.data.for.plotting"))
 ```
 
 ```{r}

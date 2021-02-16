@@ -3,6 +3,8 @@ title: 'Library Preparation: Samples 1-48 - 16_Prey'
 output:
   html_document:
     df_print: paged
+editor_options: 
+  chunk_output_type: console
 ---
 This is the lab book for the samples from the first biot of the Hake eDNA project -These are 16S_Prey Amplicons. 
 
@@ -25,6 +27,12 @@ Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>%
 
 Samples_to_Sequence <- bind_rows(Plate22, Plate23)
 ```
+
+## Amplification Success so far
+
+I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment. 
+
+
 
 These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294. 
 
@@ -58,206 +66,43 @@ If all numbers are 1 or 0, then proceed to save the output in the googlesheet. W
 #gs_title("Samples_OA_good") %>% gs_edit_cells( ws = "Sequencing_run_Apr_18b", input = output)	
 ```
 I prepare now some tables with the samples that go with each Tag - so it's easier to load the right primers into PCR2. In this case, I'm using OA_Samples (You could also use 'output', but this data has already been uploaded to the googlesheet).
+```{r}
+Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:96) %>% 
+  mutate(Row = rep(LETTERS[1:8], 12), 
+         Column = rep(1:12,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
 
-
-```{r cool tables for PCR2, results='asis'}
-OA_Samples %>% separate(Well_in_AMPureXP,into = c("Row","Column"), sep = 1, remove = F) -> OA_Samples
-PCR2_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
-PCR2_table[with (OA_Samples, cbind(Row,Column))] <- with(OA_Samples, Tag) # Populate it with the Tag that goes on each well
-print_table<-function(x){
-    PCR2_table[PCR2_table!=x ]<-"."
-    kable (PCR2_table, align= "c", format = "html") %>%
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
       kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
       column_spec(1, bold=T) %>%
       column_spec(1:13, width= "1cm")
        
-  } #Create a function that prints only 1 Tag at the time
-
-map(tagNames, print_table) #Run it along the 16 Tags
- 
-```
-### Preparing PCR2
-
-Now we prepare the PCR2 Reaction - In this case in PCR295. Some of them did not work and were rerun on later PCRs.
-
-After that, we clean the PCR2 prouducts using AMPUreXP (15 uL PCR product, 20 uL AMPure, 2x washes with 200uL 80% EtOH, elut in 20 uL PCR water) and Qubit the cleaned products. The following chunk of code does 3 things: 
-
-1. Reload the googlesheet with the updated Qubit values - and because we did not succeeded in all of them at once, we repeated some and use the good qubit values
-2. Create two vectors with the number of samples per library and the targeted amount of DNA per library
-3. Calculate how many uL are required from each sample
-
-```{r load gsheet with qubit values, results = 'hold', message = F}
-#Reload
-OA_Samples<-gs_read_csv(gs_title("Samples_OA_good"), ws = "Sequencing_run_Apr_18b")
-
-#Create the vectors
-samplesperlib <- with(OA_Samples, rowSums(table(Lib,Tag))) ##How many samples per library
-
-ngpersample   <- 250/samplesperlib # How many ng of each sample in its library
-
-#Calculates how many uL from each sample  
-
-OA_Samples %>% mutate (qvalue= ifelse (!is.na(qubit3),qubit3,Qubit)) %>% #chooses the right qubit value
-  select (Sample, Well_in_AMPureXP, Tag, Lib, qvalue) %>% # Selects the useful variables
-  group_by(Lib) %>% mutate(vol_to_pool=round(ngpersample[Lib]/qvalue,1)) -> OA_Samples
-
-
-```
- We'll do a quick check that all values add up to a similar amount - 250 ng
-```{r check calculations, results = 'asis'}
- 
-#Lets check that the calculations worked
-OA_Samples %>% mutate(ngpers = vol_to_pool * qvalue) %>% group_by(Lib) %>% summarise(mean(ngpers),
-                                                                                       min(ngpers),
-                                                                                     sum(ngpers)) %>%
-  kable(align= "c", format = 'html') %>%
-  kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
-  column_spec(1:3, width= "3cm")
-```
-
-### Pooling samples for library ligation
-
-The next step is to pool the right volume from the right well in the 96 well plate into the right tube for library ligation. So this is basically the same thing we did for PCR2, but with an extra layer of difficulty. Remember to change volumes in the pipette between samples.
-
-```{r pooling samples, results= 'asis'}
-
-OA_Samples %>% separate(Well_in_AMPureXP,into = c("Row","Column"), sep = 1, remove = F) -> OA_Samples
-
-split(OA_Samples,OA_Samples$Lib) -> list1
- 
-subset_and_table<-function(dfs){
-  Ligation_table<-matrix(data = ".", nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12))
-  
-  Ligation_table[with(dfs, cbind(Row,Column))] <- with (dfs, vol_to_pool)
-  kable(Ligation_table, align= "c", format = 'html') %>% 
-    kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>% 
-    column_spec(1, bold=T) %>%
-    column_spec(1:13, width= "1cm")
-}
-
-map(list1,subset_and_table)
 
 ```
 
-Now we have `r n_distinct(OA_Samples$Lib)` tubes. According to the library ligation protocol, we have to prepare 50 uL of each library, so now we have to add PCR H2O 
-```{r add water, results = 'asis'}
 
-OA_Samples %>% 
-  group_by (Lib) %>% summarise(Total=sum(vol_to_pool,na.rm = T)) %>%
-  mutate(Add_water= 50 - Total) %>% kable(align= "c", format = 'html') %>%
-  kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
-  column_spec(1:3, width= "3cm")
+```{r PCR50}
+Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:48) %>% 
+  mutate(Row = rep(LETTERS[1:8], 6), 
+         Column = rep(5:10,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
 
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
+      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
+      column_spec(1, bold=T) %>%
+      column_spec(1:13, width= "1cm")
+       
 ```
 
-### Library ligation
-
-The process of preparing libraries can be split into:
-
-1. Blunt end and A-tailing. To prepare the amplicons for ligation:
-![Mix for A-tailing](/Users/Moncho/Google_Drive/Kelly_Lab/Projects/OA_eDNA/Data/Lab_books/1.Atailing.png)
-
-And run the program KAPAEND in the Termocycler
-
-2. Straight after that, prepare the ligation mix: here is when we add the right volume of adapters. For 150-250 ng of DNA, the desired molar ratio is about 50:1. So we will add 3 uL of each adapter (each of them are at 25 uM). We will prepare a mix of all the reagents except for the adapter:
-```{r Master Mix, results = 'asis'}
-kable(data_frame(Component=c("Ligase","Ligase Buffer", "H20"),
-                 Volume_per_Rx=c(10,30,7),
-                 Total=c(61,183, 42.7)),
-      caption="Master Mix for ligation", format = 'html') %>%
-  kable_styling(bootstrap_options= "striped", full_width = F, position = "left") %>%
-  column_spec(1:3, width= "3cm")
-
-kable(data_frame(Component=c("Library","Ligase Mix", "Adapter"),
-                 Volume= c(60,47,3)),
-      caption = "Ligation Reaction", format='html') %>% 
-  kable_styling(bootstrap_options= "striped", full_width = F, position = "left") %>%
-  column_spec(1:2, width= "3cm")
-
-```
-The ligation Reaction occurs at room temperature. You can use the Program KAPAADAP (that runs for an hour) or have it gone for even longer.
-
-3. Proceed to Library Cleanup. Use all the rx volume and add 88 uL of Beads. Wash 2x with 200 uL of 80% Ethanol and resuspend on 25 uL of PCR water. Transfer to a new well. Use 2 uL for Qubit, keep 1 uL for Bioanalyzer and use 20 uL as template for the library amplification
-![Mix for Library Amplification](/Users/Moncho/Google_Drive/Kelly_Lab/Projects/OA_eDNA/Data/Lab_books/4.LibraryAmp.png)
-
-You need to adjust the number of cycles to the desired amount. If your start point were 250 ng of DNA, you probably don't need a lot of cycles so anywhere around 4 cycles is ok. The main point is to over represent "ready" libraries over those that did not get both adapters during the ligation reaction
-
-4. Final Cleanup. Use all Product Again
-
-![Cleanup2](/Users/Moncho/Google_Drive/Kelly_Lab/Projects/OA_eDNA/Data/Lab_books/5.Cleanup2.png)
-
-Again, wash 2x with 200uL of 80% Ethanol and elute in 25 ul of PCR water. Qubit 1 uL. Run a bioanalyzer chip. It can run 12 samples so we run Libraries 1-6 before and after Library Amplification.
-```{r last table}
-Libs= paste0("Lib_", LETTERS[1:6], "_", c(rep("Before_LibAMP",6), rep("After_LibAMP",6)))
-Lib_final_con<-data_frame(Well_in_Bioanalyzer=1:12,
-                 Library=Libs, 
-                 Qubit_ng=c(8.62,9.35,8.71,9.72,9.44,10.2,40,45.6,39.1,34.6,49.4,29))
-kable(Lib_final_con,
-      caption="Bioanalyzer Assay", format = "html") %>% kable_styling(full_width= F,position = "center", bootstrap_options="striped")
-      
-```
-Now, using the Qubit data, dilute and pool the 6 libraries for sequencing. We are using a v2 sequencing kit. So we will aim for a 4nM final concentration. We know that the fragment -with adapters- has a length of 629 bp. So using the formula to convert the MW of libraries from https://support.illumina.com/bulletins/2016/11/converting-ngl-to-nm-when-calculating-dsdna-library-concentration-.html 
-\frac {concentration in ng/uL}{660 * library size} 10^6 = concentration in nM
-So in our case
-\frac {concentration in ng/uL}{415140}10^6 = 4nM
-our target concentration in ng/ul is 
-concentration in ng/uL = \frac{415140 * 4}{10^6} = `r (415140 * 4)/ 10^6 `
-
-In order to dilute our libraries to 1.66 ng/uL, we are going to mix 5 uL of each library with the apropriate volume of PCR water, and then pool 5 uL of each diluted library
-
-```{r}
-Lib_final_con %>% slice(7:12) %>% mutate ("PCR water to 4nM" = round(((Qubit_ng + 1.66)*5)/1.66,2))
-
-```
-I then pooled 5 uL of each library - ended up with 30 ul of 4nM libraries. Go to the next step
-## Denature and dilute libraries
-Follow the Illumina protocol for a v2 500 sequencing kit. We start with the preparation of 0.2 N NaOH from 2.0 N NaOH.  Mix 2 $\mu L$ of 2.0 N NaOH with 18 $\mu L$ of PCR water.
-
-### Denature 4nM library
-Mix 5$\mu L$ of 0.2 N NaOH and 5$\mu L$ of 4nM library. Vortex briefly and incubate at room temperature for 5 minutes. Then add 990 5$\mu L$ of HT1 buffer. The result is 1 mL of 20pM denatured library
-### Dilute to final concentration
-Our target concentration for a v2 kit is 8 pM - so we mix 240 $\mu L$ of 20pM library with 360 $\mu L$ of HT1 buffer
-### Prepare the PhiX Spike -
-EJP's last run resulted on a very low - 0.01% - Phix reads, which didn't affect the clustering or quality of the data. So, instead of aiming for 5 or 10% PhiX, we aimed for 1%. We used an already denatured PhiX, made less than 2 weeks ago. So we mixed 6 $\mu L$ of 12 pM Phix with 594 $\mu L$ of 8 pM library.
-## Load reagents, flow cell and set up the run
-Thaw the cartdridge in a room temperature water bath - takes 1 hr or so, so do it in advance. Check that all reagents have thawed, primarily the purple one. Mix by turning upside down several times. Then tap it against the bench to minimize bubbles. Then pierce the foil covering the "load sample" well with a pipette tip and load the 600 $\mu L$ of denatured-diluted-spiked library.
-
-Clean the flow cell with ddH2O to remove salt deposits from the storage buffer. Then dry with a kimwipe and re dry with a kimwipe sprayed with 80% Ethanol. Be3 careful around the loading gasket. 
-
-Follow the screen directions and select a samplesheet. You can copy a previous one (the adapters are the same), but check the date and the number of cycles (for our kit, 2x251). This is how it looks.
-
-![Samplesheet](/Users/Moncho/Google_Drive/Kelly_Lab/Projects/OA_eDNA/Data/Lab_books/Samplesheet.png)
-## Get ready for when the data arrives 
-
-Data will come in 6 pairs of fastq files. In order to process it we have to prepare a parameters file and a metadata file. In the params file: make a copy of banzai_parms_for_DADA2 and keep it on the folder you are keeping the fastq files. The metadata file should be this
-```{r}
-sampleNames=gs_read_csv(gs_title("Samples_OA_good"), ws = "Samples_OA_good") %>% 
-  filter(Month %in% c("May","June")) %>%
-  select(SampleShort, Site, Station, Month)
-#Primers master sheet
-primers=gs_read_csv(gs_title("primers_master"), ws="indexed_only") %>% #read the primers gs
-  select(locus,direction, tag_sequence=`index_sequence (5' -> 3')`, 
-         Tag=index_number, primer_seq=`primer_sequence (5' -> 3')`) %>%     #Select only the interesting tags
-  mutate(Tag=paste0("Tag_",Tag)) %>%        #mMake Tag the same format as in samples.run
-  filter(locus=="COI")        #We only need COI
-  #For each locus and Tag, 
-alfa<-primers %>%
-  group_by(Tag) %>%
-  spread(key = direction, value = primer_seq)
-rm(primers)
-
-OA_Samples %>%
-  left_join(alfa, by = "Tag") %>%
-  select(sample_id=Sample,
-         sec_index_seq=tag_sequence,
-         primerF_seq="F",
-         primerR_seq=R,
-         Tag, Lib) %>%
-  mutate(SampleShort=str_replace(sample_id,".[0-9]$",""),
-         Combo= paste(Tag, Lib,sep = "_"),
-         insert_size=313,
-         sec_index_start=4) %>%
-  left_join(sampleNames, by = "SampleShort") %>% write_csv(path = "metadata_May_June17.csv")
- 
-```
-Congratulations and see you for your next run
