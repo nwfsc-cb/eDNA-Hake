@@ -8,6 +8,7 @@ library(ggplot2)
 library(rstan)
 library(lubridate)
 library(reshape2)
+library(gridExtra)
 
 # Working directories
 base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
@@ -16,11 +17,13 @@ plot.dir <- paste0(base.dir,"Plots and figures")
 
 # Pull in qPCR data, qPCR standards, sample id information
 setwd(data.dir)
-dat.all <- read.csv("./qPCR/Hake_eDNA_2019_qPCR_results.csv")
-dat.stand <- read.csv("./qPCR/Hake_eDNA_2019_qPCR_standards.csv")
+dat.all <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
+dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.csv")
+dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2020-12-15 sample details.csv")
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
-dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.csv")
 
+######################################################
+# PROCESS CTD LOCATION DATA FIRST
 # Modify and clean CTD data 
   # fix lat-lon data
   dat.station.id <- dat.station.id %>% filter(Button == "CTD at Depth" | Station.. == "49-9") %>% 
@@ -45,7 +48,6 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
   dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>% 
                               rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE) 
     
-
         d.temp <- dat.station.id %>% group_by(date,year,month,day,station, transect) %>%
                     summarise(m.lat=mean(lat),m.lon=mean(lon),m.water.depth=mean(water.depth)) %>%
                     rename(lat=m.lat,lon=m.lon,water.depth=m.water.depth)
@@ -53,17 +55,25 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
   dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, station, transect) %>%
                             # this combines the latitude and longitude to make a single concensus value for each Station.
                             left_join(d.temp,.)
-
+  # get rid of a small number of duplicate stations in this data.frame.
+  A <- dat.station.id.trim %>% group_by(station) %>% summarise(N=length(date)) %>% filter(N>1)
+  THESE  <- A$station[A$station!=""]
+  temp   <- dat.station.id.trim %>% filter(station %in% THESE) %>% arrange(station)
+  #pull out every other row to drop duplicates.
+  temp <- temp[seq(1,nrow(temp),by=2),]
+  
+  dat.station.id.trim <- dat.station.id.trim %>% filter(!station %in% THESE) %>% bind_rows(.,temp)
     
+  ##
   dat.sample.control.id <- dat.sample.id %>% mutate(date= as.Date(Date.UTC,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>%
-                                  dplyr::select(sample=Tube..,date,year,month,day,drop.sample,field.negative.type,volume = water.filtered..L.,)
+                                  dplyr::select(sample=Tube..,date,year,month,day,drop.sample,field.negative.type,volume = water.filtered.L,)
   dat.sample.id  <- dat.sample.id %>% dplyr::select(sample=Tube..,
                                                   station=CTD.cast,
                                                   Niskin,
                                                   depth,
                                                   drop.sample,
                                                   field.negative.type,
-                                                  volume = water.filtered..L.,
+                                                  volume = water.filtered.L,
                                                   Fluor,
                                                   Zymo=Zymo.columns)
 
@@ -79,20 +89,19 @@ dat.sample.id  <- read.csv("./2019 Hake- Shimada cruise - eDNA water sampling.cs
                                        depth=="" ~ "0",
                                        TRUE ~depth))
 
-
 dat.id.control <- dat.id %>% filter(!control == "no") %>% dplyr::select(sample,volume,control) %>% left_join(.,dat.sample.control.id)
 dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric(as.character(depth)))
 
 ###########################################################################
 ## DECLARED SPECIES OF INTEREST
-SP <- "eulachon" # options: hake, lamprey, eulachon
+SP <- "hake" # options: hake, lamprey, eulachon
 ###########################################################################
 
 # STANDARDS 
 THESE <- c("qPCR","well","sample","type","IPC_Ct","inhibition_rate")
 cut.plates <- c("H8")
 
-dat.stand <- dat.stand %>% dplyr::select(THESE,grep(SP,colnames(dat.stand))) %>% 
+dat.stand <- dat.stand %>% dplyr::select(all_of(THESE),grep(SP,colnames(dat.stand))) %>% 
                       rename(task=paste0(SP,"_task"),Ct=paste0(SP,"_Ct"),copies_ul = paste0(SP,"_copies_ul")) %>%
                       filter(task=="STANDARD",!qPCR%in%cut.plates) %>%
                       mutate(Ct=as.character(Ct),
@@ -107,7 +116,7 @@ dat.stand <- dat.stand %>% dplyr::select(THESE,grep(SP,colnames(dat.stand))) %>%
     
 
 # SAMPLES, ntc and control
-dat.samp <- dat.all %>% dplyr::select(THESE,useful,Zymo,grep(SP,colnames(dat.all))) %>%
+dat.samp <- dat.all %>% dplyr::select(all_of(THESE),useful,Zymo,dilution,grep(SP,colnames(dat.all))) %>%
                   filter(!qPCR%in%cut.plates) %>%
                   mutate(sample=as.character(sample),
                          sample=case_when(grepl("a",sample)~substr(sample,1,4),
@@ -126,18 +135,58 @@ dat.samp <- dat.all %>% dplyr::select(THESE,useful,Zymo,grep(SP,colnames(dat.all
                         IPC_Ct=ifelse(is.na(IPC_Ct)==T,-99,IPC_Ct), 
                         IPC_Ct=as.numeric(IPC_Ct)) %>%
                   filter(type=="unknowns")
-dat.samp <- left_join(dat.samp,dat.id.samp,by="sample") %>%
-                    filter(!drop.sample == "Y") # drop samples that hit the bench top
+dat.samp <- left_join(dat.samp,dat.id.samp,by="sample") 
 
+# Do some modifications to all of the samples first.
+# Calculate the volume sampled for each sample
 dat.samp <- dat.samp %>% mutate(vol.standard = volume/2.5)
 
+# drop samples that hit the bench top
+dat.samp <- dat.samp %>% filter(!drop.sample %in% c("Y","Y?"))#,!useful=="NO") 
+
+dat.samp.begin <- dat.samp %>% group_by(sample) %>% summarise(N=length(sample)) %>% as.data.frame()
+
+### CHECK THE SAMPLES THAT HAD TROUBLE WITH WASHING (drop.sample == "30EtOH" or "30EtOHpaired")
+dat.wash <- dat.samp %>% filter(drop.sample %in% c("30EtOH","30EtOHpaired"))
+
+  # find unique depth-station combinations among these stations.
+  dat.wash$station <- as.factor(dat.wash$station)
+  uni.wash <- dat.wash %>% group_by(station,depth,Niskin,drop.sample) %>% summarise(N=length(station)) %>% mutate(status="washed") %>% ungroup()
+
+  pairs.wash <- dat.samp %>% filter(!drop.sample %in% c("30EtOH","30EtOHpaired"))
+  pairs.wash <- uni.wash %>% dplyr::select(station,depth) %>% left_join(.,pairs.wash) %>% 
+                filter(is.na(Niskin)==F) %>% mutate(status="unwashed")
+
+  dat.wash <- dat.wash %>% mutate(status="washed")
+
+  dat.wash.all <- bind_rows(dat.wash,pairs.wash) %>% arrange(station,depth)
+
+  dat.wash.summary <- dat.wash.all %>% group_by(station,depth,Niskin,status) %>% summarise(N=length(status)) %>% arrange(station,depth,status)
+  dat.wash.summary <- dat.wash.summary %>% as.data.frame() 
+
+  # There are 24 paired samples with which to estimate the effect of the 30% EtOH treatment
+  print(nrow(dat.wash.summary[dat.wash.summary$status=="unwashed",]))
+
+  # add indicator for membership in 30EtOH club and associated pairs
+  # 0 = normal sample. 1 = washed with 30% etoh. 2= pair of washed with 30% EtOH sample
+    dat.wash.all <- dat.wash.all %>% mutate(wash.indicator = ifelse(status == "washed",1,2)) %>%
+                    dplyr::select(-status)
+    # This indicator variable gets used in the STAN code.
+    dat.wash.all <- dat.wash.all %>% mutate(wash_idx = ifelse(wash.indicator==1,1,0))
+
+  # find samples that were washed with 30% EtOH, exclude them from dat.samp, 
+  # then add them back in with needed indicator variables
+  exclude  <- unique(dat.wash.all$sample)
+  dat.samp <- dat.samp %>% mutate(wash.indicator=0,wash_idx=0) %>% filter(!sample %in% exclude) %>% 
+              bind_rows(.,dat.wash.all)
+  
 # Separate out the non-template controls and the field controls.
 dat.ntc <- dat.all %>% filter(type=="ntc") %>% mutate(IPC_Ct = as.numeric(as.character(IPC_Ct))) %>%
                       group_by(qPCR) %>% 
                       dplyr::summarise(mean.ntc = mean(IPC_Ct),sd.ntc=sd(IPC_Ct))
 
 dat.control <- dat.all %>% filter(grepl("neg",type)|type=="extc") %>%
-                    dplyr::select(THESE,useful,Zymo,grep(SP,colnames(dat.all))) %>%
+                    dplyr::select(all_of(THESE),useful,Zymo,dilution,grep(SP,colnames(dat.all))) %>%
                     rename(Ct=paste0(SP,"_Ct"),copies_ul = paste0(SP,"_copies_ul")) %>%
                      mutate(Ct = as.character(Ct),
                               Ct=ifelse(Ct=="",-99,Ct),
@@ -158,29 +207,112 @@ dat.control.field.neg <-   dat.control %>% filter(type=="field_neg")
 
 
 # Merge in ntc to data to flag inhibited samples 
-INHIBIT.LIMIT <- 1
+INHIBIT.LIMIT <- 0.5
 
+# Get rid of samples with dilution == 1 if a dilution series was run on a sample and those that were inhibited
 dat.samp <- left_join(dat.samp,dat.ntc) %>% mutate(mean.ntc = as.numeric(as.character(mean.ntc))) %>%
                   mutate(inhibit.val = IPC_Ct-mean.ntc,
-                         inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT & inhibit.val > -INHIBIT.LIMIT,0,1),
+                         #inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT & inhibit.val > -INHIBIT.LIMIT,0,1),
+                         inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT ,0,1),
                          Ct_bin = ifelse(Ct>0,1,0)) %>%
                   left_join(.,PCR) %>%
                   mutate(station.depth = paste0(station,".",depth))
 
+these.samps <- dat.samp %>% dplyr::select(sample,dilution) %>% filter(dilution<1) %>% 
+                dplyr::select(sample) %>%
+                unique() %>% c(t(.))
+
+dat.samp.dil <- dat.samp %>% filter(sample %in% these.samps,dilution<1)
+dat.samp <- dat.samp %>% filter(!sample %in% these.samps) %>% bind_rows(.,dat.samp.dil)
+    
+### MANUALLY CUT A COUPLE OF SAMPLES THAT ARE KILLING THE MODEL FIT and after inspection are clearly causing troubles.
+dat.samp <- dat.samp %>% filter(!sample %in% c(1298,
+                                               1622,
+                                               1552,
+                                               1419,
+                                               1326,
+                                               536,
+                                               55
+                                               )) # THESE ARE CRAZY OUTLIERS ()
+
+######
+
 dat.control.field.neg <- left_join(dat.control.field.neg,dat.ntc) %>% mutate(mean.ntc = as.numeric(as.character(mean.ntc))) %>%
                           mutate(inhibit.val = IPC_Ct-mean.ntc,
-                                  inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT & inhibit.val > -INHIBIT.LIMIT,0,1),
+                                  #inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT & inhibit.val > -INHIBIT.LIMIT,0,1),
+                                 inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT ,0,1),
                                   Ct_bin = ifelse(Ct>0,1,0)) %>%
                           left_join(.,PCR)
-                          
 
 # cull dat.samp of inhibited samples
 dat.inhibit <- dat.samp %>% filter(useful=="NO" | inhibit.bin==1) 
-dat.samp    <- dat.samp %>% filter(!useful=="NO", inhibit.bin==0) 
+dat.samp    <- dat.samp %>% filter(inhibit.bin==0) 
 dat.control.field.neg    <- dat.control.field.neg %>% filter(inhibit.bin==0) 
 
-SAMPLES <- data.frame(sample=unique(dat.samp$sample),sample_idx = 1:length(unique(dat.samp$sample)))
+####### THIS SECTION IS FOR EXPLORING SOME OF THE STRNAGENESS WITH
+####### UNDERSTANDING THE EFFECT OF DILUTIONS.
+dat.few <- dat.samp 
+dat.few$copies_ul[dat.few$copies_ul == ""] <- NA
+dat.few$copies_ul <- as.numeric(as.character(dat.few$copies_ul))
+B <- dat.few %>% group_by(sample,dilution) %>% 
+      summarise(count=mean(copies_ul,na.rm=T),N=sum(Ct_bin))
+  
+C <- B %>% dplyr::select(-N) %>% ungroup() %>% pivot_wider(.,names_from = c("dilution"),values_from = "count") %>% as.data.frame()
+colnames(C)[2:5] <- c("x1","x.1","x.2","x.5")
+
+p.1 <- ggplot(C) +
+  geom_point(aes(x=x.1,y=x.2),alpha=0.5) +
+  geom_abline(intercept=c(0,0),slope = c(2,1),color="red",linetype=c("solid","dashed")) +
+  xlab("DNA copies/ul at 1:10 dilution") +
+  ylab("DNA copies/ul at 1:5 dilution")
+
+p.2 <- ggplot(C) +
+  geom_point(aes(x=x.1,y=x.5),alpha=0.5) +
+  geom_abline(intercept=c(0,0),slope = c(5,1),color="red",linetype=c("solid","dashed")) +
+  xlab("DNA copies/ul at 1:10 dilution") +
+  ylab("DNA copies/ul at 1:2 dilution") +
+  xlim(c(0,120)) +
+  ylim(c(0,120))
+
+p.3 <- ggplot(C) +
+  geom_point(aes(x=x.2,y=x.5),alpha=0.5) +
+  geom_abline(intercept=c(0,0),slope = c(2.5,1),color="red",linetype=c("solid","dashed")) +
+  xlab("DNA copies/ul at 1:5 dilution") +
+  ylab("DNA copies/ul at 1:2 dilution") +
+  xlim(c(0,160)) +
+  ylim(c(0,160))
+
+grid.arrange(p.1,p.2,p.3,nrow=2)
+
+# This strongly suggests that the 0.5 dilution did not work all that well (lower copies than expected)
+# So if we exclude all of the 0.5 and inspect the results
+A <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))
+
+dat.samp <- dat.samp %>% filter(dilution !=0.5)
+B <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))  %>% as.data.frame()
+
+########## CHECK ON HOW MANY SAMPLES WE HAVE ZERO REPLICATES FOR  
+
+# Examine how many samples are retained out of the intial number done.
+dat.samp.ok <- dat.samp %>% group_by(sample,inhibit.bin) %>% summarise(N=length(sample)) %>% as.data.frame()
+
+dat.samp.begin %>% nrow() #1844
+dat.samp.ok %>% nrow() #1841 .... lost 3 samples through filtering.
+
+################################### Making indicators and indexs for stan.
 STATION.DEPTH <- data.frame(station.depth=unique(dat.samp$station.depth),station_depth_idx = 1:length(unique(dat.samp$station.depth)))
+
+# Add indices associated with each sample.
+SAMPLES <- dat.samp %>% dplyr::select(station.depth,sample) %>% group_by(station.depth,sample) %>% 
+                    summarise(N=length(sample)) %>% dplyr::select(-N) %>% left_join(.,STATION.DEPTH) %>% arrange(station_depth_idx) %>%
+                    ungroup()
+SAMPLES <- SAMPLES %>% mutate(sample_idx = 1:nrow(SAMPLES))
+SAMPLES <- SAMPLES %>% group_by(station.depth) %>% summarise(N=length(sample)) %>% 
+                mutate(singleton_idx=ifelse(N==1,0,1)) %>% dplyr::select(station.depth,singleton_idx) %>%
+                left_join(SAMPLES,.) %>% rename(samp_station_depth_idx =station_depth_idx)
+SAMPLES <- dat.samp %>% group_by(sample) %>% 
+        summarise(vol_standard=mean(vol.standard),log_vol_standard=log10(vol_standard),wash_idx=mean(wash_idx)) %>%
+        left_join(SAMPLES,.)
 
 SAMPLES.CONTROL <- data.frame(sample=unique(dat.control.field.neg$sample),
                               sample_control_idx = 1:length(unique(dat.control.field.neg$sample)))
@@ -189,9 +321,9 @@ dat.samp <- left_join(dat.samp,SAMPLES) %>% left_join(.,STATION.DEPTH)
 dat.control.field.neg <- left_join(dat.control.field.neg,SAMPLES.CONTROL)
 
 # This identifies where there is only one sample for each station-depth combination.  This is important for model identifiability.
-dat.samp   <-  dat.samp %>% group_by(station_depth_idx) %>% summarise(N=length(unique(sample))) %>% 
-              mutate(singleton_idx=ifelse(N==1,0,1)) %>% dplyr::select(-N) %>%
-              left_join(dat.samp,.)
+# dat.samp   <-  dat.samp %>% group_by(station_depth_idx) %>% summarise(N=length(unique(sample))) %>% 
+#               mutate(singleton_idx=ifelse(N==1,0,1)) %>% dplyr::select(-N) %>%
+#               left_join(dat.samp,.) %>% mutate()
 
 ### THERE IS SOME WEIRDNESS WITH SAMPLES 1306, 1361, 1362, and 412.  I think I have resolved them.
 dat.stand.bin <- dat.stand
@@ -204,10 +336,21 @@ dat.obs.pos <- dat.samp %>% filter(Ct_bin==1)
 N_obs_bin <- nrow(dat.obs.bin)
 N_obs_pos <- nrow(dat.obs.pos)
 
+bin_log_dilution_obs   <- log10(dat.obs.bin$dilution)
+pos_log_dilution_obs   <- log10(dat.obs.pos$dilution)
+log_vol_obs            <- SAMPLES$log_vol_standard
+singleton_idx          <- SAMPLES$singleton_idx
+samp_station_depth_idx <- SAMPLES$samp_station_depth_idx
+wash_idx               <- SAMPLES$wash_idx
+
 dat.control.bin <- dat.control.field.neg
 dat.control.pos <- dat.control.field.neg %>% filter(Ct_bin==1)
 N_control_bin <- nrow(dat.control.bin)
 N_control_pos <- nrow(dat.control.pos)
+bin_log_vol_control      <- log10(dat.control.bin$vol.standard)
+pos_log_vol_control      <- log10(dat.control.pos$vol.standard)
+bin_log_dilution_control <- log10(dat.control.bin$dilution)
+pos_log_dilution_control <- log10(dat.control.pos$dilution)
 
 N_pcr <- max(PCR$plate_idx)
 N_sample  <- max(SAMPLES$sample_idx)
@@ -223,7 +366,7 @@ N_control_sample <- max(SAMPLES.CONTROL$sample_control_idx)
 
 # Derive Estimates of Concentration 
 
-OFFSET = 0 # Value to imrpove Fitting in STAN
+OFFSET = 0 # Value to improve Fitting in STAN
 
 stan_data = list(
   "bin_stand"     = dat.stand.bin$Ct_bin,
@@ -231,15 +374,34 @@ stan_data = list(
   "D_bin_stand"   = dat.stand.bin$log10_copies,
   "D_pos_stand" =   dat.stand.pos$log10_copies,
   
+  #Observations
   "bin_obs"    = dat.obs.bin$Ct_bin,
   "pos_obs"    = dat.obs.pos$Ct,
-  "bin_vol_obs"= log10(dat.obs.bin$vol.standard),
-  "pos_vol_obs"= log10(dat.obs.pos$vol.standard),  
   
+  #Covariates associated with individual PCRs
+  "bin_log_dilution_obs"= bin_log_dilution_obs,
+  "pos_log_dilution_obs"= pos_log_dilution_obs,
+  
+  # Covariates associated with individual samples
+  "log_vol_obs"     = log_vol_obs,
+  "singleton_idx"   = singleton_idx,
+  "wash_idx"        = wash_idx,
+  
+  # Indices for sample bottles combinations and singleton indicator
+  "sample_idx" = SAMPLES$sample_idx,
+  "samp_station_depth_idx" = SAMPLES$samp_station_depth_idx,
+  "singleton_idx" = SAMPLES$singleton_idx,
+  
+  # Indices for station-depth combination
+  "station_depth_idx" = STATION.DEPTH$station_depth_idx,
+  
+  # Control Values
   "bin_control"    = dat.control.bin$Ct_bin,
   "pos_control"    = dat.control.pos$Ct,
-  "bin_vol_control"= log10(dat.control.bin$vol.standard),
-  "pos_vol_control"= log10(dat.control.pos$vol.standard),  
+  "bin_log_vol_control"= bin_log_vol_control,
+  "pos_log_vol_control"= pos_log_vol_control,  
+  "bin_log_dilution_control"= bin_log_dilution_control,
+  "pos_log_dilution_control"= pos_log_dilution_control,  
   
   # Indices and counters
   "N_pcr"    = N_pcr,    # Number of PCR plates
@@ -261,12 +423,8 @@ stan_data = list(
   "pcr_control_bin_idx"   = dat.control.bin$plate_idx,
   "pcr_control_pos_idx" =   dat.control.pos$plate_idx,
 
-  # Indices for sample bottles combination
-  "sample_idx" = SAMPLES$sample_idx,
+  # Control samples  
   "sample_control_idx" = SAMPLES.CONTROL$sample_control_idx,
-  
-  # Indices for station-depth combination
-  "station_depth_idx" = STATION.DEPTH$station_depth_idx,
   
   # Indices for Samples
   "sample_pos_idx" = dat.obs.pos$sample_idx,
@@ -277,9 +435,12 @@ stan_data = list(
   "station_depth_pos_idx" = dat.obs.pos$station_depth_idx,
   "station_depth_bin_idx" = dat.obs.bin$station_depth_idx,
   
-  "singleton_pos_idx" = dat.obs.pos$singleton_idx,
-  "singleton_bin_idx" = dat.obs.bin$singleton_idx,
-  
+  # "singleton_pos_idx" = dat.obs.pos$singleton_idx,
+  # "singleton_bin_idx" = dat.obs.bin$singleton_idx,
+
+  "wash_pos_idx" = dat.obs.pos$wash_idx,
+  "wash_bin_idx" = dat.obs.bin$wash_idx,
+    
   #Offset of density for improving fitting characteristics
   "OFFSET" = OFFSET
 )
@@ -289,8 +450,14 @@ stan_pars = c(
   "beta_1", # slope for standards
   "phi_0",  # logit intercept for standards
   "phi_1",  # logit slope for standard,
+  "wash_offset", # parameter for concentration offset from washing with 30% EtOH instead of 70%.
   
+  "mu_contam", # log-mean of average contamination
+  "sigma_contam", # lod-sd of contamination
+
   "D",     # Latent variable for Log-count in each station-location combination
+  "D_error",
+  "D_contam",
   "D_control", # Latent variable for log-count in field negative controls.
   
   "sigma_stand_int", # variability among standards regression.
@@ -325,16 +492,18 @@ stan_pars = c(
         # beta_1_bar = rnorm(1,-3,1),
         beta_0 = runif(N_pcr,30,40),
         beta_1 = rnorm(N_pcr,-4,1),
+        wash_offset = rnorm(1,-2,1),
         
         # phi_0_bar = runif(1,10,25),
         # phi_1_bar = rnorm(1,5,1),
         phi_0  = runif(N_pcr,0,5),
         phi_1  = rnorm(N_pcr,3,0.5),
-        D      = rnorm(N_station_depth,0,2),
-        D_control  = rnorm(N_control_sample,0,2),
-        # gamma  = rnorm(N_hybrid,0,2)
         sigma_pcr = runif(1,0.01,0.4),
-        tau_sample = runif(1,0.01,0.2)
+        tau_sample = runif(1,0.01,0.2),
+        D      = rnorm(N_station_depth,0,2),
+        D_control  = rnorm(N_control_sample,0,2)
+        # gamma  = rnorm(N_hybrid,0,2)
+
       )
     }
     return(A)
@@ -348,22 +517,22 @@ stan_pars = c(
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
   
-N_CHAIN = 5
-Warm = 5000
-Iter = 15000
-Treedepth = 11
-Adapt_delta = 0.70
+N_CHAIN = 3
+Warm = 1000
+Iter = 5000
+Treedepth = 10
+Adapt_delta = 0.60
 
-LOC <- paste0(base.dir,"/Scripts/Stan Files/")
+LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)
 
 stanMod = stan(file = "qPCR_Hake.stan" ,data = stan_data, 
-               verbose = FALSE, chains = N_CHAIN, thin = 15, 
+               verbose = FALSE, chains = N_CHAIN, thin = 2, 
                warmup = Warm, iter = Warm + Iter, 
                control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                pars = stan_pars,
                boost_lib = NULL,
-               # sample_file = "./STAN_models/Output files/test.csv",
+               sample_file = "./Output files/test.csv",
                init = stan_init_f1(n.chain=N_CHAIN,
                                    N_pcr= N_pcr,
                                    N_station_depth = N_station_depth,
@@ -379,13 +548,32 @@ pars <- rstan::extract(stanMod, permuted = TRUE)
 samp_params <- get_sampler_params(stanMod)
 #samp_params 
 stanMod_summary <- summary(stanMod)$summary
-round(stanMod_summary,2)
+stanMod_summary_reg <- summary(stanMod,pars=c("beta_0",
+                               "beta_1",
+                               "phi_0",
+                               "phi_1"))$summary
+stanMod_summary_param <- summary(stanMod,pars=c(
+                                         "wash_offset",
+                                         "mu_contam",
+                                         "sigma_contam",
+                                         "tau_sample",
+                                         "sigma_stand_int", # variability among standard regression.
+                                         "sigma_pcr"))$summary     # variability among samples, given individual bottle, site, and month ))$summary
+stanMod_summary_D <- summary(stanMod,pars="D")$summary
+ID <- rownames(stanMod_summary_D)
+stanMod_summary_D <- stanMod_summary_D %>%  as.data.frame() %>% mutate(ID=ID) %>% arrange(desc(Rhat))
+
+#round(stanMod_summary,2)
 
 base_params <- c(
   "beta_0",
   "beta_1",
   "phi_0",
   "phi_1",
+  "wash_offset",
+  
+  "mu_contam",
+  "sigma_contam",
   
   #"D",
   #"delta",
@@ -398,12 +586,19 @@ base_params <- c(
 
 ##### MAKE SOME DIAGNOSTIC PLOTS
 TRACE <- list()
+TRACE[[as.name("D")]] <- traceplot(stanMod,pars=c("lp__",paste0("D[",sample(1:N_sample,8),"]")),inc_warmup=FALSE)
 TRACE[[as.name("Phi0")]] <- traceplot(stanMod,pars=c("lp__","phi_0"),inc_warmup=FALSE)
 TRACE[[as.name("Phi1")]] <- traceplot(stanMod,pars=c("lp__","phi_1"),inc_warmup=FALSE)
 TRACE[[as.name("Beta0")]] <- traceplot(stanMod,pars=c("lp__","beta_0"),inc_warmup=FALSE)
 TRACE[[as.name("Beta1")]] <- traceplot(stanMod,pars=c("lp__","beta_1"),inc_warmup=FALSE)
 TRACE[[as.name("Var")]] <- traceplot(stanMod,pars=c("lp__","tau_sample","sigma_stand_int","sigma_pcr"),inc_warmup=FALSE)
+TRACE[[as.name("Contam")]] <- traceplot(stanMod,pars=c("lp__","wash_offset","mu_contam","sigma_contam"),inc_warmup=FALSE)
 
+# pull 9 random D values.
+
+
+TRACE$Var
+TRACE$Contam
 
 #pairs(stanMod, pars = c(base_params), log = FALSE, las = 1)
 
@@ -430,7 +625,7 @@ for(i in 1:ncol(Y)){
   plot(Y[,i]~X,xlim=x.lim,ylim=y.lim,type="l",col=2)
   par(new=T)
 }
-plot(dat.stand.pos$Ct~ dat.stand.pos$log10.density,xlim=x.lim,ylim=y.lim)
+plot(dat.stand.pos$Ct~ dat.stand.pos$log10_copies,xlim=x.lim,ylim=y.lim)
 
 
 #BREAKS <- c(-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5)
@@ -507,7 +702,37 @@ station_depth_out_liter <- data.frame(station_depth_idx= 1:ncol(pars$D),
                                 Sd=apply(10^(pars$D+LOG.EXPAND),2,sd),
                                 Val=data.frame(t(apply(10^(pars$D+LOG.EXPAND),2,quantile,probs=PROBS))))
 
+sample_contam_error_out <- data.frame(sample_idx= 1:ncol(pars$D_error), 
+                                Mean.log=apply(pars$D_error,2,mean),
+                                Sd.log=apply(pars$D_error,2,sd),
+                                Log.Val=data.frame(t(apply(pars$D_error,2,quantile,probs=PROBS))),
+                                Mean=apply(10^pars$D_error,2,mean),
+                                Sd=apply(10^pars$D_error,2,sd),
+                                Val=data.frame(t(apply(10^pars$D_error,2,quantile,probs=PROBS))))
 
+sample_contam_error_out_liter <- data.frame(sample_idx= 1:ncol(pars$D_error), 
+                                      Mean.log=apply(pars$D_error+LOG.EXPAND,2,mean),
+                                      Sd.log=apply(pars$D_error+LOG.EXPAND,2,sd),
+                                      Log.Val=data.frame(t(apply(pars$D_error+LOG.EXPAND,2,quantile,probs=PROBS))),
+                                      Mean=apply(10^(pars$D_error+LOG.EXPAND),2,mean),
+                                      Sd=apply(10^(pars$D_error+LOG.EXPAND),2,sd),
+                                      Val=data.frame(t(apply(10^(pars$D_error+LOG.EXPAND),2,quantile,probs=PROBS))))
+
+sample_contam_total_out <- data.frame(sample_idx= 1:ncol(pars$D_contam), 
+                                      Mean.log=apply(pars$D_contam,2,mean),
+                                      Sd.log=apply(pars$D_contam,2,sd),
+                                      Log.Val=data.frame(t(apply(pars$D_contam,2,quantile,probs=PROBS))),
+                                      Mean=apply(10^pars$D_contam,2,mean),
+                                      Sd=apply(10^pars$D_contam,2,sd),
+                                      Val=data.frame(t(apply(10^pars$D_contam,2,quantile,probs=PROBS))))
+
+sample_contam_total_out_liter <- data.frame(sample_idx= 1:ncol(pars$D_contam), 
+                                            Mean.log=apply(pars$D_contam+LOG.EXPAND,2,mean),
+                                            Sd.log=apply(pars$D_contam+LOG.EXPAND,2,sd),
+                                            Log.Val=data.frame(t(apply(pars$D_contam+LOG.EXPAND,2,quantile,probs=PROBS))),
+                                            Mean=apply(10^(pars$D_contam+LOG.EXPAND),2,mean),
+                                            Sd=apply(10^(pars$D_contam+LOG.EXPAND),2,sd),
+                                            Val=data.frame(t(apply(10^(pars$D_contam+LOG.EXPAND),2,quantile,probs=PROBS))))
 
 field_neg_out <- data.frame(sample_control_idx= 1:ncol(pars$D_control), 
                                 Mean.log=apply(pars$D_control,2,mean),
@@ -548,6 +773,7 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     dat.stand.pos = dat.stand.pos,
                     dat.obs.bin =dat.obs.bin,
                     dat.obs.pos = dat.obs.pos,
+                    INHIBIT.LIMIT = INHIBIT.LIMIT,
                     OFFSET = OFFSET,
                     base_params =base_params,
                     STATION.DEPTH=STATION.DEPTH,

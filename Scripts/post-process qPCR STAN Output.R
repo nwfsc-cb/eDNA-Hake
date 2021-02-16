@@ -8,7 +8,6 @@ library(maps)
 library(mapdata)
 library(ggplot2)
 
-
 script.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Scripts"
 # load and run in the acoustic data.
 setwd(script.dir)
@@ -21,7 +20,7 @@ base.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
 setwd(base.dir)
 
 # CHANGE THIS FOR switching between species.
-#SPECIES <- "eulachon"
+SPECIES <- "hake" # eulachon, hake 
 
 load(paste("qPCR 2019",SPECIES, "Fitted.RData"))
 
@@ -104,8 +103,8 @@ dat.lat.lon.water <- dat.process %>% group_by(station) %>% summarise(lat=mean(la
                                                           water.depth.cat %in% c("w_400_750") ~ "500",
                                                           water.depth.cat %in% c("w_250_400") ~ "300",
                                                           water.depth.cat %in% c("w_125_250") ~ "150",
-                                                          #water.depth.cat %in% c("w_75_125") ~ "100",
-                                                          water.depth.cat %in% c("w_0_75","w_75_125") ~ "50"))
+                                                          water.depth.cat %in% c("w_75_125") ~ "100",
+                                                          water.depth.cat %in% c("w_0_75") ~ "50"))
 
 
 #### Plotting information
@@ -585,10 +584,10 @@ depth.p3 <- ggplot(dat.SP.sum.by.depth.cat) +
   theme_bw()
 print(depth.p3)
 
-depth.p4 <- depth.p3 +
-  scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL,expand=c(0,0.05)) 
-
-print(depth.p4)
+# depth.p4 <- depth.p3 +
+#   scale_y_continuous(trans="log2",label=LABEL,breaks=LABEL,expand=c(0,0.05)) 
+# 
+# print(depth.p4)
 
 
 
