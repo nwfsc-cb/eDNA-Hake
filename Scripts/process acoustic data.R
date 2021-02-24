@@ -19,6 +19,8 @@ plot.dir <- paste0(base.dir,"Plots and figures")
 setwd(data.dir)
 dat.acoustic <- read.csv("Biomass_2019 Hake Survey.csv")
 
+
+### WORK WITH THE ACOUSTIC DATA.
 dat.acoustic <- dat.acoustic %>% 
                       rename(transect=Transect,
                              lat=Latitude..deg.,
@@ -29,26 +31,29 @@ dat.acoustic <- dat.acoustic %>%
                              biomass=Biomass..kg.)
 
 
-max.lon.by.trans <- dat.acoustic %>% group_by(transect) %>% summarise(lon=max(lon)) %>% mutate(near.coast=1)
+max.lon.by.trans <- dat.acoustic %>% group_by(transect) %>% summarise(max.lon=max(lon),max.lat=max(lat)) %>% mutate(near.coast=1)
 
-dat.acoustic <- dat.acoustic %>% left_join(.,max.lon.by.trans)
 
-TRANS <- max.lon.by.trans$transect
+dat.acoustic <- dat.acoustic %>% left_join(.,max.lon.by.trans) %>% mutate(near.coast=ifelse(lon==max.lon,1,0))
+# There are two transects which have two locations that correspond to max.lon. (121,127) both are up in Canada,
+# So it doesn't really matter for our purposes.  But this is something to keep an eye on.
+# I drop 121 and 127 here to make it obvious something is amiss with them. 
+dat.acoustic <- dat.acoustic %>% filter(!transect %in% c(121,127))
+
+TRANS <- unique(dat.acoustic$transect)
 
 temp.all <- NULL
 for(i in 1:length(TRANS)){
   #print(i)
   temp <- dat.acoustic %>% filter(transect == TRANS[i])
-  ref  <- temp %>% filter(near.coast==1) %>% select(lon,lat)
+  ref  <- temp %>% filter(near.coast==1) %>% dplyr::select(max.lon,max.lat)
   D <- distGeo(p1=as.matrix(data.frame(lon=temp$lon,lat=temp$lat)),p2=ref)
   D <- D / 1000
   temp <- temp %>% mutate(dist.km = D) %>% arrange(dist.km) %>% mutate(id.numb = 1:nrow(temp))
   temp.all <- bind_rows(temp.all,temp)
-
 }
 
 dat.acoustic <- left_join(dat.acoustic,temp.all)
-
 dat.acoustic$biomass_mt <- dat.acoustic$biomass/1000
 dat.acoustic$log10_biomass_mt <- log10(dat.acoustic$biomass_mt)
  
@@ -93,7 +98,7 @@ lon.lims.trim <- c(-126.5501,-122.5)
 
 # Call Base_map.R
 setwd(script.dir)
-source("Base_map.R")
+source("Base_map.R",local=T)
   
 # Make some basic plots of lat-longs of biomass
 lower.lim = 1

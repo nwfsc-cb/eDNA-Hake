@@ -19,7 +19,9 @@ source("post-process qPCR STAN Output.R")
 
 ### Sampling and processing to date.
 
-In total we have processed qPCR for pacific hake, pacific lamprey, and eulachon from `r N.station.run` CTD stations representing `r N.station.depth.run` station-depth combinations for `r N.sample.run` individual 2.5L water samples.   
+In total we have processed qPCR for pacific hake, pacific lamprey, and eulachon from `r N.station.run` CTD stations representing `r N.station.depth.run` station-depth combinations for `r N.sample.run` individual 2.5L water samples.
+
+THESE ARE RESULTS FOR `r SPECIES`
 
 ```{r,echo=FALSE,warning=FALSE, fig.height=7}
 print(sample.process.facet)
@@ -30,10 +32,10 @@ print(sample.process.facet)
 
 ### Inhibition
 
-There were a lot of samples that show signs of inhibition. They were concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. 
+There were a lot of samples that show signs of inhibition. They were concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. We used a inhibition threshold of 
 
 ```{r,echo=FALSE}
-kable(g_i_dat)
+kable(inhibit.summ.dat)
 ```
 
 We can look at the patterns of inhibition spatially and by depth.
@@ -53,7 +55,7 @@ print(inhibit.plot.by.depth.few)
 \newpage
 ### Standards
 
-The standards used in the qPCR assay look pretty reasonable good.  Each color represents a different PCR plate. They are pretty much on top of each other.
+The standards used in the qPCR assay look pretty reasonable.  Each color represents a different PCR plate. They are pretty much on top of each other.
 
 ```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
 print(stand.plot)
@@ -65,6 +67,13 @@ print(stand.plot.pres)
 
 ```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
 print(stand.plot.facet)
+```
+### Dilutions
+
+For inhibited samples, we diluted the samples into three 
+
+```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(Output.qpcr$dilution_plot)
 ```
 
 
@@ -86,6 +95,10 @@ We can look at the temporal pattern of the control values too.  This will be mor
 print(control.by.time)
 ```
 
+### Ethanol wash samples
+
+For a buch of samples, the final stage of th extraction wash was conducted using a 30% Ethanol wash as opposed to a 70% ethanol wash.  This should result in some amount of DNA being lost from the samples.  To examine this, we intentionally washed one of the two Niskin bottles from 23 station-depth combinations with 30% ethanol and one with 70% ethanol with the goal of detecting what the average difference in DNA concentration between the two samples washed in DNA would be.
+
 \newpage
 ## Hake eDNA
 
@@ -94,6 +107,15 @@ We can first ask if the distribution of estimated hake DNA compare to the values
 ```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
 print(compare.hist2)
 ```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+
+
+We can make similar plots of the distribution of controls relative to the observed distribution of samples at each depth.
 
 Let's make some plots of the spatial distribution of hake DNA.
 
@@ -104,6 +126,28 @@ print(SP.p2)
 
 ```{r,echo=FALSE,fig.height=9,warning=FALSE}
 print(SP.p3)
+```
+
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p4)
+```
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p5)
+```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+```{r,echo=FALSE,fig.height=5,fig.width=7,warning=FALSE}
+p.lat.by.d 
+```
+
+```{r,echo=FALSE,fig.height=7,fig.width=7,warning=FALSE}
+p.lat.by.d.facet
 ```
 
 \newpage

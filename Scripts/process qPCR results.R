@@ -9,11 +9,35 @@ library(rstan)
 library(lubridate)
 library(reshape2)
 library(gridExtra)
+library(raster)
+library(rgdal)
+library(sp)
+library(brms)
+library(loo)
+###########################################################################
+## DECLARED SPECIES OF INTEREST
+SP <- "hake" # options: hake, lamprey, eulachon
+###########################################################################
+# Make a choice about the kind of model to run.
+# Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
+MODEL.TYPE = "lat.long.smooth"
+###########################################################################
+# identifier
+MODEL.ID <- "7_12_C"
+###########################################################################
+set.seed(9111211)
+# Construct smoothes for each 
+# define knots.
+N.knots.lon  <- 7
+N.knots.lat  <- 12
+N.knots.bd <- 6
+
 
 # Working directories
 base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
 data.dir <- paste0(base.dir,"Data")
 plot.dir <- paste0(base.dir,"Plots and figures")
+script.dir <- paste0(base.dir,"/Scripts")
 
 # Pull in qPCR data, qPCR standards, sample id information
 setwd(data.dir)
@@ -22,7 +46,24 @@ dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.c
 dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2020-12-15 sample details.csv")
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
+# load and run the acoustic data. this is needed to reference the offshore-ness of 
+setwd(script.dir)
+source("process acoustic data.R",local=T)
+# dat.acoustic and dat.acoustic.binned are the relevant data frames
+
+# Pull in posterior for wash_offset derived from hake
+setwd(paste0(base.dir,"Stan Model Fits/"))
+wash_offset_hake <- read.csv("wash_offset_hake.csv") 
 ######################################################
+
+
+if(MODEL.TYPE == "Base"){
+  TRIM.25 <- FALSE
+} 
+if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
+  TRIM.25 <- TRUE
+}  
+
 # PROCESS CTD LOCATION DATA FIRST
 # Modify and clean CTD data 
   # fix lat-lon data
@@ -47,10 +88,26 @@ dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
   dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>% 
                               rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE) 
-    
+  
+  ### HERE ADD SCRIPT FOR PULLING DEPTH FROM bathy
+  setwd(script.dir)
+  source("pull NOAA bathy for acoustic data.R",local=T)
+ 
+  temp <- marmap::get.depth(b,
+                    x= dat.station.id %>% dplyr::select(lon,lat),
+                    locator = FALSE)  
+  dat.station.id$bathy.bottom.depth <-  -temp$depth
+  
         d.temp <- dat.station.id %>% group_by(date,year,month,day,station, transect) %>%
-                    summarise(m.lat=mean(lat),m.lon=mean(lon),m.water.depth=mean(water.depth)) %>%
-                    rename(lat=m.lat,lon=m.lon,water.depth=m.water.depth)
+                    summarise(m.lat=mean(lat),m.lon=mean(lon),
+                              m.water.depth=mean(water.depth),bathy.depth = mean(bathy.bottom.depth)) %>%
+                    rename(lat=m.lat,lon=m.lon, water.depth=m.water.depth, bathy.bottom.depth=bathy.depth)
+  # come up with consensus bottom depth
+        d.temp$bottom.depth.consensus <- d.temp$water.depth
+        d.temp <- d.temp %>% mutate(
+                            bottom.depth.consensus = ifelse(water.depth<100 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
+                            bottom.depth.consensus = ifelse(water.depth<600 & water.depth>400 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
+                            bottom.depth.consensus = ifelse(water.depth<1100 & water.depth>1000 & bathy.bottom.depth>2000,bathy.bottom.depth,bottom.depth.consensus))
 
   dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, station, transect) %>%
                             # this combines the latitude and longitude to make a single concensus value for each Station.
@@ -77,6 +134,146 @@ dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
                                                   Fluor,
                                                   Zymo=Zymo.columns)
 
+  
+  ##################################################3
+  ##################################################3
+  ##################################################3
+  ##################################################3
+  # ---- PULL IN SPATIAL DATA TO MAKE GRID ESTIMATE ON AND 
+  # ---- TO PROJECT TO 
+  
+  str_name <- paste0(base.dir,"Data/raster_grid_blake/fivekm_grid.tif")
+  dat_raster=raster(str_name)
+  dat_raster_extracted <- rasterToPoints(dat_raster)
+  
+  # Get depth information.
+  raster_depth <- read.csv(paste0(base.dir,"Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
+  raster_depth$depth_m <-  - raster_depth$WM_depth_m
+  
+  ####### 
+  ### Get observations from the station IDs and convert to the new spatial coordinate systyem that Blake uses.
+  #######
+  # Use a projection derived by Blake.
+    ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  PROJ.txt <- dat_raster@crs %>% as.character()
+  proj      <- SpatialPointsDataFrame(coords = dat.station.id.trim %>% ungroup() %>% dplyr::select(lon,lat),
+                                      data=dat.station.id.trim,
+                                      proj4string = CRS("+proj=longlat"))
+  proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+  
+  dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
+  
+  dat.station.id.trim <- cbind(dat.station.id.trim %>% ungroup(),dat.utm)
+  
+  # calculate offshore distance from the acoustic survey start point reference 
+  TRANS <- data.frame(trans=unique(dat.station.id.trim$transect)) 
+  TRANS <- TRANS %>% filter(trans %in% c(unique(dat.acoustic$transect))) 
+  
+  temp.all <- NULL
+  for(i in 1:length(TRANS$trans)){
+    #print(i)
+    temp <- dat.station.id.trim %>% filter(transect == TRANS$trans[i])
+    ref  <- dat.acoustic %>% filter(transect == TRANS$trans[i],near.coast==1) %>% dplyr::select(max.lon,max.lat)
+    D <- distGeo(p1=as.matrix(data.frame(lon=temp$lon,lat=temp$lat)),p2=ref)
+    D <- D / 1000
+    temp <- temp %>% mutate(dist.km = D) %>% arrange(dist.km) %>% mutate(id.numb = 1:nrow(temp))
+    temp.all <- bind_rows(temp.all,temp)
+  }
+  
+  # merge in the distances from the start of the transect.
+  dat.station.id.trim <- left_join(dat.station.id.trim,temp.all %>% dplyr::select(station,transect,dist.km)) %>%
+                                      rename(transect.dist.km=dist.km)
+  
+  # Clip all raster points at that are not in the neighborhood of the observed locations
+  lon.lim <-  proj.utm@bbox["lon",]
+  lat.lim <-  proj.utm@bbox["lat",]
+  
+  dat_raster_trim <- dat_raster_extracted %>% as_tibble() %>%
+    filter(x>(0.95 * lon.lim[1]),
+           x<(1.05 * lon.lim[2]),
+           y>(0.95 * lat.lim[1]),
+           y<(1.05 * lat.lim[2]))
+  # get rid of values in Puget Sound.
+  dat_raster_trim <- dat_raster_trim %>% as_tibble() %>%
+    filter(x < 930000 | y < 1780000)
+  
+  dat_raster_trim <- dat_raster_trim %>% mutate(x=x/1000,y=y/1000)
+  dat_raster_trim <- dat_raster_trim %>% rename(Gridcell_ID=fivekm_grid)
+  dat_raster_trim <- left_join(dat_raster_trim,raster_depth) %>% filter(is.na(depth_m)==F,depth_m>30)
+  
+  ggplot(dat_raster_trim) +
+      geom_tile(aes(x=x,y=y,fill=depth_m),alpha=0.8) +
+      geom_point(data=dat.station.id.trim,aes(x=utm.lon,y=utm.lat),col="red")
+  
+  # crop values that are way offshore to make a nice map to project to.
+    # offshore first
+        lat.lon.points <- dat.station.id.trim %>% group_by(transect) %>% 
+                              summarise(lat = mean(utm.lat),min.lon = min(utm.lon),max.lon=max(utm.lon))
+        
+        lat.lon.points <- lat.lon.points %>% filter(!transect %in% c("","HA","Mo","NH","VN","zP")) %>%
+                              mutate(transect=as.numeric(transect)) %>% arrange(transect)
+        
+        lat.lon.points$lon.clip.min <-0
+        lat.lon.points$lon.clip.max <-0
+        BUF <- 2
+        for(i in 1:nrow(lat.lon.points)){
+            if(i<=BUF){ 
+              lat.lon.points$lon.clip.min[i] = min(lat.lon.points$min.lon[1:(i+BUF)])
+              lat.lon.points$lon.clip.max[i] = max(lat.lon.points$max.lon[1:(i+BUF)])
+            }
+          if(i>3 & i<(nrow(lat.lon.points)-3)){ 
+              lat.lon.points$lon.clip.min[i] = min(lat.lon.points$min.lon[(i-BUF):(i+BUF)])
+              lat.lon.points$lon.clip.max[i] = max(lat.lon.points$max.lon[(i-BUF):(i+BUF)])
+          }
+          if(i>=(nrow(lat.lon.points)-3)){ 
+            lat.lon.points$lon.clip.min[i] = min(lat.lon.points$min.lon[(i-BUF):(nrow(lat.lon.points))])
+            lat.lon.points$lon.clip.max[i] = max(lat.lon.points$max.lon[(i-BUF):(nrow(lat.lon.points))])
+          }
+        }
+        
+        lat.lon.points <- lat.lon.points %>% mutate( lon.clip.min = lon.clip.min*0.99, lon.clip.max = lon.clip.max*1.01  )         
+        
+        # OK. Go through and cut out parts of dat_raster_trim that aren't near the observed locations (with buffer)
+          dat_raster_fin <- NULL
+          for(i in 1:nrow(lat.lon.points)){
+            if(i==1){
+              temp <- dat_raster_trim %>% filter(y < lat.lon.points$lat[i]*0.98)  %>% 
+                        filter(x > lat.lon.points$lon.clip.min[i]) %>% 
+                        filter(x < lat.lon.points$lon.clip.max[i])
+            }else if(i==nrow(lat.lon.points)){
+              temp <- dat_raster_trim %>% filter(y < (lat.lon.points$lat[i])*1.02, y >= (lat.lon.points$lat[i-1]))  %>% 
+                filter(x > lat.lon.points$lon.clip.min[i]) %>% 
+                filter(x < lat.lon.points$lon.clip.max[i])
+            } else{
+              temp <- dat_raster_trim %>% filter(y < (lat.lon.points$lat[i]), y >= (lat.lon.points$lat[i-1]))  %>% 
+                filter(x > lat.lon.points$lon.clip.min[i]) %>% 
+                filter(x < lat.lon.points$lon.clip.max[i])
+            }
+            dat_raster_fin <- rbind(dat_raster_fin,temp)
+          }
+        
+          # Trim everything south of SF Bay.
+          dat_raster_fin <- dat_raster_fin %>% filter(y>810)
+          dat_raster_fin$x = dat_raster_fin$x * 1000
+          dat_raster_fin$y = dat_raster_fin$y * 1000
+          # Add lat and lon to dat_raster_fin for help with plotting later
+          proj      <- SpatialPointsDataFrame(coords = dat_raster_fin %>% ungroup() %>% dplyr::select(x,y),
+                                              data = dat_raster_fin,
+                                              proj4string = crs(PROJ.txt))
+          proj.latlon <- spTransform(proj, CRSobj = CRS("+proj=longlat"))
+         
+          dat_raster_fin <- left_join(dat_raster_fin,
+                              data.frame(Gridcell_ID= proj.latlon$Gridcell_ID,
+                              data.frame(proj.latlon@coords)%>% rename(lon=x,lat=y)))
+          dat_raster_fin <- dat_raster_fin %>% mutate(x= x/1000, y=y/1000)
+          
+          ggplot(dat_raster_fin) +
+            geom_tile(aes(x=x,y=y,fill=depth_m),alpha=0.8) +
+            geom_point(data=dat.station.id.trim,aes(x=utm.lon,y=utm.lat),col="red") 
+          
+           
+  ##################################################3
+  ##################################################3  
     dat.id <- full_join(dat.sample.id,dat.station.id.trim) %>% 
               mutate(station=ifelse(sample=="412","-",station)) %>%
               mutate(control = case_when(station=="" ~ "extraction",
@@ -92,13 +289,11 @@ dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 dat.id.control <- dat.id %>% filter(!control == "no") %>% dplyr::select(sample,volume,control) %>% left_join(.,dat.sample.control.id)
 dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric(as.character(depth)))
 
-###########################################################################
-## DECLARED SPECIES OF INTEREST
-SP <- "hake" # options: hake, lamprey, eulachon
-###########################################################################
-
+##################################################3
+##################################################3
 # STANDARDS 
 THESE <- c("qPCR","well","sample","type","IPC_Ct","inhibition_rate")
+##################################################3##################################################
 cut.plates <- c("H8")
 
 dat.stand <- dat.stand %>% dplyr::select(all_of(THESE),grep(SP,colnames(dat.stand))) %>% 
@@ -114,7 +309,6 @@ dat.stand <- dat.stand %>% dplyr::select(all_of(THESE),grep(SP,colnames(dat.stan
     PCR <- data.frame(qPCR=unique(dat.stand$qPCR),plate_idx= 1:length(unique(dat.stand$qPCR)))
     dat.stand <- left_join(dat.stand,PCR)
     
-
 # SAMPLES, ntc and control
 dat.samp <- dat.all %>% dplyr::select(all_of(THESE),useful,Zymo,dilution,grep(SP,colnames(dat.all))) %>%
                   filter(!qPCR%in%cut.plates) %>%
@@ -135,7 +329,17 @@ dat.samp <- dat.all %>% dplyr::select(all_of(THESE),useful,Zymo,dilution,grep(SP
                         IPC_Ct=ifelse(is.na(IPC_Ct)==T,-99,IPC_Ct), 
                         IPC_Ct=as.numeric(IPC_Ct)) %>%
                   filter(type=="unknowns")
+
 dat.samp <- left_join(dat.samp,dat.id.samp,by="sample") 
+# Classify each depth into one of a few categories.
+dat.samp <- dat.samp %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
+                                                          depth ==25 ~ 25,  
+                                                          depth > 25  & depth <= 50  ~ 50,
+                                                          depth > 50  & depth <= 100 ~ 100,
+                                                          depth > 119 & depth <= 150 ~ 150,
+                                                          depth > 151 & depth <= 200 ~ 200,
+                                                          depth > 240 & depth <= 350 ~ 300,
+                                                          depth > 400 & depth <= 500 ~ 500))
 
 # Do some modifications to all of the samples first.
 # Calculate the volume sampled for each sample
@@ -151,7 +355,8 @@ dat.wash <- dat.samp %>% filter(drop.sample %in% c("30EtOH","30EtOHpaired"))
 
   # find unique depth-station combinations among these stations.
   dat.wash$station <- as.factor(dat.wash$station)
-  uni.wash <- dat.wash %>% group_by(station,depth,Niskin,drop.sample) %>% summarise(N=length(station)) %>% mutate(status="washed") %>% ungroup()
+  uni.wash <- dat.wash %>% group_by(station,depth,Niskin,drop.sample) %>% 
+                summarise(N=length(station)) %>% mutate(status="washed") %>% ungroup()
 
   pairs.wash <- dat.samp %>% filter(!drop.sample %in% c("30EtOH","30EtOHpaired"))
   pairs.wash <- uni.wash %>% dplyr::select(station,depth) %>% left_join(.,pairs.wash) %>% 
@@ -226,15 +431,18 @@ dat.samp.dil <- dat.samp %>% filter(sample %in% these.samps,dilution<1)
 dat.samp <- dat.samp %>% filter(!sample %in% these.samps) %>% bind_rows(.,dat.samp.dil)
     
 ### MANUALLY CUT A COUPLE OF SAMPLES THAT ARE KILLING THE MODEL FIT and after inspection are clearly causing troubles.
-dat.samp <- dat.samp %>% filter(!sample %in% c(1298,
-                                               1622,
-                                               1552,
-                                               1419,
-                                               1326,
-                                               536,
-                                               55
-                                               )) # THESE ARE CRAZY OUTLIERS ()
 
+if(SP == "hake"){
+  dat.samp <- dat.samp %>% filter(!sample %in% c(1298, # This one must have dropped on the tabletop
+                                               1622,   # This one must have dropped on the tabletop 30EtOH too.
+                                               1552,   # Two orders of magnitude large than pair.
+                                               1419,   # Two orders of magnitude large than pair.
+                                               1326,   # This is a 25m deep spot so gets dropped anyway.
+                                               536,535,    # Removed both of this pari() 
+                                               #55,    # This is a 25m deep spot so gets dropped anyway.
+                                               1807 # THIS IS outlier among washed samples (dropped on tabletop)
+  )) 
+}
 ######
 
 dat.control.field.neg <- left_join(dat.control.field.neg,dat.ntc) %>% mutate(mean.ntc = as.numeric(as.character(mean.ntc))) %>%
@@ -243,6 +451,9 @@ dat.control.field.neg <- left_join(dat.control.field.neg,dat.ntc) %>% mutate(mea
                                  inhibit.bin=ifelse(inhibit.val < INHIBIT.LIMIT ,0,1),
                                   Ct_bin = ifelse(Ct>0,1,0)) %>%
                           left_join(.,PCR)
+# add wash_idx to field negatives
+dat.control.field.neg <- dat.control.field.neg %>% 
+                          mutate(wash_idx = ifelse(drop.sample=="30etOH",1,0))
 
 # cull dat.samp of inhibited samples
 dat.inhibit <- dat.samp %>% filter(useful=="NO" | inhibit.bin==1) 
@@ -260,48 +471,80 @@ B <- dat.few %>% group_by(sample,dilution) %>%
 C <- B %>% dplyr::select(-N) %>% ungroup() %>% pivot_wider(.,names_from = c("dilution"),values_from = "count") %>% as.data.frame()
 colnames(C)[2:5] <- c("x1","x.1","x.2","x.5")
 
-p.1 <- ggplot(C) +
-  geom_point(aes(x=x.1,y=x.2),alpha=0.5) +
-  geom_abline(intercept=c(0,0),slope = c(2,1),color="red",linetype=c("solid","dashed")) +
-  xlab("DNA copies/ul at 1:10 dilution") +
-  ylab("DNA copies/ul at 1:5 dilution")
-
-p.2 <- ggplot(C) +
-  geom_point(aes(x=x.1,y=x.5),alpha=0.5) +
-  geom_abline(intercept=c(0,0),slope = c(5,1),color="red",linetype=c("solid","dashed")) +
-  xlab("DNA copies/ul at 1:10 dilution") +
-  ylab("DNA copies/ul at 1:2 dilution") +
-  xlim(c(0,120)) +
-  ylim(c(0,120))
-
-p.3 <- ggplot(C) +
-  geom_point(aes(x=x.2,y=x.5),alpha=0.5) +
-  geom_abline(intercept=c(0,0),slope = c(2.5,1),color="red",linetype=c("solid","dashed")) +
-  xlab("DNA copies/ul at 1:5 dilution") +
-  ylab("DNA copies/ul at 1:2 dilution") +
-  xlim(c(0,160)) +
-  ylim(c(0,160))
-
-grid.arrange(p.1,p.2,p.3,nrow=2)
+# p.1 <- ggplot(C) +
+#   geom_point(aes(x=x.1,y=x.2),alpha=0.5) +
+#   geom_abline(intercept=c(0,0),slope = c(2,1),color="red",linetype=c("solid","dashed")) +
+#   xlab("DNA copies/ul at 1:10 dilution") +
+#   ylab("DNA copies/ul at 1:5 dilution")
+# 
+# p.2 <- ggplot(C) +
+#   geom_point(aes(x=x.1,y=x.5),alpha=0.5) +
+#   geom_abline(intercept=c(0,0),slope = c(5,1),color="red",linetype=c("solid","dashed")) +
+#   xlab("DNA copies/ul at 1:10 dilution") +
+#   ylab("DNA copies/ul at 1:2 dilution") #+
+#   # xlim(c(0,120)) +
+#   # ylim(c(0,120))
+# 
+# p.3 <- ggplot(C) +
+#   geom_point(aes(x=x.2,y=x.5),alpha=0.5) +
+#   geom_abline(intercept=c(0,0),slope = c(2.5,1),color="red",linetype=c("solid","dashed")) +
+#   xlab("DNA copies/ul at 1:5 dilution") +
+#   ylab("DNA copies/ul at 1:2 dilution") # +
+#   # xlim(c(0,160)) +
+#   # ylim(c(0,160))
+# 
+# dilution_plot <- grid.arrange(p.1,p.2,p.3,nrow=2)
 
 # This strongly suggests that the 0.5 dilution did not work all that well (lower copies than expected)
 # So if we exclude all of the 0.5 and inspect the results
 A <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))
 
-dat.samp <- dat.samp %>% filter(dilution !=0.5)
+
+if(SP == "lamprey"){ # ONLY KEEP 0.1 for lamprey
+  dat.samp <- dat.samp %>% filter(!dilution %in% c(0.5,0.2))
+}
+if(SP == "eulachon"){ # ONLY KEEP 0.2 for Eulachon.
+  dat.samp <- dat.samp %>% filter(!dilution %in% c(0.5,0.1))
+}
+if(SP == "hake"){ # ONLY KEEP 0.2 for hake
+  dat.samp <- dat.samp %>% filter(!dilution %in% c(0.5,0.1))
+}
+
 B <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))  %>% as.data.frame()
 
 ########## CHECK ON HOW MANY SAMPLES WE HAVE ZERO REPLICATES FOR  
-
 # Examine how many samples are retained out of the intial number done.
 dat.samp.ok <- dat.samp %>% group_by(sample,inhibit.bin) %>% summarise(N=length(sample)) %>% as.data.frame()
 
 dat.samp.begin %>% nrow() #1844
 dat.samp.ok %>% nrow() #1841 .... lost 3 samples through filtering.
 
-################################### Making indicators and indexs for stan.
-STATION.DEPTH <- data.frame(station.depth=unique(dat.samp$station.depth),station_depth_idx = 1:length(unique(dat.samp$station.depth)))
+### GET RID OF 25 m deep samples and 200m samples if doing smoothes by depth category.
+if(TRIM.25 ==TRUE) {
+  dat.samp <- dat.samp %>% filter(!depth_cat %in% c(25,200))
+}
 
+################################### Making indicators and indices for stan.
+STATION.DEPTH <- data.frame(station.depth=unique(dat.samp$station.depth),
+                            station_depth_idx = 1:length(unique(dat.samp$station.depth)))
+# add depth and depth category
+STATION.DEPTH <- STATION.DEPTH %>% left_join(.,
+                                    dat.samp %>% dplyr::select(station.depth,depth,depth_cat,transect,station) %>%
+                                      group_by(station.depth,depth,depth_cat,transect,station) %>% summarise(N=length(depth)))
+# Add utm.lat, utm.lon, observed water depth.
+STATION.DEPTH <- STATION.DEPTH %>% left_join(.,
+                                    dat.station.id.trim %>% dplyr::select(transect,station,utm.lon,utm.lat,lat,lon,
+                                                                          bottom.depth=water.depth,
+                                                                          bathy.bottom.depth,
+                                                                          bottom.depth.consensus,
+                                                                          transect.dist.km)) %>%
+                                    dplyr::select(-N)
+
+STATION.DEPTH$depth_cat_factor <- factor(STATION.DEPTH$depth_cat)
+
+########################################################################
+## SAMPLES
+########################################################################
 # Add indices associated with each sample.
 SAMPLES <- dat.samp %>% dplyr::select(station.depth,sample) %>% group_by(station.depth,sample) %>% 
                     summarise(N=length(sample)) %>% dplyr::select(-N) %>% left_join(.,STATION.DEPTH) %>% arrange(station_depth_idx) %>%
@@ -314,10 +557,14 @@ SAMPLES <- dat.samp %>% group_by(sample) %>%
         summarise(vol_standard=mean(vol.standard),log_vol_standard=log10(vol_standard),wash_idx=mean(wash_idx)) %>%
         left_join(SAMPLES,.)
 
+these_samp <- dat.samp %>% group_by(station.depth) %>% summarise(Ct_bin_idx = max(Ct_bin))
+SAMPLES <- left_join(SAMPLES,these_samp) 
+
 SAMPLES.CONTROL <- data.frame(sample=unique(dat.control.field.neg$sample),
                               sample_control_idx = 1:length(unique(dat.control.field.neg$sample)))
 
 dat.samp <- left_join(dat.samp,SAMPLES) %>% left_join(.,STATION.DEPTH) 
+dat.samp$loo_idx <- 1:nrow(dat.samp)
 dat.control.field.neg <- left_join(dat.control.field.neg,SAMPLES.CONTROL)
 
 # This identifies where there is only one sample for each station-depth combination.  This is important for model identifiability.
@@ -357,22 +604,135 @@ N_sample  <- max(SAMPLES$sample_idx)
 N_station_depth <- max(STATION.DEPTH$station_depth_idx)
 N_control_sample <- max(SAMPLES.CONTROL$sample_control_idx)
 
-#####################################3
-#####################################3
-#####################################3
-#####################################3
-#####################################3
-#####################################3
+if(SP=="hake"){
+  wash_offset_prior <- c(-1,1)                          
+}else{
+  wash_offset_prior <- c(wash_offset_hake$Mean,wash_offset_hake$SD*0.01)                           
+}
 
-# Derive Estimates of Concentration 
+# Deal with singleton in control positive for lamprey.
+if(nrow(dat.control.pos)==1){
+  N_control_pos = 2
+  single_n_control_pos <- 1
+  pos_control    = c(dat.control.pos$Ct,0)
+  pos_log_vol_control= c(pos_log_vol_control,0)
+  pos_log_dilution_control = c(pos_log_dilution_control,0)
+  pcr_control_pos_idx    <- c(dat.control.pos$plate_idx,0)
+  sample_control_pos_idx <- c(dat.control.pos$sample_control_idx,0) 
+  wash_control_pos_idx   <- c(dat.control.pos$wash_idx,0)
+}else{
+  single_n_control_pos = 0
+  pos_control         = dat.control.pos$Ct
+  pos_log_vol_control = pos_log_vol_control
+  pos_log_dilution_control = pos_log_dilution_control
+  pcr_control_pos_idx    <- dat.control.pos$plate_idx
+  sample_control_pos_idx <- dat.control.pos$sample_control_idx
+  wash_control_pos_idx   <- dat.control.pos$wash_idx
+}
+#################################################################### 
+#################################################################### 
+#################################################################### 
+# Make the code for smoothes using the data in the STATION.DEPTH data.frame
 
-OFFSET = 0 # Value to improve Fitting in STAN
 
+if(MODEL.TYPE == "lat.long.smooth"){
+  # LAT-LON TENSOR SMOOTHES
+  utm.lon.lims <- c(min(STATION.DEPTH$utm.lon), max(STATION.DEPTH$utm.lon))
+  utm.lat.lims <- c(min(STATION.DEPTH$utm.lat), max(STATION.DEPTH$utm.lat))
+  knots.lon    <- seq(utm.lon.lims[1],utm.lon.lims[2],length.out=N.knots.lon)
+  knots.lat    <- seq(utm.lat.lims[1],utm.lat.lims[2],length.out=N.knots.lat)
+
+  # bottom.depth smooth
+  N.knots.bd <- 6
+  bd.lims <- c(min(STATION.DEPTH$bottom.depth.consensus), max(STATION.DEPTH$bottom.depth.consensus))
+  knots.bd <- seq(bd.lims[1],bd.lims[2],length.out=N.knots.bd)
+  
+  # depth smooth
+  N.knots.depth <- 4
+  depth.lims <- c(min(STATION.DEPTH$depth_cat), max(STATION.DEPTH$depth_cat))
+  knots.depth <- seq(depth.lims[1],depth.lims[2],length.out=N.knots.depth)
+  
+  STATION.DEPTH.temp <- STATION.DEPTH %>% mutate(Y=rnorm(nrow(STATION.DEPTH),0,1))
+  
+  brms.object <- brm(Y ~ t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)+
+           s(bottom.depth.consensus,k=N.knots.bd) +
+           depth_cat_factor,
+           #knots=list(#utm.lon=knots.lon,
+                  #utm.lat=knots.lat,
+            #      bottom.depth = knots.bd),
+       data=STATION.DEPTH.temp,
+       chains=0)
+  
+  smooth.dat <- standata(brms.object)
+  code.dat   <- stancode(brms.object)
+  # THIS IS THE MAGIC SAUCE FOR MAKING PREDICTIONS ON THE SAME SET OF BASIS FUNCTIONS.
+  #    new.dat <- data.frame(Y = rep(0,3),bottom.depth = Q$bottom.depth[1:3])
+  #    smooth.dat.pred <- standata(brms.object,newdata=new.dat)
+
+  # C <- brm(Y ~ s(bottom.depth,k=N.knots.bd),
+  #          knots=list(bottom.depth = knots.bd),
+  #          data=Q,
+  #          chains=0)
+  
+  # brms.object <- 
+  # smooth.datC <- standata(C)
+  # code.datC   <- stancode(C)
+}
+
+if(MODEL.TYPE == "lat.long.smooth.base"){
+
+  # LAT-LON TENSOR SMOOTHES
+  utm.lon.lims <- c(min(STATION.DEPTH$utm.lon), max(STATION.DEPTH$utm.lon))
+  utm.lat.lims <- c(min(STATION.DEPTH$utm.lat), max(STATION.DEPTH$utm.lat))
+  knots.lon    <- seq(utm.lon.lims[1],utm.lon.lims[2],length.out=N.knots.lon)
+  knots.lat    <- seq(utm.lat.lims[1],utm.lat.lims[2],length.out=N.knots.lat)
+  
+  # bottom.depth smooth
+  # N.knots.bd <- 6
+  # bd.lims <- c(min(STATION.DEPTH$bathy.bottom.depth), max(STATION.DEPTH$bathy.bottom.depth))
+  # knots.bd <- seq(bd.lims[1],bd.lims[2],length.out=N.knots.bd)
+  
+  # depth smooth
+  # N.knots.depth <- 4
+  # depth.lims <- c(min(STATION.DEPTH$depth_cat), max(STATION.DEPTH$depth_cat))
+  # knots.depth <- seq(depth.lims[1],depth.lims[2],length.out=N.knots.depth)
+  
+  STATION.DEPTH.temp <- STATION.DEPTH %>% mutate(Y=rnorm(nrow(STATION.DEPTH),0,1))
+
+  # print("HEHEHEHEHEHEHEHEHEHEHEHEHEHEHEHEHE")
+  # print(N.knots.lon)
+  brms.object <- brm(Y ~ t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)+
+                            depth_cat_factor,
+                     #knots=list(#utm.lon=knots.lon,
+                     #utm.lat=knots.lat,
+                     #      bottom.depth = knots.bd),
+                     data=STATION.DEPTH.temp,
+                     chains=0)
+  # print("HERE")
+  smooth.dat <- standata(brms.object)
+  code.dat   <- stancode(brms.object)
+  # THIS IS THE MAGIC SAUCE FOR MAKING PREDICTIONS ON THE SAME SET OF BASIS FUNCTIONS.
+  #    new.dat <- data.frame(Y = rep(0,3),bottom.depth = Q$bottom.depth[1:3])
+  #    smooth.dat.pred <- standata(brms.object,newdata=new.dat)
+  
+  # C <- brm(Y ~ s(bottom.depth,k=N.knots.bd),
+  #          knots=list(bottom.depth = knots.bd),
+  #          data=Q,
+  #          chains=0)
+  
+  # brms.object <- 
+  # smooth.datC <- standata(C)
+  # code.datC   <- stancode(C)
+}
+
+
+#################################################################### 
+#################################################################### 
 stan_data = list(
   "bin_stand"     = dat.stand.bin$Ct_bin,
   "pos_stand"     = dat.stand.pos$Ct,
   "D_bin_stand"   = dat.stand.bin$log10_copies,
-  "D_pos_stand" =   dat.stand.pos$log10_copies,
+  "D_pos_stand"   = dat.stand.pos$log10_copies,
   
   #Observations
   "bin_obs"    = dat.obs.bin$Ct_bin,
@@ -391,17 +751,18 @@ stan_data = list(
   "sample_idx" = SAMPLES$sample_idx,
   "samp_station_depth_idx" = SAMPLES$samp_station_depth_idx,
   "singleton_idx" = SAMPLES$singleton_idx,
+  "Ct_bin_idx" = SAMPLES$Ct_bin_idx,
   
   # Indices for station-depth combination
   "station_depth_idx" = STATION.DEPTH$station_depth_idx,
   
   # Control Values
   "bin_control"    = dat.control.bin$Ct_bin,
-  "pos_control"    = dat.control.pos$Ct,
-  "bin_log_vol_control"= bin_log_vol_control,
-  "pos_log_vol_control"= pos_log_vol_control,  
+  "pos_control"    = pos_control,
+  "bin_log_vol_control" = bin_log_vol_control,
+  "pos_log_vol_control" = pos_log_vol_control,
   "bin_log_dilution_control"= bin_log_dilution_control,
-  "pos_log_dilution_control"= pos_log_dilution_control,  
+  "pos_log_dilution_control"= pos_log_dilution_control,
   
   # Indices and counters
   "N_pcr"    = N_pcr,    # Number of PCR plates
@@ -414,36 +775,109 @@ stan_data = list(
   "N_obs_pos"   = N_obs_pos,
   "N_control_bin"   = N_control_bin,
   "N_control_pos"   = N_control_pos,
-
+  
   # Indices for qPCR plate
   "pcr_stand_bin_idx"   = dat.stand.bin$plate_idx,
   "pcr_stand_pos_idx" = dat.stand.pos$plate_idx,
   "pcr_obs_bin_idx"   = dat.obs.bin$plate_idx,
   "pcr_obs_pos_idx" =   dat.obs.pos$plate_idx,
   "pcr_control_bin_idx"   = dat.control.bin$plate_idx,
-  "pcr_control_pos_idx" =   dat.control.pos$plate_idx,
-
+  "pcr_control_pos_idx" =   pcr_control_pos_idx,
+  
+  # Index for leave.one.out
+  "loo_pos_idx" = dat.obs.pos$loo_idx,
+  
   # Control samples  
   "sample_control_idx" = SAMPLES.CONTROL$sample_control_idx,
   
   # Indices for Samples
   "sample_pos_idx" = dat.obs.pos$sample_idx,
   "sample_bin_idx" = dat.obs.bin$sample_idx,
-  "sample_control_pos_idx" = dat.control.pos$sample_control_idx,
+  "sample_control_pos_idx" = sample_control_pos_idx,
   "sample_control_bin_idx" = dat.control.bin$sample_control_idx,
-
+  
   "station_depth_pos_idx" = dat.obs.pos$station_depth_idx,
   "station_depth_bin_idx" = dat.obs.bin$station_depth_idx,
   
   # "singleton_pos_idx" = dat.obs.pos$singleton_idx,
   # "singleton_bin_idx" = dat.obs.bin$singleton_idx,
-
+  
   "wash_pos_idx" = dat.obs.pos$wash_idx,
   "wash_bin_idx" = dat.obs.bin$wash_idx,
-    
+  
+  "wash_control_pos_idx" = wash_control_pos_idx,
+  "wash_control_bin_idx" = dat.control.bin$wash_idx,
+  
   #Offset of density for improving fitting characteristics
-  "OFFSET" = OFFSET
-)
+  "OFFSET" = 0,
+  
+  "single_n_control_pos" = single_n_control_pos,
+  
+  # Contamination Weight
+  "wash_offset_prior" = wash_offset_prior,
+  
+  
+  # SMOOTH COMPONENTS.
+  # Data for linear effects
+    "K" = smooth.dat$K, # number of population-level effects
+    "X" = smooth.dat$X,  # population-level design matrix
+    # data for splines
+    "Ks" = smooth.dat$Ks, # number of linear effects
+    "Xs" = smooth.dat$Xs, # design matrix for the linear effects
+    # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)0
+    "nb_1" = smooth.dat$nb_1,  # number of bases
+    "knots_1" = smooth.dat$knots_1, # number of knots
+    # basis function matrices
+    "Zs_1_1" = smooth.dat$Zs_2_1,
+    "Zs_1_2" = smooth.dat$Zs_2_2,
+    "Zs_1_3" = smooth.dat$Zs_2_3,
+  # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)50
+  "nb_2" = smooth.dat$nb_2,  # number of bases
+  "knots_2" = smooth.dat$knots_2,  # number of knots
+  # basis function matrices
+   "Zs_2_1" = smooth.dat$Zs_2_1,
+   "Zs_2_2" = smooth.dat$Zs_2_2,
+   "Zs_2_3" = smooth.dat$Zs_2_3,
+  # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)100
+   "nb_3" = smooth.dat$nb_3,  # number of bases
+   "knots_3" = smooth.dat$knots_3,   # number of knots
+  # basis function matrices
+   "Zs_3_1"= smooth.dat$Zs_3_1,
+   "Zs_3_2"= smooth.dat$Zs_3_2,
+   "Zs_3_3"= smooth.dat$Zs_3_3,
+  
+   # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)150
+   "nb_4"= smooth.dat$nb_4,  # number of bases
+   "knots_4"= smooth.dat$knots_4,  # number of knots
+  # basis function matrices
+   "Zs_4_1"= smooth.dat$Zs_4_1,
+   "Zs_4_2"= smooth.dat$Zs_4_2,
+   "Zs_4_3"= smooth.dat$Zs_4_3,
+  
+   # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)300
+   "nb_5"= smooth.dat$nb_5, # number of bases
+   "knots_5"= smooth.dat$knots_5, # number of knots
+  # basis function matrices
+  "Zs_5_1"= smooth.dat$Zs_5_1,
+  "Zs_5_2"= smooth.dat$Zs_5_2,
+  "Zs_5_3"= smooth.dat$Zs_5_3,
+  
+  # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)500
+  "nb_6" = smooth.dat$nb_6,  # number of bases
+  "knots_6"= smooth.dat$knots_6,  # number of knots
+  # basis function matrices
+  "Zs_6_1"= smooth.dat$Zs_6_1,
+  "Zs_6_2"= smooth.dat$Zs_6_2,
+  "Zs_6_3"= smooth.dat$Zs_6_3
+) 
+if(MODEL.TYPE == "lat.long.smooth"){
+  stan_data = c(stan_data,
+  list(# data for spline s(bottom.depth,k=N.knots.bd)
+  "nb_7"= smooth.dat$nb_7,  # number of bases
+  "knots_7"= smooth.dat$knots_7,  # number of knots
+  # basis function matrices
+  "Zs_7_1"= smooth.dat$Zs_7_1))
+}
 
 stan_pars = c(
   "beta_0", # intercept for standards
@@ -454,117 +888,193 @@ stan_pars = c(
   
   "mu_contam", # log-mean of average contamination
   "sigma_contam", # lod-sd of contamination
-
-  "D",     # Latent variable for Log-count in each station-location combination
-  "D_error",
+  
+  "D",     # Latent variable for Log10-count in each station-location combination
+  "D_delta",
+  #"D_error",
   "D_contam",
   "D_control", # Latent variable for log-count in field negative controls.
   
   "sigma_stand_int", # variability among standards regression.
   "sigma_pcr",     # variability among samples, given individual bottle, site, and month 
-  
   "delta",  # random effect for sample #
-  "tau_sample"   # sd among samples given station-depth 
-
-  # random effect for each bottle around the site-month mean.
+  "tau_sample",
+  "log_lik")   # sd among samples given station-depth 
   
-  #"sigma_stand_slope", # variability among standards regression.
-  #"sigma_stand_slope2", # variability among standards regression.
-  
-  # "sigma_stand_int_bar", # variability among standards regression.
-  # "sigma_stand_slope_bar", # variability among standards regression.
-  # "sigma_stand_int_sd", # variability among standards regression.
-  # "sigma_stand_slope_sd", # variability among standards regression.
 
-  # "geom_month_index",
-  # "arith_month_index"
-)   
+if(MODEL.TYPE=="lat.long.smooth"){
+  stan_pars <- c(stan_pars,
+    # smooth and linear coefficients
+    "D",
+    "D_delta",
+   # "Intercept",
+    "b",
+    "bs",
+    "s_1_1","s_1_2","s_1_3",
+    "s_2_1","s_2_2","s_2_3",
+    "s_3_1","s_3_2","s_3_3",
+    "s_4_1","s_4_2","s_4_3",
+    "s_5_1","s_5_2","s_5_3",
+    "s_6_1","s_6_2","s_6_3",
+    "s_7_1"
+  ) 
+  N_knots_all <- list("N.knots.lon"=N.knots.lon,
+                      "N.knots.lat"=N.knots.lat,
+                      "N.knots.bd"=N.knots.bd)
+}
+if(MODEL.TYPE=="lat.long.smooth.base"){
+  stan_pars <- c(stan_pars,
+                 # smooth and linear coefficients
+                 # "Intercept",
+                 "b",
+                 "bs",
+                 "s_1_1","s_1_2","s_1_3",
+                 "s_2_1","s_2_2","s_2_3",
+                 "s_3_1","s_3_2","s_3_3",
+                 "s_4_1","s_4_2","s_4_3",
+                 "s_5_1","s_5_2","s_5_3",
+                 "s_6_1","s_6_2","s_6_3"
+  )   
+  N_knots_all <- list("N.knots.lon"=N.knots.lon,
+                      "N.knots.lat"=N.knots.lat)
+}
 
 ### INTIAL VALUES
-  stan_init_f1 <- function(n.chain,N_pcr,N_station_depth,N_control_sample){ 
-    A <- list()
-    for(i in 1:n.chain){
-      A[[i]] <- list(
-        
-        sigma_stand_int = runif(1,0.01,2),
-        #sigma_stand_slope = runif(1,-1,-0.1),
-        # beta_0_bar = runif(1,20,40),
-        # beta_1_bar = rnorm(1,-3,1),
-        beta_0 = runif(N_pcr,30,40),
-        beta_1 = rnorm(N_pcr,-4,1),
-        wash_offset = rnorm(1,-2,1),
-        
-        # phi_0_bar = runif(1,10,25),
-        # phi_1_bar = rnorm(1,5,1),
-        phi_0  = runif(N_pcr,0,5),
-        phi_1  = rnorm(N_pcr,3,0.5),
-        sigma_pcr = runif(1,0.01,0.4),
-        tau_sample = runif(1,0.01,0.2),
-        D      = rnorm(N_station_depth,0,2),
-        D_control  = rnorm(N_control_sample,0,2)
-        # gamma  = rnorm(N_hybrid,0,2)
-
-      )
-    }
-    return(A)
+stan_init_f2 <- function(n.chain,N_pcr,N_station_depth,N_control_sample){ 
+  A <- list()
+  for(i in 1:n.chain){
+    A[[i]] <- list(
+      
+      sigma_stand_int = runif(1,0.01,2),
+      beta_0 = runif(N_pcr,30,40),
+      beta_1 = rnorm(N_pcr,-4,1),
+      wash_offset = rnorm(1,-2,1),
+      
+      phi_0  = runif(N_pcr,0,5),
+      phi_1  = rnorm(N_pcr,3,0.5),
+      sigma_pcr = runif(1,0.01,0.4),
+      D_control  = rnorm(N_control_sample,0,2)
+      
+    )
   }
+  return(A)
+}
 
-#################################################################### 
-#################################################################### 
-##### STAN
-#################################################################### 
-#################################################################### 
+################################################################
+################################################################
+# STAN MODEL FOR THE UNKNOWN SAMPLES
+################################################################
+################################################################
+
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
-  
-N_CHAIN = 3
-Warm = 1000
-Iter = 5000
+
+N_CHAIN = 1
+Warm = 1200
+Iter = 2000
 Treedepth = 10
-Adapt_delta = 0.60
+Adapt_delta = 0.80
 
 LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)
 
-stanMod = stan(file = "qPCR_Hake.stan" ,data = stan_data, 
-               verbose = FALSE, chains = N_CHAIN, thin = 2, 
+if(MODEL.TYPE=="Base"){
+  stanMod = stan(file = "qPCR_Hake.stan" ,data = stan_data, 
+                        verbose = FALSE, chains = N_CHAIN, thin = 5, 
+                        warmup = Warm, iter = Warm + Iter, 
+                        control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
+                        pars = stan_pars,
+                        boost_lib = NULL,
+                        sample_file = paste0("./Output files/",MODEL.TYPE,"_",MODEL.ID,".csv"),
+                        init = stan_init_f2(n.chain=N_CHAIN,
+                                            N_pcr= N_pcr,
+                                            N_station_depth = N_station_depth,
+                                            N_control_sample = N_control_sample)
+  )
+}
+
+if(MODEL.TYPE=="lat.long.smooth"){
+  stanMod = stan(file = "qPCR_Hake_smoothes.stan" ,data = stan_data, 
+               verbose = FALSE, chains = N_CHAIN, thin = 1, 
                warmup = Warm, iter = Warm + Iter, 
                control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                pars = stan_pars,
                boost_lib = NULL,
-               sample_file = "./Output files/test.csv",
-               init = stan_init_f1(n.chain=N_CHAIN,
+               sample_file = paste0("./Output files/",MODEL.TYPE,"_",MODEL.ID,".csv"),
+               init = stan_init_f2(n.chain=N_CHAIN,
                                    N_pcr= N_pcr,
                                    N_station_depth = N_station_depth,
                                    N_control_sample = N_control_sample)
-)
+  )
+}
+if(MODEL.TYPE=="lat.long.smooth.base"){
+  stanMod = stan(file = "qPCR_Hake_smoothes_no_depth.stan" ,data = stan_data, 
+                 verbose = FALSE, chains = N_CHAIN, thin = 1, 
+                 warmup = Warm, iter = Warm + Iter, 
+                 control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
+                 pars = stan_pars,
+                 boost_lib = NULL,
+                 sample_file = paste0("./Output files/",MODEL.TYPE,"_",MODEL.ID,".csv"),
+                 init = stan_init_f2(n.chain=N_CHAIN,
+                                     N_pcr= N_pcr,
+                                     N_station_depth = N_station_depth,
+                                     N_control_sample = N_control_sample)
+  )
+}
 
-#################################################################### 
-#################################################################### 
-#################################################################### 
-
-pars <- rstan::extract(stanMod, permuted = TRUE)
 # get_adaptation_info(stanMod)
+pars <- rstan::extract(stanMod, permuted = TRUE)
+log_lik_1 <- extract_log_lik(stanMod, merge_chains = FALSE)
+r_eff <- relative_eff(exp(log_lik_1))
+loo_val <- loo(log_lik_1, r_eff = r_eff)
+print(loo_val)
+
+
 samp_params <- get_sampler_params(stanMod)
 #samp_params 
 stanMod_summary <- summary(stanMod)$summary
-stanMod_summary_reg <- summary(stanMod,pars=c("beta_0",
+stanMod_summary_parts <- list()
+stanMod_summary_parts[[as.name("D")]] <- summary(stanMod,pars="D")$summary  
+stanMod_summary_parts[[as.name("reg")]] <- summary(stanMod,pars=c("beta_0",
                                "beta_1",
                                "phi_0",
                                "phi_1"))$summary
-stanMod_summary_param <- summary(stanMod,pars=c(
+stanMod_summary_parts[[as.name("param")]] <- summary(stanMod,pars=c(
                                          "wash_offset",
                                          "mu_contam",
                                          "sigma_contam",
                                          "tau_sample",
                                          "sigma_stand_int", # variability among standard regression.
                                          "sigma_pcr"))$summary     # variability among samples, given individual bottle, site, and month ))$summary
-stanMod_summary_D <- summary(stanMod,pars="D")$summary
-ID <- rownames(stanMod_summary_D)
-stanMod_summary_D <- stanMod_summary_D %>%  as.data.frame() %>% mutate(ID=ID) %>% arrange(desc(Rhat))
+if(MODEL.TYPE == "lat.long.smooth"){
+  stanMod_summary_parts[[as.name("smoothes")]] <- summary(stanMod, pars=c("b", "bs",
+                                               "s_1_1","s_1_2","s_1_3",  
+                                               "s_2_1","s_2_2","s_2_3",
+                                               "s_3_1","s_3_2","s_3_3",
+                                               "s_4_1","s_4_2","s_4_3",
+                                               "s_5_1","s_5_2","s_5_3",
+                                               "s_6_1","s_6_2","s_6_3",
+                                               "s_7_1"))$summary
+  
+}
+if(MODEL.TYPE == "lat.long.smooth.base"){
+  stanMod_summary_parts[[as.name("smoothes")]] <- summary(stanMod, pars=c("b", "bs",
+                                                                          "s_1_1","s_1_2","s_1_3",  
+                                                                          "s_2_1","s_2_2","s_2_3",
+                                                                          "s_3_1","s_3_2","s_3_3",
+                                                                          "s_4_1","s_4_2","s_4_3",
+                                                                          "s_5_1","s_5_2","s_5_3",
+                                                                          "s_6_1","s_6_2","s_6_3"))$summary
+  
+}
 
-#round(stanMod_summary,2)
 
+
+
+ID <- rownames(stanMod_summary_parts$D)
+stanMod_summary_D <- stanMod_summary_parts$D %>%  as.data.frame() %>% mutate(ID=ID) %>% arrange(desc(Rhat))
+
+####
 base_params <- c(
   "beta_0",
   "beta_1",
@@ -572,8 +1082,8 @@ base_params <- c(
   "phi_1",
   "wash_offset",
   
-  "mu_contam",
-  "sigma_contam",
+   "mu_contam",
+   "sigma_contam",
   
   #"D",
   #"delta",
@@ -586,7 +1096,9 @@ base_params <- c(
 
 ##### MAKE SOME DIAGNOSTIC PLOTS
 TRACE <- list()
-TRACE[[as.name("D")]] <- traceplot(stanMod,pars=c("lp__",paste0("D[",sample(1:N_sample,8),"]")),inc_warmup=FALSE)
+TRACE[[as.name("D")]] <- traceplot(stanMod,pars=c("lp__","D[12]","D[234]","D[456]","D[855]"),inc_warmup=FALSE)
+#TRACE[[as.name("mu_smooth")]] <- traceplot(stanMod,pars=c("lp__","mu_smooth[12]","mu_smooth[234]","mu_smooth[456]","mu_smooth[878]"),inc_warmup=FALSE)
+
 TRACE[[as.name("Phi0")]] <- traceplot(stanMod,pars=c("lp__","phi_0"),inc_warmup=FALSE)
 TRACE[[as.name("Phi1")]] <- traceplot(stanMod,pars=c("lp__","phi_1"),inc_warmup=FALSE)
 TRACE[[as.name("Beta0")]] <- traceplot(stanMod,pars=c("lp__","beta_0"),inc_warmup=FALSE)
@@ -594,174 +1106,55 @@ TRACE[[as.name("Beta1")]] <- traceplot(stanMod,pars=c("lp__","beta_1"),inc_warmu
 TRACE[[as.name("Var")]] <- traceplot(stanMod,pars=c("lp__","tau_sample","sigma_stand_int","sigma_pcr"),inc_warmup=FALSE)
 TRACE[[as.name("Contam")]] <- traceplot(stanMod,pars=c("lp__","wash_offset","mu_contam","sigma_contam"),inc_warmup=FALSE)
 
-# pull 9 random D values.
+if(MODEL.TYPE=="lat.long.smooth"){
+TRACE[[as.name("b")]] <- traceplot(stanMod,pars=c("b"),inc_warmup=FALSE)
+TRACE[[as.name("bs")]] <- traceplot(stanMod,pars=c("bs"),inc_warmup=FALSE)
 
+TRACE[[as.name("s_1")]] <- traceplot(stanMod,pars=c("s_1_1","s_1_2","s_1_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_2")]] <- traceplot(stanMod,pars=c("s_2_1","s_2_2","s_2_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_3")]] <- traceplot(stanMod,pars=c("s_3_1","s_3_2","s_3_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_4")]] <- traceplot(stanMod,pars=c("s_4_1","s_4_2","s_4_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_5")]] <- traceplot(stanMod,pars=c("s_5_1","s_5_2","s_5_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_6")]] <- traceplot(stanMod,pars=c("s_6_1","s_6_2","s_6_3"),inc_warmup=FALSE)
+TRACE[[as.name("s_7")]] <- traceplot(stanMod,pars=c("s_7_1"),inc_warmup=FALSE)
+}else if(MODEL.TYPE=="lat.long.smooth.base"){
+  TRACE[[as.name("b")]] <- traceplot(stanMod,pars=c("b"),inc_warmup=FALSE)
+  TRACE[[as.name("bs")]] <- traceplot(stanMod,pars=c("bs"),inc_warmup=FALSE)
+  
+  TRACE[[as.name("s_1")]] <- traceplot(stanMod,pars=c("s_1_1","s_1_2","s_1_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_2")]] <- traceplot(stanMod,pars=c("s_2_1","s_2_2","s_2_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_3")]] <- traceplot(stanMod,pars=c("s_3_1","s_3_2","s_3_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_4")]] <- traceplot(stanMod,pars=c("s_4_1","s_4_2","s_4_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_5")]] <- traceplot(stanMod,pars=c("s_5_1","s_5_2","s_5_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_6")]] <- traceplot(stanMod,pars=c("s_6_1","s_6_2","s_6_3"),inc_warmup=FALSE)
+  #TRACE[[as.name("s_7")]] <- traceplot(stanMod,pars=c("s_7_1"),inc_warmup=FALSE)
+}
 
 TRACE$Var
 TRACE$Contam
+TRACE$b
+TRACE$bs
 
-#pairs(stanMod, pars = c(base_params), log = FALSE, las = 1)
-
-B1 <- apply(pars$beta_0,2,mean)
-B2 <- apply(pars$beta_1,2,mean)
-
-P0 <- apply(pars$phi_0,2,mean)
-P1 <- apply(pars$phi_1,2,mean)
-
-V0 <-  mean(pars$sigma_stand_int)
-#V1 <- mean(pars$sigma_stand_slope)
-#V2 <- mean(pars$sigma_stand_slope2)
-
-# Plot regression against Standard
-X <- seq(0,5,length.out=1000) - OFFSET 
-Y <- t(B1 + B2 %*% t(X ))
-
-STAND.REG <- data.frame(X=X,Y=Y)
-STAND.REG <- melt(STAND.REG,id.vars="X",value.name="Y")
-
-x.lim=c(min(X),max(X))
-y.lim=c(20,40)
-for(i in 1:ncol(Y)){
-  plot(Y[,i]~X,xlim=x.lim,ylim=y.lim,type="l",col=2)
-  par(new=T)
-}
-plot(dat.stand.pos$Ct~ dat.stand.pos$log10_copies,xlim=x.lim,ylim=y.lim)
-
-
-#BREAKS <- c(-2.5,-1.5,-0.5,0.5,1.5,2.5,3.5,4.5)
-#LABS   <- BREAKS + OFFSET
-
-
-lab.temp<- data.frame(variable=paste0("Y.",PCR$plate_idx), qPCR=PCR$qPCR)
-STAND.REG <-left_join(STAND.REG,lab.temp)
-
-stand.plot <- ggplot(dat.stand.pos) +
-  geom_point(aes(x=log10_copies - OFFSET ,y=Ct,color=qPCR),alpha=0.75) +
-  scale_shape_discrete(name="qPCR Plate") +
-  theme_bw()
-stand.plot <- stand.plot +
-  geom_line(data=STAND.REG,aes(x=X,y=Y,color=qPCR)) +
-  scale_color_discrete(name="qPCR Plate") +
-  ylab("PCR cycle")  +
-  xlab("log10 copies DNA") +
-  facet_wrap(~qPCR)
-#scale_x_continuous(labels = paste0("1e",LABS),limits = c(-2,4))
-stand.plot
-
-# Plot occurrence of standard
-Y <- t(P0 + P1 %*% t(X ))
-LOGIT <- data.frame(X=X,Y=plogis(Y))
-LOGIT <- melt(LOGIT,id.vars="X",value.name="Y")
-
-LOGIT <-left_join(LOGIT,lab.temp)
-
-stand.plot.pres <- ggplot(dat.stand.bin) +
-  geom_jitter(aes(x=log10_copies - OFFSET,y=Ct_bin,color=qPCR),alpha=0.75,width=0,height=0.05) +
-  geom_line(data=LOGIT,aes(y=Y,x=X,color=qPCR)) +
-  theme_bw() +
-  scale_shape_discrete(name="qPCR Plate") +
-  scale_color_discrete(name="qPCR plate") +
-  xlab("log10 copies DNA") +
-  ylab("Amplification success") +
-  scale_y_continuous(breaks=c(0,1),labels = c("No","Yes"))
-#scale_x_continuous(breaks=BREAKS,labels = paste0("1e",LABS),limits = c(-2.5,4))
-
-stand.plot.pres
-
-################################################################################################
-################################################################################################
-################################################################################################
-################################################################################################
-##### Extract data of interest, save to file for use elsewhere
-################################################################################################
-################################################################################################
-################################################################################################
-###############################################################################################
-
-# THIS IS THE FACTOR FOR EXPANDING FROM COPIES PER ul to COPIES PER L 
-# Based on sampling volume of 2.5 L
-
-EXPAND <- 40
-LOG.EXPAND <- log10(EXPAND)
-
-PROBS <- c(0.025,0.05,0.10,0.25,0.5,0.75,0.9,0.95,0.975)
-Log   <- paste0("log",PROBS)
-station_depth_out <- data.frame(station_depth_idx= 1:ncol(pars$D), 
-                         Mean.log=apply(pars$D,2,mean),
-                         Sd.log=apply(pars$D,2,sd),
-                         Log.Val=data.frame(t(apply(pars$D,2,quantile,probs=PROBS))),
-                         Mean=apply(10^pars$D,2,mean),
-                         Sd=apply(10^pars$D,2,sd),
-                         Val=data.frame(t(apply(10^pars$D,2,quantile,probs=PROBS))))
-
-station_depth_out_liter <- data.frame(station_depth_idx= 1:ncol(pars$D), 
-                                Mean.log=apply(pars$D+LOG.EXPAND,2,mean),
-                                Sd.log=apply(pars$D+LOG.EXPAND,2,sd),
-                                Log.Val=data.frame(t(apply(pars$D+LOG.EXPAND,2,quantile,probs=PROBS))),
-                                Mean=apply(10^(pars$D+LOG.EXPAND),2,mean),
-                                Sd=apply(10^(pars$D+LOG.EXPAND),2,sd),
-                                Val=data.frame(t(apply(10^(pars$D+LOG.EXPAND),2,quantile,probs=PROBS))))
-
-sample_contam_error_out <- data.frame(sample_idx= 1:ncol(pars$D_error), 
-                                Mean.log=apply(pars$D_error,2,mean),
-                                Sd.log=apply(pars$D_error,2,sd),
-                                Log.Val=data.frame(t(apply(pars$D_error,2,quantile,probs=PROBS))),
-                                Mean=apply(10^pars$D_error,2,mean),
-                                Sd=apply(10^pars$D_error,2,sd),
-                                Val=data.frame(t(apply(10^pars$D_error,2,quantile,probs=PROBS))))
-
-sample_contam_error_out_liter <- data.frame(sample_idx= 1:ncol(pars$D_error), 
-                                      Mean.log=apply(pars$D_error+LOG.EXPAND,2,mean),
-                                      Sd.log=apply(pars$D_error+LOG.EXPAND,2,sd),
-                                      Log.Val=data.frame(t(apply(pars$D_error+LOG.EXPAND,2,quantile,probs=PROBS))),
-                                      Mean=apply(10^(pars$D_error+LOG.EXPAND),2,mean),
-                                      Sd=apply(10^(pars$D_error+LOG.EXPAND),2,sd),
-                                      Val=data.frame(t(apply(10^(pars$D_error+LOG.EXPAND),2,quantile,probs=PROBS))))
-
-sample_contam_total_out <- data.frame(sample_idx= 1:ncol(pars$D_contam), 
-                                      Mean.log=apply(pars$D_contam,2,mean),
-                                      Sd.log=apply(pars$D_contam,2,sd),
-                                      Log.Val=data.frame(t(apply(pars$D_contam,2,quantile,probs=PROBS))),
-                                      Mean=apply(10^pars$D_contam,2,mean),
-                                      Sd=apply(10^pars$D_contam,2,sd),
-                                      Val=data.frame(t(apply(10^pars$D_contam,2,quantile,probs=PROBS))))
-
-sample_contam_total_out_liter <- data.frame(sample_idx= 1:ncol(pars$D_contam), 
-                                            Mean.log=apply(pars$D_contam+LOG.EXPAND,2,mean),
-                                            Sd.log=apply(pars$D_contam+LOG.EXPAND,2,sd),
-                                            Log.Val=data.frame(t(apply(pars$D_contam+LOG.EXPAND,2,quantile,probs=PROBS))),
-                                            Mean=apply(10^(pars$D_contam+LOG.EXPAND),2,mean),
-                                            Sd=apply(10^(pars$D_contam+LOG.EXPAND),2,sd),
-                                            Val=data.frame(t(apply(10^(pars$D_contam+LOG.EXPAND),2,quantile,probs=PROBS))))
-
-field_neg_out <- data.frame(sample_control_idx= 1:ncol(pars$D_control), 
-                                Mean.log=apply(pars$D_control,2,mean),
-                                Sd.log=apply(pars$D_control,2,sd),
-                                Log.Val=data.frame(t(apply(pars$D_control,2,quantile,probs=PROBS))),
-                                Mean=apply(10^pars$D_control,2,mean),
-                                Sd=apply(10^pars$D_control,2,sd),
-                                Val=data.frame(t(apply(10^pars$D_control,2,quantile,probs=PROBS))))
-
-field_neg_out_liter <- data.frame(sample_control_idx= 1:ncol(pars$D_control), 
-                                  Mean.log=apply(pars$D_control+LOG.EXPAND,2,mean),
-                                  Sd.log=apply(pars$D_control+LOG.EXPAND,2,sd),
-                                  Log.Val=data.frame(t(apply(pars$D_control+LOG.EXPAND,2,quantile,probs=PROBS))),
-                                  Mean=apply(10^(pars$D_control+LOG.EXPAND),2,mean),
-                                  Sd=apply(10^(pars$D_control+LOG.EXPAND),2,sd),
-                                  Val=data.frame(t(apply(10^(pars$D_control+LOG.EXPAND),2,quantile,probs=PROBS))))
-
-delta_out <- data.frame(sample_idx= 1:ncol(pars$delta), 
-                                Mean.log=apply(pars$delta,2,mean) ,
-                                Sd.log=apply(pars$delta,2,sd),
-                                Log.Val=data.frame(t(apply(pars$delta,2,quantile,probs=PROBS))),
-                                Mean=apply(10^pars$delta,2,mean),
-                                Sd=apply(10^pars$delta,2,sd),
-                                Val=data.frame(t(apply(10^pars$delta,2,quantile,probs=PROBS))))
-
-
-Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = pars, samp_params=samp_params,
+#### WRITE TO FILE
+Output.qpcr <- list(
+                    # STAN MODEL ASSOCIATED THINGS
+                    stanMod = stanMod, 
+                    stanMod_summary = stanMod_summary,
+                    loo_val = loo_val, #loo summary
+                    log_lik_1 = log_lik_1, #log_likelihood object for summary
+                    r_eff = r_eff,
+                    Iter=Iter,
+                    N_knots_all = N_knots_all,
+                    #stanMod_summary_reg = stanMod_summary_reg,
+                    stanMod_summary_parts = stanMod_summary_parts,
+                    #stanMod_summary_D = stanMod_summary_D,
+                    samp = pars, samp_params=samp_params,
                     TRACE = TRACE,
                     SPECIES = SP,
+                    MODEL.TYPE = MODEL.TYPE,
+                    # Input Data
+                    brms.object =brms.object, # for constructing the model.
+                    N_knots_all = N_knots_all,# for constructing the model.
                     dat.station.id.trim=dat.station.id.trim,
                     dat.sample.id=dat.sample.id,
                     dat.id =dat.id,
@@ -774,8 +1167,6 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     dat.obs.bin =dat.obs.bin,
                     dat.obs.pos = dat.obs.pos,
                     INHIBIT.LIMIT = INHIBIT.LIMIT,
-                    OFFSET = OFFSET,
-                    base_params =base_params,
                     STATION.DEPTH=STATION.DEPTH,
                     SAMPLES=SAMPLES,
                     SAMPLES.CONTROL=SAMPLES.CONTROL,
@@ -783,16 +1174,17 @@ Output.qpcr <- list(stanMod = stanMod, stanMod_summary = stanMod_summary,samp = 
                     N_station_depth=N_station_depth,
                     N_sample = N_sample,   # Number of site-month-bottle combinations.
                     N_pcr    = N_pcr,    # Number of PCR plates
-                    stand.plot = stand.plot,
-                    stand.plot.pres = stand.plot.pres,
-                    station_depth_out=station_depth_out,
-                    station_depth_out_liter=station_depth_out_liter,
-                    field_neg_out=field_neg_out,
-                    field_neg_out_liter=field_neg_out_liter,
-                    delta_out=delta_out)
+                    dat_raster_fin = dat_raster_fin,
+                    dat_raster_trim = dat_raster_trim
+                    
+                    )
 
 setwd(base.dir)
 setwd("./Stan Model Fits/")
-save(Output.qpcr,file=paste("qPCR 2019",SP,"Fitted.RData"))
+save(Output.qpcr,file=paste("qPCR 2019",SP,MODEL.TYPE,MODEL.ID,"Fitted.RData"))
 #################################################################
 ##################################
+if(SP=="hake"){
+  dat.wash.offset <- data.frame(Mean = mean(pars$wash_offset),SD = sd(pars$wash_offset))
+  write.csv(dat.wash.offset, "wash_offset_hake.csv",row.names = F)
+}

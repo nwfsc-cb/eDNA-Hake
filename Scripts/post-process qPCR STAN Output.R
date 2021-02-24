@@ -6,7 +6,12 @@ library(viridis)
 library(ggmap)
 library(maps)
 library(mapdata)
+library(sp)
+library(gstat)
 library(ggplot2)
+library(sf)
+library(brms)
+library(ggsci)
 
 script.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Scripts"
 # load and run in the acoustic data.
@@ -16,61 +21,40 @@ source("process acoustic data.R")
 source("pull NOAA bathy for acoustic data.R")
 
 # Read in the output from the Stan model
-base.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
-setwd(base.dir)
+results.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
+setwd(results.dir)
 
 # CHANGE THIS FOR switching between species.
 SPECIES <- "hake" # eulachon, hake 
+# CHANGE THIS FOR switching among model output.
+MOD <-  "lat.long.smooth.base"
 
-load(paste("qPCR 2019",SPECIES, "Fitted.RData"))
+load(paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
+#save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
+
+### Cacluate posterior summaries and predictive surfaces
+setwd(script.dir)
+source("summarize_stan_output.R")
+#########
+### MAKE A BUNCH OF DATA FRAMES FOR LATER USE.
+#########
 ### Get some of the output on sample and station IDs from file.
 dat.samp <- Output.qpcr$dat.obs.bin
-dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,Output.qpcr$field_neg_out_liter)
-
-dat.summary <- dat.samp %>%
-  group_by(date,transect,station,station.depth,depth,station_depth_idx) %>%
-  dplyr::summarise(N=length(unique(sample_idx)))
-dat.summary <- left_join(dat.summary,Output.qpcr$station_depth_out_liter)
-dat.summary <- dat.summary %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
-                                                          depth ==25 ~ 25,  
-                                                          depth > 25  & depth <= 50  ~ 50,
-                                                          depth > 50  & depth <= 100 ~ 100,
-                                                          depth > 120 & depth <= 150 ~ 150,
-                                                          depth > 151 & depth <= 200 ~ 200,
-                                                          depth > 250 & depth <= 350 ~ 300,
-                                                          depth > 400 & depth <= 500 ~ 500))
-
-dat.inhibit <- Output.qpcr$dat.inhibit %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
-                                                                      depth == 25 ~ 25,            
-                                                                      depth > 25  & depth <=50  ~ 50,
-                                                                      depth > 50  & depth <=100 ~ 100,
-                                                                      depth > 120 & depth <=150 ~ 150,
-                                                                      depth > 151 & depth <=200 ~ 200,
-                                                                      depth > 250 & depth <=350 ~ 300,
-                                                                      depth > 400 & depth <=500 ~ 500))
+dat.control.field.neg <- Output.qpcr$dat.control.field.neg %>% left_join(.,field_neg_out_liter)
+STATION.DEPTH <- left_join(STATION.DEPTH,station_depth_out_liter)
 
 ##### Calculate some info about the field negative controls
-field.neg.summ <- Output.qpcr$field_neg_out_liter 
-
-N.station.run       <- length(unique(c(dat.inhibit$station,dat.samp$station)))
-N.station.depth.run <- length(unique(c(dat.inhibit$station.depth,dat.samp$station.depth)))
-N.sample.run        <- length(unique(c(dat.inhibit$sample,dat.samp$sample)))
-
-###################################################################
-###################################################################
-###################################################################
-###################################################################
-###################################################################
+N.station.run       <- length(unique(c(STATION.DEPTH$station)))
+N.station.depth.run <- length(unique(c(STATION.DEPTH$station.depth)))
+N.sample.run        <- length(unique(c(dat.samp$sample)))
 
 # Make a map of where we have samples.
-
 dat.id <- Output.qpcr$dat.id
 dat.station.id.trim <- Output.qpcr$dat.station.id.trim
 dat.sample.id <- Output.qpcr$dat.sample.id
 
 # combine ids into stations, samples outstanding, and processed samples
-
 dat.A <- dat.station.id.trim %>% dplyr::select(station,lat,lon,water.depth) %>% mutate(Level="CTD Stations")
 dat.B <- left_join(dat.sample.id,dat.id) %>% dplyr::select(station,lat,lon,water.depth) %>%
   group_by(station,lat,lon,water.depth) %>% summarise(N=length(station)) %>% dplyr::select(-N) %>% filter(is.na(lat)==F) %>%
@@ -79,44 +63,68 @@ dat.C <- dat.samp %>% dplyr::select(station,lat,lon) %>% group_by(station,lat,lo
   dplyr::select(-N) %>% mutate(Level="Processed Stations") %>% 
   left_join(.,dat.station.id.trim %>% dplyr::select(station,water.depth) )  
 
-
 ### THIS IS ALL OF THE CTD STATIONS.  IF YOU NEED A LAT LONG FOR EACH STATION, MERGE IN FROM HERE.
 dat.process <- bind_rows(dat.A,dat.B,dat.C) %>% filter(!station=="")
 dat.process$Level <- factor(dat.process$Level, levels=c("CTD Stations","Sampled Stations","Processed Stations"))
-  # Calculate a Category for  water depth associated with each station.
 
-dat.lat.lon.water <- dat.process %>% group_by(station) %>% summarise(lat=mean(lat),lon=mean(lon),water.depth=mean(water.depth)) %>%
-                      mutate(water.depth.cat = case_when(water.depth >=2000 ~ "w_2000_plus",
-                                                         water.depth < 2000 & water.depth >=1250 ~ "w_1250_2000",
-                                                         water.depth < 1250 & water.depth >= 750 ~ "w_750_1250",
-                                                         water.depth < 750 & water.depth >= 400 ~ "w_400_750",
-                                                         water.depth < 400 & water.depth >= 250 ~ "w_250_400",
-                                                         water.depth < 250  & water.depth >= 125 ~ "w_125_250",
-                                                         water.depth < 125 & water.depth >= 75 ~ "w_75_125",
-                                                         water.depth < 75  ~ "w_0_75"), 
-                               water.depth.cat = case_when(station %in% c("26-3","27-8","49-7") ~ "w_2000_plus",
-                                                         station %in% c("47-9") ~ "w_1250_2000",
-                                                         TRUE ~ water.depth.cat )) %>%
-                      mutate(water.depth.cat.2= water.depth.cat, 
-                             water.depth.cat.2 = case_when(water.depth.cat %in% c("w_2000_plus","w_1250_2000","w_750_1250") ~ "1000+",
-                                                          #water.depth.cat %in% c("w_750_1250") ~ "1000",
-                                                          water.depth.cat %in% c("w_400_750") ~ "500",
-                                                          water.depth.cat %in% c("w_250_400") ~ "300",
-                                                          water.depth.cat %in% c("w_125_250") ~ "150",
-                                                          water.depth.cat %in% c("w_75_125") ~ "100",
-                                                          water.depth.cat %in% c("w_0_75") ~ "50"))
+# Calculate a Category for  water depth associated with each station.
+STATION.DEPTH <- STATION.DEPTH %>% 
+  mutate(water.depth.cat="",water.depth.cat = 
+           case_when(bottom.depth.consensus >=2000 ~ "w_2000_plus",
+                     bottom.depth.consensus < 2000 & bottom.depth.consensus >=1200 ~ "w_1200_2000",
+                     bottom.depth.consensus < 1250 & bottom.depth.consensus >= 750 ~ "w_750_1200",
+                     bottom.depth.consensus < 750 & bottom.depth.consensus >= 400 ~ "w_400_750",
+                     bottom.depth.consensus < 400 & bottom.depth.consensus >= 210 ~ "w_210_400",
+                     bottom.depth.consensus < 210  & bottom.depth.consensus >= 124 ~ "w_125_210",
+                     bottom.depth.consensus < 124 & bottom.depth.consensus >= 75 ~ "w_75_125",
+                     bottom.depth.consensus < 75  ~ "w_0_75", 
+                     TRUE ~ water.depth.cat )) %>%
+  mutate(water.depth.cat.2= water.depth.cat, 
+         water.depth.cat.2 = case_when(water.depth.cat %in% c("w_2000_plus","w_1200_2000","w_750_1200") ~ "1000+",
+                                       #water.depth.cat %in% c("w_750_1250") ~ "1000",
+                                       water.depth.cat %in% c("w_400_750") ~ "500",
+                                       water.depth.cat %in% c("w_210_400") ~ "300",
+                                       water.depth.cat %in% c("w_125_210") ~ "150",
+                                       water.depth.cat %in% c("w_75_125") ~ "100",
+                                       water.depth.cat %in% c("w_0_75") ~ "50"))
 
+# Repeat for the Niskin level samples
+SAMPLES <- left_join(SAMPLES,
+                     dat.samp %>% group_by(sample) %>% summarise(dilution = min(dilution),wash = mean(wash_idx)) %>% 
+                       mutate(inhibit_cat = ifelse(dilution < 1,"Yes","No"),
+                              wash_cat = ifelse(wash==1,"Yes","No")))
 
-#### Plotting information
+SAMPLES <- left_join(SAMPLES,
+                     dat.id %>% dplyr::select(sample,station,lat,lon))
 
-# Plot for all samples
-lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
-lon.lims <- c(min(dat.id$lon,na.rm=T),max(dat.id$lon,na.rm=T))
+SAMPLES <- left_join(SAMPLES,D_delta_out_liter)
 
-lat.lims.trim <- c(37.5,max(dat.id$lat,na.rm=T))
-lon.lims.trim <- c(min(dat.id$lon,na.rm=T),-122.5)
+SAMPLES <- SAMPLES %>% 
+  mutate(water.depth.cat="",water.depth.cat = 
+           case_when(bottom.depth.consensus >=2000 ~ "w_2000_plus",
+                     bottom.depth.consensus < 2000 & bottom.depth.consensus >=1200 ~ "w_1200_2000",
+                     bottom.depth.consensus < 1250 & bottom.depth.consensus >= 750 ~ "w_750_1200",
+                     bottom.depth.consensus < 750 & bottom.depth.consensus >= 400 ~ "w_400_750",
+                     bottom.depth.consensus < 400 & bottom.depth.consensus >= 210 ~ "w_210_400",
+                     bottom.depth.consensus < 210  & bottom.depth.consensus >= 124 ~ "w_125_210",
+                     bottom.depth.consensus < 124 & bottom.depth.consensus >= 75 ~ "w_75_125",
+                     bottom.depth.consensus < 75  ~ "w_0_75", 
+                     TRUE ~ water.depth.cat )) %>%
+  mutate(water.depth.cat.2= water.depth.cat, 
+         water.depth.cat.2 = case_when(water.depth.cat %in% c("w_2000_plus","w_1200_2000","w_750_1200") ~ "1000+",
+                                       #water.depth.cat %in% c("w_750_1250") ~ "1000",
+                                       water.depth.cat %in% c("w_400_750") ~ "500",
+                                       water.depth.cat %in% c("w_210_400") ~ "300",
+                                       water.depth.cat %in% c("w_125_210") ~ "150",
+                                       water.depth.cat %in% c("w_75_125") ~ "100",
+                                       water.depth.cat %in% c("w_0_75") ~ "50"))
 
+##### MAP MAKING COMMANDS
+# Plot Limits for all samples (see Base_Map.R)
+# lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
+# lon.lims <- c(min(dat.id$lon,na.rm=T),max(dat.id$lon,na.rm=T))
 
+#lat.lims.trim <- c(37.5,max(dat.id$lat,na.rm=T))
 # Call Base_map.R
 setwd(script.dir)
 source("Base_map.R")
@@ -128,169 +136,77 @@ sample.process <- base_map +
 sample.process.facet <- sample.process +
   facet_wrap(~Level)
 
-#print(sample.process)
+####################################################################
+# STANDARDS, CONTAMINATION, OTHER NUTS and BOLTS PROCESSES
+#####################################################################
 
-
-###################################################################
-###################################################################
-###################################################################
-###################################################################
-###################################################################
-
-
-##### Calculate some inhibition characteristics.
-inhibit.summ <- dat.inhibit %>% 
-  group_by(date,transect,station,station.depth,depth,depth_cat) %>%
-  summarise(N_pcr=length(unique(qPCR)),N_sample=length(unique(sample)),N_rep=length(sample)) %>%
-  mutate(inhibited = "Y")
-good.summ <- dat.summary %>%
-  dplyr::select(date,transect,station,station.depth,depth,depth_cat,N_sample=N) %>%
-  mutate(inhibited = "N")
-
-g_i_dat <- bind_rows(inhibit.summ %>% dplyr::select(-N_pcr,-N_rep),good.summ) %>%
-  group_by(station,depth_cat,station.depth,inhibited) %>%
-  summarise(N_inhibited=length(inhibited)) %>%
-  pivot_wider(.,names_from=c("inhibited"),values_from=c("N_inhibited")) %>%
-  mutate(N=ifelse(is.na(N),0,N),
-         Y=ifelse(is.na(Y),0,Y),
-         Both=ifelse(N==1 & Y==1,1,0)) %>%
-  group_by(depth_cat) %>% 
-  summarise(Total=length(station.depth),
-            Not_inhibited=Total-sum(Y),
-            Partially_inhibited = sum(Both),
-            Completely_inhibited = Total-sum(N)) %>%
-  filter(is.na(depth_cat)==F)
-
-g_i_dat <- bind_rows(g_i_dat %>% mutate(depth_cat=as.character(depth_cat)),
-                     colSums(g_i_dat)%>%t()%>%as.data.frame()%>%mutate(depth_cat="TOTAL")) %>%
-  rename("Depth Category (m)"=depth_cat,)
-
-g_i_2 <- bind_rows(inhibit.summ %>% dplyr::select(-N_pcr,-N_rep),good.summ) %>%
-  group_by(station,depth_cat,station.depth,inhibited) %>%
-  dplyr::summarise(N_inhibited=length(inhibited)) %>%
-  pivot_wider(.,names_from=c("inhibited"),values_from=c("N_inhibited")) %>%
-  mutate(N=ifelse(is.na(N),0,N),
-         Y=ifelse(is.na(Y),0,Y),
-         Both=ifelse(N==1 & Y==1,1,0)) %>%
-  left_join(.,dat.lat.lon.water)
-
-#####
-g_i_3 <- g_i_2 %>% mutate(inhib_cat=case_when(N==1 & Y==0 ~ "None",
-                                              N==0 & Y==1 ~ "All",
-                                              N==1 & Y==1 ~ "Partial"))
-g_i_3$inhib_cat <- factor(g_i_3$inhib_cat,levels=c("All","Partial","None"))
-
-### Make a spatial plot of inhibition
-
+# MAPS OF INHIBITION AND WASHED SAMPLES
 inhibit.plot <- base_map_trim +
-  geom_point(data=g_i_3,aes(x=lon,y=lat,color=inhib_cat)) +
+  geom_point(data=SAMPLES,aes(x=lon,y=lat,color=inhibit_cat)) +
   scale_color_viridis_d(begin=0,end=0.8)+
-  facet_wrap(~inhib_cat)
-
+  facet_wrap(~inhibit_cat)
 inhibit.plot.by.depth <- base_map_trim +
-  geom_point(data=g_i_3 %>% filter(is.na(depth_cat)==F),aes(x=lon,y=lat,color=inhib_cat),alpha=0.5) +
+  geom_point(data=SAMPLES %>% filter(is.na(depth_cat)==F),aes(x=lon,y=lat,color=inhibit_cat),alpha=0.5) +
   facet_wrap(~depth_cat,nrow = 2) +
   scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
-
-
 inhibit.plot.by.depth.few <- base_map_trim +
-  geom_point(data=g_i_3 %>% filter(depth_cat %in% c(0,50,100)) ,aes(x=lon,y=lat,color=inhib_cat),alpha=0.5) +
+  geom_point(data=SAMPLES %>% filter(depth_cat %in% c(0,50,100)) ,aes(x=lon,y=lat,color=inhibit_cat),alpha=0.5) +
   facet_wrap(~depth_cat,nrow = 1) +
   scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
 
+wash.plot <- base_map_trim +
+  geom_point(data=SAMPLES,aes(x=lon,y=lat,color=wash_cat)) +
+  scale_color_viridis_d(begin=0,end=0.8)+
+  facet_wrap(~wash_cat)
+wash.plot.by.depth <- base_map_trim +
+  geom_point(data=SAMPLES %>% filter(is.na(depth_cat)==F),aes(x=lon,y=lat,color=wash_cat),alpha=0.5) +
+  facet_wrap(~depth_cat,nrow = 2) +
+  scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
 
-###################################################################
-###################################################################
-###----- Plots of standards and data
-###################################################################
-###################################################################
-
-OFFSET <- Output.qpcr$OFFSET
-pars <- Output.qpcr$samp
-PCR <- Output.qpcr$PCR
-dat.stand.pos <- Output.qpcr$dat.stand.pos
-dat.stand.bin <- Output.qpcr$dat.stand.bin
-
-B1 <- apply(pars$beta_0,2,mean)
-B2 <- apply(pars$beta_1,2,mean)
-
-P0 <- apply(pars$phi_0,2,mean)
-P1 <- apply(pars$phi_1,2,mean)
-
-V0 <-  mean(pars$sigma_stand_int)
-#V1 <- mean(pars$sigma_stand_slope)
-#V2 <- mean(pars$sigma_stand_slope2)
-
-# Plot regression against Standard
-X <- seq(0,5,length.out=1000) - OFFSET 
-Y <- t(B1 + B2 %*% t(X ))
-
-STAND.REG <- data.frame(X=X,Y=Y)
-STAND.REG <- melt(STAND.REG,id.vars="X",value.name="Y")
-
-x.lim=c(min(X),max(X))
-y.lim=c(20,40)
+## Calculate some summaries of how many samples were inhibited 
+inhibit.summ.dat <- STATION.DEPTH %>% group_by(depth_cat,inhibit) %>% summarise(N=length(inhibit)) %>% 
+  pivot_wider(values_from="N",names_from=c("inhibit"))
+inhibit.summ.dat[is.na(inhibit.summ.dat)] <- 0
+colnames(inhibit.summ.dat)[1:3] <- c("Depth_m","No","Yes")
 
 
-lab.temp<- data.frame(variable=paste0("Y.",PCR$plate_idx), qPCR=PCR$qPCR)
-STAND.REG <-left_join(STAND.REG,lab.temp)
-
-stand.plot <- ggplot(dat.stand.pos) +
-  geom_point(aes(x=log10_copies - OFFSET ,y=Ct,color=qPCR),alpha=0.5) +
-  scale_shape_discrete(name="qPCR Plate") +
-  theme_bw()
-stand.plot <- stand.plot +
-  geom_line(data=STAND.REG,aes(x=X,y=Y,color=qPCR),alpha=0.5) +
-  scale_color_discrete(name="qPCR Plate") +
-  ylab("PCR cycle")  +
-  xlab("log10 copies DNA") 
-#scale_x_continuous(labels = paste0("1e",LABS),limits = c(-2,4))
-stand.plot
-
-
-
-stand.plot.facet <- stand.plot +facet_wrap(~qPCR,ncol=2)
-
-# Plot occurrence of standard
-Y <- t(P0 + P1 %*% t(X ))
-LOGIT <- data.frame(X=X,Y=plogis(Y))
-LOGIT <- melt(LOGIT,id.vars="X",value.name="Y")
-
-LOGIT <-left_join(LOGIT,lab.temp)
-
-stand.plot.pres <- ggplot(dat.stand.bin) +
-  geom_jitter(aes(x=log10_copies - OFFSET,y=Ct_bin,color=qPCR),alpha=0.75,width=0,height=0.05) +
-  geom_line(data=LOGIT,aes(y=Y,x=X,color=qPCR)) +
-  theme_bw() +
-  scale_shape_discrete(name="qPCR Plate") +
-  scale_color_discrete(name="qPCR plate") +
-  xlab("log10 copies DNA") +
-  ylab("Amplification success") +
-  scale_y_continuous(breaks=c(0,1),labels = c("No","Yes"))
-#scale_x_continuous(breaks=BREAKS,labels = paste0("1e",LABS),limits = c(-2.5,4))
-
-stand.plot.pres
+###----- Plots of STANDARDS (from summarize_stan_output.R)
+# stand.plot
+# stand.plot.facet <- stand.plot +facet_wrap(~qPCR,ncol=6)
+# stand.plot.pres
 
 #######################################################
-#######################################################
-####### ---- Calculate Control quantities.
-#######################################################
+####### ---- Calculate CONTAMINATION
 #######################################################
 
 # Calculations for Field Negative Controls.
 SAMPLES.CONTROL <- Output.qpcr$SAMPLES.CONTROL
 dat.id.control <-  Output.qpcr$dat.id.control
-field.neg.summ <- left_join(SAMPLES.CONTROL,field.neg.summ) %>% left_join(.,dat.id.control)
+field.neg.summ <- left_join(SAMPLES.CONTROL,field_neg_out_liter) %>% left_join(.,dat.id.control)
 
-BREAKS <- seq(0,1000,by=10)
+mu_contam_l  <- mu_contam_out$Mean[mu_contam_out$type == "liter"] 
+sigma_contam_l <- sigma_contam_out$Mean
+
+BREAKS <- seq(0,max(field.neg.summ$Mean)*1.1,length.out=30)
 XLIM <- c(0,max(field.neg.summ$Mean)*1.1)
-control.hist1 <- ggplot(field.neg.summ) +
-  geom_histogram(aes(Mean,fill=field.negative.type),breaks=BREAKS) +
+X <- seq(0.25,max(XLIM),by=0.5)
+DENS <- dlnorm(X,mu_contam_l,sigma_contam_l)
+DENS_mod <- (10/max(DENS))*DENS
+Dens <- data.frame(X=X,DENS_mod=DENS_mod)
+#REAL <- rlnorm(1e6,mu_contam,sigma_contam)  
+
+PROB.DENS <- cbind(X,plnorm(X,mu_contam_l,sigma_contam_l))
+
+control.hist <- ggplot() +
+  geom_histogram(data=field.neg.summ,aes(Mean,fill=field.negative.type),breaks=BREAKS) +
   xlab("Estimated copies per L") +
   scale_fill_discrete("Type")+
   ylab("Number of negative controls") +
   xlim(XLIM) +
+  geom_line(data=Dens,aes(x=X,y=DENS_mod),col="blue")+
   theme_bw()
+
+control.hist1 <- control.hist + geom_vline(xintercept = c(20,40),color="blue",linetype="dashed")
 
 ALPHA = 0.9 
 control.by.time <- ggplot(field.neg.summ) +
@@ -303,6 +219,8 @@ control.by.time <- ggplot(field.neg.summ) +
   geom_hline(aes(yintercept = 20),linetype="dashed")+
   theme_bw()
 
+## Overplot the estimated hierarchical distribution:
+
 #control.by.time.trim <- control.by.time + ylim(c(0,1000))
 detect.lev = 20
 N_control_positive <- field.neg.summ %>% filter(Mean > detect.lev ) %>% nrow(.)
@@ -310,18 +228,15 @@ N_control_run <- nrow(field.neg.summ)
 N_control_total <- dat.id.control %>% filter(control=="field") %>% nrow(.)
 
 #######################################################
-#######################################################
 ####### ---- Compare distribution of field samples against negative controls.
 #######################################################
-#######################################################
-
-dat.sum.v.control <- bind_rows(dat.summary %>% dplyr::select(date,
+dat.sum.v.control <- bind_rows(SAMPLES %>% dplyr::select(sample,
                                                              Mean.log,Log.Val.X5.,Log.Val.X95.,
                                                              Mean,Val.X5.,Val.X95.) %>% mutate(cat="field") %>% as.data.frame(),
-                               field.neg.summ %>% dplyr::select(date,
+                               field.neg.summ %>% dplyr::select(sample,
                                                                 Mean.log,Log.Val.X5.,Log.Val.X95.,
                                                                 Mean,Val.X5.,Val.X95.) %>% mutate(cat="control") %>% as.data.frame()
-)
+                    )
 
 BREAKS <- 10^(c(-2,seq(log10(20),5,by=0.25)))
 XLIM <- c(0,max(dat.sum.v.control$Mean)*1.01)
@@ -330,53 +245,336 @@ compare.hist2 <- ggplot(dat.sum.v.control) +
   xlab("Estimated Copies/L") +
   ylab("Number of Samples") +
   xlim(XLIM) +
-  scale_fill_viridis_d("Category",begin=0,end=0.5,) +
+  scale_fill_viridis_d("Category",begin=0,end=0.5) +
   scale_x_log10() +
   theme_bw()
 compare.hist2
+
+x.int <- data.frame(INT=c(20))
+depth.hist.facet <-  ggplot(SAMPLES) +
+  geom_histogram(aes(x=Mean),alpha=0.5,fill=viridis(1)) +
+  xlab("Estimated Copies/L") +
+  #ylab("Number of Samples") +
+  scale_x_log10() +          
+  #scale_fill_viridis_d("Inhibition\nCategory",begin=0.0,end=0.5) +
+  facet_wrap(~depth_cat,nrow = 2) +
+  geom_vline(data=x.int,aes(xintercept =INT),color="black" ,linetype=c("dashed")) +
+  theme_bw()
+
+if(SPECIES == "hake"){
+  X <- seq(0.25,max(XLIM),by=0.5)
+  DENS <- dlnorm(X,mu_contam_l,sigma_contam_l)
+  DENS_mod <- (25/max(DENS))*DENS
+  Dens <- data.frame(X=X,DENS_mod=DENS_mod)
+  
+  depth.hist.facet <- depth.hist.facet +
+    geom_line(data=Dens,aes(x=X,y=DENS_mod),col="blue")
+  depth.hist.facet
+}
+
+
+### Plot marignal distributions of wash effects
+
+wash.posterior <- data.frame(wash.offset =Output.qpcr$samp$wash_offset) 
+
+
+wash.param.hist <- ggplot(wash.posterior) +
+              geom_histogram(aes(wash.offset),alpha=0.5,fill=viridis(1))+
+              geom_vline(xintercept = mean(wash.posterior$wash.offset),linetype="dashed") +
+              xlab(expression(omega*" (EtOH wash offset)")) +
+              theme_bw()
+
 
 #######################################################
 #######################################################
 ####### ------- Make Maps
 #######################################################
 #######################################################
+# SAMPLES has the data on an individual niskin level
+# STATION.DEPTH has data on a station-depth level.
+# smooth.projections %>% names()
 
+# NISKIN LEVEL FIRST
 
-dat.SP <- left_join(dat.summary,dat.lat.lon.water) %>% filter(is.na(depth_cat)==F) %>% mutate(neg.depth = -depth)
-LEV <- c("50","150","300","500","1000+") #,"1500+")
-dat.SP$water.depth.cat.2 <- factor(dat.SP$water.depth.cat.2,levels=LEV) 
+LEV <- c("0","50","100","150","300","500","1000+") #,"1500+")
+SAMPLES$water.depth.cat.2 <- factor(SAMPLES$water.depth.cat.2,levels=LEV) 
+STATION.DEPTH$water.depth.cat.2 <- factor(STATION.DEPTH$water.depth.cat.2,levels=LEV) 
 # drop sample sampled at 200m 
-dat.SP <- dat.SP %>% filter(!depth==200)
+# dat.SP <- dat.SP %>% filter(!depth==200)
 
-BREAKS = c(-100,-2,0,1,2,3,4,5)
-SP.p1 <- base_map_trim + 
-  geom_point(data=dat.SP,aes(x=lon,y=lat,size=Mean.log),shape=21) +
-  scale_size("Log Copies per L",breaks=BREAKS)+
-  scale_shape("Log Copies",solid=FALSE)+
-  facet_wrap(~depth_cat)
-SP.p1
+# BREAKS = c(-100,-2,0,1,2,3,4,5)
+# SP.p1 <- base_map_trim + 
+#   geom_point(data=dat.SP,aes(x=lon,y=lat,size=Mean.log,color=inhibit_cat),shape=21) +
+#   scale_size("Log Copies per L",breaks=BREAKS)+
+#   scale_shape("Log Copies",solid=FALSE)+
+#   facet_wrap(~depth_cat)
+# SP.p1
 
 
-  summary(dat.SP$Mean)
-  lower.lim <- 20
-  LAB<-c(lower.lim,100,1000,10000,20000)
-SP.p2 <- base_map_trim + 
-    geom_point(data=dat.SP,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
-    scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
-    geom_point(data=dat.SP%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
-    scale_shape("Copies / L",solid=FALSE)+
-    facet_wrap(~depth_cat,nrow=2)
-SP.p2
-  
-SP.p3 <- base_map_trim + 
-  geom_point(data=dat.SP %>% filter(!depth_cat==25),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+summary(SAMPLES$Mean)
+summary(STATION.DEPTH$Mean)
+
+# NISKIN level.
+lower.lim <- 20
+lower.lim.inhibit <- 100
+LAB<-c(lower.lim,100,1000,10000,20000,40000,100000,140000)
+p2 <- base_map_trim + 
+  geom_point(data=SAMPLES,aes(x=lon,y=lat,size=Mean,color=inhibit_cat),shape=21) +
   scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
-  geom_point(data=dat.SP%>% filter(Mean<=lower.lim,!depth_cat==25),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  geom_point(data=SAMPLES%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
   scale_shape("Copies / L",solid=FALSE)+
+  scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) +
   facet_wrap(~depth_cat,nrow=2)
-SP.p3
+p2
 
-######################## 
+p3 <- base_map_trim + 
+  geom_point(data=SAMPLES,aes(x=lon,y=lat,size=Mean,color=wash_cat),shape=21) +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+  geom_point(data=SAMPLES%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_shape("Copies / L",solid=FALSE)+
+  scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+  facet_wrap(~depth_cat,nrow=2)
+p3
+
+p4 <- base_map_trim + 
+  geom_point(data=SAMPLES,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+  geom_point(data=SAMPLES%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_shape("Copies / L",solid=FALSE)+
+  scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+  facet_wrap(~depth_cat,nrow=2)
+p4
+
+# Station-Depth level.
+q2 <- base_map_trim + 
+  geom_point(data=STATION.DEPTH,aes(x=lon,y=lat,size=Mean),shape=21,color = "red") +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+  geom_point(data=STATION.DEPTH %>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_shape("Copies / L",solid=FALSE)+
+  scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) +
+  facet_wrap(~depth_cat,nrow=2)
+q2
+
+q3 <- base_map_trim + 
+  geom_point(data=STATION.DEPTH,aes(x=lon,y=lat,size=Mean),shape=21,color = "red") +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+  geom_point(data=STATION.DEPTH %>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_shape("Copies / L",solid=FALSE)+
+  scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+  facet_wrap(~depth_cat,nrow=2)
+q3
+
+# 
+# p4 <- base_map_trim + 
+#   geom_point(data=SAMPLES %>% filter(inhibit==0),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+#   geom_point(data=SAMPLES %>% filter(inhibit==1,Mean > lower.lim.inhibit),aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+#   scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+#   geom_point(data=SAMPLES %>% filter(inhibit==0,Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+#   geom_point(data=SAMPLES %>% filter(inhibit==1,Mean<=lower.lim.inhibit),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+#   scale_shape("Copies / L",solid=FALSE)+
+#   scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+#   facet_wrap(~depth_cat,nrow=2)
+# p4
+
+# Plot that trims out only those spots shallower than 150m.
+# DEPTHS <- c(0,50)
+# 
+# p5 <- base_map_trim + 
+#   geom_point(data=SAMPLES %>% filter(depth_cat %in% c(0,50,100,150)),
+#              aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+#   geom_point(data=SAMPLES %>% filter(depth_cat %in% c(0,50,100,150))
+#                ,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+#   scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
+#   geom_point(data=SAMPLES %>% filter(depth %in% c(0,50,100,150)) %>%
+#                filter(inhibit==0,Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+#   geom_point(data=SAMPLES %>% filter(depth %in% c(0,50,100,150)) %>% 
+#                filter(inhibit==1,Mean<=lower.lim.inhibit),aes(x=lon,y=lat),shape="x",size=1,color="black") +
+#   scale_shape("Copies / L",solid=FALSE)+
+#   scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+#   facet_wrap(~depth_cat,nrow=1)
+# p5
+
+
+######################################################3
+# Smooth projections.
+######################################################3
+SIZE = 1
+STROKE = 0 
+
+z.lim = c(log10(20),log10(2500)) 
+z.breaks <- log10(c(20,100,250,500,1000,2500))
+z.lim.labs <- 10^z.breaks
+
+DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
+p_log_D <- list()
+
+D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
+
+# Color scales for viridis
+OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
+
+
+for(i in 1:length(DEPTH)){
+  p_log_D[[as.name(paste0("x_",DEPTH[i]))]] <-
+    base_map_trim +
+    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == 0),
+             aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i]),
+            aes(x=lon,y=lat,color=Mean),alpha=1,size=SIZE,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i],Mean < z.lim[1]),
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
+    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i],Mean > z.lim[2]),
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    ggtitle(paste(DEPTH[i],"m")) +
+    theme_bw() 
+  
+  p_log_D[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
+        p_log_D[[as.name(paste0("x_",DEPTH[i]))]] +
+        geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
+}  
+
+  SIZE = 1
+  p_log_D_facet <- base_map_trim +
+    # geom_point(data= D_pred_background,
+    #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined ,
+               aes(x=lon,y=lat,color=Mean),alpha=0.75,size=SIZE,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined %>% filter(Mean < z.lim[1]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
+    geom_point(data= D_pred_log_combined %>% filter(Mean > z.lim[2]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    facet_wrap(~depth_cat_factor) +
+    theme_bw() 
+
+  p_log_D_facet2 <- base_map_trim +
+    # geom_point(data= D_pred_background,
+    #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined ,
+               aes(x=lon,y=lat,color=Mean),alpha=0.75,size=SIZE,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined %>% filter(Mean < z.lim[1]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
+    geom_point(data= D_pred_log_combined %>% filter(Mean > z.lim[2]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    facet_wrap(~depth_cat_factor,nrow=1) +
+    theme_bw() 
+  
+    
+  ######################################################3
+  ## SD in Space
+  ######################################################3
+  SIZE = 1.5
+  STROKE = 0 
+  
+  z.lim = c(0,1.25) 
+  z.breaks <- seq(z.lim[1],z.lim[2],length.out=5)
+
+  DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
+  p_log_D_SD <- list()
+  
+  D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
+  
+  for(i in 1:length(DEPTH)){
+    p_log_D_SD[[as.name(paste0("x_",DEPTH[i]))]] <-
+      base_map_trim +
+      geom_point(data= D_pred_background,
+                 aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+      geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i]),
+                 aes(x=lon,y=lat,color=SD),alpha=1,size=SIZE,stroke=STROKE) +
+      geom_point(data= D_pred_log_combined %>% filter(SD > z.lim[2]),
+                 aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
+      scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("SD DNA Copies L"^-1)) +
+      ggtitle(paste(DEPTH[i],"m")) +
+      theme_bw() 
+    
+    p_log_D_SD[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
+      p_log_D_SD[[as.name(paste0("x_",DEPTH[i]))]] +
+      geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
+  }  
+  
+  SIZE = 1.25
+  p_log_D_SD_facet <- base_map_trim +
+    # geom_point(data= D_pred_background,
+    #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined ,
+               aes(x=lon,y=lat,color=SD),alpha=1,size=SIZE,stroke=STROKE) +
+    geom_point(data= D_pred_log_combined %>% filter(SD > z.lim[2]),
+               aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("SD DNA Copies L"^-1)) +
+    facet_wrap(~depth_cat_factor) +
+    theme_bw() 
+
+### Residuals on a map  
+  
+  z.lim = c(log10(20),log10(5000)) 
+  z.breaks <- log10(c(20,100,250,1000,2500,5000))
+  z.lim.labs <- 10^z.breaks
+  
+  
+  p_log_resid_facet <- base_map_trim +
+    geom_point(data= Resid ,
+              aes(x=lon,y=lat,color=Resid.log,fill=Resid.log),alpha=0.4,stroke=STROKE,size=4) +
+    scale_color_gradient2(low="red",mid=grey(0.8),high="blue") + 
+    scale_fill_gradient2(low="red",mid=grey(0.8),high="blue") +
+    facet_wrap(~depth_cat_factor) +
+    theme_bw() 
+  p_log_resid_facet
+  
+  p_resid_facet <- base_map_trim +
+    geom_point(data= Resid ,
+               aes(x=lon,y=lat,color=Resid,fill=Resid),alpha=0.4,stroke=STROKE,size=4) +
+    scale_color_gradient2(low="red",mid=grey(0.8),high="blue") + 
+    scale_fill_gradient2(low="red",mid=grey(0.8),high="blue") +
+    facet_wrap(~depth_cat_factor) +
+    theme_bw() 
+  p_resid_facet
+  
+  
+  p_marginal_smooth <- list()
+  if(MODEL.TYPE=="lat.long.smooth"){
+      p_marginal_smooth[[as.name("bottom_depth")]] <- ggplot(D_pred_bottom_depth_combined) +
+        geom_line(aes(x=bottom.depth.consensus,y=Mean),alpha=0.8) +
+        geom_ribbon(aes(x=bottom.depth.consensus,ymin=Val.95.,ymax=Val.5.),alpha=0.4) +
+        theme_bw()
+    
+  }
+  
+   setwd("../Plots and figures")
+   pdf(file=paste(SPECIES,"_smoothes_",MODEL.TYPE,".pdf",sep=""),onefile = T,height=10,width=8)
+      print(p_log_D_facet)
+      print(p_log_D)
+   dev.off()
+  
+  
+  
+  
+# DEEP <- 50
+# ggplot(D_pred_log_combined %>% filter(depth_cat_factor == DEEP)) +
+#   geom_tile(aes(x=utm.lon,y=utm.lat,fill=Mean),alpha=0.8) +
+#   scale_fill_viridis_c() +
+#   theme_bw() +
+#   geom_point(data=STATION.DEPTH %>% filter(depth_cat == DEEP),aes(x=utm.lon,y=utm.lat),col="red")
+# 
+# 
+# ggplot(D_pred_smooth_combined ) +
+#   geom_tile(aes(x=utm.lon,y=utm.lat,fill=Mean),alpha=0.8) +
+#   scale_fill_viridis_c() +
+#   facet_wrap(~depth_cat_factor,scales="free") +
+#   theme_bw()
+# 
+# ggplot(D_pred_smooth_combined ) +
+#   geom_tile(aes(x=utm.lon,y=utm.lat,fill=SD),alpha=0.8) +
+#   scale_fill_viridis_c() +
+#   facet_wrap(~depth_cat_factor) +
+#   theme_bw()
+# 
+# ggplot(D_pred_smooth_combined  %>% filter(depth_cat_factor == 500)) +
+#   geom_tile(aes(x=utm.lon,y=utm.lat,fill=Mean),alpha=0.8) +
+#   scale_fill_viridis_c() +
+#   theme_bw()
+
 ######################################################3
 ######################################################3
 ##### --------  Make Transect Cross-section plots.
@@ -389,78 +587,39 @@ SP.p3
 coast.ref.point <- dat.acoustic %>% filter(near.coast==1) %>% dplyr::select(transect, lat, lon,near.coast)
 coast.ref.point$transect <- as.character(coast.ref.point$transect)
 
-
 temp.all <- NULL
-TRANS <-  sort(unique(dat.SP$transect))
+TRANS <-  sort(unique(STATION.DEPTH$transect))
 for(i in 1:length(TRANS)){
-  
-  temp <- dat.SP %>% filter(transect == TRANS[i])
-  ref  <- coast.ref.point %>%filter(transect == TRANS[i]) %>% select(lon,lat)
-  D <- distGeo(p1=as.matrix(data.frame(lon=temp$lon,lat=temp$lat)),p2=ref)
-  D <- D / 1000
-  temp <- temp %>% as.data.frame() %>% mutate(dist.km = D) %>% arrange(dist.km) %>% mutate(id.numb = 1:nrow(temp))
+  temp <- STATION.DEPTH %>% filter(transect == TRANS[i])
+  ref  <- coast.ref.point %>%filter(transect == TRANS[i]) %>% dplyr::select(lon,lat)
+  Disty <- distGeo(p1=as.matrix(data.frame(lon=temp$lon,lat=temp$lat)),p2=ref)
+  Disty <- Disty / 1000
+  temp <- temp %>% as.data.frame() %>% mutate(dist.km = Disty) %>% arrange(dist.km) %>% mutate(id.numb = 1:nrow(temp))
   temp.all <- bind_rows(temp.all,temp)
 }
 
-dat.SP      <- left_join(dat.SP,temp.all)
+dat.SP      <- left_join(STATION.DEPTH,temp.all)
+dat.SP.raw  <- left_join(SAMPLES,
+                          temp.all %>% dplyr::select(station.depth,dist.km))
+                           
 
 dat.acoustic  <- dat.acoustic %>% mutate(mean.depth = ifelse(mean.depth==0,NA,mean.depth) )
-
 dat.acoustic$transect <- as.character(dat.acoustic$transect)
-dat.merge <- full_join(dat.SP %>% dplyr::select(transect,lat,lon,dist.km,neg.depth,Mean) ,
+
+dat.merge <- full_join(dat.SP %>% dplyr::select(transect,lat,lon,dist.km,depth,Mean) ,
+                       dat.acoustic %>% dplyr::select(transect,lat,lon,dist.km,mean.depth,biomass_mt,layer.thickness))
+dat.merge.raw <- full_join(dat.SP.raw %>% dplyr::select(transect,lat,lon,dist.km,depth,Mean) ,
                        dat.acoustic %>% dplyr::select(transect,lat,lon,dist.km,mean.depth,biomass_mt,layer.thickness))
 
+
+
 SP.transect.plots <- list()
+SP.transect.plots.raw <- list()
 
 #################
 ## OK. Make some plots
 #################
 if(SPECIES=="hake"){ 
-
-ALP.red =0.5
-ALP.blue = 0.3
-ALP.blue.line = 0.8
-
-lower.lim.copies = 20
-BREAK.copies = c(20,100,500,1000,2500,5000,7500,10000,20000,30000)
-LAB.copies= BREAK.copies
-
-for(i in 1:length(TRANS)){
-  nom <- as.name(paste0("Transect.",TRANS[i]))
-  SP.transect.plots[[nom]] <- 
-    ggplot(dat.merge%>% filter( transect== TRANS[i])) +
-    geom_point(aes(x= dist.km, y=mean.depth,size=biomass_mt,shape="Biomass",color="Biomass"),alpha=ALP.blue.line) +  
-    geom_point(aes(x= dist.km, y=depth,size=Mean,shape="Copies / L",color="Copies / L"),alpha=ALP.red) +
-    geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
-                  aes(x= dist.km, y=depth),shape="x") +
-    scale_size_continuous(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,max(BREAK.copies))) +  
-    # plot the bathymetry
-    geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
-                  aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
-    geom_ribbon(data=dat.acoustic %>% filter( transect== TRANS[i]),
-               aes(x=dist.km,
-                   ymin=mean.depth - 0.5*layer.thickness,
-                   ymax=mean.depth + 0.5*layer.thickness),fill="blue",alpha=ALP.blue)+
-    scale_shape_manual("Type",values=c(21,16),labels=c("Biomass","Copies / L")) +
-    scale_color_manual("Type",values=c("blue","red"),labels=c("Biomass","Copies / L")) +
-    xlab("Distance from start of transect (km)") +
-    ylab("Depth(m)") +
-    ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
-                  dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
-    coord_cartesian(ylim=c(0,500))+
-    scale_x_reverse() +
-    scale_y_reverse() +
-    theme_bw()
-}
-
-
-setwd("../Plots and figures")
-pdf(file="Hake transect profiles.pdf",onefile = T,height=6,width=7)
-  print(SP.transect.plots)
-dev.off()
-
-}else{ #### THIS IS A SECTION FOR non-hake plots
-  
   
   ALP.red =0.5
   ALP.blue = 0.3
@@ -468,15 +627,93 @@ dev.off()
   
   lower.lim.copies = 20
   BREAK.copies = c(20,100,500,1000,2500,5000,7500,10000,20000,40000)
+  BREAK.copies = c(20,100,500,1000,2500,5000)
+  BREAK.copies.raw = c(20,100,500,1000,2500,5000,7500,10000,20000,40000)
   LAB.copies= BREAK.copies
+  LAB.copies.raw= BREAK.copies.raw
   
   for(i in 1:length(TRANS)){
     nom <- as.name(paste0("Transect.",TRANS[i]))
     SP.transect.plots[[nom]] <- 
       ggplot(dat.merge%>% filter( transect== TRANS[i])) +
-
-      geom_point(aes(x= dist.km, y=depth,size=Mean),alpha=ALP.red,color="red",shape=16) +
+      geom_point(aes(x= dist.km, y=mean.depth,size=biomass_mt,shape="Biomass",color="Biomass"),alpha=ALP.blue.line) +  
+      geom_point(aes(x= dist.km, y=depth,size=Mean,shape="Copies / L",color="Copies / L"),alpha=ALP.red) +
       geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
+                 aes(x= dist.km, y=depth),shape="x") +
+      scale_size_continuous(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,max(BREAK.copies))) +  
+      # plot the bathymetry
+      geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
+                   aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
+      geom_ribbon(data=dat.acoustic %>% filter( transect== TRANS[i]),
+                  aes(x=dist.km,
+                      ymin=mean.depth - 0.5*layer.thickness,
+                      ymax=mean.depth + 0.5*layer.thickness),fill="blue",alpha=ALP.blue)+
+      scale_shape_manual("Type",values=c(21,16),labels=c("Biomass","Copies / L")) +
+      scale_color_manual("Type",values=c("blue","red"),labels=c("Biomass","Copies / L")) +
+      xlab("Distance from start of transect (km)") +
+      ylab("Depth(m)") +
+      ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
+                     dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
+      scale_y_reverse() +
+      coord_cartesian(ylim=c(500,0))+
+      scale_x_reverse() +
+      theme_bw()
+  }
+  for(i in 1:length(TRANS)){
+    nom <- as.name(paste0("Transect.",TRANS[i]))
+    SP.transect.plots.raw[[nom]] <- 
+      ggplot(dat.merge.raw %>% filter( transect== TRANS[i])) +
+      geom_point(aes(x= dist.km, y=mean.depth,size=biomass_mt,shape="Biomass",color="Biomass"),alpha=ALP.blue.line) +  
+      geom_point(aes(x= dist.km, y=depth,size=Mean,shape="Copies / L",color="Copies / L"),alpha=ALP.red) +
+      geom_point(data=dat.merge %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
+                 aes(x= dist.km, y=depth),shape="x") +
+      scale_size_continuous(name="Copies / L\nand\nBiomass (mt)",labels=LAB.copies.raw,
+                            breaks=BREAK.copies.raw,range=c(0.01,10),
+                            limits=c(lower.lim.copies,max(BREAK.copies.raw))) +  
+      # plot the bathymetry
+      geom_polygon(data=bathy.transects %>% filter(transect==TRANS[i]),
+                   aes(x=dist.km,y=-depth),fill="tan",alpha=ALP.red) +
+      geom_ribbon(data=dat.acoustic %>% filter( transect== TRANS[i]),
+                  aes(x=dist.km,
+                      ymin=mean.depth - 0.5*layer.thickness,
+                      ymax=mean.depth + 0.5*layer.thickness),fill="blue",alpha=ALP.blue)+
+      scale_shape_manual("Type",values=c(21,16),labels=c("Biomass","Copies / L")) +
+      scale_color_manual("Type",values=c("blue","red"),labels=c("Biomass","Copies / L")) +
+      xlab("Distance from start of transect (km)") +
+      ylab("Depth(m)") +
+      ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
+                     dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
+      scale_y_reverse() +
+      coord_cartesian(ylim=c(500,0))+
+      scale_x_reverse() +
+      theme_bw()
+  }
+  
+  setwd("../Plots and figures")
+    pdf(file=paste("Hake transect profiles smoothed_",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+    print(SP.transect.plots)
+  dev.off()
+  
+  setwd("../Plots and figures")
+    pdf(file=paste("Hake transect profiles raw_",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+    print(SP.transect.plots.raw)
+  dev.off()
+  
+}else{ #### THIS IS A SECTION FOR non-hake plots
+  ALP.red =0.5
+  ALP.blue = 0.3
+  ALP.blue.line = 0.8
+  
+  lower.lim.copies = 20
+  BREAK.copies = c(20,100,500,1000,2500,5000,7500,10000,20000,40000,100000,140000)
+  LAB.copies= BREAK.copies
+  
+  for(i in 1:length(TRANS)){
+    nom <- as.name(paste0("Transect.",TRANS[i]))
+    SP.transect.plots[[nom]] <- 
+      ggplot(dat.SP%>% filter( transect== TRANS[i])) +
+      geom_point(aes(x= dist.km, y=depth,size=Mean),alpha=ALP.red,color="red",shape=16) +
+      geom_point(data=dat.SP %>% filter( transect== TRANS[i],Mean<lower.lim.copies),
                  aes(x= dist.km, y=depth),shape="x") +
       scale_size_continuous(name="Copies / L",labels=LAB.copies,breaks=BREAK.copies,range=c(0.01,10),limits=c(lower.lim.copies,max(BREAK.copies))) +  
       # plot the bathymetry
@@ -488,19 +725,17 @@ dev.off()
       ylab("Depth(m)") +
       ggtitle(paste0("Transect ",TRANS[i],"; Latitude ", 
                      dat.bathy %>% filter(transect==TRANS[i]) %>% dplyr::select(lat_Mean) %>% round(.,1) %>% .$lat_Mean)) +
-      coord_cartesian(ylim=c(0,500))+
-      scale_x_reverse() +
       scale_y_reverse() +
+      coord_cartesian(ylim=c(500,0))+
+      scale_x_reverse() +
       theme_bw()
   }
-
-  setwd("../Plots and figures")
-  pdf(file=paste(SPECIES,"transect profiles.pdf"),onefile = T,height=6,width=7)
-  print(SP.transect.plots)
-  dev.off()
+  
+  # setwd("../Plots and figures")
+  # pdf(file=paste(SPECIES,"transect profiles.pdf"),onefile = T,height=6,width=7)
+  # print(SP.transect.plots)
+  # dev.off()
 }
-
-
 
 ######################################################3
 ######################################################3
@@ -514,6 +749,85 @@ dev.off()
 ######################################################3
 ######################################################3
 #### NEED TO DIFFERENTIATE AMONG CTDs in very deep water and ~500m.
+
+
+# Model Estimates of average abundance at each depth
+depth_cat_plot <- ggplot(depth_fact_summary) +
+                  geom_point(aes(x=depth_id,y=Mean)) +
+                  geom_errorbar(aes(x=depth_id,ymin=Val.X5.,ymax=Val.X95.),width=0)+
+                  labs(x="Sample Depth(m)",y=expression("DNA Copies L"^-1)) +
+                  expand_limits(y=0) +
+                  theme_bw()
+depth_cat_plot
+
+
+
+#### Make depth profiles
+
+
+water_depth_marg <-  STATION.DEPTH %>% group_by(water.depth.cat.2,depth_cat) %>% summarise(grand.mean = mean(Mean),
+                                                                      grand.median = median(Mean),
+                                                                      x.05 = quantile(Mean,probs=0.05),
+                                                                      x.25 = quantile(Mean,probs=0.25),
+                                                                      x.75 = quantile(Mean,probs=0.75),
+                                                                      x.95 = quantile(Mean,probs=0.95)
+                                                                      ) %>% rename(water_depth = water.depth.cat.2)
+
+
+STATION.DEPTH %>% filter(depth_cat == 300,water.depth.cat.2==150)
+
+
+
+water_depth_marg <- water_depth_marg %>% 
+                          mutate(depth_cat_jitt = case_when(water_depth=="50" ~ depth_cat-10,
+                                                            water_depth=="100" ~ depth_cat-6,
+                                                            water_depth=="150" ~ depth_cat-2,
+                                                            water_depth=="300" ~ depth_cat+2,
+                                                            water_depth=="500" ~ depth_cat+6,
+                                                            water_depth=="1000+" ~ depth_cat+10
+                                                                           ))
+
+ggplot(water_depth_marg) +
+    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=water_depth),position="jitter") +
+    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=water_depth),width=0,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=water_depth),width=0,size=1.2,alpha=0.5)+
+    geom_line(aes(y=grand.mean,x=depth_cat_jitt,color=water_depth),alpha=0.5) +
+    scale_x_reverse() +
+    scale_color_npg() +
+    #scale_y_continuous(trans="log2") +
+    coord_flip() +
+    theme_bw()
+
+
+
+  
+  coord_cartesian(ylim=c(500,0))+
+  scale_x_reverse() +
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 dat.SP.sum.by.depth.cat <- dat.SP %>% group_by(water.depth.cat.2,depth_cat) %>%
   summarise(N=length(Mean),MEAN=mean(Mean),SD=sd(Mean),
@@ -549,13 +863,6 @@ depth.p2 <- ggplot(dat.SP) +
 print(depth.p2)
 
 
-
-
-
-
-
-
-
 # dat.SP.sum.by.depth.cat <- dat.SP.sum.by.depth.cat %>%
 #                               mutate(max.depth.cat.fact=as.factor(max.depth.cat))
 # LEV <- unique(dat.SP.sum.by.depth.cat$max.depth.cat.fact)
@@ -572,7 +879,7 @@ depth.p3 <- ggplot(dat.SP.sum.by.depth.cat) +
   #           shape=16,size=3) +
   geom_line(aes(x=-depth_cat,y=MEDIAN,color=water.depth.cat.2),alpha=0.6) + 
   geom_ribbon(aes(x=-depth_cat,ymin=q.25,ymax=q.75,fill=water.depth.cat.2),
-                width=10,alpha=0.1) +
+              width=10,alpha=0.1) +
   scale_color_viridis_d("Water Depth \nCategory(m)",begin=0,end=0.8) +
   scale_fill_viridis_d("Water Depth \nCategory(m)",begin=0,end=0.8) +
   #scale_y_continuous(label=LABEL,breaks=LABEL) +
@@ -589,6 +896,114 @@ print(depth.p3)
 # 
 # print(depth.p4)
 
+#######################
+
+# Make a north-south transect by water depth
+
+lat.by.depth.dat <- dat.summary %>% group_by(transect,depth_cat) %>% 
+  summarise(lat.mean = mean(lat), grand.mean = mean(Mean),grand.sd = sd(Mean))
+lat.by.depth.dat$depth_cat <-as.factor(lat.by.depth.dat$depth_cat )
+dat.summary2 <- dat.summary
+dat.summary2$depth_cat <-as.factor(dat.summary2$depth_cat )
+
+p.lat.by.d <- ggplot() +
+  geom_point(data=lat.by.depth.dat,aes(y=grand.mean,x=lat.mean,color=depth_cat),alpha=0.5) +
+  geom_line(data=lat.by.depth.dat,aes(y=grand.mean,x=lat.mean,color=depth_cat),alpha=0.5) +
+  geom_point(data=dat.summary2,aes(y=Mean,x=lat,color=depth_cat),alpha=0.2) +
+  scale_y_log10() +
+  geom_hline(yintercept = 20,linetype="dashed",color="purple",alpha=0.5)+
+  #geom_hline(yintercept = 100,linetype="dashed",color="blue",alpha=0.5)+
+  theme_bw() +
+  scale_color_discrete("Depth") +
+  xlab("Latitude") +
+  ylab(expression("DNA copies L"^"-1"))
+
+p.lat.by.d.facet <- ggplot() +
+  geom_point(data=lat.by.depth.dat,aes(y=grand.mean,x=lat.mean),alpha=0.5) +
+  geom_line(data=lat.by.depth.dat,aes(y=grand.mean,x=lat.mean),alpha=0.5) +
+  geom_point(data=dat.summary2,aes(y=Mean,x=lat),alpha=0.2) +
+  scale_y_log10() +
+  geom_hline(yintercept = 20,linetype="dashed",color="purple",alpha=0.5)+
+  #geom_hline(yintercept = 100,linetype="dashed",color="blue",alpha=0.5)+
+  theme_bw() +
+  #scale_color_discrete("Depth")
+  xlab("Latitude") +
+  ylab(expression("DNA copies L"^"-1")) + facet_wrap(~depth_cat)
 
 
 
+
+
+
+
+
+
+###### Plots THAT MATTER
+pdf(file=paste("Hake transect stand.plot",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+  print(stand.plot)
+dev.off()
+pdf(file=paste("Hake transect stand.plot.pres",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+  print(stand.plot.pres)
+dev.off()
+
+# Marginal Plots
+pdf(file=paste("Hake transect Marginals",MODEL.TYPE,".pdf"),onefile = T,height=4,width=6)
+  print(wash.param.hist)
+  print(p_marginal_smooth)
+  print(depth_cat_plot)
+dev.off()
+
+
+# Dot plots for Niskins and Smooth Derived 
+pdf(file=paste("Hake transect D_delta inhibit",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+  print(p2)
+dev.off()
+pdf(file=paste("Hake transect D_delta wash",MODEL.TYPE,".pdf"),onefile = T,height=6,width=7)
+  print(p3)
+dev.off()
+pdf(file=paste("Hake transect D_delta red",MODEL.TYPE,".pdf"),onefile = T,height=10,width=7)
+  print(p4)
+dev.off()
+
+# Spatial Smoothes
+pdf(file=paste("Hake transect p_log_D",MODEL.TYPE,".pdf"),onefile = T,height=6,width=5)
+  print(p_log_D)
+dev.off()
+pdf(file=paste("Hake transect p_log_D_facet",MODEL.TYPE,".pdf"),onefile = T,height=10,width=7)
+  print(p_log_D_facet)
+dev.off()
+pdf(file=paste("Hake transect p_log_D_facet2",MODEL.TYPE,".pdf"),onefile = T,height=6,width=11)
+  print(p_log_D_facet2)
+dev.off()
+
+p_log_D
+p_log_D_facet
+p_log_D_SD
+p_log_D_SD_facet
+
+# Latitudinal slices.
+SP.transect.plots
+
+# Factors for each depth
+depth_cat_plot
+
+# Marginal Smoothes
+p_marginal_smooth
+
+# Residuals
+p_log_resid_facet
+
+# Contamination 
+control.by.time
+control.hist
+control.hist1
+
+depth.hist.facet
+
+inhibit.plot 
+inhibit.plot.by.depth 
+inhibit.plot.by.depth.few 
+
+wash.plot 
+wash.plot.by.depth 
+  

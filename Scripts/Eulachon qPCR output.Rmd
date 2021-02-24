@@ -33,7 +33,7 @@ print(sample.process.facet)
 There are a lot of samples that show signs of inhibition. They are concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. 
 
 ```{r,echo=FALSE}
-kable(g_i_dat)
+kable(inhibit.summ.dat)
 ```
 
 We can look at the patterns of inhibition spatially and by depth.
@@ -67,7 +67,11 @@ print(stand.plot.pres)
 print(stand.plot.facet)
 ```
 
-
+### Dilutions
+<!---```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(Output.qpcr$dilution_plot)
+```
+--->
 
 \newpage
 ### Controls
@@ -80,14 +84,15 @@ Thus far we have analyzed `r N_control_run` samples out of a total of `r N_contr
 print(control.hist1)
 ```
 
-We can look at the temporal pattern of the control values too.  This will be more informative when we have more samples analyzed. 
+We can look at the temporal pattern of the control values too. All are below the detection limit for the assay.
 
 ```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
 print(control.by.time)
 ```
 
+### Ethanol wash samples
 
-
+For a buch of samples, the final stage of th extraction wash was conducted using a 30% Ethanol wash as opposed to a 70% ethanol wash.  This should result in some amount of DNA being lost from the samples.  To examine this, we intentionally washed one of the two Niskin bottles from 23 station-depth combinations with 30% ethanol and one with 70% ethanol with the goal of detecting what the average difference in DNA concentration between the two samples washed in DNA would be.
 
 \newpage
 ## Eulachon eDNA
@@ -97,6 +102,16 @@ We can first ask if the distribution of estimated DNA compare to the values pres
 ```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
 print(compare.hist2)
 ```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+
+
+
+
 
 Let's make some plots of the spatial distribution of eulachon DNA.  I think that it is clear that the major problem is with inhibition in the surface samples for eulachon. There are a lot of missing data points for eulachon.
 
@@ -109,6 +124,15 @@ print(SP.p2)
 print(SP.p3)
 ```
 
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p4)
+```
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p5)
+```
+
+
 \newpage
 ## Acoustic Data.  
 
@@ -117,6 +141,7 @@ There is no acoustic information for eulachon.
 ## eDNA transects.  
 
 Here are a few plots from individual transects.  Coast is on the right side of the graph. 
+
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
 nom <-as.name("Transect.27")
 print(SP.transect.plots[[nom]])
@@ -137,12 +162,30 @@ nom <-as.name("Transect.67")
 print(SP.transect.plots[[nom]])
 ```
 
-\newpage
-This is a plot of median (plus interquartile range) for eulachon DNA concentration by the water depth category. Shallower sites are on the shelf (same data with two different x-axes, plotted)
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.67")
+print(SP.transect.plots[[nom]])
+```
 
 ```{r,echo=FALSE,fig.height=6,warning=FALSE}
-print(depth.p3)
-print(depth.p4)
+nom <-as.name("Transect.73")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.75")
+print(SP.transect.plots[[nom]])
+```
+\newpage
+## North to south patterns by water depth categoris.
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+p.lat.by.d
+```
+
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+p.lat.by.d.facet
 ```
 
 
