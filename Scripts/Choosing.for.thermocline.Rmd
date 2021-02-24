@@ -46,9 +46,12 @@ eDNA.samples %>%
   left_join(CTD.stations) %>% 
   separate(Station, into = c("Transect","position"), remove = F) %>% 
   filter (Transect %in% c(81, 77,67,60,53,39,35,26)) %>% 
-  select(Transect, position, depth, `Tube #`) %>% 
+  select(Transect, position, depth, `Tube #`, lat, lon) %>% 
+  distinct() -> eDNA.samples.transects 
   
-  pivot_wider(-`Tube #`, names_from = position, values_from = depth)
+  eDNA.samples.transects %>% 
+    select(eDNA.sample = `Tube #`, everything()) %>% 
+    write_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
 
 ```
 
