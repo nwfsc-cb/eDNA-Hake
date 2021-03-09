@@ -1,0 +1,9 @@
+Argument,value
+folder,/Users/ramon.gallegosimon/Projects/eDNA-Hake/Data/Pipeline_output/Run3/noprimers/
+  hash, TRUE
+  trimming.length.Read1, 220
+  trimming.length.Read2, 150
+  metadata, output.metadata.csv
+  output.folder, ~/test_dad2
+  keep.mid.files, TRUE
+  merge.overlap, 10
