@@ -1,0 +1,112 @@
+---
+title: 'Library Preparation: Samples 1-48 - 16_Prey'
+output:
+  html_document:
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+This is the lab book for the samples from the first biot of the Hake eDNA project -These are 16S_Prey Amplicons. 
+
+```{r loading packages, echo=FALSE}
+library (here)
+library (tidyverse)
+library (knitr)
+library(kableExtra)
+library(googlesheets4)
+```
+
+For this Library Prep, the Samples selected are in our googlesheet, and we created a new sheet with the samples selected and the well in which we have put them for PCR1 cleanup 
+```{r load dataset, message = F}
+Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
+  mutate (Plate = "Plate22")
+
+Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
+  mutate (Plate = "Plate23")
+
+Samples_to_Sequence <- bind_rows(Plate22, Plate23)
+```
+
+## Amplification Success so far
+
+I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment. 
+
+
+
+These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294. 
+
+I run AMPureXP cleanup protocol in the successful samples: I used 2x Ampure (10 uL PCR product, 20 uL Ampure). I eluted the DNA in 20 uL of PCR water, that would become the template for PCR2. 
+
+Before running PCR2 we need to randomly assigned tags and libraries to samples, to avoid any systematic bias in our libraries. We are going to use 16 Tags and 6 libraries (6x16 = 96 unique combinations) to label 93 samples.
+
+```{r}
+Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:96) %>% 
+  mutate(Row = rep(LETTERS[1:8], 12), 
+         Column = rep(1:12,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
+
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
+      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
+      column_spec(1, bold=T) %>%
+      column_spec(1:13, width= "1cm")
+       
+
+```
+
+
+```{r PCR50}
+Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:48) %>% 
+  mutate(Row = rep(LETTERS[1:8], 6), 
+         Column = rep(5:10,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
+
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
+      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
+      column_spec(1, bold=T) %>%
+      column_spec(1:13, width= "1cm")
+       
+```
+
+## MArch 2021
+
+```{r}
+gs4_find()
+```
+
+```{r}
+read_sheet("1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", col_types = "c") -> SuccesfulPCRs
+```
+
+
+```{r}
+SuccesfulPCRs %>% 
+  filter (!is.na(Sample)) %>% 
+  group_by(Sample) %>% 
+  add_tally()  %>%
+  nest() %>% 
+  
+  mutate (data = map (data, ~.x %>% 
+                        rownames_to_column("count") %>% 
+                        
+                        mutate ( count = as.numeric(count),
+                                 Keepers = count <= 2))) %>% 
+  unnest(data) %>% 
+  separate (Well, into = c("Row", "Column"), sep = 1, convert = T, remove = F) %>% 
+  arrange(Column, Row) %>% 
+  filter (Keepers == FALSE)
+```
+
