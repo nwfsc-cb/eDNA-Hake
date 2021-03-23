@@ -14,72 +14,73 @@ library (tidyverse)
 library (knitr)
 library(kableExtra)
 library(googlesheets4)
+library (eDNAfuns)
 ```
 
-For this Library Prep, the Samples selected are in our googlesheet, and we created a new sheet with the samples selected and the well in which we have put them for PCR1 cleanup 
-```{r load dataset, message = F}
-Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>% 
-  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
-  mutate (Plate = "Plate22")
+<!-- For this Library Prep, the Samples selected are in our googlesheet, and we created a new sheet with the samples selected and the well in which we have put them for PCR1 cleanup  -->
+<!-- ```{r load dataset, message = F} -->
+<!-- Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>%  -->
+<!--   pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%  -->
+<!--   mutate (Plate = "Plate22") -->
 
-Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>% 
-  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
-  mutate (Plate = "Plate23")
+<!-- Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>%  -->
+<!--   pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%  -->
+<!--   mutate (Plate = "Plate23") -->
 
-Samples_to_Sequence <- bind_rows(Plate22, Plate23)
-```
+<!-- Samples_to_Sequence <- bind_rows(Plate22, Plate23) -->
+<!-- ``` -->
 
-## Amplification Success so far
+<!-- ## Amplification Success so far -->
 
-I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment. 
-
-
-
-These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294. 
-
-I run AMPureXP cleanup protocol in the successful samples: I used 2x Ampure (10 uL PCR product, 20 uL Ampure). I eluted the DNA in 20 uL of PCR water, that would become the template for PCR2. 
-
-Before running PCR2 we need to randomly assigned tags and libraries to samples, to avoid any systematic bias in our libraries. We are going to use 16 Tags and 6 libraries (6x16 = 96 unique combinations) to label 93 samples.
-
-```{r}
-Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>% 
-  rownames_to_column("Position") %>% 
-  slice(1:96) %>% 
-  mutate(Row = rep(LETTERS[1:8], 12), 
-         Column = rep(1:12,each = 8)) %>% 
-  unite(Row,Column, sep = "", col = "Well", remove = F)
-
-Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
-Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well
-Norm_table[Norm_table < 2] <- "." 
-  Norm_table[Norm_table > 20] <- "." 
-    kable (Norm_table, align= "c", format = "html") %>%
-      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
-      column_spec(1, bold=T) %>%
-      column_spec(1:13, width= "1cm")
-       
-
-```
+<!-- I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment.  -->
 
 
-```{r PCR50}
-Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>% 
-  rownames_to_column("Position") %>% 
-  slice(1:48) %>% 
-  mutate(Row = rep(LETTERS[1:8], 6), 
-         Column = rep(5:10,each = 8)) %>% 
-  unite(Row,Column, sep = "", col = "Well", remove = F)
 
-Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
-Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well
-Norm_table[Norm_table < 2] <- "." 
-  Norm_table[Norm_table > 20] <- "." 
-    kable (Norm_table, align= "c", format = "html") %>%
-      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
-      column_spec(1, bold=T) %>%
-      column_spec(1:13, width= "1cm")
-       
-```
+<!-- These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294.  -->
+
+<!-- I run AMPureXP cleanup protocol in the successful samples: I used 2x Ampure (10 uL PCR product, 20 uL Ampure). I eluted the DNA in 20 uL of PCR water, that would become the template for PCR2.  -->
+
+<!-- Before running PCR2 we need to randomly assigned tags and libraries to samples, to avoid any systematic bias in our libraries. We are going to use 16 Tags and 6 libraries (6x16 = 96 unique combinations) to label 93 samples. -->
+
+<!-- ```{r} -->
+<!-- Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>%  -->
+<!--   rownames_to_column("Position") %>%  -->
+<!--   slice(1:96) %>%  -->
+<!--   mutate(Row = rep(LETTERS[1:8], 12),  -->
+<!--          Column = rep(1:12,each = 8)) %>%  -->
+<!--   unite(Row,Column, sep = "", col = "Well", remove = F) -->
+
+<!-- Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate -->
+<!-- Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well -->
+<!-- Norm_table[Norm_table < 2] <- "."  -->
+<!--   Norm_table[Norm_table > 20] <- "."  -->
+<!--     kable (Norm_table, align= "c", format = "html") %>% -->
+<!--       kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>% -->
+<!--       column_spec(1, bold=T) %>% -->
+<!--       column_spec(1:13, width= "1cm") -->
+
+
+<!-- ``` -->
+
+
+<!-- ```{r PCR50} -->
+<!-- Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>%  -->
+<!--   rownames_to_column("Position") %>%  -->
+<!--   slice(1:48) %>%  -->
+<!--   mutate(Row = rep(LETTERS[1:8], 6),  -->
+<!--          Column = rep(5:10,each = 8)) %>%  -->
+<!--   unite(Row,Column, sep = "", col = "Well", remove = F) -->
+
+<!-- Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate -->
+<!-- Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well -->
+<!-- Norm_table[Norm_table < 2] <- "."  -->
+<!--   Norm_table[Norm_table > 20] <- "."  -->
+<!--     kable (Norm_table, align= "c", format = "html") %>% -->
+<!--       kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>% -->
+<!--       column_spec(1, bold=T) %>% -->
+<!--       column_spec(1:13, width= "1cm") -->
+
+<!-- ``` -->
 
 ## MArch 2021
 
@@ -93,20 +94,115 @@ read_sheet("1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", col_types = "c") -> S
 
 
 ```{r}
+# SuccesfulPCRs %>% 
+#   filter (!is.na(Sample)) %>% 
+#   group_by(Sample) %>% 
+#   add_tally()  %>%
+#   #filter (n == 3) %>%
+#   mutate(Keepers = TRUE) %>% sheet_write(ss = "1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", sheet = "updated")
+
 SuccesfulPCRs %>% 
   filter (!is.na(Sample)) %>% 
   group_by(Sample) %>% 
   add_tally()  %>%
-  nest() %>% 
+  filter (n == 3) %>% 
+  arrange(Sample)
+  # nest() %>% 
+  # 
+  # mutate (data = map (data, ~.x %>% 
+  #                       rownames_to_column("count") %>% 
+  #                       
+  #                       mutate ( count = as.numeric(count),
+  #                                Keepers = count <= 2))) %>% 
+  # unnest(data) %>% 
+  # separate (Well, into = c("Row", "Column"), sep = 1, convert = T, remove = F) %>% 
+  # arrange(Column, Row) %>% 
+  # filter (Keepers == FALSE)
+```
+
+# Updated some info with desired bands
+
+```{r}
+Updated.PCRs <- read_sheet(ss = "1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", sheet = "updated")
+
+Updated.PCRs %>% 
+  filter (Keepers == TRUE) %>% 
+  select (-n) %>% 
+  group_by(Sample) %>% 
+  add_tally() %>% 
+  arrange(desc(n)) # THis is the sucess so far. If we keep those for which we have 2 - is it enough for a MiSeq run?
+
+Updated.PCRs %>% 
+  filter (Keepers == TRUE) %>% 
+  select (-n) %>% 
+  group_by(Sample) %>% 
+  add_tally() %>% 
+  filter (n == 2) # 64 samples + those in PCR51&52
+
+
+
+```
+
+Get what we already have indexed
+```{r}
+gs4_find()
+Updated.PCR52 <- eDNAfuns::read_indexing_PCR("1rLval2cNGmrnkRDOj1hekDMnqRrt64MQV4hFetwqBlM")
+
+Updated.PCR52 %>% 
+  filter (!is.na(SAMPLE)) -> Updated.PCR52# 84 samples
+
+Updated.PCR52 %>% 
+  filter (str_detect(SAMPLE, "T")) # 2 tilapias already, I won't need a third
+
+
+
+# Total for Run 84 + 64 = 148
+
+# Creagte a plate for AMPURE
+
+PCR.Plate <- tibble (Row = rep(LETTERS[1:8], 12),
+                     Column = rep(1:12, each = 8)) %>% 
+  unite(Row,Column,col = "Well", sep = "", remove= F) %>% 
+  rownames_to_column("Position")
+
+Updated.PCRs %>% 
+  filter (Keepers == TRUE) %>% 
+  select (-n) %>% 
+  group_by(Sample) %>% 
+  add_tally() %>% 
+  filter (n == 2) %>% # remove the Well 
+  select(-Well) %>% 
+  rownames_to_column("Position") %>% 
+  left_join(PCR.Plate) -> AMPURE_to_do # This is the plate we are going to index; we need to choose unused indices
+
+Updated.PCR52 %>% 
+  filter (Set == "B") # From Set B, I can Use BArcodes A1-H7
+
+AMPURE_to_do %>% 
+  pivot_wider(names_from = Column, id_cols = Row, values_from = PCR_of_Origin) -> PCR_plate_of_PCRs
   
-  mutate (data = map (data, ~.x %>% 
-                        rownames_to_column("count") %>% 
-                        
-                        mutate ( count = as.numeric(count),
-                                 Keepers = count <= 2))) %>% 
-  unnest(data) %>% 
-  separate (Well, into = c("Row", "Column"), sep = 1, convert = T, remove = F) %>% 
-  arrange(Column, Row) %>% 
-  filter (Keepers == FALSE)
+AMPURE_to_do %>% 
+  pivot_wider(names_from = Column, id_cols = Row, values_from = Well_of_Origin) -> PCR_plate_of_Wells
+
+AMPURE_to_do %>% 
+  pivot_wider(names_from = Column, id_cols = Row, values_from = Sample) -> PCR_plate_of_Samples
+
+
+```
+
+
+Where to get the samples
+```{r}
+AMPURE_to_do %>% 
+  mutate(
+  Well_of_Origin = cell_spec(Well_of_Origin, color = ifelse(PCR_of_Origin == "RGS_053", "white",
+                                                            if_else(PCR_of_Origin == "RGS_054","black", "blue")),
+                  background = ifelse(PCR_of_Origin == "RGS_053", "red", "white"),
+                  bold = ifelse(PCR_of_Origin == "RGS_053|RGS_055", T, F))) %>% 
+ 
+  pivot_wider(names_from = Column, id_cols = Row, values_from = Well_of_Origin) %>% 
+   kable(escape = F) %>% 
+  kable_styling()
+
 ```
 
