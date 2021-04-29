@@ -24,7 +24,6 @@ plot.dir <- paste0(base.dir,"Plots and figures")
 setwd(data.dir)
 dat.acoustic.raw <- read.csv("EchoPro_un-kriged_output-05-Dec-2019_0.csv")
 
-
 ### WORK WITH THE ACOUSTIC DATA.
 dat.acoustic <- dat.acoustic.raw %>% 
                       rename(transect=Transect,
@@ -42,7 +41,7 @@ dat.acoustic <- dat.acoustic.raw %>%
                                     VL_end,
                                     lat,
                                     lon,
-                                    mean.depth.m=,
+                                    mean.depth.m,
                                     layer.thickness.m,
                                     abundance,
                                     biomass_kg,
@@ -99,29 +98,6 @@ dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,u
 
 dat.acoustic <- cbind(dat.acoustic %>% ungroup(),dat.utm)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 temp.all <- NULL
 for(i in 1:length(TRANS)){
   #print(i)
@@ -156,11 +132,11 @@ for(i in 1:length(TRANS)){
   temp <- temp %>% group_by(transect,bin.id) %>% 
                           summarise(lat = mean(lat),
                                     lon = mean(lon),
-                                    depth.mean = mean(mean.depth),
-                                    thickness.mean = mean(layer.thickness),
+                                    depth.mean = mean(mean.depth.m),
+                                    thickness.mean = mean(layer.thickness.m),
                                     dist.km = mean(dist.km),
                                     abund= sum(abundance),
-                                    biomass = sum(biomass),
+                                    biomass_kg = sum(biomass_kg),
                                     biomass_mt = sum(biomass_mt),
                                     mean.id.numb= mean(id.numb),
                                     near.coast=ifelse(sum(near.coast,na.rm=T)==1,1,0))
@@ -204,6 +180,89 @@ hake.acoustic.binned.p1 <- base_map_trim +
   scale_shape("Biomass (mt)",solid=FALSE)
 
 print(hake.acoustic.binned.p1)
+
+
+##################################################3
+#### ---------------------------------------------
+#### Process the projection matrix to include areas that are surveyed by the acoustic surveys.
+#### ---------------------------------------------
+##################################################3
+# ---- SPTAIAL DATA IS PULLED IN ABOVE
+
+dat_raster_extracted %>% head()
+
+
+# Make a set of inshore and offshore boundaries based on dat.acoustic
+
+
+acoustic.lims <- dat.acoustic %>% group_by(transect) %>% 
+                summarise(min.lon.utm = min(utm.lon), 
+                           max.lon.utm = max(utm.lon),
+                           mean.lat.utm = mean(utm.lat)) %>% 
+                  arrange(transect)
+
+ggplot(acoustic.lims) + 
+    geom_point(aes(x=min.lon.utm,y=mean.lat.utm)) +
+    geom_point(aes(x=max.lon.utm,y=mean.lat.utm),col=2)
+
+
+
+dat_raster_trim <- NULL
+dat_raster_extracted <- dat_raster_extracted %>% as.data.frame()
+dat_raster_extracted$y.km <- dat_raster_extracted$y/1000
+dat_raster_extracted$x.km <- dat_raster_extracted$x/1000
+for(i in 2:nrow(acoustic.lims)){
+  filt.temp <-  acoustic.lims[(i-1):i,] %>% arrange(mean.lat.utm)
+  temp <- dat_raster_extracted %>% filter(y.km >= filt.temp$mean.lat.utm[1], 
+                                          y.km < filt.temp$mean.lat.utm[2])
+  uni.lat <- unique(temp$y.km) 
+  
+  SLOPE.min <-    (filt.temp$min.lon.utm[2] - filt.temp$min.lon.utm[1]) /
+                  (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
+  SLOPE.max <-    (filt.temp$max.lon.utm[2] - filt.temp$max.lon.utm[1]) /
+                  (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
+  
+  uni.lat <- uni.lat %>% as.data.frame() %>% rename(y.km = ".") %>% 
+              mutate(lon.min = SLOPE.min * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$min.lon.utm[1]) %>%
+              mutate(lon.max = SLOPE.max * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$max.lon.utm[1])
+  
+  temp <- left_join(temp,uni.lat) %>% filter(x.km > lon.min,x.km < lon.max)
+  dat_raster_trim <- bind_rows(dat_raster_trim,temp)
+}
+
+ggplot(acoustic.lims) + 
+  geom_point(aes(x=min.lon.utm,y=mean.lat.utm)) +
+  geom_point(aes(x=max.lon.utm,y=mean.lat.utm),col=2) +
+  geom_point(data=dat_raster_trim, aes(x=x.km,y=y.km),col="blue") 
+ 
+# Trim everything south of SF Bay, add in the depth information
+dat_raster_fin <- dat_raster_trim %>% dplyr::select(fivekm_grid,y,x) %>% 
+                      rename(Gridcell_ID=fivekm_grid)
+dat_raster_fin <- left_join(dat_raster_fin,raster_depth) %>% filter(is.na(depth_m)==F,depth_m>30)
+
+# Add lat and lon to dat_raster_fin for help with plotting later
+proj      <- SpatialPointsDataFrame(coords = dat_raster_fin %>% ungroup() %>% dplyr::select(x,y),
+                                    data = dat_raster_fin,
+                                    proj4string = crs(PROJ.txt))
+proj.latlon <- spTransform(proj, CRSobj = CRS("+proj=longlat"))
+
+dat_raster_fin <- left_join(dat_raster_fin,
+                            data.frame(Gridcell_ID= proj.latlon$Gridcell_ID,
+                                       data.frame(proj.latlon@coords)%>% rename(lon=x,lat=y)))
+dat_raster_fin <- dat_raster_fin %>% mutate(x= x/1000, y=y/1000)
+
+
+ggplot(dat_raster_fin) +
+  geom_tile(aes(x=x,y=y,fill=depth_m),alpha=0.8)  +
+  theme_bw()
+  #geom_point(data=dat.station.id.trim,aes(x=utm.lon,y=utm.lat),col="red") 
+
+# Save this data frame to file so the PCR and acoustics script can use it.                  
+saveRDS(dat_raster_fin,file="../Data/_projection_rds/dat_raster_fin.rds")   
+
+
+
+
 
 
 

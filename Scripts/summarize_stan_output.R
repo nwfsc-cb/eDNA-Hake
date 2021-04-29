@@ -4,15 +4,18 @@
 #####################################################3
 #####################################################3
 # Pull files from the list
-pars <- Output.qpcr$pars
+pars <- Output.qpcr$samp
 dat.stand.bin <- Output.qpcr$dat.stand.bin
 dat.stand.pos <- Output.qpcr$dat.stand.pos
+dat.id <- Output.qpcr$dat.id
 PCR <- Output.qpcr$PCR
 STATION.DEPTH <- Output.qpcr$STATION.DEPTH
 SAMPLES <- Output.qpcr$SAMPLES
 MODEL.TYPE <- Output.qpcr$MODEL.TYPE
+MODEL.VAR <- Output.qpcr$MODEL.VAR
 dat_raster_fin <- Output.qpcr$dat_raster_fin
 depth.fact <- sort(unique(STATION.DEPTH$depth_cat_factor))
+TRACE <- Output.qpcr$TRACE
 
 brms.object <- Output.qpcr$brms.object
 
@@ -23,7 +26,7 @@ if(MODEL.TYPE =="lat.long.smooth"){
 }
 
 # N posteriors to sample
-N.POST <- 1000
+N.POST <- 2000
 
 ### PLOTS OF STANDARDS and associated REGRESSIONS
 #pairs(stanMod, pars = c(base_params), log = FALSE, las = 1)
