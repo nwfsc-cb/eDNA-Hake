@@ -252,6 +252,20 @@ dat_raster_fin <- left_join(dat_raster_fin,
 dat_raster_fin <- dat_raster_fin %>% mutate(x= x/1000, y=y/1000)
 
 
+###### TRIM THE PROJECTION POINTS TO CONTRAIN THE DISTRIBUTION EXAMINED LATER.
+
+# This trims the points to include only points:
+# North of transect 25 
+# South of transect 85
+# East of longitude -126.5
+
+min.lat <- 38.3
+max.lat <- 48.5
+min.lon <- -126.5
+
+dat_raster_fin <- dat_raster_fin %>% filter(lat > min.lat,lat < max.lat,lon > min.lon)
+
+
 ggplot(dat_raster_fin) +
   geom_tile(aes(x=x,y=y,fill=depth_m),alpha=0.8)  +
   theme_bw()
@@ -260,13 +274,73 @@ ggplot(dat_raster_fin) +
 # Save this data frame to file so the PCR and acoustics script can use it.                  
 saveRDS(dat_raster_fin,file="../Data/_projection_rds/dat_raster_fin.rds")   
 
+# Make sets of lines to divide up the coast into approximately equal sized chunks
+lats.equal <- seq(38.25,max.lat,length.out = 11)
+lats.rounded.0.5 <- c(38.25,seq(39,max.lat,by=0.5))
+lats.rounded.1.0 <- c(38.25,seq(39,max.lat,by=1.0))
 
 
+# Sort from south to north
+max.lon.for.groups <- rep(0,length(lats.equal))
+max.lats <- max.lon.for.groups
+for(i in 1: length(max.lon.for.groups)){
+  if(i==1){
+    max.lon.for.groups[i] <- dat_raster_fin$lon %>% max()
+  }else{
+    max.lats[i-1] = lats.equal[i]
+    max.lon.for.groups[i]  <- dat_raster_fin %>% filter(lat< lats.equal[i],
+                                                        lat> (lats.equal[i]-0.1)) %>% 
+                              dplyr::select(lon) %>% max()
+  }
+  max.lats[length(max.lon.for.groups)] = lats.equal[length(max.lon.for.groups)] + 1
+}
+lats.equal <- bind_cols(lat=c(lats.equal),lat.max = max.lats,lon.max=max.lon.for.groups,) %>% 
+              mutate(lon.min=lon.max-1.75,ID = 1:length(lon.min))
+lats.equal <- lats.equal %>% filter(lat.max<= max.lat)
+
+# Sort from south to north
+max.lon.for.groups <- rep(0,length(lats.rounded.0.5))
+max.lats <- max.lon.for.groups
+for(i in 1: length(max.lon.for.groups)){
+  if(i==1){
+    max.lon.for.groups[i] <- dat_raster_fin$lon %>% max()
+  }else{
+    max.lats[i-1] = lats.rounded.0.5[i]
+    max.lon.for.groups[i]  <- dat_raster_fin %>% filter(lat< lats.rounded.0.5[i],
+                                                        lat> (lats.rounded.0.5[i]-0.1)) %>% 
+      dplyr::select(lon) %>% max()
+  }
+  max.lats[length(max.lon.for.groups)] = lats.rounded.0.5[length(max.lon.for.groups)] + 0.5
+}
+lats.rounded.0.5 <- bind_cols(lat=c(lats.rounded.0.5),lat.max = max.lats,lon.max=max.lon.for.groups) %>% 
+                        mutate(lon.min=lon.max-1.75,ID = 1:length(lon.min))
+lats.rounded.0.5 <- lats.rounded.0.5 %>% filter(lat.max <= max.lat)
+
+# Sort from south to north
+max.lon.for.groups <- rep(0,length(lats.rounded.1.0))
+max.lats <- max.lon.for.groups
+for(i in 1: length(max.lon.for.groups)){
+  if(i==1){
+    max.lon.for.groups[i] <- dat_raster_fin$lon %>% max()
+  }else{
+    max.lats[i-1] = lats.rounded.1.0[i]
+    max.lon.for.groups[i]  <- dat_raster_fin %>% filter(lat< lats.rounded.1.0[i],
+                                                        lat> (lats.rounded.1.0[i]-0.1)) %>% 
+      dplyr::select(lon) %>% max()
+  }
+  max.lats[length(max.lon.for.groups)] = lats.rounded.1.0[length(max.lon.for.groups)] + 1
+  
+}
+lats.rounded.1.0 <- bind_cols(lat=c(lats.rounded.1.0),lat.max = max.lats,lon.max=max.lon.for.groups) %>% 
+                        mutate(lon.min=lon.max-1.75,
+                               ID = 1:length(lon.min))
 
 
+# latitudinal breaks for analysis
+lat.breaks <- list(
+              lats.equal = lats.equal,
+              lats.rounded.0.5 = lats.rounded.0.5,
+              lats.rounded.1.0 = lats.rounded.1.0)
 
-
-
-
-
+save(lat.breaks,file="../Data/lat_breaks_for_projections.RData")
 

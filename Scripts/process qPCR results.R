@@ -23,16 +23,16 @@ SP <- "hake" # options: hake, lamprey, eulachon
 MODEL.TYPE = "lat.long.smooth"
 ###########################################################################
 # identifier
-MODEL.ID <- "7_12_fix_nu_A"
+MODEL.ID <- "5_10_fix_nu"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
 ###########################################################################
-set.seed(111)
+#set.seed(111)
 # Construct smoothes for each 
 # define knots.
-N.knots.lon  <- 7
-N.knots.lat  <- 12
+N.knots.lon  <- 5
+N.knots.lat  <- 10
 N.knots.bd <- 5
 N.knots.depth <- 4
 
@@ -353,8 +353,8 @@ dat.samp <- dat.samp %>% filter(!sample %in% these.samps) %>% bind_rows(.,dat.sa
 if(SP == "hake"){
   dat.samp <- dat.samp %>% filter(!sample %in% c(1298, # This one must have dropped on the tabletop
                                                1622,   # This one must have dropped on the tabletop 30EtOH too.
-                                               1552,   # Two orders of magnitude large than pair.
-                                               1419,   # Two orders of magnitude large than pair.
+                                               #1552,   # Two orders of magnitude large than pair.
+                                               #1419,   # Two orders of magnitude large than pair.
                                                1326,   # This is a 25m deep spot so gets dropped anyway.
                                                536,535,    # Removed both of this pari() 
                                                #55,    # This is a 25m deep spot so gets dropped anyway.
@@ -574,7 +574,7 @@ if(MODEL.TYPE == "lat.long.smooth"){
   
   brms.object <- brm(Y ~ t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)+
            s(bottom.depth.consensus,k=N.knots.bd) +
-           depth_cat_factor,
+           depth_cat_factor, 
            #knots=list(#utm.lon=knots.lon,
                   #utm.lat=knots.lat,
             #      bottom.depth = knots.bd),
@@ -904,11 +904,11 @@ stan_init_f2 <- function(n.chain,N_pcr,N_station_depth,N_control_sample){
 rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
-N_CHAIN = 1
+N_CHAIN = 4
 Warm = 1200
 Iter = 2000
 Treedepth = 11
-Adapt_delta = 0.80
+Adapt_delta = 0.95
 
 LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)
@@ -931,7 +931,7 @@ if(MODEL.TYPE=="Base"){
 if(MODEL.TYPE=="lat.long.smooth"){
   if(MODEL.VAR=="Base_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes.stan" ,data = stan_data, 
-               verbose = FALSE, chains = N_CHAIN, thin = 1, 
+               verbose = FALSE, chains = N_CHAIN, thin = 2, 
                warmup = Warm, iter = Warm + Iter, 
                control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                pars = stan_pars,
@@ -945,7 +945,7 @@ if(MODEL.TYPE=="lat.long.smooth"){
   }
   if(MODEL.VAR=="Linear_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes_VAR2.stan" ,data = stan_data, 
-                 verbose = FALSE, chains = N_CHAIN, thin = 1, 
+                 verbose = FALSE, chains = N_CHAIN, thin = 2, 
                  warmup = Warm, iter = Warm + Iter, 
                  control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                  pars = stan_pars,
@@ -962,7 +962,7 @@ if(MODEL.TYPE=="lat.long.smooth"){
 if(MODEL.TYPE=="lat.long.smooth.base"){
    if(MODEL.VAR=="Base_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes_no_depth.stan" ,data = stan_data, 
-                 verbose = FALSE, chains = N_CHAIN, thin = 1, 
+                 verbose = FALSE, chains = N_CHAIN, thin = 2, 
                  warmup = Warm, iter = Warm + Iter, 
                  control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                  pars = stan_pars,
@@ -976,7 +976,7 @@ if(MODEL.TYPE=="lat.long.smooth.base"){
    }
   if(MODEL.VAR=="Linear_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes_no_depth_VAR.stan" ,data = stan_data, 
-                   verbose = FALSE, chains = N_CHAIN, thin = 1, 
+                   verbose = FALSE, chains = N_CHAIN, thin = 2, 
                    warmup = Warm, iter = Warm + Iter, 
                    control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                    pars = stan_pars,

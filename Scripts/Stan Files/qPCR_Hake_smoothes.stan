@@ -154,9 +154,12 @@ parameters { ///////////////////////////////////////////////////////////////////
 
       real wash_offset ;
 
+ // Variance parameters for observation and random effects
+       real<lower=0> sigma_stand_int ;
        real<lower=0> tau_sample ;
        real<lower=0> sigma_pcr ; 
-
+      // real<lower=2> nu ;
+       
     // Standards regression and logit coeffs
       real beta_0[N_pcr] ;
       real beta_1[N_pcr] ;
@@ -164,9 +167,7 @@ parameters { ///////////////////////////////////////////////////////////////////
       real phi_0[N_pcr] ;
       real phi_1[N_pcr] ;
 
-    // Variance parameters for observation and random effects
-      real sigma_stand_int ;
-      //real sigma_stand_slope ;
+     //real sigma_stand_slope ;
      // real sigma_stand_slope2 ;
       
       // real sigma_stand_int_bar ;
@@ -309,7 +310,7 @@ transformed parameters { ///////////////////////////////////////////////////////
     // ADD IN A LATENT VARIABLE TO ACCOUNT FOR CONTAMINATION OF THE FIELD SAMPLES.
     for(i in 1:N_sample){
       D_delta[i] = D[samp_station_depth_idx[i]] + // This is the log-DNA concentration in each Niskin bottle.
-                        delta[i] * singleton_idx[i] * Ct_bin_idx[i]; //
+                        delta[i];// * singleton_idx[i] * Ct_bin_idx[i]; //
       D_contam[i] = D_delta[i]  +
                         log_vol_obs[i] +
                         wash_offset * wash_idx[i]; 
@@ -324,11 +325,11 @@ transformed parameters { ///////////////////////////////////////////////////////
 
     //}  
     //for( i in 1:N_count_samp){
-      sigma_all_samp = //sigma_stand_int;
-                        pow(sigma_stand_int^2 +
-                            //sigma_stand_slope * (D[bottle_count_idx[i]]- OFFSET)) +
-                            //+ sigma_stand_slope2 * D[bottle_count_idx[i]]^2) + 
-                            sigma_pcr^2,-2) ;
+      sigma_all_samp = sigma_pcr;
+                        // pow(sigma_stand_int^2 +
+                        //     //sigma_stand_slope * (D[bottle_count_idx[i]]- OFFSET)) +
+                        //     //+ sigma_stand_slope2 * D[bottle_count_idx[i]]^2) + 
+                        //     sigma_pcr^2,-2) ;
     //} 
     
 }
@@ -389,11 +390,11 @@ model {/////////////////////////////////////////////////////////////////////////
     bin_control   ~ bernoulli( inv_logit(theta_control) ) ;
     
     pos_stand   ~ normal(kappa_stand, sigma_all_stand) ;
-    pos_obs     ~ normal(kappa_obs, sigma_all_samp) ;
+    pos_obs     ~ student_t(3, kappa_obs, sigma_all_samp) ;
     if(single_n_control_pos==1){
-      pos_control[1] ~ normal(kappa_control[1], sigma_all_samp) ;
+      pos_control[1] ~ student_t(3, kappa_control[1], sigma_all_samp) ;
     }else{
-      pos_control ~ normal(kappa_control, sigma_all_samp) ;
+      pos_control ~ student_t(3, kappa_control, sigma_all_samp) ;
     }
     
     } //LOCAL VARIABLES DECLARATION END 
@@ -410,6 +411,7 @@ model {/////////////////////////////////////////////////////////////////////////
       target += normal_lpdf(sigma_stand_int | 0, 2) - 1 * normal_lccdf(0 | 0, 2);
       //sigma_pcr ~ gamma(1,1) ;
       target += normal_lpdf(sigma_pcr | 0, 2) - 1 * normal_lccdf(0 | 0, 2);
+      //target += normal_lpdf(nu | 2, 10) - 1 * normal_lccdf(2 | 2, 10);
 
       beta_0 ~ normal(38,4) ;
       beta_1 ~ normal(-3.32,0.1) ;
@@ -498,7 +500,8 @@ generated quantities {
                                                                             bin_log_dilution_obs[i])) ;
     }
     for(i in 1:N_obs_pos){
-      log_lik[loo_pos_idx[i]]  =  normal_lpdf(pos_obs[i] | beta_0[pcr_obs_pos_idx[i]] + 
+      log_lik[loo_pos_idx[i]]  =  log_lik[loo_pos_idx[i]] + 
+                                             student_t_lpdf(pos_obs[i] |3, beta_0[pcr_obs_pos_idx[i]] + 
                                                         beta_1[pcr_obs_pos_idx[i]] * (D_contam[sample_pos_idx[i]] + 
                                                                   pos_log_dilution_obs[i]), sigma_all_samp);
     }

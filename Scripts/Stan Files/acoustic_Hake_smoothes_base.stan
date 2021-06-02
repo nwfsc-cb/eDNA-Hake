@@ -43,7 +43,7 @@ data { /////////////////////////////////////////////////////////////////////////
   // matrix[N_obs_pos, knots_2[1]] Zs_2_1;
 
   // Priors and offset on cloglog components
-  real thresh_mt_nm2;
+  real thresh_mt_km2;
   
   real phi_0_fix ;  
   // real phi_0_mean ;
@@ -53,9 +53,9 @@ data { /////////////////////////////////////////////////////////////////////////
   real<lower=0> phi_1_sd ;
 }
 transformed data{
-  real log_thresh_mt_nm2;
+  real log_thresh_mt_km2;
   
-  log_thresh_mt_nm2 = log(thresh_mt_nm2) ;
+  log_thresh_mt_km2 = log(thresh_mt_km2) ;
 }
 parameters { //////////////////////////////////////////////////////////////////////////
   // Overall spatial intercept.
@@ -192,8 +192,8 @@ model {/////////////////////////////////////////////////////////////////////////
       // Priors
       //sigma_stand_int ~ gamma(1,1) ;
       Intercept_pos ~ normal(0,3); 
-      Intercept_bin ~ normal(0,3); 
-      //target += normal_lpdf(sigma | 0, 0.05) - 1 * normal_lccdf(0 | 0, 0.05);
+      Intercept_bin ~ normal(-1,2); 
+      target += normal_lpdf(sigma | 0, 0.5) - 1 * normal_lccdf(0 | 0, 0.5);
       //v_0 ~ normal(0,1);
      //v_1 ~ normal(-0.1,0.05);
       
@@ -206,9 +206,9 @@ model {/////////////////////////////////////////////////////////////////////////
       // priors including all constants
   //target += student_t_lpdf(Intercept | 3, 0, 2.5);
   target += student_t_lpdf(sds_1_1_pos | 3, 0, 3)
-    - 1 * student_t_lccdf(0 | 3, 0, 1);
+    - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += student_t_lpdf(sds_1_2_pos | 3, 0, 3)
-    - 1 * student_t_lccdf(0 | 3, 0, 1);
+    - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += student_t_lpdf(sds_1_3_pos | 3, 0, 3)
     - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += std_normal_lpdf(zs_1_1_pos);
@@ -216,9 +216,9 @@ model {/////////////////////////////////////////////////////////////////////////
   target += std_normal_lpdf(zs_1_3_pos);
 
   target += student_t_lpdf(sds_1_1_bin | 3, 0, 3)
-    - 1 * student_t_lccdf(0 | 3, 0, 1);
+    - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += student_t_lpdf(sds_1_2_bin | 3, 0, 3)
-    - 1 * student_t_lccdf(0 | 3, 0, 1);
+    - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += student_t_lpdf(sds_1_3_bin | 3, 0, 3)
     - 1 * student_t_lccdf(0 | 3, 0, 3);
   target += std_normal_lpdf(zs_1_1_bin);
@@ -229,20 +229,26 @@ model {/////////////////////////////////////////////////////////////////////////
   // target += std_normal_lpdf(zs_2_1);
 }
 generated quantities {
-  // log_likelihoods for use with the loo package
-  //
-  // vector[N_obs_bin] log_lik;
-  // 
-  //   for(i in 1:N_obs_bin){
-  //    log_lik[i]  = bernoulli_logit_lpmf(bin_obs[i] | phi_0[pcr_obs_bin_idx[i]] + 
-  //                                                     phi_1[pcr_obs_bin_idx[i]] * (D_contam[sample_bin_idx[i]] + 
-  //                                                                           bin_log_dilution_obs[i])) ;
-  //   }
-  //   for(i in 1:N_obs_pos){
-  //     log_lik[loo_pos_idx[i]]  =  log_lik[loo_pos_idx[i]] + 
-  //                                            student_t_lpdf(pos_obs[i] |3, beta_0[pcr_obs_pos_idx[i]] + 
-  //                                                       beta_1[pcr_obs_pos_idx[i]] * (D_contam[sample_pos_idx[i]] + 
-  //                                                                 pos_log_dilution_obs[i]), sigma_all_samp);
-  //   }
-  // 
+  //log_likelihoods for use with the loo package
+  vector[N_obs_bin] log_lik_bin;
+  vector[N_obs_pos] log_lik_pos;
+  vector[N_obs_bin] theta_bin;
+  vector[N_obs_pos] D_pos ;
+  
+    theta_bin =   Intercept_bin + 
+                    Xs_bin * bs_bin + // linear effects of smoothes
+                    Zs_1_1_bin * s_1_1_bin + Zs_1_2_bin * s_1_2_bin + Zs_1_3_bin * s_1_3_bin ;
+      
+    D_pos     =    Intercept_pos + 
+                    Xs_pos * bs_pos + // linear effects of smoothes
+                    Zs_1_1_pos * s_1_1_pos + Zs_1_2_pos * s_1_2_pos + Zs_1_3_pos * s_1_3_pos ;
+
+  for(i in 1:N_obs_bin){
+        log_lik_bin[i]  = bernoulli_logit_lpmf(bin_weight_dens[i] | theta_bin[i]) ;
+  }
+  for(i in 1:N_obs_pos){
+    log_lik_pos[i]  =  normal_lpdf(pos_weight_dens[i] | D_pos[i] -
+                                        0.5*sigma^2,
+                                        sigma);
+  }
 }
