@@ -894,7 +894,7 @@ stan_init_f2 <- function(n.chain,N_pcr,N_station_depth,N_control_sample){
   }
   return(A)
 }
-
+ 
 ################################################################
 ################################################################
 # STAN MODEL FOR THE UNKNOWN SAMPLES
