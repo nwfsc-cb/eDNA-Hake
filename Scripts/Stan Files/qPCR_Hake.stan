@@ -51,6 +51,7 @@ data { /////////////////////////////////////////////////////////////////////////
     int samp_station_depth_idx[N_sample] ;
     real wash_idx[N_sample] ;
     real singleton_idx[N_sample] ;
+    real Ct_bin_idx[N_sample] ;
     int sample_control_idx[N_control_sample]    ;
     int station_depth_idx[N_station_depth] ;
 
@@ -59,12 +60,18 @@ data { /////////////////////////////////////////////////////////////////////////
     int sample_pos_idx[N_obs_pos]  ;
     int sample_control_bin_idx[N_control_bin]      ;
     int sample_control_pos_idx[N_control_pos]  ;
+    real wash_control_bin_idx[N_control_bin]      ;
+    real wash_control_pos_idx[N_control_pos]  ;
     
     //int station_depth_bin_idx[N_obs_bin]      ;
     //int station_depth_pos_idx[N_obs_pos]  ;
 
+    int single_n_control_pos; // This is an indicator for dealing with single values where program is looking for a vector
+
     //Offset
     real OFFSET ;
+
+    real wash_offset_prior[2];
 }
 transformed data{
 }
@@ -100,7 +107,7 @@ parameters { ///////////////////////////////////////////////////////////////////
 
     // // Effects of station-depths and samples
        real D[N_station_depth] ;
-       real D_error[N_sample] ;
+       //real D_error[N_sample] ;
        real D_control[N_control_sample] ;
        real delta[N_sample] ;
 }
@@ -114,9 +121,8 @@ transformed parameters { ///////////////////////////////////////////////////////
 
     // ADD IN A LATENT VARIABLE TO ACCOUNT FOR CONTAMINATION OF THE FIELD SAMPLES.
     for(i in 1:N_sample){
-      D_contam[i] = log(exp(D[samp_station_depth_idx[i]] + 
-                          delta[i] * singleton_idx[i]) +
-                        exp(D_error[i])) +
+      D_contam[i] = D[samp_station_depth_idx[i]] + 
+                        delta[i] * singleton_idx[i] * Ct_bin_idx[i] +
                         log_vol_obs[i] +
                         wash_offset * wash_idx[i]; 
             // + exp(D_error[i])) ;      //D_contam[i] = log(exp(D[i]) + exp(D_error[i])) ;
@@ -163,6 +169,7 @@ model {/////////////////////////////////////////////////////////////////////////
     for(i in 1:N_control_bin){
        theta_control[i]  = phi_0[pcr_control_bin_idx[i]] + 
                       phi_1[pcr_control_bin_idx[i]] * (D_control[sample_control_bin_idx[i]] +
+                                                        wash_offset * wash_control_bin_idx[i] +
                                                         bin_log_dilution_control[i] +
                                                         bin_log_vol_control[i] - OFFSET) ;
     }
@@ -180,9 +187,10 @@ model {/////////////////////////////////////////////////////////////////////////
                                                       OFFSET) ;
     }
     
-    for(i in 1:N_control_pos){
+    for(i in 1:(N_control_pos-single_n_control_pos)){
       kappa_control[i]  = beta_0[pcr_control_pos_idx[i]] + 
                         beta_1[pcr_control_pos_idx[i]] * (D_control[sample_control_pos_idx[i]] + 
+                                                          wash_offset * wash_control_pos_idx[i] +
                                                           pos_log_dilution_control[i] +
                                                           pos_log_vol_control[i] - OFFSET) ;
     }
@@ -194,16 +202,20 @@ model {/////////////////////////////////////////////////////////////////////////
     
     pos_stand   ~ normal(kappa_stand, sigma_all_stand) ;
     pos_obs     ~ normal(kappa_obs, sigma_all_samp) ;
-    pos_control ~ normal(kappa_control, sigma_all_samp) ;
-
+    if(single_n_control_pos==1){
+      pos_control[1] ~ normal(kappa_control[1], sigma_all_samp) ;
+    }else{
+      pos_control ~ normal(kappa_control, sigma_all_samp) ;
+    }
+    
     } //LOCAL VARIABLES DECLARATION END 
 
 
     // Parameters for the gBLOCKS:
      // Random effects
-      D ~ normal(0,4);
+      D ~ normal(0,3);
       D_control ~ normal(mu_contam,sigma_contam); // Estimating contamination.
-      D_error   ~ normal(mu_contam,sigma_contam); // Unobserved contamination... D_error is an estimated latent variable.
+      //D_error   ~ normal(mu_contam,sigma_contam); // Unobserved contamination... D_error is an estimated latent variable.
       
       // Priors
       sigma_stand_int ~ gamma(1,1) ;
@@ -215,10 +227,11 @@ model {/////////////////////////////////////////////////////////////////////////
       phi_0 ~ normal(2, 2) ;
       phi_1 ~ normal(4, 2) ;
 
-      delta ~ normal(0,tau_sample) ;
+      delta ~ normal(-0.5*tau_sample^2,tau_sample) ;
       tau_sample ~ gamma(2,2) ;
 
-      mu_contam ~ normal(0,4) ;
+      mu_contam ~ normal(0,3) ;
       sigma_contam ~ gamma(2,2) ;
 
+      wash_offset ~ normal(wash_offset_prior[1],wash_offset_prior[2]) ;
 }

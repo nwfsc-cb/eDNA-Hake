@@ -4,15 +4,21 @@
 #####################################################3
 #####################################################3
 # Pull files from the list
-pars <- Output.qpcr$pars
+pars <- Output.qpcr$samp
 dat.stand.bin <- Output.qpcr$dat.stand.bin
 dat.stand.pos <- Output.qpcr$dat.stand.pos
+dat.obs.bin <- Output.qpcr$dat.obs.bin
+dat.obs.pos <- Output.qpcr$dat.obs.pos
+dat.id <- Output.qpcr$dat.id
 PCR <- Output.qpcr$PCR
 STATION.DEPTH <- Output.qpcr$STATION.DEPTH
 SAMPLES <- Output.qpcr$SAMPLES
 MODEL.TYPE <- Output.qpcr$MODEL.TYPE
-dat_raster_fin <- Output.qpcr$dat_raster_fin
+MODEL.VAR <- Output.qpcr$MODEL.VAR
+MODEL.ID <- Output.qpcr$MODEL.ID
+#dat_raster_fin <- Output.qpcr$dat_raster_fin
 depth.fact <- sort(unique(STATION.DEPTH$depth_cat_factor))
+TRACE <- Output.qpcr$TRACE
 
 brms.object <- Output.qpcr$brms.object
 
@@ -23,7 +29,7 @@ if(MODEL.TYPE =="lat.long.smooth"){
 }
 
 # N posteriors to sample
-N.POST <- 1000
+N.POST <- 4000
 
 ### PLOTS OF STANDARDS and associated REGRESSIONS
 #pairs(stanMod, pars = c(base_params), log = FALSE, las = 1)
@@ -202,6 +208,7 @@ depth_id<- levels(STATION.DEPTH$depth_cat_factor) %>% as.numeric(as.character())
 ## Project Surfaces for lat.long.smooth and lat.long.smooth.base MODEL.TYPE
 ##############################
 
+
 smooth.projections <- list()
 if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
   
@@ -280,12 +287,12 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
     
     
     D_smooth[,ID$id[ID$N.ID==i]] <-         smooth.dat.pred$Xs[,(1:ncol(smooth.dat.pred$Xs)-1)] %*% pars$bs[i,(1:ncol(smooth.dat.pred$Xs)-1)] +
-      smooth.dat.pred$Zs_1_1 %*% pars$s_1_1[i,] + smooth.dat.pred$Zs_1_2 %*% pars$s_1_2[i,] + smooth.dat.pred$Zs_1_3 %*% pars$s_1_3[i,] + 
-      smooth.dat.pred$Zs_2_1 %*% pars$s_2_1[i,] + smooth.dat.pred$Zs_2_2 %*% pars$s_2_2[i,] + smooth.dat.pred$Zs_2_3 %*% pars$s_2_3[i,] + 
-      smooth.dat.pred$Zs_3_1 %*% pars$s_3_1[i,] + smooth.dat.pred$Zs_3_2 %*% pars$s_3_2[i,] + smooth.dat.pred$Zs_3_3 %*% pars$s_3_3[i,] + 
-      smooth.dat.pred$Zs_4_1 %*% pars$s_4_1[i,] + smooth.dat.pred$Zs_4_2 %*% pars$s_4_2[i,] + smooth.dat.pred$Zs_4_3 %*% pars$s_4_3[i,] + 
-      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] + 
-      smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,] 
+      smooth.dat.pred$Zs_1_1 %*% pars$s_1_1[i,] + smooth.dat.pred$Zs_1_2 %*% pars$s_1_2[i,] + smooth.dat.pred$Zs_1_3 %*% pars$s_1_3[i,] +
+      smooth.dat.pred$Zs_2_1 %*% pars$s_2_1[i,] + smooth.dat.pred$Zs_2_2 %*% pars$s_2_2[i,] + smooth.dat.pred$Zs_2_3 %*% pars$s_2_3[i,] +
+      smooth.dat.pred$Zs_3_1 %*% pars$s_3_1[i,] + smooth.dat.pred$Zs_3_2 %*% pars$s_3_2[i,] + smooth.dat.pred$Zs_3_3 %*% pars$s_3_3[i,] +
+      smooth.dat.pred$Zs_4_1 %*% pars$s_4_1[i,] + smooth.dat.pred$Zs_4_2 %*% pars$s_4_2[i,] + smooth.dat.pred$Zs_4_3 %*% pars$s_4_3[i,] +
+      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] +
+      smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,]
     
   }    
   
@@ -330,8 +337,24 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
                         left_join(.,orig_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,depth_cat_factor,station_depth_idx))
   
   D_pred_smooth_combined <- bind_cols(D_pred_smooth,new_data_trim %>% dplyr::select(-Y)) %>%
-    left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor))
-  
+     left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor))
+
+  D_smooth_summary <- bind_cols(as.data.frame(D_smooth),new_data_trim %>% dplyr::select(-Y)) %>%
+                              left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor)) %>%
+                              pivot_longer(starts_with("V"),names_to="MCMC.rep",values_to = "dens") %>%
+                              group_by(MCMC.rep,depth_cat_factor) %>%
+                              summarise(SD = sd(dens)) %>%
+                              group_by(depth_cat_factor) %>%
+                              summarise(Mean_SD = mean(SD), SD_SD = sd(SD),
+                                        Q.0.025= quantile(SD,probs=c(0.025)),
+                                          Q.0.05= quantile(SD,probs=c(0.05)),
+                                          Q.0.25= quantile(SD,probs=c(0.25)),
+                                          Median = median(SD),
+                                          Q.0.75=quantile(SD,probs=c(0.75)),
+                                          Q.0.95= quantile(SD,probs=c(0.95)),
+                                          Q.0.975=quantile(SD,probs=c(0.975)))
+
+    
   if(MODEL.TYPE=="lat.long.smooth"){
     smooth.projections <- list(D_pred_combined = D_pred_combined,
                                D_pred_log_combined = D_pred_log_combined,
@@ -352,7 +375,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
 
 
 # Calculate some residual 
-Resid <-D_delta_out_liter %>% dplyr::select(sample_idx,Mean.log,Mean) %>% 
+Resid <- D_delta_out_liter %>% dplyr::select(sample_idx,Mean.log,Mean) %>% 
           left_join(.,
              SAMPLES %>% 
                dplyr::select(sample_idx,samp_station_depth_idx) %>% 
@@ -369,30 +392,194 @@ Resid <- Resid %>% mutate(Resid.log = Mean.log - sd.mean.log,Resid = Mean - sd.m
                                         lon,lat,
                                         station_depth_idx,depth_cat_factor))
 
-# Combine the necessary data.frames into a list for use later.
-Output.summary <- list(
-  # Output (Standards)
-  stand.plot = stand.plot,
-  stand.plot.pres = stand.plot.pres,
-  # Output (Field Summaries)
-  station_depth_out=station_depth_out,
-  station_depth_out_liter=station_depth_out_liter,
-  D_delta_out = D_delta_out,
-  D_delta_out_liter = D_delta_out_liter,
-  Resid = Resid,
+#############################################
+#############################################
+#############################################
+#############################################
+#### ----- From the projected smoothes, interpolate to new depth strata
+#############################################
+#############################################
+#############################################
+#############################################
+
+# We use D_pred + LOG.EXPAND from above.
+
+D_pred_interp <- bind_cols(as.data.frame(10^(D_pred+LOG.EXPAND)),new_data_trim %>% dplyr::select(-Y)) %>%
+  left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor))
+
+# Linear interpolate to these depths (DEPTHS)
+d.step = 50 # depth interval in meters to project to
+depth.obs <- sort(unique(D_pred_interp$depth_cat_factor))
+DEPTHS <- seq(0,max(depth.obs),by= d.step) %>% as.data.frame() %>% rename(d='.')
+DEPTHS <- DEPTHS %>% filter(!d %in% depth.obs) 
+
+# Derive depths to define interpolation:
+for(i in 1:nrow(DEPTHS)){
+  DEPTHS$above[i] <- max(depth.obs[which(depth.obs < DEPTHS$d[i])])
+  DEPTHS$below[i] <- min(depth.obs[which(depth.obs > DEPTHS$d[i])])
+}
+# Define weights based on depth distance:
+DEPTHS <- DEPTHS %>% mutate(w.above = (d-above) / (d-above + below-d),
+                            w.below = 1-w.above,
+                            d.cutoff = d-10)
+# loop over interpolation depths:
+d.all <- NULL
+for(i in 1:nrow(DEPTHS)){
+  temp.a <- D_pred_interp %>% filter(depth_cat_factor == DEPTHS$above[i]) %>% 
+                              mutate(weight = DEPTHS$w.above[i])
+  temp.b <- D_pred_interp %>% filter(depth_cat_factor == DEPTHS$below[i]) %>%
+                              mutate(weight = DEPTHS$w.below[i])
+  temp <- bind_rows(temp.a,temp.b)
+  # Pick out the instances where there is only one depth prediction (e.g. 150 but no 300)
+  temp2 <- temp %>% group_by(Gridcell_ID) %>% summarise(N=length(Gridcell_ID)) %>% filter(N==1)
+  # change weights for observations with only one adjacent prediction
+  temp <- temp %>% mutate(weight = ifelse(Gridcell_ID %in% temp2$Gridcell_ID,1,weight))
+  # get rid of of predictions if the depth is not within 10m of the depth (less that d.cutoff) 
+  temp <- temp %>% filter(bottom.depth.consensus > DEPTHS$d.cutoff[i])
   
-  # Projections or projection helpers.
-  N.POST = N.POST, # number of posterior samples used.
-  dat_raster_fin = dat_raster_fin, 
-  smooth.projections = smooth.projections,
+  # Check to make sure that all the weights sum to 1
+  check <- temp %>% group_by(Gridcell_ID) %>% summarise(SUM=sum(weight))
+  if(min(check$SUM)<1 | max(check$SUM)>1){ print("ERROR, ERROR"); break}
   
-  # Output(negative Controls, Contamination)
-  field_neg_out=field_neg_out,
-  field_neg_out_liter=field_neg_out_liter,
-  sample_contam_total_out = sample_contam_total_out,
-  sample_contam_total_out_liter = sample_contam_total_out_liter,
-  delta_out=delta_out,
-  mu_contam_out = mu_contam_out,
-  sigma_contam_out =sigma_contam_out
-)
+  temp[,1:N.POST] <- temp[,1:N.POST] * temp$weight
+  temp <- temp %>% dplyr::select(-utm.lat,-utm.lon,-bottom.depth.consensus, 
+                                 -depth_cat_factor,-lon,-lat,-weight) 
+  temp.long <- temp %>% pivot_longer(!Gridcell_ID,names_to="MCMC.rep",values_to = "w.dens")
+
+  d.weighted <- temp.long %>% group_by(Gridcell_ID,MCMC.rep) %>% summarise(D = sum(w.dens)) %>% 
+                  mutate(depth_cat_factor= DEPTHS$d[i] )
+  
+  d.all <- bind_rows(d.all,d.weighted)
+}
+
+
+# add on the depths that we already have predictions for here.
+
+  d.measured <-  bind_cols(as.data.frame(10^(D_pred+LOG.EXPAND)),new_data_trim %>% dplyr::select(-Y)) %>%
+        left_join(.,new_data %>% dplyr::select(utm.lon,utm.lat,Gridcell_ID,depth_cat_factor)) %>%
+        dplyr::select(-utm.lon,-utm.lat,-bottom.depth.consensus)
+
+  d.measured <- d.measured %>% pivot_longer(starts_with("V"),names_to="MCMC.rep",values_to = "w.dens") %>%
+                  dplyr::select(Gridcell_ID, MCMC.rep, D = w.dens, depth_cat_factor)
+
+  d.all <- bind_rows(d.all,d.measured)
+
+  # Merge in the different ID categories for dividing the coast up into spatial strata.
+  # I'm too tired to do this is plyr so here are some loops.
+  new_dat_temp <- new_data %>% dplyr::select(Gridcell_ID,lon,lat) %>% distinct()
+  
+  new_dat_strata <- NULL
+  for(i in 1:nrow(lat.breaks$lats.equal)){
+    temp <- new_dat_temp %>% 
+                  filter(lat < lat.breaks$lats.equal$lat.max[i], lat > lat.breaks$lats.equal$lat[i] ) %>%
+                  mutate( ID.equal = lat.breaks$lats.equal$ID[i])
+    new_dat_strata <- bind_rows(new_dat_strata,temp)
+  }
+  
+  new_dat_temp <- new_dat_strata
+  new_dat_strata <- NULL
+  for(i in 1:nrow(lat.breaks$lats.rounded.0.5)){
+    temp <- new_dat_temp %>% 
+      filter(lat < lat.breaks$lats.rounded.0.5$lat.max[i], lat > lat.breaks$lats.rounded.0.5$lat[i] ) %>%
+      mutate( ID.lat.0.5 = lat.breaks$lats.rounded.0.5$ID[i])
+    new_dat_strata <- bind_rows(new_dat_strata,temp)
+  }
+  
+  new_dat_temp <- new_dat_strata
+  new_dat_strata <- NULL
+  for(i in 1:nrow(lat.breaks$lats.rounded.1.0)){
+    temp <- new_dat_temp %>% 
+      filter(lat < lat.breaks$lats.rounded.1.0$lat.max[i], lat > lat.breaks$lats.rounded.1.0$lat[i] ) %>%
+      mutate( ID.lat.1.0 = lat.breaks$lats.rounded.1.0$ID[i])
+    new_dat_strata <- bind_rows(new_dat_strata,temp)
+  }
+  #new_dat_strata is the data.frame of interest
+  
+  
+  # Merge new_dat_strata into d.all 
+  d.all <- left_join(d.all,new_dat_strata)
+
+  # Summarize concentration across depths.
+  d.all.no.depth <- d.all %>% filter(depth_cat_factor>0) %>% 
+    group_by(Gridcell_ID, MCMC.rep,ID.equal,ID.lat.0.5,ID.lat.1.0) %>%
+    summarise(tot = sum(D))  # This sums the projections across depths
+  
+
+  # Produce different summaries at different spatial aggregations.
+  # This is the summary for each cell.
+  D_final_projected <- d.all.no.depth %>%
+                group_by(Gridcell_ID) %>% 
+                summarise(Mean=mean(tot), # These are summaries across MCMC for each cell.
+                          Median=median(tot),
+                          SD=sd(tot),
+                          Q.0.01 = quantile(tot,probs=c(0.01)),
+                          Q.0.025 = quantile(tot,probs=c(0.025)),
+                          Q.0.05 = quantile(tot,probs=c(0.05)),
+                          Q.0.25 = quantile(tot,probs=c(0.25)),
+                          Q.0.75 = quantile(tot,probs=c(0.75)),
+                          Q.0.95 = quantile(tot,probs=c(0.95)),
+                          Q.0.975 = quantile(tot,probs=c(0.975)),
+                          Q.0.99 = quantile(tot,probs=c(0.99)))
+ 
+  # This is the summary for one way of breaking up the coast (equal latitudinal divisions)
+  D_final_lat_equal <- d.all.no.depth %>% rename(Tot = tot) %>%
+              group_by(MCMC.rep,ID.equal) %>% 
+              summarise(tot = sum(Tot)) %>%  # This sums the projections across strata for each MCMC
+              group_by(ID.equal) %>% 
+              summarise(Mean=mean(tot), # This summarizes the averages within each strata
+                      Median=median(tot),
+                      SD=sd(tot),
+                      Q.0.01 = quantile(tot,probs=c(0.01)),
+                      Q.0.025 = quantile(tot,probs=c(0.025)),
+                      Q.0.05 = quantile(tot,probs=c(0.05)),
+                      Q.0.25 = quantile(tot,probs=c(0.25)),
+                      Q.0.75 = quantile(tot,probs=c(0.75)),
+                      Q.0.95 = quantile(tot,probs=c(0.95)),
+                      Q.0.975 = quantile(tot,probs=c(0.975)),
+                      Q.0.99 = quantile(tot,probs=c(0.99)))
+  
+  D_final_lat_0.5 <- d.all.no.depth %>% rename(Tot = tot) %>%
+    group_by(MCMC.rep,ID.lat.0.5) %>% 
+    summarise(tot = sum(Tot)) %>%  # This sums the projections across strata for each MCMC
+    group_by(ID.lat.0.5) %>% 
+    summarise(Mean=mean(tot), # This summarizes the averages within each strata
+              Median=median(tot),
+              SD=sd(tot),
+              Q.0.01 = quantile(tot,probs=c(0.01)),
+              Q.0.025 = quantile(tot,probs=c(0.025)),
+              Q.0.05 = quantile(tot,probs=c(0.05)),
+              Q.0.25 = quantile(tot,probs=c(0.25)),
+              Q.0.75 = quantile(tot,probs=c(0.75)),
+              Q.0.95 = quantile(tot,probs=c(0.95)),
+              Q.0.975 = quantile(tot,probs=c(0.975)),
+              Q.0.99 = quantile(tot,probs=c(0.99)))
+  
+  D_final_lat_1.0 <- d.all.no.depth %>% rename(Tot = tot) %>%
+    group_by(MCMC.rep,ID.lat.1.0) %>% 
+    summarise(tot = sum(Tot)) %>%  # This sums the projections across strata for each MCMC
+    group_by(ID.lat.1.0) %>% 
+    summarise(Mean=mean(tot), # This summarizes the averages within each strata
+              Median=median(tot),
+              SD=sd(tot),
+              Q.0.01 = quantile(tot,probs=c(0.01)),
+              Q.0.025 = quantile(tot,probs=c(0.025)),
+              Q.0.05 = quantile(tot,probs=c(0.05)),
+              Q.0.25 = quantile(tot,probs=c(0.25)),
+              Q.0.75 = quantile(tot,probs=c(0.75)),
+              Q.0.95 = quantile(tot,probs=c(0.95)),
+              Q.0.975 = quantile(tot,probs=c(0.975)),
+              Q.0.99 = quantile(tot,probs=c(0.99)))
+  
+  # repeat the summaries but calculate an non-dimension index referenced to the southern most area
+  # D_final_lat_1.0_NON_DIM <- d.all.no.depth %>% rename(Tot = tot) %>%
+  #   group_by(MCMC.rep,ID.lat.1.0) %>% 
+  #   summarise(tot = sum(Tot))
+  # 
+  # D_first_area <- D_final_lat_1.0_NON_DIM
+  # 
+  # 
+  
+  D_final_projected <- left_join(D_final_projected, 
+                                 new_data %>% dplyr::select(Gridcell_ID,utm.lat,utm.lon,lon,lat) %>% distinct())
+
  
