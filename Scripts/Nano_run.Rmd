@@ -1,0 +1,81 @@
+---
+title: "Nano Run"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library (here)
+library (tidyverse)
+```
+
+## Load ASV table, classified hashes, and metadata
+
+```{r}
+Metadata <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"), col_types = "cdccdd") 
+
+Metadata %>% mutate (depth= case_when (depth == "sfc" ~ 0,
+                                       TRUE           ~ as.numeric(depth))) %>% 
+  rename (Sample = eDNA.sample) -> Metadata
+
+
+
+
+ASV.table <- read_csv(here("Data","Nano_run", "noprimers", "outputs", "ASV_table.csv"))
+classified.hashes <- read_csv(here("Data","Nano_run", "noprimers", "outputs", "hash.classified.csv"))
+
+ASV.table %>% 
+  group_by(Sample_name) %>% 
+  tally(wt = nReads, sort = T)
+```
+
+# Compare with the requeued
+
+```{r}
+ASV.table.new <- read_csv(here("Data","Nano_run","reque", "output", "output", "ASV_table.csv"))
+classified.hashes.new <- read_csv(here("Data","Nano_run","reque", "output", "output", "hash.classified.csv"))
+
+anti_join(classified.hashes.new, classified.hashes, by = "representative")
+ASV.table.new %>% 
+  group_by(Sample_name) %>% 
+  tally(wt = nReads, sort = T)
+```
+
+
+```{r cry me a river}
+
+ASV.table %>% 
+  left_join(classified.hashes, by = c("Hash" = "representative")) %>% 
+  unite (family, genus, species, col = "taxonomy", sep = "|") %>% 
+  filter (taxonomy != "NA|NA|NA") %>% 
+  group_by(Sample_name, taxonomy) %>% 
+  summarise(nReads = sum(nReads)) %>% 
+  arrange(taxonomy) %>% 
+  separate (Sample_name, into = c("Sample", "replicate")) %>% 
+  left_join(Metadata)
+
+```
+
+# Map them
+
+```{r}
+
+Metadata %>% 
+  ungroup() %>% summarise (across(.cols = c("lat", "lon"),
+                                  .funs = list( Max = ~ round( max(.x) + 1,0) ,
+                                              Min = ~ round( min(.x) - 1,0))  ))
+  summarise_at(.vars = c("lat", "lon"), .funs = list( Max = ~ round( max(.x) + 1,0) ,
+                                              Min = ~ round( min(.x) - 1,0))) %>%
+  pivot_longer(cols = everything(),
+               names_to = "Corner",
+               values_to = "Coordinates") %>%
+  # mutate (Corner = str_replace(Corner, "lat_", "y"),
+  #         Corner = str_replace(Corner, "lon_", "x")) %>% 
+  # arrange(Corner) %>% 
+          
+          named_pull(Coordinates, Corner)-> limits.for.map
+```
+

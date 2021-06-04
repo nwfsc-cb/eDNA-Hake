@@ -1,0 +1,7 @@
+Sample_name,Locus,file1,file2
+457.2,16S_Prey,Locus_16S_Prey_457-2_S11_L001_R1_001.fastq,Locus_16S_Prey_457-2_S11_L001_R2_001.fastq
+486.1,16S_Prey,Locus_16S_Prey_486-1_S17_L001_R1_001.fastq,Locus_16S_Prey_486-1_S17_L001_R2_001.fastq
+988.2,16S_Prey,Locus_16S_Prey_988-2_S59_L001_R1_001.fastq,Locus_16S_Prey_988-2_S59_L001_R2_001.fastq
+1209.2,16S_Prey,Locus_16S_Prey_1209-2_S65_L001_R1_001.fastq,Locus_16S_Prey_1209-2_S65_L001_R2_001.fastq
+463.2,16S_Prey,Locus_16S_Prey_463-2_S82_L001_R1_001.fastq,Locus_16S_Prey_463-2_S82_L001_R2_001.fastq
+779.2,16S_Prey,Locus_16S_Prey_779-2_S90_L001_R1_001.fastq,Locus_16S_Prey_779-2_S90_L001_R2_001.fastq

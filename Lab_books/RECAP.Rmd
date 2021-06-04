@@ -1,0 +1,43 @@
+---
+title: "Re shuffle the pools"
+output: html_notebook
+---
+
+I end up having two miseq runs and a nano Run. The first miseq has ~ 140 samples, the second one ~ 80. I can transfer 20 samples from run1 to run2 and make read depth more comparable
+
+```{r}
+library (tidyverse)
+library(here)
+```
+
+# Find all raw data, get metadata for each run
+
+```{r}
+all.runs.csv <- list.files (path = here("Data", "FASTQ_raw"), pattern = "metadata*", recursive = T  )
+
+Nano <- read_csv(here("Data", "FASTQ_raw", "Nano_run/noprimers/output.metadata.csv" ))
+
+Run1_20201109 <- read_csv(here("Data", "FASTQ_raw",  "Run1_20201109/metadata_2020-11-03.csv"   ))
+
+Run2_20201119 <- read_csv(here("Data", "FASTQ_raw", "Run2_20201119/metadata.csv"  ))
+Run3_20210301 <- read_csv(here("Data", "FASTQ_raw", "Run3_20210301/metadata.csv"  ))
+Run4_20210326 <- read_csv(here("Data", "FASTQ_raw", "Run4_20210326/noprimers/output.metadata.csv"  ))
+Run5_20210504 <- read_csv(here("Data", "FASTQ_raw", "Run5_20210504/metadata_20210504.csv"  ))
+Run6_20210507 <- read_csv(here("Data", "FASTQ_raw", "Run6_20210507/metadata_2021-05-07.csv"  )) %>% 
+  mutate(Sample_name = str_replace(Sample_name, "_", "\\."))
+
+all.runs <- list (Run1_20201109, Run2_20201119, Run3_20210301, Run4_20210326, Run5_20210504, Run6_20210507, Nano )
+
+# FOr each run, extract the number of replicates per sample
+
+all.samples <- map (all.runs, ~.x %>% select(Sample_name) %>% separate (Sample_name, into = c("Sample", "replicate"))
+                    %>% group_by(Sample) %>% tally(name = "nreps")
+                    )
+
+map(all.samples, ~.x %>% filter (is.na(replicate))) # that;s ok
+
+all.samples <- map (all.samples, ~.x %>% filter (!str_detect(Sample, "Undetermined"))                    )
+```
+# Run1
+Produces no pipeline output.
+

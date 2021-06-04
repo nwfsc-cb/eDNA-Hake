@@ -1,0 +1,141 @@
+---
+title: "Sequencing Gaps"
+author: "Ramon Gallego"
+date: "3/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r libraries}
+library (tidyverse)
+library (here)
+```
+
+## What did you intend to sequence
+
+
+
+```{r datasets, echo=FALSE}
+Run1_intentions <- read_csv(here("Data", "RUN1", "metadata_2020-11-03.csv"))
+
+Run2_intentions <- read_csv(here("Data", "Pipeline_output","Run2","noprimers", "output.metadata.csv"))
+
+Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
+  mutate (Plate = "Plate22")
+
+Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
+  mutate (Plate = "Plate23")
+
+Project_goals <-  bind_rows(Plate22, Plate23)
+
+eDNA.samples <- read_csv(file = here("Data", "eDNA hake water samples.csv")) %>% 
+  rename(Station = `CTD cast`, Tube = `Tube #`) %>% 
+  mutate(Tube = as.character(Tube))
+
+## Outputs
+
+Read_counts_Run1 <- read_csv(here("Data", "Pipeline_output","Run1","noprimers", "outputs", "ASV_table.csv"))
+
+Read_counts_Run2 <- read_delim(here("Data", "FASTQ_raw","Run20201119", "raw.counts.txt"), delim = " ", col_names = c("nReads", "file")) %>% 
+  mutate (nReads = as.numeric(nReads))
+
+Read_counts_Run3 <- read_delim(here("Data", "FASTQ_raw", "Run20210301", "seq_counts.step0.txt"), delim = " ",  col_names = c("nReads", "file")) %>% 
+  mutate (nReads = as.numeric(nReads))
+Read_counts_Run2 %>% 
+  filter (nReads < 40000) %>% 
+  separate(file, into = "sample", sep = "_") %>% 
+  distinct(sample) %>% 
+  separate(sample, into = c("sample", "rep"), sep = "-") 
+
+
+Read_counts_Run2 %>% 
+  filter (nReads > 40000) %>% 
+  separate(file, into = "sample", sep = "_") %>% 
+  distinct(sample) %>% 
+  separate(sample, into = c("sample", "rep"), sep = "-") %>% 
+  group_by(sample) %>% 
+  summarise (reps = n_distinct(rep)) -> predicted.good.output.Run2
+
+Read_counts_Run1 %>% 
+  group_by(Sample_name) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  filter (nReads > 34000) %>% 
+  separate (Sample_name, into = c("sample", "rep"), sep = "\\.") %>% 
+  group_by(sample) %>% 
+  summarise (reps = n_distinct(rep)) -> predicted.good.output.Run1
+
+bind_rows(predicted.good.output.Run1, predicted.good.output.Run2, .id = "Run") %>% 
+  group_by(sample) %>% 
+  summarise(reps = sum(reps)) %>% 
+  arrange(reps) -> successes
+
+successes %>% 
+  filter (reps > 1)
+
+Read_counts_Run3 %>% 
+  filter (nReads < 30000) %>% 
+  separate(file, into = "sample", sep = "_") %>% 
+  distinct(sample) %>% 
+  separate(sample, into = c("sample", "rep"), sep = "-") 
+Project_goals %>% 
+  anti_join(successes %>% 
+  filter (reps > 1) %>% 
+    mutate(sample = as.numeric(sample))) -> Gaps
+
+successes %>% 
+  filter (reps == 1) %>% pull(sample) -> ones
+
+
+Gaps %>% 
+  unite(Row,Column, col = "Well", sep = "", remove = F) %>% 
+  select(sample , Plate, everything()) %>% 
+  mutate(ngaps = case_when(sample %in% ones ~ 1,
+                           TRUE             ~ 2)) %>% 
+  arrange(Plate, as.numeric(Column)) %>% 
+  write_csv("gaps.for.Abi.csv")
+  
+```
+
+## Split Run1 and Run2
+
+```{r}
+Run1_intentions %>% 
+  filter (Locus == "16S_Prey") %>% 
+  select (Sample_name) %>% 
+  separate (Sample_name, into = c("Biol", "rep"), convert = T, remove = F) -> Run1_intentions
+
+
+Run2_intentions %>% 
+   filter (Locus == "16S_Prey") %>% 
+  select (Sample_name) %>% 
+  separate (Sample_name, into = c("Biol", "rep"), convert = T, remove = F) -> Run2_intentions
+
+
+```
+
+Get number of samples that didn't get reads
+
+```{r}
+##m Summary first
+
+ASV_Run1 %>% group_by(Sample_name) %>% summarise (nReads = sum(nReads)) %>% arrange (desc(nReads)) ## All passed filters
+
+
+ASV_Run2 %>% group_by(Sample_name) %>% summarise (nReads = sum(nReads)) %>% arrange (desc(nReads))
+
+anti_join(Run1_intentions, ASV_Run1)
+
+anti_join(Run2_intentions, ASV_Run2)
+```
+

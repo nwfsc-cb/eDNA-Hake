@@ -1,0 +1,86 @@
+---
+title: "Insect"
+author: "Ramon Gallego"
+date: "4/23/2021"
+output: html_document
+params:
+  folder: 
+    value: /cloud/project/output.test/noprimers/outputs
+  previous:
+    value: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## For each run
+
+Load the hash_key and return the classified sequences
+
+```{r packages}
+library (here)
+library (tidyverse)
+library (insect)
+```
+
+## do it
+
+
+
+```{r data}
+tree <- read_rds(here("Data", "classifier_16S_all_node05.rds"))
+
+seqs <- readFASTA(file.path(params$folder, "hash_key.fasta"))
+```
+
+If some sequences have already been classified, bring them here, if not start from scratch
+
+```{r}
+if(!is.na(params$previous) ){
+  
+  prev <- read_csv(params$previous)
+  
+  seqs.csv <- read_csv(file.path(params$folder, "hash_key.csv"))
+  
+  anti_join(seqs.csv, prev, by = c("Hash"= "representative")) -> newseqs
+  
+  semi_join(prev, seqs.csv, by = c( "representative"= "Hash")) -> old.clas
+  
+  seqinr::write.fasta(sequences = as.list(newseqs$Sequence),
+                      names = as.list(newseqs$Hash),
+                      file.out = file.path(params$folder, "new_hash_key.fasta"))
+  
+  newseqs <- readFASTA (file.path(params$folder, "new_hash_key.fasta"))
+  
+  classify(newseqs, tree) -> seqs.classified
+  
+  bind_rows(seqs.classified, old.clas) %>% 
+    
+    write_csv(file.path(params$folder, "hash.classified.csv"))
+  
+  # also print an updated total.db
+  
+  bind_rows(prev, seqs.classified) %>% 
+    
+    write_csv(file.path(params$folder, "All.hash.classified.csv"))
+  
+  } else {
+      
+      
+    classify(seqs, tree) -> seqs.classified
+
+    write_csv(seqs.classified, file.path(params$folder, "hash.classified.csv"))
+      
+    }
+```
+
+
+```{r}
+
+```
+
+
+
+
+

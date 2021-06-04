@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/usr/local/bin/cutadapt", line 10, in <module>
+    sys.exit(main())
+  File "/usr/local/lib/python3.7/site-packages/cutadapt/__main__.py", line 803, in main
+    stats = runner.run()
+  File "/usr/local/lib/python3.7/site-packages/cutadapt/pipeline.py", line 727, in run
+    (n, total1_bp, total2_bp) = self._pipeline.process_reads(progress=self._progress)
+  File "/usr/local/lib/python3.7/site-packages/cutadapt/pipeline.py", line 315, in process_reads
+    for read1, read2 in self._reader:
+  File "/usr/local/lib/python3.7/site-packages/dnaio/__init__.py", line 219, in __iter__
+    r1 = next(it1)
+  File "src/dnaio/_core.pyx", line 163, in fastq_iter
+OSError: [Errno 5] Input/output error

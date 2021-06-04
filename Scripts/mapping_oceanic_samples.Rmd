@@ -36,16 +36,24 @@ return(output)
 
 # Get the coordinates
 
-eDNA.samples %>% 
-  summarise_at(c("lat", "lon"), .funs = list( Max = ~ round( max(.x) + 1,0) ,
-                                              Min = ~ round( min(.x) - 1,0))) %>% pivot_longer(cols = everything(),names_to = "Corner",
+# Get the limits for the map
+named_pull <- function(x, values_from, names_from){
+names.output<- pull(x, {{names_from}})
+output <- pull(x, {{values_from}})
+names(output)<- names.output
+return(output)
+}
+
+
+# Get the coordinates
+
+metadata %>% 
+  summarise(across(c("lat", "lon"), .fns = list( Max = ~ round( max(.x, na.rm = T) + 1,0) ,
+                                              Min = ~ round( min(.x, na.rm = T) - 1,0)))) %>% pivot_longer(cols = everything(),names_to = "Corner",
                                                                                                values_to = "Coordinates") %>% named_pull(Coordinates, Corner)-> limits.for.map
 
 
-```
-
-
-```{r bathymetry}
+# Bathymetry
 b = getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
                   lon2 = limits.for.map[ "lon_Min" ],
                   lat1 = limits.for.map["lat_Min"], 
@@ -53,25 +61,20 @@ b = getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
                   resolution = 1)
 
 b <- fortify(b)
-b
 
-
+# Slope 
 
 slope <- terrain(rasterFromXYZ(b, crs = "+proj=longlat +datum=WGS84 +no_defs"), opt = "slope")
 str(slope)
 as.data.frame(as(slope, "SpatialPixelsDataFrame")) -> slope
-```
 
-```{r}
-
-
-
+# Get the basemap
 
 base_map <- ne_countries(scale="large",returnclass="sf")
 sf::st_crs(base_map)
 
 
-
+# And all together for future use
 
 ggplot(base_map) +
   
@@ -80,21 +83,25 @@ ggplot(base_map) +
 
   geom_sf() +
   
-  coord_sf(xlim=c(limits.for.map["lon_Max"], limits.for.map["lon_Min"]),ylim=c(limits.for.map["lat_Max"], limits.for.map["lat_Min"]),expand=F) +
+  coord_sf(xlim=c(limits.for.map["lon_Min"], limits.for.map["lon_Max"]),
+           ylim=c(limits.for.map["lat_Min"], limits.for.map["lat_Max"]),expand=F) +
 
   geom_contour(data = b %>%  filter (z < 0), 
                aes(x=x, y=y, z=z),
-               breaks=c(  -50, -75),
+               breaks=c(  -50, -200),
                size=c(0.3),
                colour="grey")  +
   geom_text_contour (data = b %>%  filter (z < 0,y < 47), 
                aes(x=x, y=y,   z = z),
-               breaks=c( -50, -75),
+               breaks=c( -50, -200),
               
                colour="black")+
   theme_minimal() +
   xlab("") +
-  ylab("")  -> base_plot
+  ylab("") +
+  labs(fill = "depth") -> base_plot
+
+base_plot %>% write_rds(here("Data/Hake_map.rds"))
 
 
 base_plot +

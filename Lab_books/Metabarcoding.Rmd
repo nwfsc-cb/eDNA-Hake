@@ -1,0 +1,62 @@
+---
+title: "Library Prep Metabarcoding"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Step1: PCR1 
+
+Conditions tailored to your primers of choice. Primers should have Illumina overhangs at the 5' end of each primer
+
+  - Fwd primer : 5’ TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG‐[locus‐specific sequence]
+  
+  - Rev primer :  5’ GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAG‐[locus‐specific sequence]
+  
+Bc I have Inhibition, low template proportion, I end up with a really strange Master Mix. PCR volume for me is 30 uL  
+  
+# Step2: Clean up 
+
+Check it on a gel, and then do a 1:1 AMPUREXP Cleanup. I'd say that at the beggining you should adjust this ratio to the size of your product and the size of the primer dimer. I do 15 ul Template and final elution 15ul.
+
+# Step3: PCR2
+
+The Indexing reaction is not very many cycles. We use here the Phusion Master Mix from NEB (https://www.neb.com/products/m0531-phusion-high-fidelity-pcr-master-mix-with-hf-buffer#Product%20Information), and the conditions I use are inhereted from Zack
+
+    - Master Mix
+    
+    PCR water                6.25	
+    UDIPrimer                1.25	
+    Phusion MM              12.5	
+    CleanedPCR1 product      5	
+    
+    - Cycling
+    				        Processs             temp		time
+    				        initialization				98		30s	
+    				        number of cycles:						10	
+    				        denature			      	98		10	
+    				        annealing	      			55		30	
+    				        extension	      			72		30	
+    				        final ext.		    		72		5 min	
+
+# Step3: Cleanup
+
+Again depends on the size of product vs primer dimer. The original recipe calls for 1:1.1 ratio, but if you have carryover primer dimer that can be tricky. Start with 20 uL, elute in 15 ul
+
+# Step4: Qubit 
+
+198 ul mix + 2 ul template
+
+# Step5: Calculate molarity and pool
+
+I know already the size of my product so I can estimate molarity with that info. Then I made a 5nM or 7.5nM plate, adding 5ul (or 7.5) of each sample to a well and adding variable amounts of water to achieve 7.5nM. Then I pool 3 ul of each well into a 1.5mL tube to get the pooled library. 
+
+# Library size and final concentration
+
+Once you have one pooled library, you can make sure it is at the target concentration with more detail, either by gel extraction or AMPURE at 1:0.7. Here I'll use a lot of pooled library to make sure that you have room to play.
+
+Dilute to 4nM (if you are sending it here for sequencing) and enjoy!
+
+
+
+						

@@ -1,0 +1,121 @@
+---
+title: "Run 20210521"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(eDNAfuns)
+library(here)
+library(googlesheets4)
+```
+
+# Taking samples from a few places:
+
+The last run minus the samples that I transfer to the previous run
+
+```{r}
+#gs4_find()
+PCR51 <- read_indexing_PCR("1kr9eVOF0a04pC6gc0vuSZNmJ_BWmI9VVuDRO4UhG_Bc")
+PCR52 <- read_indexing_PCR("1iJc7MRdQQH18UPt5tBS13D5ry_s69OZ1cLcD7dntZ3Q")
+PCR57 <- read_indexing_PCR("1tJwmPWZ2Ruog4gOAfnQHfFoYsy-WApAZ2oRC_JFOLMQ")
+
+
+
+PCR57 %>% 
+  filter (!str_detect(Well, "01|02")) %>% 
+  filter (!is.na(Sample)) %>% 
+  mutate(Barcode = Well) -> Adding57
+
+PCR51 %>% 
+  filter (!is.na(Sample)) %>% 
+  filter (!str_detect(Well, "7|8")) %>% 
+  mutate(Barcode = Well)-> Adding51
+
+PCR52 %>% 
+  filter (!is.na(Sample)) -> Adding52
+
+# Have I reused.any
+
+list (Adding57, Adding51, Adding52) %>% set_names(nm = list("PCR57", "PCR51", "PCR52")) %>% bind_rows(.id = "PCR") -> all.together
+
+all.together %>% 
+  unite(Set, Barcode, col = "Unique") %>% 
+  group_by(Unique) %>% 
+  summarise (n = n())
+
+```
+
+Cool - Prepare a metadata file and Generate the Sample Sheet and metadata file
+You need an input file with at least the following columns:
+
+  - Sample_name: Avoid spaces - for compatibility with MiSeq's sample sheet, use hyphen "-" instead of underscores "_" or full stops "."
+  - Well:  in the 96-well plate used for the Nextera reaction. If you are using UDI indices, and select the option `Matching with well`,  then this field MUST match that of the UDI plate you are using.
+  - Set: Use A,B,C,D or 1,2,3,4. Crucial for the UDI plate
+  - PrimerF: using IUPAC wildcard character
+  - PrimerR: ditto
+  - Locus: Name of the locus, again without spaces.
+  - i7_Index_Name: Adapter used to identify samples. Format is N7XX for the Nextera. 
+  - i5_Index_Name: Adapter used to identify samples. Format is N5XX for the Nextera.
+  - UDI_Index_Name: Adapter used to identify samples with the UDI. Format is  UDPXXXX
+
+```{r}
+all.together %>% 
+   group_by(Sample) %>% 
+  nest() %>% 
+  mutate(data = map(data, ~.x %>% rownames_to_column("rep"))) %>% 
+  unnest(data) %>% 
+  unite(Sample, rep, col = "Sample_name", sep = "-") -> temp 
+  
+  
+  
+```
+
+# Check uniques
+
+```{r}
+read_csv(here("Data", "FASTQ_raw/Run7_20210518/metadata_2021-05-18.csv")) %>% 
+  distinct(Sample_name)
+  tally() %>% 
+  filter (n>1)
+
+
+temp %>% 
+  semi_join(read_csv(here("Data", "FASTQ_raw/Run7_20210518/metadata_2021-05-18.csv")) %>% 
+  distinct(Sample_name)) %>% 
+  filter (!str_detect(Sample_name, "Tilapia")) %>% 
+  mutate(Sample_name = str_replace(Sample_name, "-1", "-2")) -> first.half
+
+temp %>% 
+  anti_join(read_csv(here("Data", "FASTQ_raw/Run7_20210518/metadata_2021-05-18.csv")) %>% 
+  distinct(Sample_name)) -> second.half
+
+temp %>%
+  filter(str_detect(Sample_name, "Tilapia")) -> third.half
+
+bind_rows(first.half, second.half, third.half ) %>% 
+  mutate(Well = Barcode) %>% 
+  select(-Barcode, -PCR) %>% 
+  mutate(PrimerF = "GYAATCACTTGTCTTTTAAATGAAGACC",
+         PrimerR = "GGATTGCGCTGTTATCCCTA",
+         Locus = "16S_Prey") %>% 
+  write_csv(here("Data", "Lab_books", "metadata_input_20210521.csv"))
+
+```
+
+All good
+```{r}
+read_csv(here("Data", "Lab_books", "metadata_input_20210521.csv")) %>% 
+  
+  separate(Sample_name, into = c("Sample", "replicate")) %>% 
+  group_by(Sample) %>% 
+  mutate(replicate = case_when(Sample %in% c("1004", "985", "999") & Well %in% c("C03", "E05", "A06") ~ "1", TRUE ~replicate)) %>% 
+  unite(Sample, replicate, col = "Sample_name", sep = "-") %>% 
+  
+  write_csv(here("Data", "FASTQ_raw/Run8_20210521/metadata_input_2021-05-20b.csv"))
+```
+

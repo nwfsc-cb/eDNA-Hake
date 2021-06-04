@@ -1,0 +1,343 @@
+---
+title: "PCRs and progress"
+output: html_notebook
+---
+
+A bit tiresome, but... where are we on the Hake metabarcoding?
+
+```{r}
+library (here)
+library (tidyverse)
+library (googlesheets4)
+library (eDNAfuns)
+
+```
+
+
+
+## Target
+
+These are plates 22 and 23 for the above and below the thermocline, and an extra plate for bottom samples
+
+```{r targets}
+
+Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>%
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%
+  mutate (Plate = "Plate22")
+
+Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>%
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%
+  mutate (Plate = "Plate23")
+
+Plate.extra <- read_csv(here("Data", "Samples_To_Sequence", "plate.at.depth.csv")) %>%
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%
+  mutate (Plate = "Plate.extra")
+
+Samples_to_Sequence <- bind_rows(Plate22, Plate23, Plate.extra)
+
+Samples_to_Sequence %>% 
+  mutate(Sample = as.character(sample)) %>%
+  select(-sample) %>% 
+  filter (!is.na(Sample))   -> Samples_to_Sequence
+
+Metadata <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"), col_types = "cdccdd") 
+
+Metadata %>% mutate (depth= case_when (depth == "sfc" ~ 0,
+                                       TRUE           ~ as.numeric(depth))) %>% 
+  rename (Sample = eDNA.sample) -> Metadata
+
+
+```
+
+
+## Already sequenced
+
+```{r}
+
+
+PCR51 <- read_indexing_PCR("1rLval2cNGmrnkRDOj1hekDMnqRrt64MQV4hFetwqBlM")
+
+
+PCR57 <- read_indexing_PCR("1tJwmPWZ2Ruog4gOAfnQHfFoYsy-WApAZ2oRC_JFOLMQ")
+
+bind_rows(PCR51, PCR57) %>% 
+  filter (!is.na(Sample)) -> Run_March2021
+
+PCR67 <- read_indexing_PCR("1MB_hyVKw4PfFGNfNm211DUBVpzICwKL-QR8-lFpBXE8")
+
+PCR67 %>% 
+  filter (!is.na(Sample)) -> Nano_April
+```
+
+## Successful PCRs so far
+
+```{r}
+
+succesful.pcr <- read_csv(here("Data", "succesful.prcs.csv"))
+
+succesful.pcr %>% distinct (PCR)
+
+
+Abi.pcrs <- gs4_find()
+
+Abi.pcrs %>% filter (str_detect(name, "AW")) %>% 
+  pull(id) %>% map(read_step1_PCR) -> Abi.succesful.pcrs
+
+Abi.succesful.pcrs %>% 
+  map(~.x$Samples) %>% 
+  bind_rows() %>% 
+  filter (!is.na(Success)) %>% write_csv(here("Data", "Abi.succesful.pcrs.csv"))
+
+Abi.succes.pcrs <- read_csv(here("Data", "Abi.succesful.pcrs.csv"))
+
+All.succeses <- bind_rows(succesful.pcr, Abi.succes.pcrs)
+
+All.succeses %>% filter (Success %in% c("Y", "y")) -> All.succeses
+
+PCR58 <- read_step1_PCR("1hKsSdew0AOhuTotPE-AJTqSXpyw-QegwIxJhaobIjmE")
+
+```
+
+So from the list of required samples, let's tally how many times sequenced, how many times amplified
+
+```{r}
+Nano_April %>% 
+  separate(Sample, into = c("Sample", "rep")) -> Nano_April
+bind_rows(Run_March2021, Nano_April, .id = "Run") -> All.sequenced.so.far
+
+
+sequence.fails <- "996"
+
+
+
+All.sequenced.so.far %>% 
+  filter (Sample != sequence.fails) %>% 
+  group_by(Sample) %>% 
+   tally() -> sequence.totals
+```
+Now tally all PCR successes
+
+```{r}
+All.succeses %>% 
+  group_by(Sample) %>% 
+   tally() -> PCR.totals
+
+d
+```
+Now combine all info
+
+```{r}
+Samples_to_Sequence %>% 
+  left_join(sequence.totals ) %>% 
+  rename(Seq.times = n) %>% 
+  left_join(PCR.totals) %>% 
+  rename(PCR.success = n) %>% 
+  replace_na(list(Seq.times = 0, PCR.success = 0 )) -> All.info.together
+
+
+
+```
+
+## Now remove all done
+
+```{r}
+All.info.together %>% 
+  filter (Seq.times < 2) -> todo.list
+```
+
+Now things that only need Ampure (either 1 sequenced and 1+ Amplified, or 0 sequenced and 2+ amplified, so Amp+seq >= 2 )
+
+# Things to Ampure 
+
+```{r}
+todo.list %>% 
+  filter ((Seq.times + PCR.success) >= 2 ) -> only.need.ampure
+```
+
+
+# Things to Amplify
+
+```{r}
+todo.list %>% 
+  anti_join(only.need.ampure) %>% 
+  filter ((Seq.times + PCR.success) == 1) -> one.more.PCR
+```
+
+
+```{r}
+todo.list %>% 
+  anti_join(only.need.ampure) %>% 
+  filter ((Seq.times + PCR.success) ==  0) -> two.more.PCR
+
+two.more.PCR %>% 
+  arrange(Plate, as.numeric(Sample)) %>% 
+  unite(Row, Column, col = "Well", sep = "", remove = F) %>% 
+  write_csv(here("Data", "two.more.left.to.do.csv"))
+```
+
+
+
+## I tried to do all from one.more.pcr
+
+```{r}
+read_step1_PCR("1XL9z-iX6Va_Xa8qh1XqH-IWArA8aXIrlphzyvMw1Olg") -> PCR68
+read_step1_PCR("1jwHYzc4ehJ90zQhjFG5I3h4dQ-syZ-xyHEAvJhc6_F4") -> PCR69
+read_step1_PCR("1Zat34yKKwVjdWqmjFzPCzCNZ_jzo9AkLO0dKLo1H3lc") -> PCR70
+
+list(PCR68, PCR69, PCR70) %>% 
+  map("Samples") %>% 
+  bind_rows() %>% 
+  filter (Success == "Y") %>% write_csv(here("Data", "add.to.Ampure.csv"))
+
+list(PCR68, PCR69, PCR70) %>% 
+  map("Samples") %>% 
+  bind_rows() %>% 
+  replace_na(list(Success = 0)) %>% 
+  anti_join(list(PCR68, PCR69, PCR70) %>% 
+  map("Samples") %>% 
+  bind_rows() %>% 
+  filter (Success == "Y"), by = "Sample") %>% 
+  filter (Success != "Y") %>% 
+  select(-Well, -Notes) %>% 
+  pivot_wider(names_from = PCR, values_from = Success) %>% 
+  distinct(Sample) %>% 
+  left_join(Samples_to_Sequence) %>% 
+  arrange(Plate, (as.numeric(Sample))) %>% 
+  unite(Row, Column, col = "Well", sep = "", remove = F) %>% 
+  write_csv(here("Data", "one.last.chance.csv"))
+  
+PCR71 <- read_step1_PCR("1o1xCCiab0627di2YxnRZrDlkfz7FhvtCQRaHCNF9sco")
+PCR72 <- read_step1_PCR("10-enYxxKOHaP-YCoQCDuHgiFy1UVvvdXPaTPJlQwxjE")
+
+list (PCR71, PCR72) %>% 
+  map ("Samples") %>% 
+  bind_rows() %>% 
+  filter (Success == "Y") %>% write_csv(here("Data", "add.to.Ampure.csv"))
+```
+
+## Remove already succesful & sequenced
+
+```{r}
+
+Nano_April %>% 
+  separate(Sample, into = c("Sample", "rep")) -> Nano_April
+bind_rows(Run_March2021, Nano_April, .id = "Run") -> All.sequenced.so.far
+
+
+sequence.fails <- "996"
+
+
+
+All.sequenced.so.far %>% 
+  filter (Sample != sequence.fails) %>% 
+  group_by(Sample) %>% 
+   tally() %>% 
+  filter (n >= 2) -> all.done
+
+anti_join(All.sequenced.so.far, all.done) %>% distinct(Sample) -> one.done 
+
+All.succeses %>% 
+  anti_join(all.done) -> useful
+
+
+useful %>% 
+  semi_join(one.done) %>%
+  write_csv(here("Data", "one.more.left.csv")) # These are the ones with one sequenced and ready to go
+  
+  useful %>% 
+  anti_join(one.done) %>% 
+    group_by(Sample) %>% 
+    tally() %>% 
+    filter (n == 2) %>% pull(Sample) -> two.ready # Not sequenced yet but already amplified twice
+  
+   useful %>% 
+  anti_join(one.done) %>% 
+    group_by(Sample) %>% 
+    tally() %>% 
+    filter (n > 2) %>% pull(Sample) -> more.than.two.ready # I need to choose two of these
+
+useful %>% filter (Sample %in% two.ready) %>% write_csv(here("Data", "two.ready.csv"))
+
+useful %>% filter (Sample %in% more.than.two.ready) %>% arrange(Sample) %>%write_csv(here("Data", "choose.two.ready.csv"))
+  
+# useful %>% 
+#   anti_join(one.done) %>% 
+#     group_by(Sample) %>% 
+#     add_tally() %>% 
+#   filter (n ==1) %>% 
+#   write_csv(here("Data", "one.ready.csv")) # these are samples that we have never sequenced, and only has amplified once
+
+
+
+
+
+```
+
+What do I need to amplify?
+
+   * Samples that have only amplified once:
+
+```{r}
+read_csv(here("Data", "one.ready.csv")) %>% 
+  select(Sample) %>% 
+  left_join(Samples_to_Sequence) %>% 
+  arrange(Row) %>% 
+  arrange(Plate, Column) %>% 
+  unite(c(Row, Column), col = "Well", sep = "") %>% 
+  write_csv(here("Data", "gaps.PCR68.csv"))
+```
+
+
+Another 
+
+
+## Everything ready to go is in a gsheet
+
+```{r}
+ready_to_sequence <- read_sheet("1-BtW-JijZPH_-XAA1W8TexBqYXucNoIMvGASju-B0B8")
+```
+
+
+
+## Update
+
+We have the samples that have worked and have been sequenced, a lot of samples ready to be cleaned, and those for which we need another successful PCR, and a bunch that never worked. Let's work on the last group.
+
+```{r}
+
+
+All.succeses %>% 
+  distinct(Sample) %>% 
+  bind_rows(
+All.sequenced.so.far %>% 
+  distinct(Sample)) %>% 
+  distinct() -> work.in.progress
+
+Samples_to_Sequence %>% 
+  anti_join(work.in.progress) %>% 
+  arrange(Plate, as.numeric(Sample))
+
+
+```
+Add those samples with low number of reads in nano run
+
+
+
+```{r}
+Samples_to_Sequence
+
+All.succeses %>% 
+  distinct(PCR)
+
+list (PCR68, PCR69, PCR70, PCR71) %>% 
+  map("Samples") %>% 
+  bind_rows() %>% 
+  # distinct(Success)
+  bind_rows(All.succeses) %>% 
+  filter (Success %in% c("Y", "y", "maybe")) %>% 
+  filter (Sample %in% c("61", "848", "998", "489", "81", "283")) %>% 
+  arrange(Sample)
+
+
+```
+
