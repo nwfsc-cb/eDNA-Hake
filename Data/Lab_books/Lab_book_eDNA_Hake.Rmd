@@ -33,13 +33,6 @@ Samples_to_Sequence <- bind_rows(Plate22, Plate23)
 I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment. 
 
 
-
-These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294. 
-
-I run AMPureXP cleanup protocol in the successful samples: I used 2x Ampure (10 uL PCR product, 20 uL Ampure). I eluted the DNA in 20 uL of PCR water, that would become the template for PCR2. 
-
-Before running PCR2 we need to randomly assigned tags and libraries to samples, to avoid any systematic bias in our libraries. We are going to use 16 Tags and 6 libraries (6x16 = 96 unique combinations) to label 93 samples.
-
 ```{r randomnly assign Tags and Libraries to samples}
 Ntags=16
 NtotalSamples=nrow(OA_Samples)

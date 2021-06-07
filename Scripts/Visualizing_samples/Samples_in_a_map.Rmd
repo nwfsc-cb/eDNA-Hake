@@ -10,7 +10,9 @@ After many, many attempts, I have a couple of successful MiSeq runs. Let's plot 
 ```{r}
 library(tidyverse)
 library(here)
-# library(raster)
+library (sf)
+
+ library(raster)
 
 named_pull <- function(x, values_from, names_from){
 names.output<- pull(x, {{names_from}})
@@ -137,11 +139,17 @@ b = marmap::getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
 b <- fortify(b)
 
 b %>% write_csv("temp.csv")
-sf::read_sf("temp.csv",  options=c("X_POSSIBLE_NAMES=x","Y_POSSIBLE_NAMES=y")) ->b
+sf::read_sf("temp.csv",  options=c("X_POSSIBLE_NAMES=x","Y_POSSIBLE_NAMES=y")) -> b
 
 sf::read_sf(here("Data", "eDNA.samples.with.lat.lon.csv"),
             options = c("X_POSSIBLE_NAMES=lon","Y_POSSIBLE_NAMES=lat")) -> metadata
 
 metadata
+```
+
+Calculate the distance to bottom at each point
+```{r}
+metad.df <- as_tibble(metadata) %>% dplyr::select(x= lon, y=lat) %>% distinct() %>% rownames_to_column("FID")
+extract(raster(b), metadata)
 ```
 
