@@ -17,7 +17,7 @@ D_acoustics_lat_equal <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_
 D_acoustics_lat_1.0   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_1.0
 D_acoustics_lat_0.5   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_0.5
 
-load("Qpcr_summaries_lat.long.smooth_Base_Var_6_10_fix_nu.RData")
+load("Qpcr_summaries_lat.long.smooth_Base_Var_5_10_fix_nu.RData")
 
 D_DNA_points    <- Output.summary.qpcr$D_final_projected
 D_DNA_lat_equal <- Output.summary.qpcr$D_final_lat_equal
