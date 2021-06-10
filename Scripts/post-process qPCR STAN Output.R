@@ -38,7 +38,7 @@ SPECIES <- "hake" # eulachon, hake
 MOD <-  "lat.long.smooth"
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("qPCR 2019 hake lat.long.smooth 6_10_fix_nu Base_Var Fitted.RData")
+load("qPCR 2019 hake lat.long.smooth 5_10_fix_nu Base_Var Fitted.RData")
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 ### Cacluate posterior summaries and predictive surfaces

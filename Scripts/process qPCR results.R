@@ -20,10 +20,10 @@ SP <- "hake" # options: hake, lamprey, eulachon
 ###########################################################################
 # Make a choice about the kind of model to run.
 # Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
-MODEL.TYPE = "lat.long.smooth"
+MODEL.TYPE = "lat.long.smooth.base"
 ###########################################################################
 # identifier
-MODEL.ID <- "5_10_fix_nu"
+MODEL.ID <- "6_10_fix_nu"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
@@ -31,7 +31,7 @@ MODEL.VAR <- "Base_Var" #
 #set.seed(111)
 # Construct smoothes for each 
 # define knots.
-N.knots.lon  <- 5
+N.knots.lon  <- 6
 N.knots.lat  <- 10
 N.knots.bd <- 5
 N.knots.depth <- 4

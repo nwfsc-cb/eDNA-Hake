@@ -1,0 +1,191 @@
+---
+title: "Hake 2019 Survey"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE,warning=FALSE, include=FALSE}
+rm(list=ls())
+# This calls both the qPCR results and the acoustic data.
+# define species
+SPECIES <- "lamprey"
+source("post-process qPCR STAN Output.R")
+```
+
+## eDNA from the 2019 Hake cruise, `r SPECIES` 
+
+### Sampling and processing to date.
+
+In total we have processed qPCR for pacific hake, pacific lamprey, and eulachon from `r N.station.run` CTD stations representing `r N.station.depth.run` station-depth combinations for `r N.sample.run` individual 2.5L water samples.   
+
+```{r,echo=FALSE,warning=FALSE, fig.height=7}
+print(sample.process.facet)
+```
+
+
+\newpage
+
+### Inhibition
+
+There are a lot of samples that show signs of inhibition. They are concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. 
+
+```{r,echo=FALSE}
+kable(inhibit.summ.dat)
+```
+
+We can look at the patterns of inhibition spatially and by depth.
+
+```{r,echo=FALSE,fig.height=8}
+print(inhibit.plot.by.depth)
+```
+
+\clearpage
+\newpage
+Here are some larger plot of just a few shallow depths.  Inhibition is clearly strongest at the surface, but beyond depth there is no obvious pattern of inhibition among the samples.  Perhaps there is a hint of inhibition in the offsore edges of the transects at the 50 and 100m depths, but it is not a strong pattern.
+
+```{r,echo=FALSE,fig.height=6}
+print(inhibit.plot.by.depth.few)
+```
+
+\newpage
+### Standards
+
+The standards used in the qPCR assay look pretty reasonable good.  Each color represents a different PCR plate. They are pretty much on top of each other.
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
+print(stand.plot)
+```
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
+print(stand.plot.pres)
+```
+
+```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(stand.plot.facet)
+```
+
+### Dilutions
+<!---```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(Output.qpcr$dilution_plot)
+```
+--->
+
+\newpage
+### Controls
+
+There are two main types of control: field negative control and extraction controls.  The extraction controls have never produced any measurable amount of DNA, so we will ignore them for now.
+
+Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples.  Out of the `r N_control_run`, `r N_control_positive` have detectable amounts (> `r detect.lev` Copies $L^{-1}$) of eulachon DNA. In general the amount of detected eulachon DNA is pretty much zero. 
+
+```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
+print(control.hist1)
+```
+
+We can look at the temporal pattern of the control values too. All are below the detection limit for the assay.
+
+```{r,echo=FALSE,fig.height=3,fig.width=5,warning=FALSE}
+print(control.by.time)
+```
+
+### Ethanol wash samples
+
+For a buch of samples, the final stage of th extraction wash was conducted using a 30% Ethanol wash as opposed to a 70% ethanol wash.  This should result in some amount of DNA being lost from the samples.  To examine this, we intentionally washed one of the two Niskin bottles from 23 station-depth combinations with 30% ethanol and one with 70% ethanol with the goal of detecting what the average difference in DNA concentration between the two samples washed in DNA would be.
+
+\newpage
+## Eulachon eDNA
+
+We can first ask if the distribution of estimated DNA compare to the values present in the field samples. The vast majority of samples have effectively 0 eulachon DNA. 
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=5.5,warning=FALSE}
+print(compare.hist2)
+```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+
+
+
+
+
+Let's make some plots of the spatial distribution of eulachon DNA.  I think that it is clear that the major problem is with inhibition in the surface samples for eulachon. There are a lot of missing data points for eulachon.
+
+```{r,echo=FALSE,fig.height=8,warning=FALSE}
+print(SP.p2)
+```
+
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p3)
+```
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p4)
+```
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p5)
+```
+
+
+\newpage
+## Acoustic Data.  
+
+There is no acoustic information for eulachon.
+
+## eDNA transects.  
+
+Here are a few plots from individual transects.  Coast is on the right side of the graph. 
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.27")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.61")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.65")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.67")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.67")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.73")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.75")
+print(SP.transect.plots[[nom]])
+```
+\newpage
+## North to south patterns by water depth categoris.
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+p.lat.by.d
+```
+
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+p.lat.by.d.facet
+```
+
+
