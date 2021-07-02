@@ -17,7 +17,7 @@ library(gtools)
 
 results.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
 script.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Scripts"
-plots.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Plots and figures"
+plot.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Plots and figures"
 # load and run in the acoustic data.
 setwd(script.dir)
 #source("process acoustic data.R")
@@ -33,7 +33,7 @@ setwd(results.dir)
 SPECIES <- "hake" # eulachon, hake 
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("Acoustics 2019 lat.long.smooth 8_16_6_10_smooth_hurdle Base_Var Fitted.RData")
+load("Acoustics 2019 lat.long.smooth 7_14_6_10_smooth_hurdle Base_Var Fitted.RData")
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 # Read in agreed upon dat_raster_fin that has been trimmed to 
@@ -46,9 +46,7 @@ load(file="../Data/lat_breaks_for_projections.RData")
 setwd(script.dir)
 source("summarize_stan_output_acoustics.R")
 
-
 #### MAKE OBSERRVED v. PREDICTION Plots
-
 pred_obs_bin_p1 <- ggplot(pred_obs_bin) + 
                    geom_point(aes(x=Mean,y=bin_weight_dens),
                               position=position_jitter(width=0,height=0.1),alpha=0.5) +
@@ -154,10 +152,10 @@ z.lim.bin = c(0,1)
 z.breaks <- log10(c(20,100,250,500,1000,2500))
 z.bin.breaks <- seq(0,1,length.out = 6)
 
-DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
+#DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
 p_log_D <- list()
 
-D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
+#D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
 
 # Color scales for viridis
 OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
@@ -179,8 +177,8 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
     theme_bw() 
   p_log_D$pos
   
-  sqrt_breaks <- c(0,100,500,seq(1000,2500,by=500))
-  z.lim = c(0,2000) 
+  sqrt_breaks <- c(0,100,500,seq(1000,5000,by=1000))
+  z.lim = c(0,5050) 
   p_log_D[[as.name("uncond")]] <- 
     base_map_trim_proj +
     geom_point(data= D_pred_uncond_mt_combined ,
@@ -273,7 +271,7 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
   #################### 
   ## Smoothes Only
   ###################
-   D_pred_smooth_combined <- smooth.projections$D_pred_smooth_combined
+   D_pred_smooth_pos_combined <-   smooth.projections$D_pred_smooth_pos_combined
   
    z.lim = c(min(D_pred_smooth_combined),max(D_pred_smooth_combined))
    z.breaks <- log10(c(20,100,250,500,1000,2500))
@@ -281,21 +279,21 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
    
    
    SIZE = 1
-   p_log_D_smoothes_only_facet <- base_map_trim +
+   p_log_D_smoothes_only <- base_map_trim +
      # geom_point(data= D_pred_background,
      #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
-     geom_point(data= D_pred_smooth_combined ,
+     geom_point(data= D_pred_smooth_pos_combined ,
                 aes(x=lon,y=lat,color=Mean),alpha=0.75,size=SIZE,stroke=STROKE) +
-     geom_point(data= D_pred_smooth_combined %>% filter(Mean < z.lim[1]),
+     geom_point(data= D_pred_smooth_pos_combined %>% filter(Mean < z.lim[1]),
                 aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
-     geom_point(data= D_pred_smooth_combined %>% filter(Mean > z.lim[2]),
+     geom_point(data= D_pred_smooth_pos_combined %>% filter(Mean > z.lim[2]),
                 aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
      scale_color_viridis_c(option=OPT,
                            # limits=z.lim,
                            # breaks=z.breaks,
                            # labels=z.lim.labs,
-                           name=expression("log"[10]*"DNA Copies L"^-1)) +
-     facet_wrap(~depth_cat_factor) +
+                           name=expression("Biomass")) +
+     #facet_wrap(~depth_cat_factor) +
      theme_bw() 
 
 
@@ -393,6 +391,9 @@ Acoustic.dat.figs <- list(
   D_pred_bin = D_pred_bin,
   D_pred_pos = D_pred_pos,
   D_pred_uncond = D_pred_uncond,
+  D_pred_uncond_mt_combined = D_pred_uncond_mt_combined,
+  D_acoustic_uncond_cum_sum = D_acoustic_uncond_cum_sum,
+  D_acoustic_uncond_total_mt = D_acoustic_uncond_total_mt,
   
   # Map Plots
   p_Acoustics_lat_0.5 = p_Acoustics_lat_0.5,
@@ -401,13 +402,7 @@ Acoustic.dat.figs <- list(
   p_Acoustics_lat_base = p_log_D$uncond,
   lat.breaks = lat.breaks,
   base_map_trim_proj = base_map_trim_proj
-
 )
-
 
 setwd(results.dir)
 save(Acoustic.dat.figs,file=paste("./_Summarized_Output/Acoustics 2019",MODEL.TYPE,MODEL.ID,MODEL.VAR,"Derived Q.RData"))
-
-
-
-

@@ -13,6 +13,7 @@ library(sf)
 library(brms)
 library(ggsci)
 library(gridExtra)
+library(cowplot)
 
 script.dir <- "/Users/ole.shelton/Github/eDNA-Hake/Scripts"
 results.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits"
@@ -38,7 +39,7 @@ SPECIES <- "hake" # eulachon, hake
 MOD <-  "lat.long.smooth"
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("qPCR 2019 hake lat.long.smooth 5_10_fix_nu Base_Var Fitted.RData")
+load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu Base_Var Fitted.RData")
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 ### Cacluate posterior summaries and predictive surfaces
@@ -460,15 +461,15 @@ q3
 ######################################################3
 # Smooth projections.
 ######################################################3
-SIZE = 1
+SIZE = 1.5
 STROKE = 0 
 
-z.lim = c(log10(20),log10(2500)) 
-z.breaks <- log10(c(20,100,250,500,1000,2500))
-z.lim.labs <- 10^z.breaks
+z.lim = c(20,2500) 
+z.breaks <-  c(20,100,250,500,1000,1500,2500)
+z.lim.labs <- z.breaks
 
 DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
-p_log_D <- list()
+p_D <- list()
 
 D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
 
@@ -477,57 +478,53 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
 
 
 for(i in 1:length(DEPTH)){
-  p_log_D[[as.name(paste0("x_",DEPTH[i]))]] <-
+  
+  LAB <- paste0(DEPTH[i],"m")
+  if(DEPTH[i]==0){LAB <- "3m"}
+  p_D[[as.name(paste0("x_",DEPTH[i]))]] <-
     base_map_trim_proj +
-    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == 0),
-             aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i]),
-            aes(x=lon,y=lat,color=Mean),alpha=1,size=SIZE,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i],Mean < z.lim[1]),
-             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
-    geom_point(data= D_pred_log_combined %>% filter(depth_cat_factor == DEPTH[i],Mean > z.lim[2]),
-             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
-    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
-    ggtitle(paste(DEPTH[i],"m")) +
+    geom_point(data= D_pred_combined %>% filter(depth_cat_factor == 0),
+             aes(x=lon,y=lat),size=SIZE,fill=grey(0.6),color=grey(0.6),alpha=1,stroke=STROKE,shape=22) +
+    geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i]),
+            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+    geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i],Mean < z.lim[1]),
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,color=viridis(1,begin=0,end=0.001)) +
+    geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i],Mean > z.lim[2]),
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,
+             color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    scale_fill_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    ggtitle(LAB) +
     theme_bw() 
   
-  p_log_D[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
-        p_log_D[[as.name(paste0("x_",DEPTH[i]))]] +
+  p_D[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
+        p_D[[as.name(paste0("x_",DEPTH[i]))]] +
         geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
 }  
 
   SIZE = 1
-  p_log_D_facet <- base_map_trim_proj +
+  p_D_facet <- base_map_trim_proj +
     # geom_point(data= D_pred_background,
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined ,
-               aes(x=lon,y=lat,color=Mean),alpha=0.75,size=SIZE,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined %>% filter(Mean < z.lim[1]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
-    geom_point(data= D_pred_log_combined %>% filter(Mean > z.lim[2]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
-    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
-    facet_wrap(~depth_cat_factor) +
+    geom_point(data= D_pred_combined ,
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=0.75,size=SIZE,stroke=STROKE,shape=22) +
+    geom_point(data= D_pred_combined %>% filter(Mean < z.lim[1]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=22,
+               color=viridis(1,begin=0,end=0.001),fill=viridis(1,begin=0,end=0.001)) +
+    geom_point(data= D_pred_combined %>% filter(Mean > z.lim[2]),
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=22,
+               color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.999,end=1)) +
+    scale_color_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+    scale_fill_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
+        facet_wrap(~depth_cat_factor) +
     theme_bw() 
 
-  p_log_D_facet2 <- base_map_trim_proj +
-    # geom_point(data= D_pred_background,
-    #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined ,
-               aes(x=lon,y=lat,color=Mean),alpha=0.75,size=SIZE,stroke=STROKE) +
-    geom_point(data= D_pred_log_combined %>% filter(Mean < z.lim[1]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0,end=0.001)) +
-    geom_point(data= D_pred_log_combined %>% filter(Mean > z.lim[2]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
-    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
-    facet_wrap(~depth_cat_factor,nrow=1) +
-    theme_bw() 
+  p_D_legend_only <- cowplot::get_legend(p_D$x_0)
+  ggdraw(p_D_legend_only)
     
   ###################
   ## Plot of sum to surface result.
   ###################
-  
-  
   SIZE = 2
   STROKE = 0 
   
@@ -603,6 +600,8 @@ for(i in 1:length(DEPTH)){
   D_pred_background <- D_pred_log_combined %>% filter(depth_cat_factor == 0)
   
   for(i in 1:length(DEPTH)){
+    LAB <- paste0(DEPTH[i],"m")
+    if(DEPTH[i]==0){LAB <- "3m"}
     p_log_D_SD[[as.name(paste0("x_",DEPTH[i]))]] <-
       base_map_trim_proj +
       geom_point(data= D_pred_background,
@@ -612,7 +611,7 @@ for(i in 1:length(DEPTH)){
       geom_point(data= D_pred_log_combined %>% filter(SD > z.lim[2]),
                  aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999,end=1)) +
       scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("SD DNA Copies L"^-1)) +
-      ggtitle(paste(DEPTH[i],"m")) +
+      ggtitle(LAB) +
       theme_bw() 
     
     p_log_D_SD[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
@@ -632,6 +631,62 @@ for(i in 1:length(DEPTH)){
     facet_wrap(~depth_cat_factor) +
     theme_bw() 
 
+  ######################################################3
+  ## CV in Space
+  ######################################################3
+  SIZE = 1.5
+  STROKE = 0 
+  
+  z.lim = c(0.15,1.5) 
+  z.breaks <- seq(z.lim[1],z.lim[2],length.out=6)
+  
+  DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
+  p_D_CV <- list()
+  
+  D_pred_combined <- D_pred_combined %>% mutate(CV=SD/Mean)
+  
+  D_pred_background <- D_pred_combined %>% filter(depth_cat_factor == 0)
+  
+  for(i in 1:length(DEPTH)){
+    LAB <- paste0(DEPTH[i],"m")
+    if(DEPTH[i]==0){LAB <- "3m"}
+    p_D_CV[[as.name(paste0("x_",DEPTH[i]))]] <-
+      base_map_trim_proj +
+      geom_point(data= D_pred_background,
+                 aes(x=lon,y=lat),size=SIZE,color=grey(0.6),fill=grey(0.6),alpha=1,stroke=STROKE,shape=22) +
+      geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i]),
+                 aes(x=lon,y=lat,color=CV,fill=CV),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+      geom_point(data= D_pred_combined %>% filter(CV > z.lim[2],depth_cat_factor == DEPTH[i]),
+                  aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,
+                  color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.99999,end=1)) +
+      scale_color_viridis_c(option=OPT,limits=z.lim,trans="sqrt",
+                            breaks=z.breaks,labels=round(z.breaks,2),name=expression("CV")) +
+      scale_fill_viridis_c(option=OPT,limits=z.lim,trans="sqrt",
+                            breaks=z.breaks,labels=round(z.breaks,2),name=expression("CV")) +
+      ggtitle(LAB) +
+      theme_bw() 
+    
+    p_D_CV[[as.name(paste0("x_",DEPTH[i],"_dots"))]] <- 
+      p_D_CV[[as.name(paste0("x_",DEPTH[i]))]] +
+      geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
+  }  
+  
+  p_D_CV_legend_only <- cowplot::get_legend(p_D_CV$x_0)
+  ggdraw(p_D_CV_legend_only)  
+  
+  SIZE = 1.25
+  p_D_CV_facet <- base_map_trim_proj +
+    # geom_point(data= D_pred_background,
+    #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
+    geom_point(data= D_pred_combined ,
+               aes(x=lon,y=lat,color=CV),alpha=1,size=SIZE,stroke=STROKE) +
+    geom_point(data= D_pred_combined %>% filter(CV > z.lim[2]),
+               aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999999,end=1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("SD DNA Copies L"^-1)) +
+    facet_wrap(~depth_cat_factor) +
+    theme_bw() 
+  
+  
 ### Residuals on a map  
   z.lim = c(log10(20),log10(5000)) 
   z.breaks <- log10(c(20,100,250,1000,2500,5000))
@@ -1038,8 +1093,12 @@ Output.summary.qpcr <- list(
   tau.sample.summary = tau.sample.summary,
   station_depth_out=station_depth_out,
   station_depth_out_liter=station_depth_out_liter,
+  D_pred_combined = D_pred_combined,
   D_delta_out = D_delta_out,
   D_delta_out_liter = D_delta_out_liter,
+  
+  D_DNA_uncond_total = D_DNA_uncond_total,
+  D_DNA_cum_sum = D_DNA_cum_sum,
   D_final_projected = D_final_projected,
   D_final_lat_1.0 = D_final_lat_1.0,
   D_final_lat_0.5 = D_final_lat_0.5,
@@ -1052,6 +1111,26 @@ Output.summary.qpcr <- list(
   p_DNA_lat_0.5 = p_DNA_lat_0.5,
   p_DNA_lat_equal =p_DNA_lat_equal,
   p_DNA_lat_base =p_log_D_final_proj,
+  
+  p_D = p_D,
+  p_D_legend_only = p_D_legend_only,
+  
+  p_D_CV = p_D_CV,
+  p_D_CV_legend_only = p_D_CV_legend_only,
+  
+  # Contamination and wash plots
+  control.by.time = control.by.time ,
+  control.hist = control.hist,
+  control.hist1 = control.hist1,
+  
+  depth.hist.facet = depth.hist.facet,
+  
+  inhibit.plot = inhibit.plot ,
+  inhibit.plot.by.depth  = inhibit.plot.by.depth ,
+  inhibit.plot.by.depth.few = inhibit.plot.by.depth.few, 
+  
+  wash.plot = wash.plot ,
+  wash.plot.by.depth = wash.plot.by.depth, 
   
   # Projections or projection helpers.
   N.POST = N.POST, # number of posterior samples used.
@@ -1112,19 +1191,19 @@ pdf(file=paste("Hake transect DNA D_delta red",MODEL.TYPE,"_",MODEL.VAR,"_",MODE
 dev.off()
 
 # Spatial Smoothes
-pdf(file=paste("Hake transect DNA p_log_D",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=6,width=5)
-  print(p_log_D)
+pdf(file=paste("Hake transect DNA p_D",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=6,width=5)
+  print(p_D)
 dev.off()
-pdf(file=paste("Hake transect DNA p_log_D_facet",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=10,width=7)
-  print(p_log_D_facet)
+pdf(file=paste("Hake transect DNA p_D_facet",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=10,width=7)
+  print(p_D_facet)
 dev.off()
-pdf(file=paste("Hake transect DNA p_log_D_facet2",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=6,width=11)
-  print(p_log_D_facet2)
-dev.off()
+# pdf(file=paste("Hake transect DNA p_log_D_facet2",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf"),onefile = T,height=6,width=11)
+#   print(p_log_D_facet2)
+# dev.off()
 
 pdf(file=paste(SPECIES,"DNA_smoothes_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf",sep=""),onefile = T,height=10,width=8)
-  print(p_log_D_facet)
-  print(p_log_D)
+  print(p_D_facet)
+  print(p_D)
 dev.off()
 
 ##### Summed to surface plots.
@@ -1157,10 +1236,13 @@ dev.off()
 ##################################################
 
 
-p_log_D
-p_log_D_facet
+p_D
+p_D_facet
 p_log_D_SD
 p_log_D_SD_facet
+
+p_D_CV
+p_D_CV_facet
 
 p_log_D_smoothes_only_facet
 

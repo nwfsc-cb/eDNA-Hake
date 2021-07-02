@@ -405,7 +405,7 @@ Resid <- Resid %>% mutate(Resid.log = Mean.log - sd.mean.log,Resid = Mean - sd.m
 # We use D_pred + LOG.EXPAND from above.
 
 D_pred_interp <- bind_cols(as.data.frame(10^(D_pred+LOG.EXPAND)),new_data_trim %>% dplyr::select(-Y)) %>%
-  left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor))
+  left_join(.,new_data %>% dplyr::select(lon,lat,utm.lon,utm.lat,Gridcell_ID,depth_cat_factor,bottom.depth.consensus))
 
 # Linear interpolate to these depths (DEPTHS)
 d.step = 50 # depth interval in meters to project to
@@ -569,6 +569,41 @@ for(i in 1:nrow(DEPTHS)){
               Q.0.95 = quantile(tot,probs=c(0.95)),
               Q.0.975 = quantile(tot,probs=c(0.975)),
               Q.0.99 = quantile(tot,probs=c(0.99)))
+
+  D_DNA_uncond_total <- d.all.no.depth %>% 
+    left_join(.,new_dat_strata %>% dplyr::select(Gridcell_ID,lat)) %>%
+    arrange(lat,MCMC.rep) %>%
+    group_by(MCMC.rep) %>%
+    mutate(cum_sum = cumsum(tot),max_cum_sum = max(cum_sum)) %>%
+    mutate(cum_sum_prob = cum_sum / max_cum_sum)
+
+  D_DNA_cum_sum <-   D_DNA_uncond_total %>%    
+    group_by(lat) %>%
+    summarise(Mean=mean(cum_sum_prob), # These are summaries across MCMC for each cell.
+              Median=median(cum_sum_prob),
+              SD=sd(cum_sum_prob),
+              Q.0.01 = quantile(cum_sum_prob,probs=c(0.01)),
+              Q.0.025 = quantile(cum_sum_prob,probs=c(0.025)),
+              Q.0.05 = quantile(cum_sum_prob,probs=c(0.05)),
+              Q.0.25 = quantile(cum_sum_prob,probs=c(0.25)),
+              Q.0.75 = quantile(cum_sum_prob,probs=c(0.75)),
+              Q.0.95 = quantile(cum_sum_prob,probs=c(0.95)),
+              Q.0.975 = quantile(cum_sum_prob,probs=c(0.975)),
+              Q.0.99 = quantile(cum_sum_prob,probs=c(0.99)))
+  
+  D_DNA_uncond_total <- D_DNA_uncond_total %>% 
+    ungroup() %>%
+    summarise(Mean=mean(max_cum_sum), # These are summaries across MCMC for each cell.
+              Median=median(max_cum_sum),
+              SD=sd(max_cum_sum),
+              Q.0.01 = quantile(max_cum_sum,probs=c(0.01)),
+              Q.0.025 = quantile(max_cum_sum,probs=c(0.025)),
+              Q.0.05 = quantile(max_cum_sum,probs=c(0.05)),
+              Q.0.25 = quantile(max_cum_sum,probs=c(0.25)),
+              Q.0.75 = quantile(max_cum_sum,probs=c(0.75)),
+              Q.0.95 = quantile(max_cum_sum,probs=c(0.95)),
+              Q.0.975 = quantile(max_cum_sum,probs=c(0.975)),
+              Q.0.99 = quantile(max_cum_sum,probs=c(0.99)))
   
   # repeat the summaries but calculate an non-dimension index referenced to the southern most area
   # D_final_lat_1.0_NON_DIM <- d.all.no.depth %>% rename(Tot = tot) %>%
