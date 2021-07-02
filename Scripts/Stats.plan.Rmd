@@ -18,6 +18,8 @@ Two layers of evidence can be used:
 ```{r}
 library (tidyverse)
 library(here)
+library(rLakeAnalyzer)
+library(castr)
 
 By.taxa.dataset.metadata <- read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
 
@@ -43,7 +45,7 @@ By.taxa.dataset.metadata %>%
 ```
 
 
-```{r}
+```{r, warning=FALSE}
 base_plot <- read_rds(here("Data/Hake_map.rds"))
 base_plot +
   geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
@@ -55,6 +57,22 @@ base_plot +
   geom_label(data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
               aes(x = lon, y = lat, label = position))
 ```
+
+And a cross section at one of the transects
+
+```{r}
+CTD_profiles <- read_csv(here("Data", "1_converted","CTD_hake_data_10-2019.csv"))
+
+CTD_profiles %>% 
+  rename (CTD_Cast = `CTD Cast #`) %>% 
+  semi_join(eDNA.samples, by = "CTD_Cast") %>% 
+  filter (!is.na(CTD_Cast)) %>% 
+  group_by(CTD_Cast ) %>% 
+  summarise (mean.max.depth = mean(`EK-38kHz-DepthBelowSurface-M-VALUE`)) -> max.depth
+```
+
+
+
 ## Metadata for analysis
 
 ### Label stations as inshore, mid and offshore
@@ -108,8 +126,10 @@ thermoclines2 %>%
   dplyr::select(CTD_Cast, Thermocline) %>% 
   right_join(metadata) %>% 
   mutate(position = case_when(depth < Thermocline ~ "above",
-                              TRUE                ~ "below"))
+                              TRUE                ~ "below")) %>% 
+  left_join(max.depth) %>% 
+  write_csv(here("Data", "Samples_with_Thermocline.csv"))
 
-
+Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"))
 ```
 
