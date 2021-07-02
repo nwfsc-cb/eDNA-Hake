@@ -20,10 +20,10 @@ SP <- "hake" # options: hake, lamprey, eulachon
 ###########################################################################
 # Make a choice about the kind of model to run.
 # Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
-MODEL.TYPE = "lat.long.smooth.base"
+MODEL.TYPE = "lat.long.smooth"
 ###########################################################################
 # identifier
-MODEL.ID <- "6_10_fix_nu"
+MODEL.ID <- "4_10_fix_nu"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
@@ -31,7 +31,7 @@ MODEL.VAR <- "Base_Var" #
 #set.seed(111)
 # Construct smoothes for each 
 # define knots.
-N.knots.lon  <- 6
+N.knots.lon  <- 4
 N.knots.lat  <- 10
 N.knots.bd <- 5
 N.knots.depth <- 4
@@ -356,7 +356,7 @@ if(SP == "hake"){
                                                #1552,   # Two orders of magnitude large than pair.
                                                #1419,   # Two orders of magnitude large than pair.
                                                1326,   # This is a 25m deep spot so gets dropped anyway.
-                                               536,535,    # Removed both of this pari() 
+                                               536,535,    # Removed both of this pair() 
                                                #55,    # This is a 25m deep spot so gets dropped anyway.
                                                1807 # THIS IS outlier among washed samples (dropped on tabletop)
   )) 
@@ -416,7 +416,6 @@ colnames(C)[2:5] <- c("x1","x.1","x.2","x.5")
 # This strongly suggests that the 0.5 dilution did not work all that well (lower copies than expected)
 # So if we exclude all of the 0.5 and inspect the results
 A <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))
-
 
 if(SP == "lamprey"){ # ONLY KEEP 0.1 for lamprey
   dat.samp <- dat.samp %>% filter(!dilution %in% c(0.5,0.2))
@@ -478,6 +477,15 @@ SAMPLES <- dat.samp %>% group_by(sample) %>%
 these_samp <- dat.samp %>% group_by(station.depth) %>% summarise(Ct_bin_idx = max(Ct_bin))
 SAMPLES <- left_join(SAMPLES,these_samp) 
 
+# Make index for depth category 
+SAMPLES <- SAMPLES %>% mutate(depth_idx = case_when(depth_cat == 0 ~ 1,
+                                                    depth_cat == 50 ~ 2,
+                                                    depth_cat == 100 ~ 3,
+                                                    depth_cat == 150 ~ 4,
+                                                    depth_cat == 300 ~ 5,
+                                                    depth_cat == 500 ~ 6))
+N_depth <- length(unique(SAMPLES$depth_cat))
+
 SAMPLES.CONTROL <- data.frame(sample=unique(dat.control.field.neg$sample),
                               sample_control_idx = 1:length(unique(dat.control.field.neg$sample)))
 
@@ -507,6 +515,7 @@ log_vol_obs            <- SAMPLES$log_vol_standard
 singleton_idx          <- SAMPLES$singleton_idx
 samp_station_depth_idx <- SAMPLES$samp_station_depth_idx
 wash_idx               <- SAMPLES$wash_idx
+
 
 dat.control.bin <- dat.control.field.neg
 dat.control.pos <- dat.control.field.neg %>% filter(Ct_bin==1)
@@ -670,6 +679,7 @@ stan_data = list(
   "samp_station_depth_idx" = SAMPLES$samp_station_depth_idx,
   "singleton_idx" = SAMPLES$singleton_idx,
   "Ct_bin_idx" = SAMPLES$Ct_bin_idx,
+  "depth_idx"  = SAMPLES$depth_idx,
   
   # Indices for station-depth combination
   "station_depth_idx" = STATION.DEPTH$station_depth_idx,
@@ -684,6 +694,7 @@ stan_data = list(
   
   # Indices and counters
   "N_pcr"    = N_pcr,    # Number of PCR plates
+  "N_depth"  = N_depth,
   "N_sample" = N_sample,
   "N_control_sample" = N_control_sample,
   "N_station_depth"  = N_station_depth,
@@ -908,7 +919,7 @@ N_CHAIN = 4
 Warm = 1200
 Iter = 2000
 Treedepth = 11
-Adapt_delta = 0.95
+Adapt_delta = 0.85
 
 LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)

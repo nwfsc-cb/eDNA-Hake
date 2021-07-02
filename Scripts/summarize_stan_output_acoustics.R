@@ -70,7 +70,6 @@ D_pos_out <- data.frame(trans_id= dat.acoustic.pos$trans_id,
 ##############################
 ## Project Surfaces for lat.long.smooth and lat.long.smooth.base MODEL.TYPE
 ##############################
-
 smooth.projections <- list()
 if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
   
@@ -113,8 +112,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
       smooth.dat.pred.pos$Xs %*% pars$bs_pos[i,] +
       smooth.dat.pred.pos$Zs_1_1 %*% pars$s_1_1_pos[i,] + 
       smooth.dat.pred.pos$Zs_1_2 %*% pars$s_1_2_pos[i,] + 
-      smooth.dat.pred.pos$Zs_1_3 %*% pars$s_1_3_pos[i,] -
-      0.5*pars$sigma[i]^2
+      smooth.dat.pred.pos$Zs_1_3 %*% pars$s_1_3_pos[i,]
     
     if(MODEL.TYPE=="lat.long.smooth"){
       D_pred_bin[,ID$id[ID$N.ID==i]] <- D_pred_bin[,ID$id[ID$N.ID==i]] + smooth.dat.pred.bin$Zs_2_1 %*% pars$s_2_1_bin[i,]
@@ -169,14 +167,16 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
   D_pred_smooth_pos <- data.frame(Mean=rowMeans(D_smooth_pos),
                                   SD=apply(D_smooth_pos,1,sd),
                                   Val=apply(D_smooth_pos,1,quantile,probs=PROBS) %>% t() %>% as.matrix())
+  
   ## Make unconditional predictions
   KM_2 <- 25 # each grid cell is 25km^2
   
    D_pred_pos_real <- D_pred_pos * 0
-   # for(i in 1:N.POST){
-   #   D_pred_pos_real[,i] <- rlnorm(nrow(D_pred_pos) ,D_pred_pos[,i],sigma.vec[i])
-   # }
-   D_pred_uncond <- inv.logit(D_pred_bin) * exp(D_pred_pos)
+   for(i in 1:N.POST){
+      D_pred_pos_real[,i] <- #exp(D_pred_pos[,i]) 
+            rlnorm(nrow(D_pred_pos), D_pred_pos[,i] - 0.5*pars$sigma[N.ID[i]]^2, sigma.vec[N.ID[i]])
+    }
+   D_pred_uncond <- inv.logit(D_pred_bin) * D_pred_pos_real
   
    D_pred_uncond_summary <- data.frame(Mean=rowMeans(D_pred_uncond),
                                        SD=apply(D_pred_uncond,1,sd),
@@ -289,7 +289,40 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
                Q.0.975 = quantile(tot,probs=c(0.975)),
                Q.0.99 = quantile(tot,probs=c(0.99)))
    
+   D_acoustic_uncond_total_mt <- d.all %>% group_by(Gridcell_ID,MCMC.rep) %>% 
+     summarise(tot = sum(D)) %>% 
+     left_join(.,new_dat_strata %>% dplyr::select(Gridcell_ID,lat)) %>%
+     arrange(lat,MCMC.rep) %>%
+     group_by(MCMC.rep) %>%
+     mutate(cum_sum = cumsum(tot),max_cum_sum = max(cum_sum)) %>%
+     mutate(cum_sum_prob = cum_sum / max_cum_sum)
    
+  D_acoustic_uncond_cum_sum <-   D_acoustic_uncond_total_mt %>%    
+     group_by(lat) %>%
+     summarise(Mean=mean(cum_sum_prob), # These are summaries across MCMC for each cell.
+               Median=median(cum_sum_prob),
+               SD=sd(cum_sum_prob),
+               Q.0.01 = quantile(cum_sum_prob,probs=c(0.01)),
+               Q.0.025 = quantile(cum_sum_prob,probs=c(0.025)),
+               Q.0.05 = quantile(cum_sum_prob,probs=c(0.05)),
+               Q.0.25 = quantile(cum_sum_prob,probs=c(0.25)),
+               Q.0.75 = quantile(cum_sum_prob,probs=c(0.75)),
+               Q.0.95 = quantile(cum_sum_prob,probs=c(0.95)),
+               Q.0.975 = quantile(cum_sum_prob,probs=c(0.975)),
+               Q.0.99 = quantile(cum_sum_prob,probs=c(0.99)))
+   
+   D_acoustic_uncond_total_mt <- D_acoustic_uncond_total_mt %>% ungroup() %>%
+      summarise(Mean=mean(max_cum_sum), # These are summaries across MCMC for each cell.
+               Median=median(max_cum_sum),
+               SD=sd(max_cum_sum),
+               Q.0.01 = quantile(max_cum_sum,probs=c(0.01)),
+               Q.0.025 = quantile(max_cum_sum,probs=c(0.025)),
+               Q.0.05 = quantile(max_cum_sum,probs=c(0.05)),
+               Q.0.25 = quantile(max_cum_sum,probs=c(0.25)),
+               Q.0.75 = quantile(max_cum_sum,probs=c(0.75)),
+               Q.0.95 = quantile(max_cum_sum,probs=c(0.95)),
+               Q.0.975 = quantile(max_cum_sum,probs=c(0.975)),
+               Q.0.99 = quantile(max_cum_sum,probs=c(0.99)))
    
    #####
    
@@ -352,6 +385,7 @@ pred_obs_pos <- bind_cols(dat.acoustic.pos %>%
                             dplyr::select(transect,lat,lon,utm.lat,utm.lon,bin_weight_dens,weight_dens_mt_km2,bathy.bottom.depth),
                           D_pos_out) %>%
                 mutate(resid = weight_dens_mt_km2 - Mean) #log.resid=log(resid))
+
 
 # Combine the necessary data.frames into a list for use later.
 Output.summary <- list(

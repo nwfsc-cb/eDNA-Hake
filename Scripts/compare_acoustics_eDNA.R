@@ -4,25 +4,29 @@ library(gridExtra)
 library(ggExtra)
 library(paletteer)
 library(dplyr)
+library(cowplot)
 
 results.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits/_Summarized_Output"
 setwd(results.dir)
 plot.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Plots and figures"
 
 
-load("Acoustics 2019 lat.long.smooth 8_16_6_10_smooth_hurdle Base_Var Derived Q.RData")
+load("Acoustics 2019 lat.long.smooth 7_14_6_10_smooth_hurdle Base_Var Derived Q.RData")
 
 D_acoustics_points    <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt
 D_acoustics_lat_equal <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_equal
 D_acoustics_lat_1.0   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_1.0
 D_acoustics_lat_0.5   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_0.5
 
-load("Qpcr_summaries_lat.long.smooth_Base_Var_5_10_fix_nu.RData")
+load("Qpcr_summaries_lat.long.smooth_Base_Var_4_10_fix_nu.RData")
 
 D_DNA_points    <- Output.summary.qpcr$D_final_projected
 D_DNA_lat_equal <- Output.summary.qpcr$D_final_lat_equal
 D_DNA_lat_1.0   <- Output.summary.qpcr$D_final_lat_1.0
 D_DNA_lat_0.5   <- Output.summary.qpcr$D_final_lat_0.5
+
+p_D    <- Output.summary.qpcr$p_D
+p_D_CV <- Output.summary.qpcr$p_D_CV
 
 ### 
 Both_points <- full_join(D_acoustics_points %>% rename(Mean_ac = Mean,
@@ -136,7 +140,7 @@ ggplot(Both_equal) +
 
 FILL.COL <- grey(0.8)
 
-ggplot(Both_lat_0.5_1000) +
+p_cor_0.5 <- ggplot(Both_lat_0.5_1000) +
   geom_errorbar(aes(x=Mean_ac,ymin=Q.0.05_dna,ymax=Q.0.95_dna),alpha=1,width=0)+
   geom_errorbarh(aes(y=Mean_dna,xmin=Q.0.05_ac,xmax=Q.0.95_ac),alpha=1,height=0)+
   geom_point(aes(x=Mean_ac,y=Mean_dna),alpha=1,color=FILL.COL,size=2.5)+
@@ -160,8 +164,13 @@ p_cor_1.0 <- ggplot(Both_lat_1.0_1000) +
   theme_classic()
 
 setwd(plot.dir)
-quartz(file="Hake DNA-Acoustic bivariate correlation.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+quartz(file="Hake DNA-Acoustic bivariate correlation_1.0.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
 print(p_cor_1.0)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA-Acoustic bivariate correlation_0.5.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(p_cor_0.5)
 dev.off()
 
 
@@ -185,11 +194,11 @@ max.dna = max(Both_points$Mean_dna) *1.01
 max.ac = max(Both_points$Mean_ac) *1.01
 
 g_base <- ggplot(Both_points) +
-    geom_density2d_filled(aes(x=Mean_ac,y=Mean_dna),alpha=0.7,bins=8,shape=20) +  
+    #geom_density2d_filled(aes(x=Mean_ac,y=Mean_dna),alpha=0.7,bins=8,shape=20) +  
     geom_point(aes(x=Mean_ac,y=Mean_dna),alpha=0.2)+
     xlab("Acoustic Biomass (mt)") +
     ylab("DNA Index") +
-    scale_fill_brewer(palette = "Blues") +
+    #scale_fill_brewer(palette = "Blues") +
     expand_limits(x=c(0,max.ac),y=c(-0.1,max.dna)) +
     scale_x_continuous(expand=c(0,0)) +
     scale_y_continuous(expand=c(0,0)) +
@@ -211,7 +220,7 @@ g_right <- ggplot(Both_points) +
   geom_histogram(aes(y=Mean_dna),fill=grey(0.9),color="black",boundary=0) +
   theme_classic() +
   expand_limits(x=0,y=0.1) +
-  scale_x_continuous(expand=c(0,0)) +
+  scale_x_continuous(expand=c(0,0),breaks=c(0,200,400)) +
   scale_y_continuous(expand=c(0,0)) +
   xlab("Frequency") +
   theme(axis.title.y=element_blank(),
@@ -229,6 +238,23 @@ quartz(file="Hake bivariate point-level.jpeg",height=5.5,width=6,dpi=600,type="j
       heights=c(0.5,1,1),
       layout_matrix = lay)
 dev.off()
+
+# Combine point level and 1 degree plots into one figure.
+
+setwd(plot.dir)
+quartz(file="Hake point-level and 1 degree.jpeg",height=4,width=8,dpi=600,type="jpeg")
+grid.arrange(
+    g_top,
+    g_base,
+    g_right ,
+    p_cor_1.0,
+  widths=c(1,0.25,1),
+  heights=c(0.25,1),
+  layout_matrix=rbind(c(1,NA,NA),
+                      c(2,3,4))
+  )
+dev.off()
+
 
 ################################################
 ### put DNA and Acoustics maps side-by-side.
@@ -252,20 +278,20 @@ size.regions = 3
 y.axis.text <- 12
 
 setwd(plot.dir)
-quartz(file="Hake maps combined.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
+quartz(file="Hake maps combined to surface.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
   grid.arrange(survey.map + xlab("") +
-                geom_segment(data=lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                              linetype="dashed")+
-                geom_text(data=lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+                geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
                  theme(plot.margin = unit(c(0.1,-6,0.1,-2), "lines"),
                        axis.text.x = element_text(size=y.axis.text),
                        axis.text.y = element_text(size=y.axis.text),
                        axis.title=element_text(size=y.axis.text+2)),
         
               Output.summary.qpcr$p_DNA_lat_base+
-                geom_segment(data=lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                              linetype="dashed")+
-                geom_text(data=lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+                geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
                 ylab("") +
                 theme( legend.position = c(1.07, .55),
                        legend.justification = c("right", "top"),
@@ -276,9 +302,9 @@ quartz(file="Hake maps combined.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
                        axis.title=element_text(size=y.axis.text+2)),
         
               Acoustic.dat.figs$p_Acoustics_lat_base+
-                geom_segment(data=lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                geom_segment(data=Acoustic.dat.figs$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                              linetype="dashed")+
-                geom_text(data=lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+                geom_text(data=Acoustic.dat.figs$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
                 ylab("") +
                 xlab("") +
                 theme( legend.position = c(1.10, .55),
@@ -291,6 +317,323 @@ quartz(file="Hake maps combined.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
                nrow=1)
   
 dev.off()
+
+
+setwd(plot.dir)
+#### Make Grid of MEAN Predicitons 
+
+lay = rbind(c(1,2,3,4),
+            c(5,6,7,8))
+
+
+axis.text <- 9
+title.text <-11
+quartz(file="Hake maps Mean depth manual facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
+  grid.arrange(survey.map + xlab("") + ggtitle("Survey")+
+                 #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                 #              linetype="dashed")+
+                 #geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+                 theme(plot.margin = unit(c(0.1,-10,-0.8,-2), "lines"),
+                       axis.text.x = element_text(size=axis.text),
+                       axis.text.y = element_text(size=axis.text),
+                       axis.title=element_text(size=title.text),
+                       plot.title = element_text(size=title.text,vjust=-1)),
+              p_D$x_0 + theme(legend.position = "none",
+                               plot.margin = unit(c(0.1,-8,-0.8,-4), "lines"),
+                               axis.text.x = element_text(size=axis.text,color="white"),
+                               axis.text.y = element_text(size=axis.text,color="white"),
+                               axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                               axis.title.x = element_text(size=title.text,color="white"),
+                               plot.title = element_text(size=title.text,vjust=-1),
+                                ),
+               p_D$x_50 + theme(legend.position = "none",
+                                plot.margin = unit(c(0.1,-6,-0.8,-6), "lines"),
+                                axis.text.x = element_text(size=axis.text,color="white"),
+                                axis.text.y = element_text(size=axis.text,color="white"),
+                                axis.title.x = element_text(size=title.text,color="white"),
+                                axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                                plot.title = element_text(size=title.text,vjust=-1),
+                                   ),
+  
+               p_D$x_100 + theme(legend.position = "none",
+                                 plot.margin = unit(c(0.1,-4,-0.8,-8), "lines"),
+                                 axis.text.x = element_text(size=axis.text,color="white"),
+                                 axis.text.y = element_text(size=axis.text,color="white"),
+                                 axis.title.x = element_text(size=title.text,color="white"),
+                                 axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                                 plot.title = element_text(size=title.text,vjust=-1),
+                                 ),
+              get_legend(p_D$x_0 + theme(legend.margin = margin(0,-70,0,70),
+                                         legend.title = element_text(size=title.text))),
+              
+               p_D$x_150 + theme(legend.position = "none",
+                                 plot.margin = unit(c(-0.8,-8,0.1,-4), "lines"),
+                                 axis.text.x = element_text(size=axis.text),
+                                 axis.text.y = element_text(size=axis.text),
+                                 axis.title.y = element_text(size=title.text),
+                                 axis.title.x = element_text(size=title.text,color="white"),
+                                 plot.title = element_text(size=title.text,vjust=-1)
+                                  ),
+               p_D$x_300 + theme(legend.position = "none",
+                                 plot.margin = unit(c(-0.8,-6,0.1,-6), "lines"),
+                                 axis.text.x = element_text(size=axis.text),
+                                 axis.text.y = element_text(size=axis.text,color="white"),
+                                 axis.title.x = element_text(size=title.text),
+                                 axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                                 plot.title = element_text(size=title.text,vjust=-1)
+                                  ),
+               p_D$x_500 + theme(legend.position = "none",
+                                 plot.margin = unit(c(-0.8,-4,0.1,-8), "lines"),
+                                 axis.text.x = element_text(size=axis.text),
+                                 axis.text.y = element_text(size=axis.text,color="white"),
+                                 axis.title.x = element_text(size=title.text,color="white"),
+                                 axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                                 plot.title = element_text(size=title.text,vjust=-1),
+                                     ),
+               
+               widths=c(1,1,1,1),
+               layout_matrix = lay)
+dev.off()                 
+
+
+
+
+
+
+#### Make Grid of MEAN Predicitons VERSION 2
+
+# Make marginal plot of CV vs. depth.  
+
+CV.summary <- Output.summary.qpcr$D_pred_combined %>% group_by(depth_cat_factor) %>% 
+        summarise(grand.mean.cv = mean(CV),
+                  grand.median.cv =median(CV),
+                  cv.q.025 = quantile(CV,probs=0.025),
+                  cv.q.05 = quantile(CV,probs=0.05),
+                  cv.q.10 = quantile(CV,probs=0.10),
+                  cv.q.25 = quantile(CV,probs=0.25),
+                  cv.q.75 = quantile(CV,probs=0.75),
+                  cv.q.90 = quantile(CV,probs=0.90),
+                  cv.q.95 = quantile(CV,probs=0.95),
+                  cv.q.975 = quantile(CV,probs=0.975)
+                ) %>%
+        mutate(plot_depth=ifelse(depth_cat_factor==0,3,depth_cat_factor))
+  
+CV_marg_plot <- ggplot(CV.summary) +
+    geom_errorbarh(aes(y=plot_depth,xmin=cv.q.10,xmax=cv.q.90),height=0) +
+    geom_errorbarh(aes(y=plot_depth,xmin=cv.q.25,xmax=cv.q.75),height=0,size=2) +
+    geom_point(aes(y=plot_depth,x=grand.mean.cv),shape=21,fill="white",size=1.5) +
+    geom_point(aes(y=plot_depth,x=grand.median.cv),shape="|",size=5) +
+    scale_y_reverse("Depth (m)")+
+    scale_x_continuous("CV",expand=c(0.0,0.0),limits = c(0,7.2),
+                       breaks=c(0,0.5,1,2,4,6), labels=c(0,0.5,1,2,4,6)) +
+    theme_classic() +
+    ggtitle("g)")
+
+
+lay = rbind(c(1,2,3,4),
+            c(5,6,7,8))
+
+axis.text <- 9
+title.text <-11
+quartz(file="Hake maps Mean depth manual facet V2.jpeg",height=9,width=8,dpi=600,type="jpeg")
+grid.arrange(
+               # #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+               # #              linetype="dashed")+
+               # #geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+               # theme(plot.margin = unit(c(0.1,-10,-0.8,-2), "lines"),
+               #       axis.text.x = element_text(size=axis.text),
+               #       axis.text.y = element_text(size=axis.text),
+               #       axis.title=element_text(size=title.text),
+               #       plot.title = element_text(size=title.text,vjust=-1)),
+             p_D$x_0 +  ggtitle("a) 3m") +
+                      theme(legend.position = "none",
+                             plot.margin = unit(c(0.1,0,-0.8,0), "lines"),
+                             axis.text.x = element_text(size=axis.text,color="white"),
+                             axis.text.y = element_text(size=axis.text),
+                             axis.title.y = element_text(size=title.text),
+                             axis.title.x = element_text(size=title.text,color="white"),
+                             plot.title = element_text(size=title.text,vjust=-1),
+             ),
+             p_D$x_50 + ggtitle("b) 50m") + 
+               theme(legend.position = "none",
+                              plot.margin = unit(c(0.1,-2,-0.8,-6), "lines"),
+                              axis.text.x = element_text(size=axis.text,color="white"),
+                              axis.text.y = element_text(size=axis.text,color="white"),
+                              axis.title.x = element_text(size=title.text,color="white"),
+                              axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                              plot.title = element_text(size=title.text,vjust=-1),
+             ),
+             
+             p_D$x_100 + ggtitle("e) 100m") +
+               theme(legend.position = "none",
+                               plot.margin = unit(c(0.1,-2,-0.8,-10), "lines"),
+                               axis.text.x = element_text(size=axis.text,color="white"),
+                               axis.text.y = element_text(size=axis.text,color="white"),
+                               axis.title.x = element_text(size=title.text,color="white"),
+                               axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                               plot.title = element_text(size=title.text,vjust=-1),
+             ),
+             get_legend(p_D$x_0 + theme(legend.margin = margin(0,70,0,-70),
+                                        legend.title = element_text(size=title.text))),
+             
+             p_D$x_150 + ggtitle("d) 150m") +
+               theme(legend.position = "none",
+                               plot.margin = unit(c(-0.8,-0,0.1,0), "lines"),
+                               axis.text.x = element_text(size=axis.text),
+                               axis.text.y = element_text(size=axis.text),
+                               axis.title.y = element_text(size=title.text),
+                               axis.title.x = element_text(size=title.text,color="white"),
+                               plot.title = element_text(size=title.text,vjust=-1)
+             ),
+             p_D$x_300 + ggtitle("e) 300m") +
+               theme(legend.position = "none",
+                               plot.margin = unit(c(-0.8,-2,0.1,-6), "lines"),
+                               axis.text.x = element_text(size=axis.text),
+                               axis.text.y = element_text(size=axis.text,color="white"),
+                               axis.title.x = element_text(size=title.text),
+                               axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                               plot.title = element_text(size=title.text,vjust=-1)
+             ),
+             p_D$x_500  + ggtitle("f) 500m") + 
+               theme(legend.position = "none",
+                               plot.margin = unit(c(-0.8,-2,0.1,-10), "lines"),
+                               axis.text.x = element_text(size=axis.text),
+                               axis.text.y = element_text(size=axis.text,color="white"),
+                               axis.title.x = element_text(size=title.text,color="white"),
+                               axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                               plot.title = element_text(size=title.text,vjust=-1),
+             ),
+             CV_marg_plot +
+               theme(legend.position = "none",
+                     plot.margin = unit(c(-0.8,0.1,0.1,-4), "lines"),
+                     axis.text.x = element_text(size=axis.text),
+                     axis.text.y = element_text(size=axis.text),
+                     axis.title.x = element_text(size=title.text),
+                     axis.title.y = element_text(size=title.text),
+                     plot.title = element_text(size=title.text,vjust=-1,hjust=-0.2)),
+             
+             widths=c(1,1,1,1),
+             layout_matrix = lay)
+dev.off()                 
+
+#### Make Grid of CV Predictions 
+axis.text <- 9
+title.text <-11
+quartz(file="Hake maps CV depth manual facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
+grid.arrange(
+        survey.map + xlab("") + ggtitle("Survey")+
+          #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+          #               linetype="dashed")+
+          #geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+            theme(plot.margin = unit(c(0.1,-10,-0.8,-2), "lines"),
+              axis.text.x = element_text(size=axis.text),
+              axis.text.y = element_text(size=axis.text),
+              axis.title=element_text(size=title.text),
+              plot.title = element_text(size=title.text,vjust=-1)),
+        p_D_CV$x_0 + theme(legend.position = "none",
+                              plot.margin = unit(c(0.1,-8,-0.8,-4), "lines"),
+                              axis.text.x = element_text(size=axis.text,color="white"),
+                              axis.text.y = element_text(size=axis.text,color="white"),
+                              axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                              axis.title.x = element_text(size=title.text,color="white"),
+                              plot.title = element_text(size=title.text,vjust=-1)),
+            p_D_CV$x_50 + theme(legend.position = "none",
+                 plot.margin = unit(c(0.1,-6,-0.8,-6), "lines"),
+                 axis.text.x = element_text(size=axis.text,color="white"),
+                 axis.text.y = element_text(size=axis.text,color="white"),
+                 axis.title.x = element_text(size=title.text,color="white"),
+                 axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                 plot.title = element_text(size=title.text,vjust=-1),
+              ),
+            p_D_CV$x_100 + theme(legend.position = "none",
+                  plot.margin = unit(c(0.1,-4,-0.8,-8), "lines"),
+                  axis.text.x = element_text(size=axis.text,color="white"),
+                  axis.text.y = element_text(size=axis.text,color="white"),
+                  axis.title.x = element_text(size=title.text,color="white"),
+                  axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                  plot.title = element_text(size=title.text,vjust=-1),
+              ),
+            get_legend(p_D_CV$x_0 + theme(legend.margin = margin(0,-60,0,60),
+                                   legend.title = element_text(size=title.text))),
+        
+            p_D_CV$x_150 + theme(legend.position = "none",
+                  plot.margin = unit(c(-0.8,-8,0.1,-4), "lines"),
+                  axis.text.x = element_text(size=axis.text),
+                  axis.text.y = element_text(size=axis.text),
+                  axis.title.y = element_text(size=title.text),
+                  axis.title.x = element_text(size=title.text,color="white"),
+                  plot.title = element_text(size=title.text,vjust=-1)
+              ),
+            p_D_CV$x_300 + theme(legend.position = "none",
+                  plot.margin = unit(c(-0.8,-6,0.1,-6), "lines"),
+                  axis.text.x = element_text(size=axis.text),
+                  axis.text.y = element_text(size=axis.text,color="white"),
+                  axis.title.x = element_text(size=title.text),
+                  axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                  plot.title = element_text(size=title.text,vjust=-1)
+              ),
+            p_D_CV$x_500 + theme(legend.position = "none",
+                  plot.margin = unit(c(-0.8,-4,0.1,-8), "lines"),
+                  axis.text.x = element_text(size=axis.text),
+                  axis.text.y = element_text(size=axis.text,color="white"),
+                  axis.title.x = element_text(size=title.text,color="white"),
+                  axis.title.y = element_text(size=title.text,color="white",hjust=-2),
+                  plot.title = element_text(size=title.text,vjust=-1)),
+widths=c(1,1,1,1),
+layout_matrix = lay)
+dev.off()                 
+
+
+###############################################################
+
+
+
+
+
+setwd(plot.dir)
+quartz(file="Hake maps combined SD.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
+grid.arrange(survey.map + xlab("") +
+               geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                            linetype="dashed")+
+               geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+               theme(plot.margin = unit(c(0.1,-6,0.1,-2), "lines"),
+                     axis.text.x = element_text(size=y.axis.text),
+                     axis.text.y = element_text(size=y.axis.text),
+                     axis.title=element_text(size=y.axis.text+2)),
+             
+             Output.summary.qpcr$p_DNA_lat_base+
+               geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                            linetype="dashed")+
+               geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+               ylab("") +
+               theme( legend.position = c(1.07, .55),
+                      legend.justification = c("right", "top"),
+                      legend.box.just = "right",
+                      plot.margin = unit(c(0.1,-4,0.1,-4), "lines"),
+                      axis.text.x = element_text(size=y.axis.text),
+                      axis.text.y = element_blank(),
+                      axis.title=element_text(size=y.axis.text+2)),
+             
+             Acoustic.dat.figs$p_Acoustics_lat_base+
+               geom_segment(data=Acoustic.dat.figs$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
+                            linetype="dashed")+
+               geom_text(data=Acoustic.dat.figs$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
+               ylab("") +
+               xlab("") +
+               theme( legend.position = c(1.10, .55),
+                      legend.justification = c("right", "top"),
+                      legend.box.just = "right",
+                      plot.margin = unit(c(0.1,-2,0.1,-6), "lines"),
+                      axis.text.x = element_text(size=y.axis.text),
+                      axis.text.y = element_blank(),
+                      axis.title=element_text(size=y.axis.text+2)),
+             nrow=1)
+
+dev.off()
+
+
+
+
 
 ################################################
 # Spatial series.
@@ -401,11 +744,167 @@ ggplot(D_pred_smooth) +
   geom_point(aes(x=depth_cat_factor,y=Mean-LOG.EXPAND),alpha=0.5)
 
 
+####################################################################3
+####################################################################
+####################################################################
+####################################################################
+### Make some plots akin to Hovmuller plots
+####################################################################
+####################################################################
+####################################################################
+####################################################################
+
+dat.project <- Output.summary.qpcr$smooth.projections$D_pred_combined %>% mutate(CV=SD/Mean)
+
+# break into XXX degree latitudinal bins 
+XXX = 0.25
+lat.breaks <- seq(floor(min(dat.project$lat)),ceiling(max(dat.project$lat)),by=XXX)
+
+lat.breaks.plot <- lat.breaks %>% as.data.frame() %>%
+                      mutate(lat.group = lat.breaks + XXX/2) %>% filter(lat.group < max(lat.breaks)) %>%
+                      mutate(id= 1:n())
+# trim to provide just areas that are near 500m.
+dat.500 <- dat.project %>% filter(bottom.depth.consensus < 750,bottom.depth.consensus > 400) %>% 
+  mutate(lat.bin = cut(lat,breaks=lat.breaks))
+lat.lab <- data.frame(lat.bin=levels(dat.500$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
+  left_join(.,lat.breaks.plot %>% select(-"."))
+dat.500 <- left_join(dat.500,lat.lab) %>%
+  group_by(depth_cat_factor,lat.group) %>% 
+  summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
+
+# trim to provide just areas that are near 300m.
+dat.300 <- dat.project %>% filter(bottom.depth.consensus < 400,bottom.depth.consensus > 225) %>% 
+              mutate(lat.bin = cut(lat,breaks=lat.breaks))
+lat.lab <- data.frame(lat.bin=levels(dat.300$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
+                left_join(.,lat.breaks.plot %>% select(-"."),grand.cv=grand.sd/grand.mean)
+dat.300 <- left_join(dat.300,lat.lab) %>%
+              group_by(depth_cat_factor,lat.group) %>% 
+              summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
+# trim to provide just areas that are near 300m.
+dat.150 <- dat.project %>% filter(bottom.depth.consensus < 225,bottom.depth.consensus > 125) %>% 
+                  mutate(lat.bin = cut(lat,breaks=lat.breaks))
+lat.lab <- data.frame(lat.bin=levels(dat.150$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
+                  left_join(.,lat.breaks.plot %>% select(-"."))
+dat.150 <- left_join(dat.150,lat.lab) %>%
+              group_by(depth_cat_factor,lat.group) %>% 
+              summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
+
+dat.150$depth_cat_factor = factor(dat.150$depth_cat_factor,levels=c("500", "300","150","100","50","0"))
+dat.300$depth_cat_factor = factor(dat.300$depth_cat_factor,levels=c("500","300","150","100","50","0"))
+dat.500$depth_cat_factor = factor(dat.500$depth_cat_factor,levels=c("500","300","150","100","50","0"))
+
+ggplot(dat.300)+
+  geom_point(aes(x=lat.group,y=grand.mean))+
+  facet_wrap(~depth_cat_factor)
+
+H_150 <- ggplot(dat.150)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.mean)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
+H_150_CV <- ggplot(dat.150)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.cv)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
+
+H_300 <- ggplot(dat.300)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.mean)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
+H_300_CV <- ggplot(dat.300)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.cv)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
+
+H_500 <- ggplot(dat.500)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.mean)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
+H_500_CV <- ggplot(dat.500)+
+  geom_tile(aes(x=lat.group,y=as.factor(depth_cat_factor),fill=grand.cv)) +
+  scale_fill_viridis_c(option = "plasma") +
+  theme_bw()
 
 
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller 150.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+  print(H_150)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller 300.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(H_300)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller 500.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(H_500)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller_CV 150.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(H_150_CV)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller_CV 300.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(H_300_CV)
+dev.off()
+
+setwd(plot.dir)
+quartz(file="Hake DNA Hovmuller_CV 500.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+print(H_500_CV)
+dev.off()
 
 
+####
+## Make Distributional Plots
+####
+ 
+cdf_dist_plot <- ggplot() +
+    geom_line(data=Acoustic.dat.figs$D_acoustic_uncond_cum_sum, 
+              aes(x=lat,y=Mean,color="Acoustic",linetype="Acoustic"))+
+    geom_ribbon(data=Acoustic.dat.figs$D_acoustic_uncond_cum_sum, 
+                  aes(x=lat,ymin=Q.0.05,ymax=Q.0.95),alpha=0.3,fill=viridis(1,begin=0.0)) +
+    geom_line(data=Output.summary.qpcr$D_DNA_cum_sum, aes(x=lat,y=Mean,color="eDNA",linetype="eDNA")) +
+    geom_ribbon(data=Output.summary.qpcr$D_DNA_cum_sum, 
+            aes(x=lat,ymin=Q.0.05,ymax=Q.0.95),alpha=0.3,fill=viridis(1,begin=0.4)) + 
+    scale_y_continuous(expand=c(0.01,0.01)) +
+    ylab("Cumulative Distribution") +
+    xlab("Latitude") +
+    scale_color_viridis_d("Survey",end=0.4)+
+    scale_linetype_manual("Survey",values=c("solid","dashed"))+
+    theme_bw()
+
+both_dist_summary <- 
+  data.frame(id="Acoustic",
+             x.lon = -125.5,
+             min.lat = unlist(Acoustic.dat.figs$D_acoustic_uncond_cum_sum %>% filter(Q.0.05 >= 0.5) %>% slice(which.min(lat)) %>% dplyr::select(lat)),
+            max.lat  = unlist(Acoustic.dat.figs$D_acoustic_uncond_cum_sum %>% filter(Q.0.95 <= 0.5) %>% slice(which.max(lat)) %>% dplyr::select(lat)),
+            mean.lat = unlist(Acoustic.dat.figs$D_acoustic_uncond_cum_sum %>% filter(Mean >= 0.5) %>% slice(which.min(lat)) %>% dplyr::select(lat))) %>%
+  bind_rows(.,
+    data.frame(id="eDNA",
+            x.lon = -125,
+             min.lat = unlist(Output.summary.qpcr$D_DNA_cum_sum %>% filter(Q.0.05 >= 0.5) %>% slice(which.min(lat)) %>% dplyr::select(lat)),
+             max.lat  = unlist(Output.summary.qpcr$D_DNA_cum_sum %>% filter(Q.0.95 <= 0.5) %>% slice(which.max(lat)) %>% dplyr::select(lat)),
+             mean.lat = unlist(Output.summary.qpcr$D_DNA_cum_sum %>% filter(Mean >= 0.5) %>% slice(which.min(lat)) %>% dplyr::select(lat)))
+  )
+
+cog_plot <-
+  Output.summary.qpcr$base_map_trim_proj +
+    geom_point(data=both_dist_summary,aes(x=x.lon,y=mean.lat,color=id)) +
+    geom_errorbar(data=both_dist_summary,aes(x=x.lon,ymin=min.lat,ymax=max.lat,color=id),width=0)+
+    scale_color_viridis_d("Center of Gravity\n   (Median)",end = 0.4)
 
 
-
-
+quartz(file="Hake compare distribution.jpeg",height=4,width=8,dpi=600,type="jpeg")
+  grid.arrange(
+      cdf_dist_plot + theme(plot.margin = unit(c(0.25,0.25,0.25,0.25), "lines"),
+                            legend.position = c(0.75, .4),
+                            legend.title=element_text(size=10)),
+      cog_plot + 
+        theme(plot.margin = unit(c(0.25,-4,0.25,-12), "lines"),
+              legend.position = c(1.2, .5),
+              legend.title=element_text(size=10)),
+      nrow=1,
+      widths=c(1.5,1))
+dev.off()  
