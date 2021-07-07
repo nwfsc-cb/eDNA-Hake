@@ -1,0 +1,91 @@
+---
+title: "Thermocline calculations"
+output: html_notebook
+---
+
+To generate the csv file we use in the Statsplan.Rmd
+
+
+```{r libraries}
+
+library (tidyverse)
+library(here)
+library(rLakeAnalyzer)
+library(castr)
+
+```
+
+## Input data
+Get all the CTD casts we need
+
+```{r required CTDs}
+Used_eDNA.samples <- read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% distinct(eDNA.sample)
+
+Casts <- read_csv(here("Data","cleaned_CTD_stations.csv")) %>% 
+  select(CTD_Cast, Station) %>% 
+  distinct()
+Casts <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv")) %>% 
+  unite(Transect, position, col ="Station", sep = "-", remove = F) %>% 
+  semi_join(Used_eDNA.samples) %>% 
+  left_join(Casts)
+
+Casts 
+```
+
+```{r}
+### Change the numbering
+
+
+Casts %>% 
+  distinct(CTD_Cast) %>% 
+  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast, ".csv"),
+                              TRUE           ~ paste0(CTD_Cast, ".csv"))) %>% pull() -> casts.to.keep
+
+files.inCTD <- list.files(path = here("Data","1_converted"), pattern = "*.csv")
+
+# are u there
+
+casts.to.keep %in% files.inCTD
+
+# Change them to a tibble of full paths
+
+files.inCTD <- tibble (file = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
+                       full.path = list.files(path = here("Data","1_converted"), full.names = T,pattern = "*.csv")) %>% 
+  filter (file %in% casts.to.keep) %>% 
+  mutate (data = purrr::map(full.path, read_csv))
+  
+files.inCTD %>% 
+  mutate (data = purrr::map (data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
+          Thermocline = map_dbl (data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermoclines2
+
+thermoclines2 %>% write_rds(here("Data", "Casts.with.thermoclines.rds"))
+
+thermoclines2 %>% 
+  mutate (Tempdiff = map2_dbl(data, Thermocline, function(.x,.y){
+    .x %>%
+      rename (Depth = `Depth (m)`) %>% 
+    #   filter (abs(`Depth (m)` - .y) > 5) %>% 
+        group_by(Above = Depth > .y) %>% 
+      mutate_at(.vars = vars(Depth), .funs = list(max = max, min = min)) %>% 
+      mutate(keepers = case_when(Above==FALSE & Depth > (.y-5)~ "Yes",
+                                 Above==TRUE & Depth < (.y+5)~"Yes",
+                                 TRUE                        ~ "No")) %>% 
+      filter(keepers == "Yes") %>% 
+      
+       summarise(Temp = mean(`Temperature (degC)`, na.rm=T)) %>% 
+       pivot_wider(names_from = Above, values_from = Temp) %>% 
+    mutate(Tempdiff = `FALSE`-`TRUE`) %>%
+      pull(Tempdiff)
+    
+  })) %>% 
+  separate(file, into = "CTD_Cast") %>% 
+  mutate(CTD_Cast = as.numeric(str_remove(CTD_Cast, "^0"))) %>% 
+  dplyr::select(CTD_Cast, Thermocline_depth = Thermocline, Thermocline_strength = Tempdiff) %>% 
+  right_join(eDNA.samples.used, by = "CTD_Cast") %>% 
+  mutate(position = case_when(depth < Thermocline_depth ~ "above",
+                              TRUE                ~ "below")) %>% 
+#  left_join(max.depth) %>% 
+  write_csv(here("Data", "Samples_with_Thermocline.csv"))
+
+Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"))
+```

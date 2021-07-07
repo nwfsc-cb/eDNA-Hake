@@ -10,7 +10,7 @@ We have a sampling design that includes eDNA samples from three strata of the wa
 Two layers of evidence can be used:
 
   * single species information, from those species that are well known to dwell in deeper waters, and not to take part in the Daily Vertical Migration.
-  * Whole community assemablages: We will expect some level of mixing between deep water and surface water, but how to formally test it? Within each transect, we will expect that:
+  * Whole community assemblages: We will expect some level of mixing between deep water and surface water, but how to formally test it? Within each transect, we will expect that:
       - the similarity (based on a Bray-Curtis dissimilarity matrix on the normalized reads calculated on the eDNAindex from Kelly et al 2018) between samples from above and below the thermocline will be greater in places where the thermocline is weaker (so more mixing) AND
       - the similarity between these uppermost samples and the deep water will be greater when there is strong upwelling AND
       - this similarity is likely driven by deep water species
@@ -18,40 +18,55 @@ Two layers of evidence can be used:
 ```{r}
 library (tidyverse)
 library(here)
-library(rLakeAnalyzer)
-library(castr)
+library(eDNAfuns)
+library(vegan)
 
 By.taxa.dataset.metadata <- read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
 
 eDNA.samples <- read_csv(here("Data","cleaned_CTD_stations.csv"))
 
+base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
+
+base.eDNA %>% distinct(depth)
+
+base.eDNA %>% 
+  mutate (depth  = case_when (depth == "sfc" ~ 0, 
+                              TRUE  ~ as.numeric(depth))) %>% 
+  unite(Transect, position, sep = "-", col = "Station", remove = F)-> base.eDNA
+
 eDNA.samples %>% 
-  separate(Station, into = c("Transect", "Stop"), remove = F) %>% 
-  group_by(Transect, Date) %>% 
+  select(CTD_Cast, Station, lat, lon) %>% 
+  left_join(base.eDNA,.) %>% distinct() -> base.eDNA
+  
+base.eDNA %>% 
+  
+group_by(Transect) %>% 
   summarise(xstart = max(lon),
             xend = min(lon),
             ystart = mean(lat),
-            yend  = mean(lat))  -> Transects
+            yend  = mean(lat))  -> Transects.used
 
-By.taxa.dataset.metadata %>% 
-  group_by(Transect, position) %>% tally(name = "tot") %>% 
-  pivot_wider(id_cols = Transect, 
-              names_from = position, 
-              values_from= tot)
+base.eDNA %>% 
+  semi_join(By.taxa.dataset.metadata, by = "eDNA.sample") -> eDNA.samples.used
 
-By.taxa.dataset.metadata %>% 
-  dplyr::select(Transect, eDNA.sample, position, depth) %>% 
-  left_join(eDNA.samples %>% separate(Station, into = c("Transect", "Stop"), remove = F)) -> metadata.that.counts
+eDNA.samples %>% 
+  separate(Station, into = c("Transect", "position"), convert = T) %>% 
+  group_by(Transect) %>% 
+  summarise(xstart = max(lon),
+            xend = min(lon),
+            ystart = mean(lat),
+            yend  = mean(lat))  -> Transects.total
+
+
 ```
 
 
 ```{r, warning=FALSE}
 base_plot <- read_rds(here("Data/Hake_map.rds"))
 base_plot +
-  geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
-  geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) +
-  geom_segment (data = Transects %>% 
-                  semi_join(By.taxa.dataset.metadata), aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
+  geom_segment (data = Transects.total, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
+  geom_text(data = Transects.total, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) +
+  geom_segment (data = Transects.used, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
   geom_point (data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
               aes(x = lon, y = lat)) +
   geom_label(data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
@@ -61,16 +76,48 @@ base_plot +
 And a cross section at one of the transects
 
 ```{r}
-CTD_profiles <- read_csv(here("Data", "1_converted","CTD_hake_data_10-2019.csv"))
 
-CTD_profiles %>% 
-  rename (CTD_Cast = `CTD Cast #`) %>% 
-  semi_join(eDNA.samples, by = "CTD_Cast") %>% 
-  filter (!is.na(CTD_Cast)) %>% 
-  group_by(CTD_Cast ) %>% 
-  summarise (mean.max.depth = mean(`EK-38kHz-DepthBelowSurface-M-VALUE`)) -> max.depth
+Ole.depth <- read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
+  
+  # separate(station, into= c("Transect", "position"), sep = "-") %>% 
+   select(Station = station , bottom.depth.consensus)# %>% 
+  # filter(!is.na(Transect)) %>% 
+  # mutate(Transect = as.numeric(Transect),
+  #        position = as.numeric(position))
+Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv")) 
+
+right_join(Ole.depth, Samples_with_thermocline) -> Sample.info
+
+Station.info <- Sample.info %>% 
+  select(Station, bottom.depth.consensus, Thermocline_depth, Thermocline_strength, lat, lon) %>% 
+  distinct %>% 
+  separate(Station, into = "Transect", convert = T, remove = F)
+  
+Sample.info %>% 
+  ggplot(aes(x = Station, y = -depth)) +
+ # geom_label (aes(label = eDNA.sample, fill = position), position = "jitter") +
+  geom_point(aes(fill = position ),shape = 21, position = "jitter") +
+  #  geom_ribbon(aes(ymin = -  bottom.depth.consensus - 20, ymax = -  bottom.depth.consensus + 20), fill = "grey70") +
+   geom_line(data = Station.info, aes(x = Station, y = -  Thermocline_depth, color = Thermocline_strength, group = Transect), size = 1.2) + 
+ # geom_ribbon(aes(ymin=0, ymax= - bottom.depdth.consensus)) +
+  facet_wrap(~reorder(Transect,desc(Transect)),  scales = "free_x", ncol = 1) +
+  viridis::scale_color_viridis()+
+  theme_minimal()+
+  theme(legend.position = "bottom")
+
 ```
 
+So we have 8 transects, and in three of them (81, 53 and 26) there is no thermocline in the stations near the coast, in other 2 there is no thermocline in the Offshore (35 and 29) while in the rest there is a strong thermocline.   
+
+### THermocline strength distribution
+
+Nothing too surprising here: stronger thermoclines are shallower than deeper ones.
+
+```{r}
+Station.info %>% 
+  ggplot(aes(Thermocline_strength)) +
+  geom_density_2d_filled(aes( y = Thermocline_depth))
+```
 
 
 ## Metadata for analysis
@@ -78,58 +125,64 @@ CTD_profiles %>%
 ### Label stations as inshore, mid and offshore
 
 ```{r}
-eDNA.samples %>% separate (Station, into = c("Transect", "position")) %>% mutate (position = as.numeric(position)) %>% 
-  #separate()
-  semi_join(By.taxa.dataset.metadata , by = c("Transect", "position")) %>% 
-  group_by(Transect) %>% 
-  mutate(Openness = case_when (position == min(position) ~ "Onshore",
-                               position == max(position) ~ "Offshore", 
-                               TRUE                      ~ "Mid")) -> Step1
-  Step1 %>% ungroup %>% 
-    dplyr::select( CTD_Cast, Openness) %>% 
-    distinct()-> Openness
-  
-    left_join(metadata.that.counts, Openness, by = "CTD_Cast")  -> metadata
 
-metadata %>% 
-  distinct()
+
+Sample.info %>%
+  separate (Station, into = c(NA, "stop"), remove = F) %>% mutate (stop = as.numeric(stop)) %>% select(eDNA.sample, everything()) %>% 
+  #separate()
+  # semi_join(By.taxa.dataset.metadata , by = c("Transect", "position" = "stop")) %>% 
+  # group_by(Transect) %>% 
+  mutate(Openness = case_when (stop == min(stop) ~ "Onshore",
+                               stop == max(stop) ~ "Offshore", 
+                               TRUE                      ~ "Mid")) -> Step1
+ 
 ```
 
-### Get the thermocline depth
+We can label each Station as "Mixed" or "Stratified" Based on Thermocline strength 
 
 ```{r}
 Step1 %>% 
-  distinct(CTD_Cast) %>% 
-  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast, ".csv"),
-                              TRUE           ~ paste0(CTD_Cast, ".csv"))) %>% pull() -> casts.to.keep
-files.inCTD <- list.files(path = here("Data","1_converted"), pattern = "*.csv")
+  distinct(Station, Thermocline_strength) %>% 
+  mutate (groups = cut_interval(Thermocline_strength, n = 3),
+          groups = case_when(groups == "[-0.00571,1.7]"~ "Mixed",
+                             TRUE ~                              "Stratified")) %>% 
+  select(-Thermocline_strength) %>% 
+  left_join(Step1,.) -> Step2
+```
 
-# are u there
+# Now to the analysis
 
-casts.to.keep %in% files.inCTD
+Get the Long table and caluclate the eDNA index
 
-# Change them to a tibble of full paths
-
-files.inCTD <- tibble (file = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
-                       full.path = list.files(path = here("Data","1_converted"), full.names = T,pattern = "*.csv")) %>% 
-  filter (file %in% casts.to.keep) %>% 
-  mutate (data = purrr::map(full.path, read_csv))
+```{r}
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxa, nReads) %>% 
+ 
+  eDNAindex(Sample_column = eDNA.sample,OTU_column = taxa, Counts_column = nReads)  %>%
+   left_join(Step2) %>% ungroup() %>% nest() %>% 
+  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         
+         mds.points = map2( bc, env,function(.x, .y){
+           monoMDS(.x) -> temp
+           
+           tibble(MDS1 = temp$points[,1],
+                  MDS2 = temp$points[,2]) -> df
+            df$eDNA.sample <- as.numeric(dimnames(temp$points)[[1]])
+            
+            df %>% 
+              left_join(.y)
+            
+           
+                  } ),
+         
+         mds.plot = map(mds.points, function(.x){
+           ggplot(.x) +
+             geom_point(aes(x = MDS1, y = MDS2, color = depth))
+         }),
+         
+          PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~ depth,data = .y, permutations = 9999) })
+         ) %>% pull(mds.plot) 
   
-files.inCTD %>% 
-  mutate (data = purrr::map (data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
-          Thermocline = map_dbl (data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermoclines2
-
-
-thermoclines2 %>% 
-  separate(file, into = "CTD_Cast") %>% 
-  mutate(CTD_Cast = as.numeric(str_remove(CTD_Cast, "^0"))) %>% 
-  dplyr::select(CTD_Cast, Thermocline) %>% 
-  right_join(metadata) %>% 
-  mutate(position = case_when(depth < Thermocline ~ "above",
-                              TRUE                ~ "below")) %>% 
-  left_join(max.depth) %>% 
-  write_csv(here("Data", "Samples_with_Thermocline.csv"))
-
-Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"))
 ```
 
