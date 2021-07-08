@@ -145,9 +145,22 @@ Step1 %>%
   distinct(Station, Thermocline_strength) %>% 
   mutate (groups = cut_interval(Thermocline_strength, n = 3),
           groups = case_when(groups == "[-0.00571,1.7]"~ "Mixed",
-                             TRUE ~                              "Stratified")) %>% 
+                             TRUE ~                      "Stratified")) %>% 
   select(-Thermocline_strength) %>% 
   left_join(Step1,.) -> Step2
+
+Step2 %>% 
+  distinct(position)
+
+## Recode position so we have three levels: Bottom, above and below
+
+Step2 %>% 
+  mutate (Distance_to_thermocline = depth - Thermocline_depth,
+          Distance_to_seafloor    = bottom.depth.consensus - depth) %>% 
+  mutate(position = case_when(Distance_to_thermocline < 0 ~ "above",
+                              Distance_to_thermocline > Distance_to_seafloor ~ "seafloor",
+                              TRUE                        ~ "below")) -> Step2
+  
 ```
 
 # Now to the analysis
@@ -159,7 +172,10 @@ By.taxa.dataset.metadata %>%
   select(eDNA.sample, rep, taxa, nReads) %>% 
  
   eDNAindex(Sample_column = eDNA.sample,OTU_column = taxa, Counts_column = nReads)  %>%
-   left_join(Step2) %>% ungroup() %>% nest() %>% 
+   left_join(Step2) %>%
+  ungroup() %>%
+  # group_by(Transect) %>% 
+  nest() %>% 
   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
          env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
          
@@ -178,11 +194,11 @@ By.taxa.dataset.metadata %>%
          
          mds.plot = map(mds.points, function(.x){
            ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = depth))
+             geom_point(aes(x = MDS1, y = MDS2, color = Station))
          }),
          
-          PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~ depth,data = .y, permutations = 9999) })
-         ) %>% pull(mds.plot) 
+          PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) })
+         ) %>% pull(PERMANOVA) 
   
 ```
 

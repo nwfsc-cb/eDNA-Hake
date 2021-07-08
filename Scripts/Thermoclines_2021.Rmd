@@ -60,6 +60,8 @@ files.inCTD %>%
 
 thermoclines2 %>% write_rds(here("Data", "Casts.with.thermoclines.rds"))
 
+thermoclines2 <- read_rds(here("Data", "Casts.with.thermoclines.rds"))
+
 thermoclines2 %>% 
   mutate (Tempdiff = map2_dbl(data, Thermocline, function(.x,.y){
     .x %>%
@@ -89,3 +91,18 @@ thermoclines2 %>%
 
 Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"))
 ```
+
+
+## Genrerate a few plots of Temp, Chla and salinity profiles
+
+```{r}
+thermoclines2 %>% 
+  slice (1:10) %>% unnest(data) %>% 
+   select(Depth = `Depth (m)`, Temperature = `Temperature (degC)`, Salinity = `Salinity (psu)`, Chla = `Fluorescence (ug_per_l)`, O2 = `Oxygen (ml_per_l)`) %>% 
+  pivot_longer (cols = -Depth, names_to = "Variable", values_to = "value") %>% 
+  ggplot (aes (y = Depth, x = value), color = "red") +
+  geom_line() +
+    scale_y_reverse() +
+  facet_wrap(~Variable, scales = "free_x", nrow = 1)
+```
+
