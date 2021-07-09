@@ -81,7 +81,8 @@ thermoclines2 %>%
     
   })) %>% 
   separate(file, into = "CTD_Cast") %>% 
-  mutate(CTD_Cast = as.numeric(str_remove(CTD_Cast, "^0"))) %>% 
+  mutate(CTD_Cast = as.numeric(str_remove(CTD_Cast, "^0")))->thermoclines2
+thermoclines2 %>% 
   dplyr::select(CTD_Cast, Thermocline_depth = Thermocline, Thermocline_strength = Tempdiff) %>% 
   right_join(eDNA.samples.used, by = "CTD_Cast") %>% 
   mutate(position = case_when(depth < Thermocline_depth ~ "above",
@@ -97,12 +98,14 @@ Samples_with_thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"
 
 ```{r}
 thermoclines2 %>% 
-  slice (1:10) %>% unnest(data) %>% 
-   select(Depth = `Depth (m)`, Temperature = `Temperature (degC)`, Salinity = `Salinity (psu)`, Chla = `Fluorescence (ug_per_l)`, O2 = `Oxygen (ml_per_l)`) %>% 
-  pivot_longer (cols = -Depth, names_to = "Variable", values_to = "value") %>% 
-  ggplot (aes (y = Depth, x = value), color = "red") +
-  geom_line() +
+  filter (Thermocline > 6) %>% 
+  arrange(Tempdiff) %>% 
+  slice(c(1:2,18:19)) %>% unnest(data) %>% 
+   select(Depth = `Depth (m)`, Temperature = `Temperature (degC)`, Salinity = `Salinity (psu)`, Chla = `Fluorescence (ug_per_l)`, O2 = `Oxygen (ml_per_l)`, CTD_Cast) %>% 
+  pivot_longer (cols = c(-Depth, -CTD_Cast), names_to = "Variable", values_to = "value") %>% 
+  ggplot (aes (y = Depth, x = value)) +
+  geom_line(aes(color =CTD_Cast)) +
     scale_y_reverse() +
-  facet_wrap(~Variable, scales = "free_x", nrow = 1)
+  facet_grid(CTD_Cast~Variable, scales = "free")
 ```
 

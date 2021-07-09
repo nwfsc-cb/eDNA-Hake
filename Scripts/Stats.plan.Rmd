@@ -160,7 +160,9 @@ Step2 %>%
   mutate(position = case_when(Distance_to_thermocline < 0 ~ "above",
                               Distance_to_thermocline > Distance_to_seafloor ~ "seafloor",
                               TRUE                        ~ "below")) -> Step2
-  
+
+
+Step2 %>% write_csv(here("Data", "Final_metadata.csv"))
 ```
 
 # Now to the analysis
