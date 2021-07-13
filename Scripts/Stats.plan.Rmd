@@ -20,8 +20,39 @@ library (tidyverse)
 library(here)
 library(eDNAfuns)
 library(vegan)
+library (patchwork)
+```
 
-By.taxa.dataset.metadata <- read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+## Combine 
+## Combine Miseq runs with classification
+```{r}
+ASV.after.cleanup <- read_csv(here("Output","ASV_table_all_together.csv"))
+Hashs.classified <- read_csv(here("Data","Pipeline_output","Run8","output","hash.classified.csv")) %>% 
+  bind_rows(read_csv(here("Data","Pipeline_output","Run7","output_no_MaxEE","hash.classified.csv"))) %>% 
+  distinct()
+Hashs.classified %>% 
+  group_by(representative) %>% 
+  tally(sort = T)
+
+ASV.after.cleanup %>% 
+  anti_join(Hashs.classified, by = c("Hash" = "representative")) # All Hashes classified
+
+ASV.after.cleanup %>% 
+  left_join(Hashs.classified, by = c("Hash" = "representative")) %>% 
+  unite(family, genus, species, col = "taxon", sep = "%" ) %>% 
+  #select (Miseq_run, Sample_name, nReads, taxon) %>% 
+  group_by(Sample_name, taxon) %>% 
+  summarise(nReads = sum(nReads)) %>% 
+  ungroup() %>% 
+  filter (taxon != "NA%NA%NA") %>% 
+  separate (Sample_name, into = c("eDNA.sample", "rep"), convert = T) -> By.taxa.dataset.metadata
+
+# By.taxa.dataset.metadata %>% write_csv(here("Data", "by.taxa.dataset.metadata.csv"))
+
+```
+
+```{r}
+# By.taxa.dataset.metadata <- read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
 
 eDNA.samples <- read_csv(here("Data","cleaned_CTD_stations.csv"))
 
@@ -167,7 +198,7 @@ Step2 %>% write_csv(here("Data", "Final_metadata.csv"))
 
 # Now to the analysis
 
-Get the Long table and caluclate the eDNA index
+Get the Long table and calculate the eDNA index
 
 ```{r}
 By.taxa.dataset.metadata %>% 
@@ -202,5 +233,130 @@ By.taxa.dataset.metadata %>%
           PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) })
          ) %>% pull(PERMANOVA) 
   
+```
+
+
+### Exploratory analysis
+
+```{r}
+
+final.metadata <- read_csv(here("Data", "Final_metadata.csv"))
+By.taxa.dataset.metadata %>%
+  distinct() %>% 
+  group_by(eDNA.sample) %>% #mutate(nReads = sum(nReads), prevalence = )
+  left_join(final.metadata) %>% 
+  group_by(Station, depth) %>% 
+  mutate (nsam = n_distinct(eDNA.sample, rep)) %>% 
+  group_by(Station, depth, taxon, lat, lon, Transect) %>% 
+  summarise(nReads = sum(nReads),
+            prevalence = n()/nsam) %>% distinct() %>% ungroup() -> for.explanatory.plots
+for.explanatory.plots %>% distinct(taxon)
+for.explanatory.plots %>% 
+  filter (str_detect(taxon, "Merlu"))
+
+for.explanatory.plots %>% 
+  group_by(taxon) %>% 
+  summarise(median.lat  = median(lat),
+            ave.depth = mean (depth),
+            n_samples = n_distinct(Station, depth)) -> sum.stats
+
+sum.stats %>% 
+  arrange(ave.depth) %>% 
+  filter (n_samples >10)
+```
+
+```{r taxa.plotter}
+taxa.plotter <- function (df, taxa){
+  left.plot <- base_plot +
+    geom_point (data = df %>% filter (str_detect(taxon, taxa)),
+                aes(x = lon, y = lat, size = prevalence, color = nReads)) +
+    viridis::scale_color_viridis()
+  
+  
+  right.plot <- Sample.info %>% 
+  ggplot(aes(x = Station, y = -depth)) +
+ # geom_label (aes(label = eDNA.sample, fill = position), position = "jitter") +
+  geom_point(aes(fill = position ),shape = 21, position = "jitter") +
+    geom_point(data = df %>% filter (str_detect(taxon, taxa)),
+               aes(x = Station, y = -depth, size = prevalence, color = nReads)) +
+    facet_wrap(~reorder(Transect,desc(Transect)),  scales = "free_x", ncol = 1) +
+  viridis::scale_color_viridis()+
+  theme_minimal()
+   left.plot + right.plot +
+     plot_annotation(title = taxa) +
+     plot_layout(guides = "collect")
+}
+```
+
+```{r, warning=F, message=F}
+for.explanatory.plots %>% 
+  taxa.plotter("Merluccius%NA")
+```
+
+Head to head plots
+
+```{r comparing plots}
+
+head.2.head <- function (df, taxa1, taxa2 = NULL, ... ){
+ if(is.null(taxa2)){
+   query <- taxa1 }else{
+   query <-base::paste(taxa1,taxa2, sep = "|") }
+#  return(query)
+   one_plot <- base_plot +
+    geom_point (data = df %>% filter (str_detect(taxon, query)),
+                aes(x = lon, y = lat, size = prevalence, color = nReads)) +
+    viridis::scale_color_viridis() +
+     facet_wrap(~taxon, nrow = 1)
+   
+   other_plot <-  df %>% 
+     distinct(Station, depth) %>% 
+     # filter (str_detect(taxon, query)) %>% 
+     ggplot (aes(x = depth)) +
+     geom_density(fill = "grey")+
+       geom_density(data = df %>% filter (str_detect(taxon, query)),
+                    aes(x = depth, fill = taxon),
+                     alpha = 0.5) #+
+    # facet_wrap(~taxon, nrow  = 1)
+   
+   one_plot +
+     other_plot +
+     plot_layout(ncol = 1)
+}
+
+
+# with two qqueries
+for.explanatory.plots %>% 
+head.2.head("Clupea pallasii", "Trachurus symmetricus")
+# with one query, but two or three taxon
+for.explanatory.plots %>% 
+  head.2.head(taxa1 = "Merluccius")
+# with all three cases
+for.explanatory.plots %>% 
+  head.2.head(taxa1 = "Myctophidae")
+```
+
+```{r}
+library(ggExtra)
+base_plot +
+    geom_point (data = for.explanatory.plots %>% filter (str_detect(taxon, "Clupea pallasii|Trachurus symmetricus")),
+                aes(x = lon, y = lat, size = prevalence, color = nReads)) +
+ 
+    viridis::scale_color_viridis() +
+ #    facet_wrap(~taxon, nrow = 1)+
+  theme(legend.position = "bottom") -> main.pot 
+
+  ggMarginal(main.pot,
+             data = for.explanatory.plots %>% filter (str_detect(taxon, "Clupea pallasii|Trachurus symmetricus")), 
+             y = lat, x = lon,
+             type = "densigram", 
+             margins = "y"
+  )
+  
+  for.explanatory.plots %>% filter (str_detect(taxon, "Clupea pallasii|Trachurus symmetricus")) %>% 
+    ggplot (aes(x = lat, fill = taxon)) + ge
+```
+
+```{r}
+
 ```
 

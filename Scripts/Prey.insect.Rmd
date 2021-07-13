@@ -76,10 +76,6 @@ if(!is.na(params$previous) ){
 ```
 
 
-```{r}
-
-```
-
 
 
 
