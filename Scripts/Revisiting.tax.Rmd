@@ -1,0 +1,200 @@
+---
+title: "By group"
+author: "Ramon Gallego"
+date: "7/15/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Plan
+
+Let's get an idea of the ASVs by family
+```{r cars}
+library (tidyverse)
+library (here)
+library (ape)
+library (insect)
+
+```
+
+## Get data
+
+Load the hash_key, the classified hashes & ASV
+
+```{r pressure, echo=FALSE}
+
+ASV.table <- read_csv(here ("Output","ASV_table_all_together.csv"))
+
+Classification <- read_csv(here("Data", "Final_classification.csv"))
+
+Sequences <- readFASTA(here("Output","Hash_Key_all_together.fasta"))
+
+Seqs <- read_csv(here("Output","Hash_Key_all_together.csv"))
+
+```
+
+## Does Swarm solve the issue?
+
+```{r}
+ASV.table %>% 
+  group_by(Hash) %>% 
+  summarise(nReads = sum(nReads)) -> size
+
+size %>% 
+  mutate(label = paste0(Hash, ";size=", nReads)) -> size
+
+left_join(Seqs, size) -> for.swarm
+
+seqinr::write.fasta(sequences = as.list (for.swarm$Sequence),
+                    names = as.list(for.swarm$label),
+                    file.out = here("Output", "swarm.input.fasta"))
+
+```
+
+Run Swarm. Do it directly on the terminal bc it does not find it from RStudio
+
+<!-- ```{bash} -->
+
+<!-- bash /Users/ramon.gallegosimon/Projects/banzai/scripts/OTU_clustering/cluster_swarm.sh \ -->
+<!--  /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/swarm.input.fasta -->
+
+<!-- ``` -->
+
+
+Load the conversion table and the classification summary
+
+```{r}
+Swarm.conversion <- read_csv(here("Output", "OTUs_swarm","dups_to_otus.csv")) %>% 
+  separate(Query, into = "Hash")
+  
+n_distinct(Swarm.conversion$Match)
+
+```
+```{r combine}
+
+Combine.clas <- left_join(Classification, Swarm.conversion) %>% 
+  separate(Match, into = "New.Hash") %>% 
+  filter (Hash == New.Hash) 
+
+Swarm.conversion %>% 
+  separate(Match, into = "New.Hash") %>% 
+  left_join(Classification, by = c("New.Hash" = "Hash")) -> new.Classification
+
+new.Classification %>% 
+  select(-New.Hash) %>% 
+  write_csv(here("Output", "Hashes.classified.swarm.csv"))
+
+
+Combine.clas %>%  group_by(origin, is.na(species)) %>% 
+  tally(sort = T)
+Classification %>% group_by(origin, is.na(species)) %>% 
+  tally(sort = T)
+
+
+  
+```
+
+## Measuring success.
+
+For each ASV, record prevalence and nReads. Then see the effect of swarm in getting more or less species-level ids
+
+```{r}
+ASV.table %>% 
+  group_by(Hash) %>% 
+  summarise (n = n_distinct(Sample_name),
+             nReads = sum(nReads)) -> summary
+
+Classification.success <- function (ASVsummary, key){
+  
+  left_join(ASVsummary, key) %>% 
+    group_by(`Species-level` = !is.na(species)) %>% 
+    summarise (nReads = sum(nReads),
+               nASVs = n(), 
+               nspp = n_distinct(species)
+    )
+}
+
+Classification.success(summary,Classification )
+
+Classification.success(summary, new.Classification)
+
+```
+
+Using swarm:
+
+ - Reduces the number of reads and ASVs not classified to species level
+ - Reduces the number of distinct species seen
+ 
+```{r}
+left_join(summary, Classification) %>% 
+  distinct(species) %>% 
+  anti_join(
+    
+    left_join(summary, new.Classification)
+  )
+```
+ 
+Particularly within Seabastes, where the interspecies distances are really small
+
+# Hakes
+
+```{r}
+left_join(ASV.table, new.Classification) %>% 
+  filter (str_detect(family, "Merlucc")) %>% 
+  group_by(species ) %>% 
+  summarise(n_distinct(Hash),
+            sum(nReads),
+            n_distinct(Sample_name))
+```
+
+```{r}
+left_join(ASV.table, Classification) %>% 
+  filter (str_detect(family, "Merlucc")) %>% 
+  group_by(species ) %>% 
+  summarise(n_distinct(Hash),
+            sum(nReads),
+            n_distinct(Sample_name))
+```
+
+So, of the 4 ASVs identified only to genus, 1 went to the M productus cluster, the other 3 to the productus-angustimanus
+
+## Group by family, generate heatmaps
+
+```{r}
+names(Sequences) == Seqs$Hash
+?split
+left_join(Seqs, new.Classification) %>% 
+  pull(family) -> fams
+
+split(Sequences, fams) ->by.fam
+
+
+dna.dist.possible <- possibly(dist.dna, otherwise = NA)
+map(by.fam, dna.dist.possible, model = "N", pairwise.deletion = T, as.matrix = T) %>% 
+  map(reshape2::melt, value.name = "dissimilarities") ->list.of.dfs
+  
+list.of.dfs %>% 
+  compact() %>% 
+  # map(~.x %>% mutate (dissimilarities = case_when(is.character(dissimilarities)~ "200", 
+  #                               TRUE                         ~ dissimilarities))) %>% 
+  bind_rows(.id = "family") %>% 
+  filter (!is.na(Var1)) %>% 
+  ggplot(aes(x = Var1, y = Var2, fill = dissimilarities>1)) +
+  geom_raster() +
+  scale_fill_viridis_d()+
+  theme(axis.text = element_blank()) +
+  facet_wrap(~family, scales = "free")
+  
+list.of.dfs %>% 
+  compact() %>% 
+  # map(~.x %>% mutate (dissimilarities = case_when(is.character(dissimilarities)~ "200", 
+  #                               TRUE                         ~ dissimilarities))) %>% 
+  bind_rows(.id = "family") %>% 
+  filter (!is.na(Var1)) %>% 
+  ggplot(aes(x = dissimilarities)) +
+  geom_histogram()
+```
+

@@ -27,27 +27,32 @@ library (patchwork)
 ## Combine Miseq runs with classification
 ```{r}
 ASV.after.cleanup <- read_csv(here("Output","ASV_table_all_together.csv"))
-Hashs.classified <- read_csv(here("Data","Pipeline_output","Run8","output","hash.classified.csv")) %>% 
-  bind_rows(read_csv(here("Data","Pipeline_output","Run7","output_no_MaxEE","hash.classified.csv"))) %>% 
-  distinct()
-Hashs.classified %>% 
-  group_by(representative) %>% 
-  tally(sort = T)
+Hashs.classified <- read_csv(here("Data","Final_classification.csv"))
+
 
 ASV.after.cleanup %>% 
-  anti_join(Hashs.classified, by = c("Hash" = "representative")) # All Hashes classified
+  anti_join(Hashs.classified, by = "Hash" ) %>% 
+  summarise (n_distinct(Hash), 
+             sum(nReads))# 108 Hashes not classified, 54k reads thrown
+
+
 
 ASV.after.cleanup %>% 
-  left_join(Hashs.classified, by = c("Hash" = "representative")) %>% 
+  inner_join(Hashs.classified, by = "Hash" ) %>% 
   unite(family, genus, species, col = "taxon", sep = "%" ) %>% 
   #select (Miseq_run, Sample_name, nReads, taxon) %>% 
-  group_by(Sample_name, taxon) %>% 
+  group_by(Sample_name, class, order, taxon) %>% 
   summarise(nReads = sum(nReads)) %>% 
   ungroup() %>% 
   filter (taxon != "NA%NA%NA") %>% 
-  separate (Sample_name, into = c("eDNA.sample", "rep"), convert = T) -> By.taxa.dataset.metadata
+  separate (Sample_name, into = c("eDNA.sample", "rep"), convert = T) -> By.taxa.dataset
 
-# By.taxa.dataset.metadata %>% write_csv(here("Data", "by.taxa.dataset.metadata.csv"))
+base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
+
+By.taxa.dataset %>% 
+  left_join(base.eDNA) %>% write_csv(here("Output", "by.taxa.dataset.metadata.csv"))
+
+By.taxa.dataset.metadata <- read_csv(here("Output", "by.taxa.dataset.metadata.csv"))
 
 ```
 
@@ -56,7 +61,7 @@ ASV.after.cleanup %>%
 
 eDNA.samples <- read_csv(here("Data","cleaned_CTD_stations.csv"))
 
-base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
+# base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
 
 base.eDNA %>% distinct(depth)
 
@@ -106,7 +111,7 @@ base_plot +
 
 And a cross section at one of the transects
 
-```{r}
+```{r, warning=F}
 
 Ole.depth <- read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
   
@@ -194,6 +199,7 @@ Step2 %>%
 
 
 Step2 %>% write_csv(here("Data", "Final_metadata.csv"))
+Step2 <- read_csv(here("Data", "Final_metadata.csv"))
 ```
 
 # Now to the analysis
@@ -201,39 +207,116 @@ Step2 %>% write_csv(here("Data", "Final_metadata.csv"))
 Get the Long table and calculate the eDNA index
 
 ```{r}
-By.taxa.dataset.metadata %>% 
-  select(eDNA.sample, rep, taxa, nReads) %>% 
- 
-  eDNAindex(Sample_column = eDNA.sample,OTU_column = taxa, Counts_column = nReads)  %>%
-   left_join(Step2) %>%
-  ungroup() %>%
-  # group_by(Transect) %>% 
-  nest() %>% 
-  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
-         env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
-         
-         mds.points = map2( bc, env,function(.x, .y){
-           monoMDS(.x) -> temp
+MDS_function <- function(.x, .y){
+           monoMDS(.x,k = 3) -> temp
            
            tibble(MDS1 = temp$points[,1],
-                  MDS2 = temp$points[,2]) -> df
+                  MDS2 = temp$points[,2],
+                  MDS3 = temp$points[,3]) -> df
             df$eDNA.sample <- as.numeric(dimnames(temp$points)[[1]])
             
             df %>% 
               left_join(.y)
             
            
-                  } ),
+                  }
+
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+ 
+  eDNAindex(Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads)  %>%
+   left_join(Step2) -> Joined.dataset
+  
+Joined.dataset %>% 
+ungroup() %>%
+  # group_by(Transect) %>% 
+  nest() %>% 
+  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxon, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         
+         mds.points = map2( bc, env, MDS_function),
+         mds.pa = map2(jc, env, MDS_function), 
          
          mds.plot = map(mds.points, function(.x){
            ggplot(.x) +
              geom_point(aes(x = MDS1, y = MDS2, color = Station))
          }),
          
-          PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) })
-         ) %>% pull(PERMANOVA) 
+         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) }),
+         CAP_lat = map2(bc, env, function(.x,.y ){
+           
+           capscale(.x~lat,data = .y)
+         })
+         
+        
+         # CAP_lat = map2(Wide, env, function(.x,.y){
+         #   BiodiversityR::CAPdiscrim(formula = .x ~ Transect,dist = "bray",
+         #                             data = .y,
+         #                             permutations = 999)
+         #   
+         # })
+         ) -> First.analysis
   
 ```
+```{r, message= F, warning=F}
+First.analysis %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  geom_point(aes(color = position)) +
+  geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = #glue::glue(Station, depth, .sep = "-")
+                                               eDNA.sample))
+```
+## Same disticntiviness by PA
+
+```{r}
+First.analysis %>% 
+  select(mds.pa) %>% 
+  unnest() %>% 
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  geom_point(aes(color = position)) +
+  geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = glue::glue(Station, depth, .sep = "-")))
+```
+
+#### WHat's the deal with 60-4-50
+
+```{r}
+Joined.dataset %>% 
+  filter (eDNA.sample != "978") %>% 
+  ungroup() %>%
+  # group_by(Transect) %>% 
+  nest() %>% 
+  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxon, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         
+         mds.points = map2( bc, env, MDS_function),
+         mds.pa = map2(jc, env, MDS_function), 
+         
+         mds.plot = map(mds.points, function(.x){
+           ggplot(.x) +
+             geom_point(aes(x = MDS1, y = MDS2, color = Station))
+         }),
+         
+         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) }),
+         CAP_lat = map2(bc, env, function(.x,.y ){
+           
+           capscale(.x~lat,data = .y)
+         })
+         
+        
+         # CAP_lat = map2(Wide, env, function(.x,.y){
+         #   BiodiversityR::CAPdiscrim(formula = .x ~ Transect,dist = "bray",
+         #                             data = .y,
+         #                             permutations = 999)
+         #   
+         # })
+         ) -> Second.analysis
+```
+
+
+
 
 
 ### Exploratory analysis
@@ -241,7 +324,7 @@ By.taxa.dataset.metadata %>%
 ```{r}
 
 final.metadata <- read_csv(here("Data", "Final_metadata.csv"))
-By.taxa.dataset.metadata %>%
+By.taxa.dataset %>%
   distinct() %>% 
   group_by(eDNA.sample) %>% #mutate(nReads = sum(nReads), prevalence = )
   left_join(final.metadata) %>% 
@@ -250,6 +333,12 @@ By.taxa.dataset.metadata %>%
   group_by(Station, depth, taxon, lat, lon, Transect) %>% 
   summarise(nReads = sum(nReads),
             prevalence = n()/nsam) %>% distinct() %>% ungroup() -> for.explanatory.plots
+
+for.explanatory.plots %>% 
+  separate(taxon, into = c("family", "genus", "species"), sep = "%", remove = F) %>% 
+  mutate(label = case_when((species == "NA" & genus == "NA") ~ paste0(family, " sp."),
+                           species == "NA" ~  paste0(genus, " sp."),
+                           TRUE            ~ species)) -> for.explanatory.plots
 for.explanatory.plots %>% distinct(taxon)
 for.explanatory.plots %>% 
   filter (str_detect(taxon, "Merlu"))
@@ -274,12 +363,16 @@ taxa.plotter <- function (df, taxa){
   
   
   right.plot <- Sample.info %>% 
-  ggplot(aes(x = Station, y = -depth)) +
+  #ggplot(aes(x = Station, y = -depth)) +
+    ggplot()+
+    
+    ggridges::geom_density_ridges_gradient(data = df %>% filter (str_detect(taxon, taxa)),
+                                  aes(x =depth, y =Transect, group = Transect)) +
  # geom_label (aes(label = eDNA.sample, fill = position), position = "jitter") +
-  geom_point(aes(fill = position ),shape = 21, position = "jitter") +
-    geom_point(data = df %>% filter (str_detect(taxon, taxa)),
-               aes(x = Station, y = -depth, size = prevalence, color = nReads)) +
-    facet_wrap(~reorder(Transect,desc(Transect)),  scales = "free_x", ncol = 1) +
+  # geom_point(aes(fill = position ),shape = 21, position = "jitter") +
+  #   geom_point(data = df %>% filter (str_detect(taxon, taxa)),
+  #              aes(x = Station, y = -depth, size = prevalence, color = nReads)) +
+  #   facet_wrap(~reorder(Transect,ddsc(Transect)),  scales = "free_x", ncol = 1) +
   viridis::scale_color_viridis()+
   theme_minimal()
    left.plot + right.plot +
@@ -290,12 +383,12 @@ taxa.plotter <- function (df, taxa){
 
 ```{r, warning=F, message=F}
 for.explanatory.plots %>% 
-  taxa.plotter("Merluccius%NA")
+  taxa.plotter("Merluccius")
 ```
 
 Head to head plots
 
-```{r comparing plots}
+```{r comparing plots, message=F}
 
 head.2.head <- function (df, taxa1, taxa2 = NULL, ... ){
  if(is.null(taxa2)){
@@ -306,7 +399,7 @@ head.2.head <- function (df, taxa1, taxa2 = NULL, ... ){
     geom_point (data = df %>% filter (str_detect(taxon, query)),
                 aes(x = lon, y = lat, size = prevalence, color = nReads)) +
     viridis::scale_color_viridis() +
-     facet_wrap(~taxon, nrow = 1)
+     facet_wrap(~label, nrow = 1)
    
    other_plot <-  df %>% 
      distinct(Station, depth) %>% 
@@ -314,13 +407,13 @@ head.2.head <- function (df, taxa1, taxa2 = NULL, ... ){
      ggplot (aes(x = depth)) +
      geom_density(fill = "grey")+
        geom_density(data = df %>% filter (str_detect(taxon, query)),
-                    aes(x = depth, fill = taxon),
+                    aes(x = depth, fill = label),
                      alpha = 0.5) #+
     # facet_wrap(~taxon, nrow  = 1)
    
    one_plot +
      other_plot +
-     plot_layout(ncol = 1)
+     plot_layout(nrow = 1, guides = "collect") 
 }
 
 
@@ -329,7 +422,7 @@ for.explanatory.plots %>%
 head.2.head("Clupea pallasii", "Trachurus symmetricus")
 # with one query, but two or three taxon
 for.explanatory.plots %>% 
-  head.2.head(taxa1 = "Merluccius")
+  head.2.head(taxa1 = "Merluccius productus", taxa2 = "Clupea pallasii")
 # with all three cases
 for.explanatory.plots %>% 
   head.2.head(taxa1 = "Myctophidae")
@@ -355,8 +448,90 @@ base_plot +
   for.explanatory.plots %>% filter (str_detect(taxon, "Clupea pallasii|Trachurus symmetricus")) %>% 
     ggplot (aes(x = lat, fill = taxon)) + ge
 ```
+## Each transect indepenpendently
+
+If we nest the design by transect, then can we see a clear separation between bottom samples and the rest?
+
 
 ```{r}
+Second.analysis %>% 
+  mutate(by.transect.PERMANOVA = map2(bc, env, function(.x, .y){
+    perms <- how(nperm = 999)
+    setBlocks(perms) <- with(.y, Transect)
+    adonis2(formula = .x ~  position,data = .y, permutations = perms) })) %>% pull()
+  
+```
+```{r}
+First.analysis %>% pull(PERMANOVA)
+Second.analysis %>% pull(PERMANOVA)
+```
 
+```{r}
+library(gganimate)
+
+Second.analysis %>% 
+  select(mds.points) %>% 
+  unnest() -> df 
+
+df %>% 
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  geom_point(aes(color = position)) +
+  scale_color_brewer(palette = "Purples")-> p
+ # geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = glue::glue(Station, depth, .sep = "-")))   + 
+  # Here comes the gganimate code
+ p+ transition_states(
+    Transect,
+   transition_length = 2,
+   state_length = 4
+  ) +
+  labs (title = 'Transect: {closest_state}') +
+  enter_fade() + 
+  exit_shrink() +
+  ease_aes('sine-in-out') -> right_gif
+ 
+right_gif <- animate(right_gif,
+                     nframes = 80,
+                     width = 4,
+                     height = 4, units ="in", res = 200, 
+                     renderer = magick_renderer())
+anim_save("right.gif", right_gif)
+```
+
+```{r}
+base_plot +
+    geom_point (data = df ,
+                aes(x = lon, y = lat,
+                color = position),
+                position = "jitter") +
+  scale_color_brewer(palette = "Purples") -> q
+
+q + transition_states(
+    Transect,
+   transition_length = 2,
+   state_length = 4
+  ) +
+  labs (title = 'Transect: {closest_state}') +
+  enter_fade() + 
+  exit_shrink() +
+  ease_aes('sine-in-out')  -> left.plot
+
+left_gif <- animate(left.plot,
+                     nframes = 80,
+                     width = 4,
+                     height = 4, units ="in", res = 200, 
+                     renderer = magick_renderer())
+
+anim_save("left.gif", left_gif)
+```
+
+```{r}
+new.gif <- magick::image_append(c(left_gif[1], right_gif[1]))
+for (i in 2:80){
+  combined <- magick::image_append(c(left_gif[i], right_gif[i]))
+  new.gif <- c(new.gif, combined)
+}
+```
+```{r}
+anim_save("new.gif", new.gif)
 ```
 

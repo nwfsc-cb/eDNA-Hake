@@ -1,0 +1,145 @@
+---
+title: "Comparing BLAST search and insect"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library (tidyverse)
+library (seqinr)
+library (here)
+```
+
+Load both outputs. 
+
+```{r}
+insect.results <- read_csv(here("Output","All.hash.classified.csv")) %>% 
+  filter (!is.na(class)) %>% 
+  # unite (family, genus, species, col = "taxa", sep = "%") %>% 
+  # separate(taxa, into = c("family", "genus", "species"), sep = "%") %>%
+  select(Hash = representative,  class, order, family, genus, species) %>% 
+  
+  pivot_longer(-Hash, names_to = "rank", values_to = "value") %>% 
+  replace_na(list(value = "NA"))
+
+blast.results <- read_csv(here("Output", "Hash_classified_BLAST.csv")) %>% 
+  filter (!is.na(class)) %>% 
+  select(-phylum) %>% 
+  separate(taxa, into = c("family", "genus", "species"), sep = "%") %>% 
+  pivot_longer(-Hash, names_to = "rank", values_to = "value") %>% 
+  replace_na(list(value = "NA"))
+
+blast.results %>% filter(rank == "phylum") %>% distinct(value)
+insect.results %>% filter (rank == "species") %>% distinct(value)
+full_join(insect.results, blast.results, by = c("Hash",
+                                                "rank"), suffix = c(".insect", ".blast")) %>% 
+  #filter(value.blast==value.insect) %>% 
+  group_by(rank, check =value.blast!=value.insect) %>% nest %>% 
+  ungroup() %>% 
+  filter (is.na(check)) %>% 
+  unnest(data) %>% distinct(Hash) %>% 
+  semi_join(insect.results,.)
+
+# The difference is in that there are Hashes that the BLAST did not return anything
+
+## So we will keep only Hashes for which we have at least class information
+
+full_join(insect.results, blast.results, by = c("Hash",
+                                                "rank"), suffix = c(".insect", ".blast")) %>% 
+  pivot_longer(cols = starts_with("value"), names_to = "origin", names_prefix = "value.", values_to = "taxa") %>% 
+ # mutate (agreement = value.blast==value.insect) %>% 
+  pivot_wider(names_from = rank,
+              values_from = taxa) -> All.ids
+  
+All.ids  %>% 
+  #slice (1:10) %>% 
+  group_by(Hash) %>% 
+  nest() %>% 
+  
+  mutate(consensus = map2_df(data,Hash,  function(.x,.y){
+    .x %>% 
+      select(-origin) %>% 
+      condenseTaxa()  %>%  
+      as_tibble() %>% 
+      mutate(Hash = .y)
+      
+  })) %>% pull(consensus) -> agreed.dataset
+
+agreed.dataset %>% 
+  select(Hash, everything()) %>% 
+  filter (!is.na(species) & species != "NA")-> agreed.dataset
+
+All.ids %>% 
+  anti_join(agreed.dataset, by = "Hash") %>% 
+  filter (species != "NA") -> one.only
+  
+All.ids %>% 
+  anti_join(agreed.dataset, by = "Hash") %>% 
+  anti_join(one.only, by = "Hash") %>%
+  group_by(Hash) %>% 
+  nest() %>% 
+  
+  mutate(consensus = map2_df(data,Hash,  function(.x,.y){
+    .x %>% 
+      select(-origin) %>% 
+      condenseTaxa()  %>%  
+      as_tibble() %>% 
+      mutate(Hash = .y)
+      
+  })) %>% pull(consensus) -> whatleft
+
+whatleft %>% 
+   select(Hash, everything()) %>% 
+  filter (!is.na(genus) & genus != "NA")-> agreed.dataset.genus
+
+bind_rows(agreed.dataset, agreed.dataset.genus) -> agreed.dataset
+
+All.ids %>% 
+  anti_join(agreed.dataset, by = "Hash") %>% 
+  anti_join(one.only, by = "Hash") %>% 
+  filter (genus != "NA") %>% 
+  bind_rows(one.only)-> one.only
+
+
+
+
+All.ids %>% 
+  anti_join(agreed.dataset, by = "Hash") %>% 
+  anti_join(one.only, by = "Hash") %>%
+  group_by(Hash) %>% 
+  nest() %>% 
+  
+  mutate(consensus = map2_df(data,Hash,  function(.x,.y){
+    .x %>% 
+      select(-origin) %>% 
+      condenseTaxa()  %>%  
+      as_tibble() %>% 
+      mutate(Hash = .y)
+      
+  })) %>% pull(consensus) -> whatleft
+
+whatleft %>% 
+   select(Hash, everything()) %>% 
+  filter (!is.na(family) & genus != "family")-> agreed.dataset.fam
+bind_rows(agreed.dataset, agreed.dataset.fam) -> agreed.dataset
+
+All.ids %>% 
+  anti_join(agreed.dataset, by = "Hash") %>% 
+  anti_join(one.only, by = "Hash") %>% 
+  filter (family != "NA") %>% 
+  bind_rows(one.only)-> one.only
+
+agreed.dataset %>% 
+  mutate(origin = "agreed") %>% 
+  bind_rows(one.only) -> classified
+  
+All.ids %>%
+  anti_join(classified, by = "Hash")
+
+classified %>% 
+  write_csv(here("Output", "Final_classification.csv"))
+```
+
