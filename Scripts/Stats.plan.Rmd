@@ -535,3 +535,11 @@ for (i in 2:80){
 anim_save("new.gif", new.gif)
 ```
 
+## Are there any species that identify deep water samples?
+
+```{r}
+Joined.dataset %>% 
+  filter(eDNA.sample != "978") %>% 
+  ungroup()
+```
+
