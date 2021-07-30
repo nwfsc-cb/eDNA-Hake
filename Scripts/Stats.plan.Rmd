@@ -100,13 +100,19 @@ eDNA.samples %>%
 ```{r, warning=FALSE}
 base_plot <- read_rds(here("Data/Hake_map.rds"))
 base_plot +
-  geom_segment (data = Transects.total, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
-  geom_text(data = Transects.total, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) +
+  # geom_segment (data = Transects.total, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
+  # geom_text(data = Transects.total, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) +
   geom_segment (data = Transects.used, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
   geom_point (data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
-              aes(x = lon, y = lat)) +
-  geom_label(data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
-              aes(x = lon, y = lat, label = position))
+              aes(x = lon, y = lat), color = "white") +
+  # geom_label(data = By.taxa.dataset.metadata %>% distinct(Transect, position, lat, lon), 
+  #             aes(x = lon, y = lat, label = position))
+  geom_label(data = By.taxa.dataset.metadata %>%
+               group_by (Transect) %>%
+               summarise (lat = max(lat),
+                          lon = min(lon) - 1), 
+              aes(x = lon, y = lat, label = Transect)) ->p 
+  write_rds(p, here("Data/Hake_map_transects.rds"))
 ```
 
 And a cross section at one of the transects
@@ -322,7 +328,6 @@ Joined.dataset %>%
 ### Exploratory analysis
 
 ```{r}
-
 final.metadata <- read_csv(here("Data", "Final_metadata.csv"))
 By.taxa.dataset %>%
   distinct() %>% 
@@ -334,11 +339,6 @@ By.taxa.dataset %>%
   summarise(nReads = sum(nReads),
             prevalence = n()/nsam) %>% distinct() %>% ungroup() -> for.explanatory.plots
 
-for.explanatory.plots %>% 
-  separate(taxon, into = c("family", "genus", "species"), sep = "%", remove = F) %>% 
-  mutate(label = case_when((species == "NA" & genus == "NA") ~ paste0(family, " sp."),
-                           species == "NA" ~  paste0(genus, " sp."),
-                           TRUE            ~ species)) -> for.explanatory.plots
 for.explanatory.plots %>% distinct(taxon)
 for.explanatory.plots %>% 
   filter (str_detect(taxon, "Merlu"))
@@ -352,6 +352,46 @@ for.explanatory.plots %>%
 sum.stats %>% 
   arrange(ave.depth) %>% 
   filter (n_samples >10)
+
+# Samples to keep
+By.taxa.dataset %>%
+  distinct() %>% 
+  group_by(eDNA.sample) %>% #mutate(nReads = sum(nReads), prevalence = )
+  left_join(final.metadata) %>% 
+  group_by(Station, depth) %>% 
+  mutate (nsam = n_distinct(eDNA.sample, rep)) %>%
+  group_by(eDNA.sample, Station) %>% 
+  summarise (nspp = n_distinct(taxon)) %>% 
+  arrange(nspp)
+```
+
+## What to do with samples with very low diversity? 
+
+It is clear that using samples that have 0s for 140 spp - that will drive all the differences and might obscure patterns of diversity?
+
+```{r remove samples}
+By.taxa.dataset %>%
+  distinct() %>% 
+  group_by(eDNA.sample) %>% #mutate(nReads = sum(nReads), prevalence = )
+  left_join(final.metadata) %>% 
+  group_by(Station, depth) %>% 
+  mutate (nsam = n_distinct(eDNA.sample, rep)) %>%
+  group_by(eDNA.sample, Station) %>% 
+  mutate (nspp = n_distinct(taxon)) %>% 
+  arrange (nspp) %>% 
+  filter (nspp > 2) -> at.least.thrice
+
+
+```
+
+
+
+```{r}
+By.taxa.dataset %>%
+  distinct() %>% 
+  group_by(eDNA.sample) %>% #mutate(nReads = sum(nReads), prevalence = )
+  left_join(final.metadata) %>% 
+  mutate()
 ```
 
 ```{r taxa.plotter}
@@ -538,8 +578,106 @@ anim_save("new.gif", new.gif)
 ## Are there any species that identify deep water samples?
 
 ```{r}
-Joined.dataset %>% 
-  filter(eDNA.sample != "978") %>% 
-  ungroup()
+Second.analysis %>% 
+  mutate(by.transect.PERMANOVA = map2(bc, env, function(.x, .y){
+    perms <- how(nperm = 999)
+    setBlocks(perms) <- with(.y, Transect)
+    adonis2(formula = .x ~  position,data = .y, permutations = perms) })) %>% pull()
+  
+```
+
+# What is the effect of the eDNAindex
+
+We have to see which samples only have a reduced number of taxa
+```{r}
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+  group_by(eDNA.sample, taxon) %>% 
+  summarise (nReads = sum(nReads)) -> joned
+
+joned %>% 
+  group_by(eDNA.sample) %>% 
+  add_tally(sort = T) %>% 
+  filter (n<4)
+```
+# Biol vs tech
+
+Distribution of the numberof species per unit of comparison
+```{r}
+joned %>% 
+  group_by(eDNA.sample) %>% 
+  tally(name = "nspp") %>% 
+  mutate(grouping = "by.biol") ->by.biol
+
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+  group_by(eDNA.sample,rep, taxon) %>% 
+  summarise (nReads = sum(nReads))  %>% 
+  group_by(eDNA.sample, rep) %>% 
+  tally (name = "nspp") %>% 
+  mutate(grouping = "by.tech") %>% 
+  bind_rows(by.biol) %>% 
+  ggplot (aes(y = nspp, x = grouping)) +
+ # geom_point(position = "jitter") +
+  geom_violin(draw_quantiles = 0.5) +
+  geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5)
+```
+
+# Calculate the eDNA_index in each case
+```{r}
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+ 
+  eDNAindex(Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads) %>% 
+  group_by(eDNA.sample) %>%
+  mutate(nspp = n())  -> by.biol.rep
+
+
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+  unite(eDNA.sample, rep, col = "Tech", sep = ".") %>% 
+  eDNAindex(Tech, OTU_column = taxon, Counts_column = nReads) %>% 
+  group_by(Tech) %>% 
+  mutate(nspp = n()) %>% 
+  separate(Tech, into = c("eDNA.sample", "tech"), sep = "\\.", convert = T) -> by.tech.rep
+
+
+by.biol.rep %>% 
+  mutate (grouping = "biol") %>% 
+  bind_rows(by.tech.rep %>%
+              mutate(grouping = "tech")) %>% 
+  group_by(taxon, grouping) %>% 
+  mutate(npresences = n())-> all.together
+  
+all.together %>% 
+  group_by(grouping) %>% 
+  mutate (nsamples = n_distinct(eDNA.sample,tech)) %>% 
+  mutate (prevalence = npresences/nsamples) %>% 
+distinct(prevalence, taxon, grouping) %>% 
+  ggplot(aes(prevalence, group = grouping, fill = grouping)) + geom_density(alpha = 0.5)
+  
+all.together %>% 
+  group_by(grouping) %>% 
+  mutate (nsamples = n_distinct(eDNA.sample,tech)) %>% 
+  mutate (prevalence = npresences/nsamples) %>% 
+distinct(prevalence, taxon, grouping) %>% 
+pivot_wider(names_from = grouping, values_from = prevalence) %>% 
+  arrange(tech) %>% 
+  slice (c(1:5,134:139))
+
+group_by(taxon) %>% 
+  nest() %>% 
+  ungroup() %>% slice(1:2) %>% 
+  mutate(plot = map2(taxon, data, function (.x,.y){
+    
+    .y %>% 
+      ggplot (aes(Normalized.reads, group = grouping, fill = grouping)) +
+      geom_density(alpha = 0.5) +
+      ggtitle(.x) +
+      geom_label()
+    
+    
+  })) %>% pull(plot)
+
 ```
 
