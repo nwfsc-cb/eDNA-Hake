@@ -61,7 +61,7 @@ By.taxa.dataset.metadata <- read_csv(here("Output", "by.taxa.dataset.metadata.cs
 
 eDNA.samples <- read_csv(here("Data","cleaned_CTD_stations.csv"))
 
-# base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
+ base.eDNA <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
 
 base.eDNA %>% distinct(depth)
 
@@ -71,7 +71,7 @@ base.eDNA %>%
   unite(Transect, position, sep = "-", col = "Station", remove = F)-> base.eDNA
 
 eDNA.samples %>% 
-  select(CTD_Cast, Station, lat, lon) %>% 
+  dplyr::select(CTD_Cast, Station, lat, lon) %>% 
   left_join(base.eDNA,.) %>% distinct() -> base.eDNA
   
 base.eDNA %>% 

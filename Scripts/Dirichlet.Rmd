@@ -1,0 +1,54 @@
+---
+title: "Using a Drichelet regression"
+output: html_notebook
+---
+In order to compare communities (samples) based on their composition (as a vector of proportions) and see their changes as a function of Latitude (Transect),  depth and more importantly due to the presence of a thermocline
+
+```{r}
+library (tidyverse)
+library (here)
+library(DirichletReg)
+
+
+```
+
+The first task is preparing the data in the format required by the function (`DirichReg`): A wide dataframe with an extra column in which the biological data is standarized by proportions.
+
+Besides preparing the data, two layers of complexity need to be addressed. 
+  * First: do we keep actual species or shall we collapse them further into functional units (eg. sharks, flounders, Rockfishes, )
+  * Second: Shall we collapse technical replicates (sure)  but also biological replicates?
+
+# Option1. Keeping biological replicates separate
+ 
+```{r}
+By.taxa.dataset <- read_csv(here("Data",  "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+
+metadata  <- read_csv(here("Data", "Final_metadata.csv"))
+
+By.taxa.dataset %>% 
+  select(eDNA.sample,  taxa, nReads) %>% 
+  group_by(eDNA.sample, taxa) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  pivot_wider (names_from = taxa, values_from = nReads, values_fill = 0) -> wide.biol 
+wide.biol %>%    
+left_join(metadata) %>%
+  column_to_rownames("eDNA.sample")   -> ready.for.multivariate
+
+ready.for.multivariate %>% 
+  mutate(Y = DR_data(wide.biol %>% column_to_rownames("eDNA.sample"))) -> ready.for.multivariate
+```
+  
+## Not collapsing taxa
+
+The formula should be
+Com ~ Transect (factor) +
+Offshoreness or bottom_depth (factor) +
+Upwelling (factor) +
+                    	Error (among sample variability) 
+
+```{r}
+test1 <- DirichReg(Y ~ as.factor(Transect) + position +  groups, data = ready.for.multivariate )
+
+test1
+```
+
