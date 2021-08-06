@@ -11,6 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 library (tidyverse)
 library (seqinr)
 library (here)
+library (taxonomizr)
 ```
 
 Load both outputs. 

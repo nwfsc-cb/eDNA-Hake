@@ -109,3 +109,6 @@ thermoclines2 %>%
   facet_grid(CTD_Cast~Variable, scales = "free")
 ```
 
+### Do the thermocline for the transects for Eulachon
+
+

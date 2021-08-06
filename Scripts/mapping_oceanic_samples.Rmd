@@ -78,7 +78,7 @@ sf::st_crs(base_map)
 
 ggplot(base_map) +
   
-  geom_raster(data = b %>%  filter (z < 0),
+  geom_tile(data = b %>%  filter (z < 0),
               aes(x=x, y=y, fill=z)) + 
 
   geom_sf() +
@@ -88,18 +88,21 @@ ggplot(base_map) +
 
   geom_contour(data = b %>%  filter (z < 0), 
                aes(x=x, y=y, z=z),
-               breaks=c(  -50, -200),
+               breaks=c(  -250),
                size=c(0.3),
                colour="grey")  +
   geom_text_contour (data = b %>%  filter (z < 0,y < 47), 
                aes(x=x, y=y,   z = z),
-               breaks=c( -50, -200),
-              
+               stroke = 0.2,
+               label.placement = label_placement_flattest(),
+               rotate = F,
+               breaks=c( -250),
+               check_overlap = T,
                colour="black")+
   theme_minimal() +
   xlab("") +
   ylab("") +
-  labs(fill = "depth") -> base_plot
+  labs(fill = "depth")  -> base_plot
 
 base_plot %>% write_rds(here("Data/Hake_map.rds"))
 

@@ -47,8 +47,45 @@ Upwelling (factor) +
                     	Error (among sample variability) 
 
 ```{r}
-test1 <- DirichReg(Y ~ as.factor(Transect) + position +  groups, data = ready.for.multivariate )
+test1 <- DirichReg(Y ~ as.factor(Transect) + position +  groups, data = ready.for.multivariate , model = "alternative")
 
 test1
+```
+Turns out if we try to estimate sigma for all spp then it takes forever
+ 
+## Collapsing taxa
+
+Bring up a list of all taxa
+
+```{r}
+By.taxa.dataset %>% 
+  ungroup() %>% 
+  distinct(taxa) %>% 
+  arrange() %>% 
+  separate(taxa, into = c("family", "genus", "species"), extra = "merge", remove = F) %>% 
+  write_csv(here("Data", "unique.sp.csv"))
+```
+
+### Load list of major groups
+
+```{r}
+sp_groups <- read_csv(here("Data", "unique.sp_collapse.csv"))
+
+sp_groups %>% 
+  select(taxa, morpho.group = morphology, habitat = `habitat use` ) -> grouping
+
+
+
+```
+
+### COllapse
+
+```{r}
+By.taxa.dataset %>% 
+  filter(!str_detect(taxa, "Cich")) %>% #no tilapias
+  left_join(grouping) %>% 
+  group_by(eDNA.sample, morpho.group, habitat) %>% 
+  summarise (nReads = sum(nReads))
+
 ```
 
