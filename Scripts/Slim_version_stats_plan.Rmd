@@ -1,0 +1,366 @@
+---
+ title: "Stats_plan_streamlined"
+author: "Ramon Gallego"
+date: "7/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+ We have a sampling design that includes eDNA samples from three strata of the water column from each sampling station: water above and below the thermocline, and deep water closer to the sea floor. These stations are grouped in several longitudinal (onshore - offshore)  transects. Some of the stations are close to shore, and some are far offshore. In certain onshore localities, the strength of the upwelling of deep water might disturb the thermocline and bring deep water (and here comes the hypothesis) with its own eDNA. How to test the influence of deep water eDNA in a suface sample?
+
+# Whole communities vs single taxa
+
+Two layers of evidence can be used:
+
+  * single species information, from those species that are well known to dwell in deeper waters, and not to take part in the Daily Vertical Migration.
+  * Whole community assemblages: We will expect some level of mixing between deep water and surface water, but how to formally test it? Within each transect, we will expect that:
+      - the similarity (based on a Bray-Curtis dissimilarity matrix on the normalized reads calculated on the eDNAindex from Kelly et al 2018) between samples from above and below the thermocline will be greater in places where the thermocline is weaker (so more mixing) AND
+      - the similarity between these uppermost samples and the deep water will be greater when there is strong upwelling AND
+      - this similarity is likely driven by deep water species
+
+
+```{r libraries, echo=FALSE, warning=FALSE}
+library (tidyverse)
+library(here)
+library(eDNAfuns)
+library(vegan)
+library (patchwork)
+```
+
+## Loading Data
+
+Two data sources: metabarcoding reads after clean up from samples, and metadata associated with those samples
+
+```{r data}
+
+By.taxa.dataset <-  read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+
+metadata  <- read_csv(here("Data", "Final_metadata.csv"))
+
+#### Join it together through eDNA sample
+
+By.taxa.dataset %>% 
+  select(eDNA.sample, rep, taxa, nReads) %>% 
+  left_join(metadata) -> Joined.dataset
+
+
+```
+
+## Samples with low diversity & very rare species.
+
+For the multivariate analysis is worth noticing that samples with low diversity will have largest pairwise dissimilarities with every other sample. Rare species will have a small contribution to the pairwise dissimilarities between samples. 
+
+```{r}
+
+Joined.dataset %>%
+  group_by(eDNA.sample, Station) %>% 
+  mutate (nspp = n_distinct(taxa)) %>% 
+  arrange (nspp) %>% 
+  filter (nspp > 2) -> at.least.thrice
+```
+
+## Calculate eDNA.index
+
+```{r}
+at.least.thrice %>% 
+  select(eDNA.sample, rep, taxa, nReads) %>% 
+   eDNAindex(Sample_column = eDNA.sample,OTU_column = taxa, Counts_column = nReads ) %>% 
+  left_join(metadata) %>% 
+  ungroup() -> thrice.eDNA.index
+```
+## What are the species that show more often in deep water?
+
+```{r}
+at.least.thrice %>% 
+  group_by( position) %>% 
+  mutate(max.position = n_distinct(eDNA.sample)) %>% 
+  group_by(position, taxa) %>% 
+  summarise (prevalence = n()/first(max.position)) %>% # Keep those with preference to the seafloor
+  group_by(taxa) %>% 
+  mutate (prevalence = prevalence/max(prevalence)) %>% 
+  pivot_wider(names_from = position, values_from = prevalence, values_fill = list(prevalence = 0)) -> just.prevalences
+
+at.least.thrice %>% 
+   group_by(position, taxa) %>% 
+  tally_wide(rows = taxa, cols = position) 
+  
+
+```
+
+Maybe try another approach: see what species are most commonly shared between seafloor samples?
+
+```{r}
+By.taxa.dataset %>% 
+  select(eDNA.sample,  taxa, nReads) %>% 
+  group_by(eDNA.sample, taxa) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  left_join(metadata) %>% 
+  separate(taxa, into = c("family", "genus", "species"), sep = "%", remove = F) %>% 
+  mutate(label = case_when((species == "NA" & genus == "NA") ~ paste0(family, " sp."),
+                           species == "NA" ~  paste0(genus, " sp."),
+                           str_detect(species, "\\|") ~   paste0(genus, " spp."),
+                           TRUE            ~ species))  %>% 
+  select(eDNA.sample, label, everything(), -taxa) %>% 
+  group_by( position) %>% 
+  mutate(max.position = n_distinct(eDNA.sample)) %>% 
+  group_by(position, label) %>% 
+  summarise (prevalence = n()/(max.position)) %>% 
+  distinct() %>% 
+  pivot_wider(names_from = position, values_from = prevalence, values_fill = list(prevalence = 0)) %>% 
+  arrange (desc(seafloor)) 
+
+```
+
+Let's do a multivariate to see which taxa drive the differences, for each transect, between seafloor and the rest
+```{r}
+By.taxa.dataset %>% 
+  select(eDNA.sample,  taxa, nReads) %>% 
+  group_by(eDNA.sample, taxa) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  left_join(metadata) -> ready.for.multivariate
+```
+
+```{r}
+
+
+
+ready.for.multivariate %>% 
+  eDNAindex(eDNA.sample, taxa, nReads, Biological.replicate = NULL, everything()) %>% 
+  select(-nReads) %>% 
+  ungroup() %>% 
+  nest() %>% 
+    mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         PERMANOVA = map2(bc, env, function(.x, .y){
+         
+                  nrow(.x)
+                  perm <- how(nperm = 9999)
+                  setBlocks(perm) <- with(.y, Station)
+         # return( nrow(.x))})
+                  adonis2(formula = .x ~  position,data = .y, permutations = perm) }),
+         
+         CAP_lat = map2(bc, env, function(.x,.y ){
+
+           capscale(.x~position,data = .y)
+         })
+    ) -> position.by.transect
+
+position.by.transect %>% pull(PERMANOVA) 
+```
+
+## For each species, show me if they appear in the bottom or other spots
+
+```{r}
+By.taxa.dataset %>% 
+  select(eDNA.sample, rep, taxa, nReads)  %>% 
+  group_by(eDNA.sample, taxa) %>% 
+  summarise(nReads = sum(nReads)) %>% 
+  pivot_wider(names_from = taxa, values_from = nReads, values_fill = 0) %>%
+  pivot_longer(-eDNA.sample, names_to = "taxa", values_to = "nReads") %>% 
+  left_join(metadata) %>% 
+  group_by(Station, position) %>% 
+  mutate(max.position = n_distinct(eDNA.sample)) %>% 
+  group_by(Station, Transect, groups, depth.layer = position, taxa, lat, lon) %>% 
+  summarise (prevalence = sum(nReads>0)/(max.position)) %>% 
+  group_by(taxa, Station) %>% 
+  mutate (st.prevalence = case_when(max(prevalence, na.rm = T) == 0 ~ 0,
+                                    TRUE ~ prevalence/max(prevalence, na.rm = T))) -> ready.for.map
+
+ready.for.map %>% 
+  separate(taxa, into = c("family", "genus", "species"), sep = "%", remove = F) %>% 
+  mutate(label = case_when((species == "NA" & genus == "NA") ~ paste0(family, " sp."),
+                           species == "NA" ~  paste0(genus, " sp."),
+                           TRUE            ~ species)) ->ready.for.map
+
+ready.for.map %>% 
+  tally_wide(rows = taxa, cols = depth.layer, wt = prevalence) %>% 
+  arrange(seafloor)
+  # group_by(taxa, depth.layer) %>% 
+  # summarise(tots = sum(prevalence, na.rm = T))
+```
+
+
+```{r, message = F, warning=F}
+
+read_rds(here("Data/Hake_map_transects.rds")) +
+   geom_point(data = ready.for.map %>%
+                group_by(Transect, depth.layer) %>% 
+                filter (prevalence > 0, str_detect(taxa, "Tha")),
+              aes(x = lon, y = lat, size = prevalence, color = prevalence)) +
+   facet_grid(label ~depth.layer, ) +
+  viridis::scale_color_viridis()
+   
+   
+```
+```{r}
+ready.for.map %>% ungroup() %>% 
+                filter (str_detect(taxa, "Engraulis mordax")) %>% 
+  filter (prevalence >0) %>% 
+    ggplot() +
+geom_point( aes(x = lon, y = lat, size = prevalence, color = st.prevalence)) +
+   facet_grid(label ~depth.layer, ) +
+  viridis::scale_color_viridis()
+```
+
+# Does it change with thermocline strength
+
+```{r}
+ready.for.multivariate %>% 
+  ggplot (aes(Thermocline_strength)) +
+  geom_density()
+  cut_interval(ready.for.multivariate$Thermocline_strength , n = 2)
+  
+  read_rds(here("Data/Hake_map_transects.rds")) +
+    geom_point(data = ready.for.multivariate %>% distinct(lat, lon, Thermocline_strength, Thermocline_depth), aes (x = lon, y = lat, size = Thermocline_strength, color = Thermocline_depth))
+```
+# Filter stations by the strength of the thermocline
+
+```{r}
+read_rds(here("Data/Hake_map_transects.rds")) +
+    geom_point(data = ready.for.multivariate %>% distinct(lat, lon, Thermocline_strength, Thermocline_depth), aes (x = lon, y = lat, size = Thermocline_strength, color = Thermocline_strength < 1.5))
+```
+```{r}
+ready.for.multivariate %>% 
+  eDNAindex(eDNA.sample, taxa, nReads, Biological.replicate = NULL, everything()) %>% 
+  select(-nReads) %>% 
+  # filter (Openness == "Onshore" ) %>% 
+  filter (position != "seafloor") %>% 
+  group_by(Thermocline_strength < 1.5) %>% 
+  nest() %>% 
+    mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         PERMANOVA = map2(bc, env, function(.x, .y){
+         
+                  nrow(.x)
+                  perm <- how(nperm = 9999)
+                  setBlocks(perm) <- with(.y, Station)
+         # return( nrow(.x))})
+                  adonis2(formula = .x ~  position,data = .y, permutations = perm) }),
+         
+         CAP_lat = map2(bc, env, function(.x,.y ){
+
+           capscale(.x~position,data = .y)
+         })
+    ) -> Stations.by.thermocline
+
+Stations.by.thermocline %>% 
+  pull(PERMANOVA) %>% set_names(nm = c("Upwelling", "Stratified"))
+```
+
+# or filter transects by the same
+
+```{r}
+metadata %>% 
+  filter (Openness == "Onshore") %>% 
+  distinct(Transect, groups) %>% 
+  rename (Transect.group = groups) %>% 
+  left_join(ready.for.multivariate, .) %>% 
+  eDNAindex(eDNA.sample, taxa, nReads, Biological.replicate = NULL, everything()) %>% 
+  select(-nReads) %>% 
+  group_by(Transect.group) %>% 
+  nest() %>% 
+    mutate( comm.matrix = map (data, ~ tibble_to_comm(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample)),
+      
+      bc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxa,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxa, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+         PERMANOVA = map2(bc, env, function(.x, .y){
+         
+                  nrow(.x)
+                  perm <- how(nperm = 9999)
+                  setBlocks(perm) <- with(.y, Station)
+         # return( nrow(.x))})
+                  adonis2(formula = .x ~  position,data = .y, permutations = perm) }),
+         
+         CAP_lat = map2(comm.matrix, env,
+                          
+                          function(.x,.y) {
+                           
+                            caps <-  capscale(formula = .x ~ position ,
+                                                 data =  .y %>% select (position, Thermocline_Strength) ,
+                                                 distance = "bray", 
+                                                binary = F)
+         
+                            sppscores(caps) <- sqrt(decostand(.x, "total"))
+                              
+                            return(caps) }),
+    ) -> Transects.for.thermocline
+
+Transects.for.thermocline %>% 
+  pull(PERMANOVA) %>% set_names (nm = Transects.for.thermocline$Transect.group)
+```
+## See the different CAP plots to see if it changes
+
+```{r}
+Transects.for.thermocline %>% 
+  mutate (CAP.plot =   map (CAP_lat, ~ plot(.x)),
+          PLOT_beauty = map2(env, CAP.plot, function (.x, .y){
+
+bind_cols(.y$sites) %>% 
+              rownames_to_column("eDNA.sample")
+
+
+
+  })
+  ) -> datas
+
+datas %>% pull(PLOT_beauty) -> dfs
+
+dfs
+```
+
+```{r}
+By.taxa.dataset %>% 
+  select(eDNA.sample,  taxa, nReads) %>% 
+  group_by(eDNA.sample, taxa) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  group_by(eDNA.sample) %>% 
+  mutate (prop = nReads/sum(nReads)) %>% 
+  select(-nReads) %>% 
+  pivot_wider (names_from = taxa, values_from = prop, values_fill = 0) %>% 
+  column_to_rownames("eDNA.sample") -> all.data.as.matrix
+rowSums(all.data.as.matrix)
+```
+
+## Depth variation plot
+
+```{r}
+metadata %>% 
+  group_by(Transect) %>% 
+  mutate (center.point = mean(c(max(lon),min(lon))), 
+          distance.to.center = abs(lon-center.point)) %>% 
+  mutate(Openness = case_when (stop == min(stop) ~ "Onshore",
+                               stop == max(stop) ~ "Offshore", 
+                               distance.to.center == min(distance.to.center) ~ "Center",
+                               TRUE                      ~ "Transition")) -> metadata
+  
+metadata %>% 
+mutate (Openness = fct_reorder(Openness, -lon),
+          Transect = as.character(Transect)) %>% 
+  mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
+  ggplot() +
+ 
+  geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
+  geom_line (aes(x = -lon, y = Thermocline_depth), color = "green") + 
+  
+   geom_point (aes(y = depth, x = -lon, color = (Openness != "Transition"))) +
+  geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
+  facet_wrap(~fct_relevel(Transect,'81','77','67','60', "53", "39", "35", "26"), ncol = 2, scale = "free_x") +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue")) +
+  # scale_y_reverse()+
+  # scale_y_continuous(trans = trans_reverser('log10')) +
+  scale_y_continuous(trans= trans_reverser('log10')) +
+  scale_color_brewer(type = "div", palette = 5,direction = -1) +
+  labs (y = "Depth", x= "longitude", color = "Selected") 
+```
+
+```{r}
+metadata %>% 
+  filter (Transect == 60)
+```
+

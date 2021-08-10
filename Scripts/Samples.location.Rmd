@@ -119,26 +119,26 @@ CTD.stations %>%
   
   
   
-  pull -> duplicated.entries
-
-CTD.stations %>% 
-  filter (Station %in% duplicated.entries)
+#   pull -> duplicated.entries
+# 
+# CTD.stations %>% 
+#   filter (Station %in% duplicated.entries)
 
 # let's look at them 
 
-list.of.files <- list.files(path = "../Data/1_converted",
-                            pattern = "*.csv")
-CTD.stations %>% 
-  filter (Station %in% duplicated.entries) %>% 
-  group_by(CTD_Cast) %>% 
-  nest() %>% 
-  mutate(CTD = map(CTD_Cast, ~ read_csv(file = glue::glue("../Data/1_converted/", .x, ".csv")))) %>% 
-  mutate(plot = map2(CTD_Cast, CTD, ~ .y %>% rownames_to_column("Order") %>% mutate(Order = as.numeric(Order)) %>% ggplot () + geom_point(aes(x = `Temperature (degC)`, y = Order)))) %>% pull(plot)
-
-
-list.of.stations.to.keep %>% 
-  write_csv("../Data/cleaned_CTD_stations.csv")
-  
+# list.of.files <- list.files(path = "../Data/1_converted",
+#                             pattern = "*.csv")
+# CTD.stations %>% 
+#   filter (Station %in% duplicated.entries) %>% 
+#   group_by(CTD_Cast) %>% 
+#   nest() %>% 
+#   mutate(CTD = map(CTD_Cast, ~ read_csv(file = glue::glue("../Data/1_converted/", .x, ".csv")))) %>% 
+#   mutate(plot = map2(CTD_Cast, CTD, ~ .y %>% rownames_to_column("Order") %>% mutate(Order = as.numeric(Order)) %>% ggplot () + geom_point(aes(x = `Temperature (degC)`, y = Order)))) %>% pull(plot)
+# 
+# 
+# list.of.stations.to.keep %>% 
+#   write_csv("../Data/cleaned_CTD_stations.csv")
+#   
 ```
 # Make a Plot
 
@@ -250,7 +250,7 @@ list.of.stations.to.keep %>%
 ```{r}
 plot +
   geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
-  geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transects), color = "yellow", fontface = "bold") +
+  geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold") +
   ggsave("../Plots and figures/Samples_with_Transects_depth.png",height=10,dpi = 300 )
 ```
 

@@ -1,0 +1,138 @@
+---
+title: "BLAST prep"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+params:
+  file:
+    label: 'Input dataset:'
+    value: /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/Blast_output_20210714_11_02
+    input: file
+  pident:
+    value: 95
+  length:
+    value: 250  
+---
+
+If we are going to submit things to the cluster, then let's do it only once per locus
+
+```{r, echo = F, message=F}
+library (tidyverse)
+library(here)
+library(seqinr)
+library (BiocGenerics)
+library (taxonomizr)
+```
+
+## Get all the outputs
+
+```{r Import BLAST results}
+ outputFILE <- read_csv(params$file,  col_names = c("Query", "Match", "pident", "length", "mismatch", "gapopen", "sstart", "send", "evalue", "bitscore", "taxid"))
+
+out.folder <- dirname(params$file)
+```
+
+## Now we only need to parse 2 files
+
+
+<!-- Done it. Now import those files -->
+
+
+
+Get the taxonomy file from insect
+```{r}
+here()
+taxonomy <- read_rds(here("Data","all.taxonomy.rds"))
+```
+
+Now - get  the taxids are probably shared between them.
+
+```{r}
+
+outputFILE %>% distinct(taxid) %>%
+  pull()-> all.taxids
+insect::get_lineage(all.taxids, taxonomy) -> all.taxonomy
+
+all.taxonomy %>%
+  write_rds(file.path(out.folder, "lineages.rds"))
+
+all.taxids %>%
+  write_rds(file.path(out.folder, "taxids.rds"))
+```
+
+
+Now extract the information from  each lineage
+
+```{r}
+Conversion.df <- tibble (taxid = all.taxids,
+                         taxonomy = all.taxonomy) %>%
+  mutate (Phylum = map_chr(taxonomy, ~.x["phylum"]),
+          Class = map_chr(taxonomy, ~.x["class"]),
+          Order = map_chr(taxonomy, ~.x["order"]),
+          Family= map_chr(taxonomy, ~.x["family"]),
+          Genus = map_chr(taxonomy, ~.x["genus"]),
+          Species = map_chr(taxonomy, ~.x["species"]))
+
+# check how many taxids have information at different levels
+Conversion.df %>%
+  select(-taxonomy) %>%
+  pivot_longer(cols = -taxid, names_to = "rank", values_to = "taxa") %>%
+  group_by(rank, is.na(taxa)) %>%
+  tally()
+
+
+ Conversion.df %>%
+   filter(is.na(Genus))
+```
+
+We can bring this back to the original blast outputs, keeping the real matches (>95% or >98% ) and the informative database entrances (at least Family, Genus and species)
+
+```{r}
+left_join(outputFILE, Conversion.df) %>%
+  filter (pident >=params$pident, length > params$length) %>% # dropping unreliable blast
+  unite(Family, Genus, col = "taxa", sep = "|", remove = F) %>%
+  filter (taxa != "NA|NA") -> cleaned
+
+
+
+
+```
+
+Now we can see, for each query, what is the agreed taxonomy of all matches passing filters
+
+```{r}
+cleaned %>%
+  group_by(Query) %>%
+  select( pident, Phylum, Class, Order, Family, Genus, Species) %>%
+  nest() %>% # for each query, calculate the agreed taxonomy
+  # ungroup %>% slice (1:10) %>%
+  mutate(consensus = map(data,  function(.x) { 
+    # If there are 100% matches - keep those and the 99s
+    # If not, keep everything
+    
+    if(max(.x$pident == 100)){
+      
+      .x %>% 
+        filter(pident >99) %>% 
+        select(-pident) %>% 
+        condenseTaxa() %>%
+      paste(., collapse = "%")
+      
+    }else{
+    .x %>% 
+        select(-pident) %>% 
+    condenseTaxa() %>%
+      paste(., collapse = "%")}
+  }
+                               )) %>%
+  select(Query, consensus) %>%
+  unnest(consensus) -> All.Seqs.IDed
+
+All.Seqs.IDed %>%
+  separate(consensus, into = c( "phylum","class","order" , "taxa"), extra = "merge") %>%
+  rename (Hash = Query ) %>%
+    write_csv(file.path(out.folder, "Hash_classified_BLAST.csv"))
+```
+
