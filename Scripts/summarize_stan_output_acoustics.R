@@ -174,7 +174,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
    D_pred_pos_real <- D_pred_pos * 0
    for(i in 1:N.POST){
       D_pred_pos_real[,i] <- #exp(D_pred_pos[,i]) 
-            rlnorm(nrow(D_pred_pos), D_pred_pos[,i] - 0.5*pars$sigma[N.ID[i]]^2, sigma.vec[N.ID[i]])
+            rlnorm(nrow(D_pred_pos), D_pred_pos[,i] - 0.5*pars$sigma[N.ID[i]]^2, pars$sigma[N.ID[i]])
     }
    D_pred_uncond <- inv.logit(D_pred_bin) * D_pred_pos_real
   
@@ -324,6 +324,18 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
                Q.0.975 = quantile(max_cum_sum,probs=c(0.975)),
                Q.0.99 = quantile(max_cum_sum,probs=c(0.99)))
    
+   # Summarize but maintain MCMC to do uncertainty in the correlation between eDNA and acoustics.
+   
+   D_1.0_uncond_resample <- d.all %>% group_by(MCMC.rep,ID.lat.1.0) %>% 
+                              summarise(tot = sum(D))
+   
+   D_0.5_uncond_resample <- d.all %>% group_by(MCMC.rep,ID.lat.0.5) %>% 
+                              summarise(tot = sum(D))
+   
+   D_grid.cell_uncond_resample <- d.all %>% dplyr::select(Gridcell_ID,MCMC.rep,D)
+   
+   
+   
    #####
    
   D_pred_bin_combined <- bind_cols(D_pred_bin_summary,new_data_trim %>% dplyr::select(-Y)) %>%
@@ -385,6 +397,11 @@ pred_obs_pos <- bind_cols(dat.acoustic.pos %>%
                             dplyr::select(transect,lat,lon,utm.lat,utm.lon,bin_weight_dens,weight_dens_mt_km2,bathy.bottom.depth),
                           D_pos_out) %>%
                 mutate(resid = weight_dens_mt_km2 - Mean) #log.resid=log(resid))
+
+
+###  
+
+
 
 
 # Combine the necessary data.frames into a list for use later.

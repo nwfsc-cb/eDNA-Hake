@@ -39,7 +39,7 @@ SPECIES <- "hake" # eulachon, hake
 MOD <-  "lat.long.smooth"
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu Base_Var Fitted.RData")
+load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu_T Base_Var Fitted.RData")
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 ### Cacluate posterior summaries and predictive surfaces
@@ -308,26 +308,43 @@ sigma.stand.param <- ggplot() +
 sigma.pcr.param <- ggplot() +
   geom_density(aes(Output.qpcr$samp$sigma_pcr),alpha=0.5,fill=viridis(1))+
   geom_vline(xintercept = mean(Output.qpcr$samp$sigma_pcr),linetype="dashed") +
-  xlab(expression(sigma*" (PCR)")) +
+  xlab(expression(eta*" (PCR)")) +
   theme_bw()
 
-tau.sample.param <- ggplot() +
-  geom_density(aes(Output.qpcr$samp$tau_sample),alpha=0.5,fill=viridis(1))+
-  geom_vline(xintercept = mean(Output.qpcr$samp$tau_sample),linetype="dashed") +
+tau_long <- Output.qpcr$samp$tau_sample %>% as.data.frame()
+colnames(tau_long) <- levels(dat.obs.bin$depth_cat_factor)
+tau_long <- tau_long %>% mutate(N = 1:n()) %>% pivot_longer(!N,names_to="depth_factor",values_to="tau")
+
+tau_long_summary <- tau_long %>% group_by(depth_factor) %>% 
+                            dplyr::summarise(Mean=mean(tau),SD=sd(tau),
+                                             Median=median(tau),
+                                             Q.0.01 = quantile(tau,probs=c(0.01)),
+                                             Q.0.025 = quantile(tau,probs=c(0.025)),
+                                             Q.0.05 = quantile(tau,probs=c(0.05)),
+                                             Q.0.25 = quantile(tau,probs=c(0.25)),
+                                             Q.0.75 = quantile(tau,probs=c(0.75)),
+                                             Q.0.95 = quantile(tau,probs=c(0.95)),
+                                             Q.0.975 = quantile(tau,probs=c(0.975)),
+                                             Q.0.99 = quantile(tau,probs=c(0.99)))
+ 
+tau_long_summary$depth_factor_number <- tau_long_summary$depth_factor %>% as.numeric()
+
+# Tau histograms
+tau.sample.param <- ggplot(tau_long) +
+  geom_density(aes(tau),alpha=0.5,fill=viridis(1))+
+  #geom_vline(xintercept = mean(tau_long),linetype="dashed") +
   xlab(expression(tau*" (sample)")) +
+  facet_wrap(~depth_factor) +
+  theme_bw()
+
+tau.sample.by.depth <- ggplot(tau_long_summary) +
+  geom_point(aes(x=depth_factor_number,y=Mean)) +
+  geom_errorbar(aes(x=depth_factor_number,ymin=Q.0.05,ymax=Q.0.95),width=0) +
+  ylab(expression(tau))+
+  xlab("Depth(m)")+
   theme_bw()
 
 
-tau.sample.summary <- data.frame(tau=Output.qpcr$samp$tau_sample) %>% 
-                        summarise(Mean=mean(tau),SD=sd(tau), Median=median(tau),
-                                  Q.0.01 = quantile(tau,probs=c(0.01)),
-                                  Q.0.025 = quantile(tau,probs=c(0.025)),
-                                  Q.0.05 = quantile(tau,probs=c(0.05)),
-                                  Q.0.25 = quantile(tau,probs=c(0.25)),
-                                  Q.0.75 = quantile(tau,probs=c(0.75)),
-                                  Q.0.95 = quantile(tau,probs=c(0.95)),
-                                  Q.0.975 = quantile(tau,probs=c(0.975)),
-                                  Q.0.99 = quantile(tau,probs=c(0.99)))
 
 # nu.param <- ggplot() +
 #   geom_density(aes(Output.qpcr$samp$nu),alpha=0.5,fill=viridis(1))+
@@ -445,7 +462,7 @@ q3
 # p5 <- base_map_trim + 
 #   geom_point(data=SAMPLES %>% filter(depth_cat %in% c(0,50,100,150)),
 #              aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
-#   geom_point(data=SAMPLES %>% filter(depth_cat %in% c(0,50,100,150))
+#   geom_point(data=SAMPLES s%>% filter(depth_cat %in% c(0,50,100,150))
 #                ,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
 #   scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
 #   geom_point(data=SAMPLES %>% filter(depth %in% c(0,50,100,150)) %>%
@@ -464,8 +481,8 @@ q3
 SIZE = 1.5
 STROKE = 0 
 
-z.lim = c(20,2500) 
-z.breaks <-  c(20,100,250,500,1000,1500,2500)
+z.lim = c(20,2250) 
+z.breaks <-  c(20,100,250,500,1000,1500,2250)
 z.lim.labs <- z.breaks
 
 DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
@@ -528,8 +545,8 @@ for(i in 1:length(DEPTH)){
   SIZE = 2
   STROKE = 0 
   
-  z.lim = c(20,7000) 
-  z.breaks <- c(20,200,500,1000,2000,4000,6000)
+  z.lim = c(20,8500) 
+  z.breaks <- c(20,200,500,1000,2000,4000,6000,8000)
   z.lim.labs <- z.breaks
   
   lon.lab <- -126.1
@@ -556,6 +573,8 @@ for(i in 1:length(DEPTH)){
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
     geom_point(data= D_final_projected ,
                aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+    # geom_point(data= D_final_projected %>% filter(Mean>z.lim[2]),
+    #            aes(x=lon,y=lat),alpha=1,color=viridis(1,start=0.999, end=1),size=SIZE,stroke=STROKE,shape=22) +
     scale_color_viridis_c(option=OPT,trans="sqrt",  
                           limits=z.lim,breaks=z.breaks,labels=z.lim.labs,
                           name=expression("DNA Index")) +
@@ -637,7 +656,7 @@ for(i in 1:length(DEPTH)){
   SIZE = 1.5
   STROKE = 0 
   
-  z.lim = c(0.15,1.5) 
+  z.lim = c(0.15,3.5) 
   z.breaks <- seq(z.lim[1],z.lim[2],length.out=6)
   
   DEPTH <- levels(STATION.DEPTH$depth_cat_factor)
@@ -682,7 +701,7 @@ for(i in 1:length(DEPTH)){
                aes(x=lon,y=lat,color=CV),alpha=1,size=SIZE,stroke=STROKE) +
     geom_point(data= D_pred_combined %>% filter(CV > z.lim[2]),
                aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999999,end=1)) +
-    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("SD DNA Copies L"^-1)) +
+    scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("CV")) +
     facet_wrap(~depth_cat_factor) +
     theme_bw() 
   
@@ -958,16 +977,47 @@ water_depth_marg <- water_depth_marg %>%
                                                             water_depth=="1000+" ~ depth_cat+10
                                                                            ))
 
-ggplot(water_depth_marg) +
-    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=water_depth),position="jitter") +
+water_depth_marg <- water_depth_marg %>% 
+  mutate(depth_range = case_when(water_depth=="50" ~ "< 75",
+                                    water_depth=="100" ~ "75 - 125" ,
+                                    water_depth=="150" ~ "125 - 210",
+                                    water_depth=="300" ~ "210 - 400",
+                                    water_depth=="500" ~ "400 - 750",
+                                    water_depth=="1000+" ~ "> 750"
+  ))
+
+water_depth_marg$depth_range <- factor(water_depth_marg$depth_range,
+                                       levels = c("< 75","75 - 125" ,"125 - 210","210 - 400","400 - 750","> 750"))
+
+
+YLIM=c(0,max(water_depth_marg$x.95))
+
+marginal_est_D_by_depth <- ggplot(water_depth_marg) +
+    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),position="jitter") +
     #geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=water_depth),width=0,alpha=0.5)+
-    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=water_depth),width=0,size=1.2,alpha=0.5)+
-    geom_line(aes(y=grand.mean,x=depth_cat_jitt,color=water_depth),alpha=0.5) +
-    scale_x_reverse() +
-    scale_color_npg() +
+    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=depth_range),width=0,size=1.2,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=depth_range),width=0,size=0.4,alpha=0.5)+
+    geom_line(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),alpha=0.5) +
+    scale_x_reverse("Water Depth (m)") +
+    scale_y_continuous(expression("Hake DNA (copies L"^-1*")"),limits = YLIM) +
+    scale_color_npg(name="Bottom\nDepth (m)") +
     #scale_y_continuous(trans="log2") +
     coord_flip() +
     theme_bw()
+# Key for water depth categories.
+# water.depth.cat %in% c("w_2000_plus","w_1200_2000","w_750_1200") ~ "1000+",
+# #water.depth.cat %in% c("w_750_1250") ~ "1000",
+# water.depth.cat %in% c("w_400_750") ~ "500",
+# water.depth.cat %in% c("w_210_400") ~ "300",
+# water.depth.cat %in% c("w_125_210") ~ "150",
+# water.depth.cat %in% c("w_75_125") ~ "100",
+# water.depth.cat %in% c("w_0_75") ~ "50"))
+
+
+
+
+
+
 
 
 # 
@@ -1089,8 +1139,12 @@ Output.summary.qpcr <- list(
   # Output (Standards)
   stand.plot = stand.plot,
   stand.plot.pres = stand.plot.pres,
+
+  # Posterior summaries that are helpful.
+  stanMod_summary_parts = Output.qpcr$stanMod_summary_parts,
+  
   # Output (Field Summaries)
-  tau.sample.summary = tau.sample.summary,
+  tau_long_summary = tau_long_summary, 
   station_depth_out=station_depth_out,
   station_depth_out_liter=station_depth_out_liter,
   D_pred_combined = D_pred_combined,
@@ -1105,8 +1159,18 @@ Output.summary.qpcr <- list(
   D_final_lat_equal = D_final_lat_equal,
   Resid = Resid,
   
+  # summarized by MCMC sample for confidence intervals on 
+  
+  D_grid.cell_resample = D_grid.cell_resample, 
+  D_1.0_resample = D_1.0_resample,
+  D_0.5_resample = D_0.5_resample,
+  
   D_smooth_summary = D_smooth_summary,
   
+  #Marginal of D by depth 
+  marginal_est_D_by_depth = marginal_est_D_by_depth,
+  
+  #Plots with maps
   p_DNA_lat_1.0 =p_DNA_lat_1.0,
   p_DNA_lat_0.5 = p_DNA_lat_0.5,
   p_DNA_lat_equal =p_DNA_lat_equal,
@@ -1116,7 +1180,11 @@ Output.summary.qpcr <- list(
   p_D_legend_only = p_D_legend_only,
   
   p_D_CV = p_D_CV,
+  p_D_CV_facet = p_D_CV_facet,
   p_D_CV_legend_only = p_D_CV_legend_only,
+  
+  # Variability plots 
+  tau.sample.by.depth = tau.sample.by.depth,
   
   # Contamination and wash plots
   control.by.time = control.by.time ,
@@ -1131,6 +1199,10 @@ Output.summary.qpcr <- list(
   
   wash.plot = wash.plot ,
   wash.plot.by.depth = wash.plot.by.depth, 
+  wash.param.hist = wash.param.hist,
+  
+  # Resid plots
+  p_resid=p_resid,
   
   # Projections or projection helpers.
   N.POST = N.POST, # number of posterior samples used.
@@ -1147,6 +1219,9 @@ Output.summary.qpcr <- list(
   mu_contam_out = mu_contam_out,
   sigma_contam_out =sigma_contam_out,
   lat.breaks = lat.breaks,
+  
+  sigma.pcr.param = sigma.pcr.param,
+  sigma.stand.param =sigma.stand.param,
   base_map_trim_proj = base_map_trim_proj
 )
 
@@ -1201,7 +1276,7 @@ dev.off()
 #   print(p_log_D_facet2)
 # dev.off()
 
-pdf(file=paste(SPECIES,"DNA_smoothes_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf",sep=""),onefile = T,height=10,width=8)
+pdf(file=paste(SPECIES," DNA_smoothes_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf",sep=""),onefile = T,height=10,width=8)
   print(p_D_facet)
   print(p_D)
 dev.off()
@@ -1276,3 +1351,4 @@ inhibit.plot.by.depth.few
 wash.plot 
 wash.plot.by.depth 
   
+wash.param.hist

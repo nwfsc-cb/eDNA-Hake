@@ -110,6 +110,13 @@ stand.plot.pres
 EXPAND <- 40
 LOG.EXPAND <- log10(EXPAND)
 
+
+# THIS IS THE FACTOR FOR EXPANDING FROM COPIES PER ul to COPIES PER L 
+# Based on sampling volume of 2.5 L
+
+EXPAND.CONTROL <- 40
+LOG.EXPAND.CONTROL <- log10(EXPAND.CONTROL)
+
 PROBS <- c(0.025,0.05,0.10,0.25,0.5,0.75,0.9,0.95,0.975)
 Log   <- paste0("log",PROBS)
 station_depth_out <- data.frame(station_depth_idx= 1:ncol(pars$D), 
@@ -153,12 +160,12 @@ sample_contam_total_out <- data.frame(sample_idx= 1:ncol(pars$D_contam),
                                       Val=data.frame(t(apply(10^pars$D_contam,2,quantile,probs=PROBS))))
 
 sample_contam_total_out_liter <- data.frame(sample_idx= 1:ncol(pars$D_contam), 
-                                            Mean.log=apply(pars$D_contam+LOG.EXPAND,2,mean),
-                                            Sd.log=apply(pars$D_contam+LOG.EXPAND,2,sd),
-                                            Log.Val=data.frame(t(apply(pars$D_contam+LOG.EXPAND,2,quantile,probs=PROBS))),
-                                            Mean=apply(10^(pars$D_contam+LOG.EXPAND),2,mean),
-                                            Sd=apply(10^(pars$D_contam+LOG.EXPAND),2,sd),
-                                            Val=data.frame(t(apply(10^(pars$D_contam+LOG.EXPAND),2,quantile,probs=PROBS))))
+                                            Mean.log=apply(pars$D_contam+LOG.EXPAND.CONTROL,2,mean),
+                                            Sd.log=apply(pars$D_contam+LOG.EXPAND.CONTROL,2,sd),
+                                            Log.Val=data.frame(t(apply(pars$D_contam+LOG.EXPAND.CONTROL,2,quantile,probs=PROBS))),
+                                            Mean=apply(10^(pars$D_contam+LOG.EXPAND.CONTROL),2,mean),
+                                            Sd=apply(10^(pars$D_contam+LOG.EXPAND.CONTROL),2,sd),
+                                            Val=data.frame(t(apply(10^(pars$D_contam+LOG.EXPAND.CONTROL),2,quantile,probs=PROBS))))
 
 delta_out <- data.frame(sample_idx= 1:ncol(pars$delta), 
                         Mean.log=apply(pars$delta,2,mean) ,
@@ -208,7 +215,6 @@ depth_id<- levels(STATION.DEPTH$depth_cat_factor) %>% as.numeric(as.character())
 ## Project Surfaces for lat.long.smooth and lat.long.smooth.base MODEL.TYPE
 ##############################
 
-
 smooth.projections <- list()
 if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
   
@@ -224,6 +230,15 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
     temp$depth_cat_factor <- d_cat[i]
     new_data <- rbind(new_data,temp)
   }
+  
+  # Drop the 300m observation for Gridcell 133469 
+  new_data_1 <- new_data %>% 
+                filter(Gridcell_ID!=133469)
+  new_data <- bind_rows(new_data_1,
+                        new_data %>% 
+                          filter(Gridcell_ID==133469,
+                                 depth_cat_factor!=300))
+  
   #new_data$depth_cat_factor <- depth.fact
   new_data  <- new_data %>% rename(utm.lon=x,utm.lat=y,bottom.depth.consensus=depth_m)
   orig_data <- STATION.DEPTH %>% dplyr::select(utm.lon,utm.lat,bottom.depth.consensus,depth_cat_factor,lon,lat,station_depth_idx) 
@@ -374,7 +389,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
 }
 
 
-# Calculate some residual 
+# Calculate some residuals and pred-observed  
 Resid <- D_delta_out_liter %>% dplyr::select(sample_idx,Mean.log,Mean) %>% 
           left_join(.,
              SAMPLES %>% 
@@ -391,6 +406,46 @@ Resid <- Resid %>% mutate(Resid.log = Mean.log - sd.mean.log,Resid = Mean - sd.m
                           dplyr::select(utm.lon,utm.lat,
                                         lon,lat,
                                         station_depth_idx,depth_cat_factor))
+
+Resid <- Resid %>% rename(pred.mean.log=sd.mean.log,pred.mean=sd.mean,
+                          obs.mean=Mean,obs.mean.log=Mean.log)
+
+# Make Pred-Obs plots
+p_resid <- list()
+
+p_resid$p1 <- ggplot(Resid) +
+    geom_point(aes(y=obs.mean.log,x=pred.mean.log),alpha=0.3) +
+    geom_abline(intercept=0,slope=1,color="red") +
+    theme_bw()
+    
+p_resid$p2 <- ggplot(Resid) +
+  geom_point(aes(y=obs.mean.log,x=pred.mean.log),alpha=0.3) +
+  geom_abline(intercept=0,slope=1,color="red") +
+  theme_bw() +
+  facet_wrap(~depth_cat_factor)
+
+p_resid$p3 <- ggplot(Resid) +
+  geom_point(aes(y=obs.mean,x=pred.mean),alpha=0.3) +
+  geom_abline(intercept=0,slope=1,color="red") +
+  theme_bw() +
+  facet_wrap(~depth_cat_factor)
+
+
+p_resid$p4 <- ggplot(Resid) +
+  geom_point(aes(y=Resid.log,x=pred.mean.log),alpha=0.3) +
+  geom_abline(intercept=0,slope=0,color="red") +
+  theme_bw() +
+  facet_wrap(~depth_cat_factor)
+
+p_resid$p5 <- ggplot(Resid) +
+  geom_point(aes(y=Resid.log,x=lat),alpha=0.3) +
+  geom_abline(intercept=0,slope=0,color="red") +
+  theme_bw() +
+  facet_wrap(~depth_cat_factor)
+
+
+
+
 
 #############################################
 #############################################
@@ -617,4 +672,18 @@ for(i in 1:nrow(DEPTHS)){
   D_final_projected <- left_join(D_final_projected, 
                                  new_data %>% dplyr::select(Gridcell_ID,utm.lat,utm.lon,lon,lat) %>% distinct())
 
- 
+  ##### 
+  
+  D_grid.cell_resample <- d.all.no.depth %>% dplyr::select(-ID.equal,-ID.lat.0.5,-ID.lat.1.0)
+                      
+  D_1.0_resample <- d.all.no.depth %>%
+                      rename(Tot = tot) %>%
+                      group_by(MCMC.rep,ID.lat.1.0) %>% 
+                      summarise(tot = sum(Tot))
+  D_0.5_resample <- d.all.no.depth %>%
+                      rename(Tot = tot) %>%
+                      group_by(MCMC.rep,ID.lat.0.5) %>% 
+                      summarise(tot = sum(Tot))
+  
+  
+  
