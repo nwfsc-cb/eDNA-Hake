@@ -157,7 +157,7 @@ position.by.transect %>% pull(PERMANOVA)
 By.taxa.dataset %>% 
   select(eDNA.sample, rep, taxa, nReads)  %>% 
   group_by(eDNA.sample, taxa) %>% 
-  summarise(nReads = sum(nReads)) %>% 
+  summarise(nReads = sum(nReads)) %>%
   pivot_wider(names_from = taxa, values_from = nReads, values_fill = 0) %>%
   pivot_longer(-eDNA.sample, names_to = "taxa", values_to = "nReads") %>% 
   left_join(metadata) %>% 

@@ -1,0 +1,208 @@
+---
+title: "PURSUING THE EULACHON"
+output: html_notebook
+---
+
+A quick list of samples to sequence looking for Eulachon
+
+```{r}
+library (tidyverse)
+library (here)
+library(rLakeAnalyzer)
+library(castr)
+library (patchwork)
+library(ggforce)
+
+```
+
+## Already sequenced
+
+We have sequenced several samples from transects 60, 67, 77, 81
+
+Eulachon are probably coming from the Columbia River so we can also get a few more
+
+## New Candidates
+
+To cover its range, it would make sense to get samples from transects 69, 71, 73, 77
+
+```{r}
+
+eDNA.samples <- read_csv(file = here("Data", "eDNA hake water samples.csv")) %>% 
+  rename(Station = `CTD cast`, eDNA.sample = `Tube #`)
+
+eDNA.samples %>% 
+  separate(Station, into = c("Transect", "stop"), remove = F, sep = "-") %>% 
+  filter (Transect %in% c(69, 71, 73, 77), depth != "300/150") %>% 
+  mutate (depth = case_when (depth == "sfc" ~ 0,
+                             TRUE           ~ as.numeric(depth))) -> eDNA.new
+  
+```
+
+```{r}
+Casts <- read_csv(here("Data","cleaned_CTD_stations.csv")) %>% 
+  select(CTD_Cast, Station, lat, lon) %>% 
+  distinct()
+Casts <- eDNA.new %>% 
+  left_join(Casts) %>% 
+  filter (!is.na(CTD_Cast))
+
+Casts 
+```
+```{r}
+Casts %>% 
+  distinct(CTD_Cast) %>% 
+  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast, ".csv"),
+                              TRUE           ~ paste0(CTD_Cast, ".csv"))) %>% pull() -> casts.to.keep
+
+files.inCTD <- list.files(path = here("Data","1_converted"), pattern = "*.csv")
+
+# are u there
+
+casts.to.keep %in% files.inCTD
+
+# Change them to a tibble of full paths
+
+files.inCTD <- tibble (file = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
+                       full.path = list.files(path = here("Data","1_converted"), full.names = T,pattern = "*.csv")) %>% 
+  filter (file %in% casts.to.keep) %>% 
+  mutate (data = purrr::map(full.path, read_csv))
+  
+files.inCTD %>% 
+  mutate (data = purrr::map (data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
+          Thermocline = map_dbl (data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermoclines.new
+```
+
+Save
+```{r}
+thermoclines.new %>% write_rds(here("Data","Casts.Eulachon.thermoclines.rds"))
+```
+
+Calculate thermocline strength
+```{r}
+read_rds(here("Data","Casts.Eulachon.thermoclines.rds")) %>% 
+  
+  mutate (Tempdiff = map2_dbl(data, Thermocline, function(.x,.y){
+    .x %>%
+      rename (Depth = `Depth (m)`) %>% 
+    #   filter (abs(`Depth (m)` - .y) > 5) %>% 
+        group_by(Above = Depth > .y) %>% 
+      mutate_at(.vars = vars(Depth), .funs = list(max = max, min = min)) %>% 
+      mutate(keepers = case_when(Above==FALSE & Depth > (.y-5)~ "Yes",
+                                 Above==TRUE & Depth < (.y+5)~"Yes",
+                                 TRUE                        ~ "No")) %>% 
+      filter(keepers == "Yes") %>% 
+      
+       summarise(Temp = mean(`Temperature (degC)`, na.rm=T)) %>% 
+       pivot_wider(names_from = Above, values_from = Temp) %>% 
+    mutate(Tempdiff = `FALSE`-`TRUE`) %>%
+      pull(Tempdiff)
+    
+  })) %>% 
+  separate(file, into = "CTD_Cast") %>% 
+  mutate(CTD_Cast = as.numeric(str_remove(CTD_Cast, "^0"))) -> thermoclines2
+
+thermoclines2 %>% 
+  dplyr::select(CTD_Cast, Thermocline_depth = Thermocline, Thermocline_strength = Tempdiff) %>% 
+  inner_join(Casts, by = "CTD_Cast") %>% 
+  # mutate(position = case_when(depth < Thermocline_depth ~ "above",
+  #                             TRUE                ~ "below")) %>% 
+#  left_join(max.depth) %>% 
+  write_csv(here("Data", "Samples_Eulachon_with_Thermocline.csv")) 
+```
+
+#### Add bottom depth
+
+```{r}
+Ole.depth <- read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
+  
+  # separate(station, into= c("Transect", "position"), sep = "-") %>% 
+   select(Station = station , bottom.depth.consensus)
+```
+ Get a final metadata
+ 
+```{r}
+Samples_Eulachon_with_Thermocline <- read_csv(here("Data", "Samples_Eulachon_with_Thermocline.csv"))
+
+left_join(Samples_Eulachon_with_Thermocline, Ole.depth) -> Sample.info
+```
+ Almost there
+```{r}
+
+  
+Sample.info %>%
+  #separate()
+  # semi_join(By.taxa.dataset.metadata , by = c("Transect", "position" = "stop")) %>% 
+   group_by(Transect) %>% 
+  mutate (center.point = mean(c(max(lon),min(lon))), 
+          distance.to.center = abs(lon-center.point)) %>% 
+  mutate(Openness = case_when (stop == min(stop) ~ "Onshore",
+                               stop == max(stop) ~ "Offshore", 
+                               distance.to.center == min(distance.to.center) ~ "Center",
+                               TRUE                      ~ "Transition")) -> Sample.info
+```
+ ### Reduce 
+```{r}
+Sample.info %>% 
+  distinct(Station, Openness) %>% 
+  group_by(Transect, Openness) %>% 
+  slice(1) -> Stations.to.keep
+
+Sample.info %>% 
+#  filter (Openness != "Transition")  %>%
+  select (eDNA.sample, Transect, stop, Station, depth, bottom.depth.consensus, Openness, starts_with("Thermo"), lat, lon) -> Step1
+  
+Step1 %>%
+  mutate (groups = case_when(Thermocline_strength< 1.7 ~ "Mixed",
+                             TRUE                      ~ "Stratified")) %>% 
+  mutate (Distance_to_thermocline = depth - Thermocline_depth,
+          Distance_to_seafloor    = bottom.depth.consensus - depth) %>% 
+  mutate(position = case_when(Distance_to_thermocline < 0 ~ "above",
+                              Distance_to_thermocline > Distance_to_seafloor ~ "seafloor",
+                              TRUE                        ~ "below")) -> Step2
+```
+
+```{r}
+Step2 %>% 
+  nest %>% 
+  mutate (table = map(data, ~.x %>% pivot_wider(names_from = Openness, id_cols = depth, values_from = eDNA.sample, values_fn = n_distinct) %>% arrange(depth))) %>% unnest(table)
+```
+# See them in a map for a sec
+```{r}
+base_plot <- read_rds (here("Data", "Hake_map.rds"))
+base_plot +
+  geom_segment (data = Transects.total, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
+  geom_text(data = Transects.total, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) + 
+  geom_point (data = Step2, aes(x = lon, y = lat, color = (Openness != "Transition")), position = position_jitter(w = 0, h = 0.1), size = 0.5) +
+  guides(fill = "none", color = "none") + 
+  scale_color_brewer(type = "div", palette = 5,direction = -1) -> left
+
+Step2 %>% 
+  mutate (Openness = fct_reorder(Openness, -lon),
+          Transect = as.character(Transect)) %>% 
+  mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
+  ggplot() +
+ 
+  geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
+  geom_line (aes(x = -lon, y = Thermocline_depth), color = "green") + 
+  
+   geom_point (aes(y = depth, x = -lon, color = (Openness != "Transition"))) +
+  geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
+  facet_wrap(~fct_relevel(Transect,'77','73','71','69'), ncol = 1, scale = "free_x") +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue")) +
+  # scale_y_reverse(limits = c(500,0))+
+  # scale_y_continuous(trans = trans_reverser('log10')) +
+  scale_y_continuous(trans= trans_reverser('log10')) +
+  scale_color_brewer(type = "div", palette = 5,direction = -1) +
+  labs (y = "Depth", x= "longitude", color = "Selected") -> right
+right     
+left+right + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+```
+
+# All depth? Some depth?
+
+```{r}
+
+```
+
+ 

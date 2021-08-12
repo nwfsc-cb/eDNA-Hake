@@ -198,3 +198,26 @@ list.of.dfs %>%
   geom_histogram()
 ```
 
+# Export the sequences
+
+```{r}
+new.Classification %>% 
+  inner_join(Seqs) %>% 
+  filter(!is.na(class)) %>% 
+  filter (!is.na(family)) %>% 
+  # filter (is.na(genus))
+  group_by(family) %>% 
+  nest() %>%
+  mutate(
+  output = walk2(family, data, function(.x,.y){
+    .y %>% 
+      unite(Hash, New.Hash, sep = ";NEW = ", col = "name") %>% 
+      unite(name, species, sep = ";organism=", col = "name") -> temp
+      
+    seqinr::write.fasta(sequences = as.list(temp$Sequence),
+                        names     = as.list(temp$name),
+                        file.out  = here("Data","Fasta_families", paste0(.x, ".fasta")))
+  })
+  )
+```
+

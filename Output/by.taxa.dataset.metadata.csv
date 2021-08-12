@@ -1,0 +1,1441 @@
+eDNA.sample,rep,class,order,taxon,nReads,Transect,position,depth,lat,lon
+1001,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,26,60,1,60,44.23212833,-124.247595
+1001,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,7236,60,1,60,44.23212833,-124.247595
+1001,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,16778,60,1,60,44.23212833,-124.247595
+1001,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,40364,60,1,60,44.23212833,-124.247595
+1001,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,65452,60,1,60,44.23212833,-124.247595
+1001,1,Actinopteri,Scombriformes,Scombridae%Scomber%NA,66,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,64398,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,20724,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,17729,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,10146,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,6650,60,1,60,44.23212833,-124.247595
+1001,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,8828,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,10767,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,11051,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,44059,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,4433,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,13059,60,1,60,44.23212833,-124.247595
+1002,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,26449,60,1,60,44.23212833,-124.247595
+1002,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,5977,60,1,60,44.23212833,-124.247595
+1002,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,4620,60,1,60,44.23212833,-124.247595
+1002,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,13002,60,1,60,44.23212833,-124.247595
+1002,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,42569,60,1,60,44.23212833,-124.247595
+1002,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Parophrys%Parophrys vetulus,16343,60,1,60,44.23212833,-124.247595
+1003,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,122,60,1,50,44.23212833,-124.247595
+1003,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1173,60,1,50,44.23212833,-124.247595
+1003,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,5592,60,1,50,44.23212833,-124.247595
+1003,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,275,60,1,50,44.23212833,-124.247595
+1003,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,4084,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,61433,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,219,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,133,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,208,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,7,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,738,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,58,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,510,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,3292,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,3463,60,1,50,44.23212833,-124.247595
+1003,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Psettichthys%Psettichthys melanostictus,230,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,58957,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,269,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius angustimanus|productus,6599,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,4485,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%NA,315,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,50626,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1678,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,6744,60,1,50,44.23212833,-124.247595
+1003,3,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,11456,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,20494,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3612,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,1393,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3973,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1207,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,1116,60,1,50,44.23212833,-124.247595
+1003,4,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,21530,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,21,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,9,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Myctophiformes,Myctophidae%Lampanyctus%NA,523,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,608,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,289,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,1411,60,1,50,44.23212833,-124.247595
+1004,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,3662,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,2472,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Myctophiformes,Myctophidae%Lampanyctus%NA,1726,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,6437,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2486,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,2554,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2298,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,4112,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Scombriformes,Scombridae%Scomber%NA,479,60,1,50,44.23212833,-124.247595
+1004,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,1980,60,1,50,44.23212833,-124.247595
+1004,2,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,106,60,1,50,44.23212833,-124.247595
+1004,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,48,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,2612,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,257,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Clupeiformes,Engraulidae%NA%NA,305,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,173,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Myctophiformes,Myctophidae%Lampanyctus%NA,1453,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,286,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,658,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,228,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,595,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,2029,60,1,50,44.23212833,-124.247595
+1004,3,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,1323,60,1,50,44.23212833,-124.247595
+1005,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,4,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,126,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,34282,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,303,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,2473,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,3286,60,1,25,44.23212833,-124.247595
+1005,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,40956,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,20,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,234,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,54304,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,490,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%NA,5,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,4002,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,5600,60,1,25,44.23212833,-124.247595
+1005,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,89691,60,1,25,44.23212833,-124.247595
+1205,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,45041,67,1,45,45.39631833,-124.0406283
+1205,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,10795,67,1,45,45.39631833,-124.0406283
+1205,1,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,3805,67,1,45,45.39631833,-124.0406283
+1205,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes pinniger,44,67,1,45,45.39631833,-124.0406283
+1205,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,2022,67,1,45,45.39631833,-124.0406283
+1205,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,13084,67,1,45,45.39631833,-124.0406283
+1205,1,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,639,67,1,45,45.39631833,-124.0406283
+1205,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,12979,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,39495,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1343,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,10218,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Perciformes,Liparidae%Liparis%NA,586,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,236,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,225,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,4674,67,1,45,45.39631833,-124.0406283
+1205,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,868,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,533,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,468,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Osmeriformes,Osmeridae%NA%NA,200,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Perciformes,Liparidae%Liparis%Liparis pulchellus,78,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,50,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,38,67,1,45,45.39631833,-124.0406283
+1205,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,65,67,1,45,45.39631833,-124.0406283
+1205,4,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,30932,67,1,45,45.39631833,-124.0406283
+1205,4,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,9078,67,1,45,45.39631833,-124.0406283
+1205,4,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,8107,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,29101,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,16,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Osmeriformes,Osmeridae%NA%NA,2681,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,3803,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Perciformes,Agonidae%NA%NA,1360,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Perciformes,Cottidae%Chitonotus%Chitonotus pugetensis,435,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,3298,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1134,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,145,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,2550,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,383,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,1673,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Psettichthys%Psettichthys melanostictus,80,67,1,45,45.39631833,-124.0406283
+1206,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus kisutch,159,67,1,45,45.39631833,-124.0406283
+1206,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,22,67,1,45,45.39631833,-124.0406283
+1206,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,543,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,25615,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,363,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,441,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,42,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,729,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Agonidae%Chesnonia%Chesnonia verrucosa,319,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Bathymasteridae%Ronquilus%Ronquilus jordani,164,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Cottidae%Artedius%Artedius fenestralis|lateralis,38,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Cottidae%Chitonotus%Chitonotus pugetensis,534,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,1235,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,324,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,53,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,218,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,120,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,597,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,422,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,432,67,1,45,45.39631833,-124.0406283
+1206,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,1242,67,1,45,45.39631833,-124.0406283
+1206,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,80,67,1,45,45.39631833,-124.0406283
+1206,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,146,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,11391,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,31,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Osmeriformes,Osmeridae%NA%NA,352,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,997,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Perciformes,Cottidae%Chitonotus%Chitonotus pugetensis,70,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,306,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,69,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,13,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,12,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,144,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,45,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,1002,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,183,67,1,45,45.39631833,-124.0406283
+1206,3,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2933,67,1,45,45.39631833,-124.0406283
+1206,3,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,105,67,1,45,45.39631833,-124.0406283
+1206,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,21,67,1,45,45.39631833,-124.0406283
+1206,4,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,55535,67,1,45,45.39631833,-124.0406283
+1206,4,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,665,67,1,45,45.39631833,-124.0406283
+1206,4,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,350,67,1,45,45.39631833,-124.0406283
+1206,4,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,8197,67,1,45,45.39631833,-124.0406283
+1207,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,27240,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,577,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1067,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Myctophiformes,Myctophidae%Lampanyctus%NA,2826,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,1256,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Perciformes,Liparidae%Liparis%Liparis pulchellus,1981,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,184,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,235,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,965,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1346,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,665,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,805,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,7368,67,1,25,45.39631833,-124.0406283
+1207,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,1076,67,1,25,45.39631833,-124.0406283
+1207,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,106,67,1,25,45.39631833,-124.0406283
+1207,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,489,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,11225,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,2,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,272,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Myctophiformes,Myctophidae%Lampanyctus%NA,1192,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Osmeriformes,Osmeridae%Allosmerus%Allosmerus elongatus,528,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,283,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,847,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Perciformes,Liparidae%Liparis%Liparis pulchellus,791,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,1562,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,1478,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,36,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,430,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,1016,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,1862,67,1,25,45.39631833,-124.0406283
+1207,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,7299,67,1,25,45.39631833,-124.0406283
+1207,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,62,67,1,25,45.39631833,-124.0406283
+1207,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,318,67,1,25,45.39631833,-124.0406283
+1207,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,40,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,21613,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,722,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1387,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1869,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,4519,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,28194,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,2316,67,1,25,45.39631833,-124.0406283
+1208,1,Actinopteri,Scombriformes,Scombridae%NA%NA,43,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,887,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,2729,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,16151,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3909,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,4,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,1642,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,6449,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Perciformes,Cottidae%Artedius%Artedius fenestralis|lateralis,1354,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,258,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,4283,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,52,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,524,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,3408,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,5807,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Scombriformes,Scombridae%NA%NA,113,67,1,25,45.39631833,-124.0406283
+1208,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,8664,67,1,25,45.39631833,-124.0406283
+1208,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,1706,67,1,25,45.39631833,-124.0406283
+1210,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,625,67,1,sfc,45.39631833,-124.0406283
+1210,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,59842,67,1,sfc,45.39631833,-124.0406283
+1210,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1264,67,1,sfc,45.39631833,-124.0406283
+1210,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,75,67,1,sfc,45.39631833,-124.0406283
+1210,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,116024,67,1,sfc,45.39631833,-124.0406283
+1210,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,44,67,1,sfc,45.39631833,-124.0406283
+1210,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,5944,67,1,sfc,45.39631833,-124.0406283
+1210,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,95,67,1,sfc,45.39631833,-124.0406283
+1210,2,Chondrichthyes,Lamniformes,Alopiidae%Isurus%Isurus oxyrinchus,16,67,1,sfc,45.39631833,-124.0406283
+1219,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,2604,67,3,291,45.39612167,-124.4226133
+1219,1,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,7072,67,3,291,45.39612167,-124.4226133
+1219,1,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,60784,67,3,291,45.39612167,-124.4226133
+1219,1,Actinopteri,Scombriformes,Scombridae%Scomber%NA,4430,67,3,291,45.39612167,-124.4226133
+1219,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,50291,67,3,291,45.39612167,-124.4226133
+1219,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,109466,67,3,291,45.39612167,-124.4226133
+1219,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,45425,67,3,291,45.39612167,-124.4226133
+1219,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,19094,67,3,291,45.39612167,-124.4226133
+1220,1,Actinopteri,Cichliformes,Cichlidae%Oreochromis%NA,10317,67,3,291,45.39612167,-124.4226133
+1220,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,32472,67,3,291,45.39612167,-124.4226133
+1220,1,Actinopteri,Perciformes,Zoarcidae%Lycodapus%Lycodapus mandibularis,5702,67,3,291,45.39612167,-124.4226133
+1220,1,Actinopteri,Perciformes,Zoarcidae%Lycodapus%NA,323,67,3,291,45.39612167,-124.4226133
+1220,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,4,67,3,291,45.39612167,-124.4226133
+1220,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,114335,67,3,291,45.39612167,-124.4226133
+1220,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,12969,67,3,291,45.39612167,-124.4226133
+1220,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,2595,67,3,291,45.39612167,-124.4226133
+1220,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes polyspinis|variabilis|ciliatus|crameri,10278,67,3,291,45.39612167,-124.4226133
+1220,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,16113,67,3,291,45.39612167,-124.4226133
+1225,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,10344,67,3,50,45.39612167,-124.4226133
+1225,1,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,11797,67,3,50,45.39612167,-124.4226133
+1225,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,363,67,3,50,45.39612167,-124.4226133
+1225,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas,23423,67,3,50,45.39612167,-124.4226133
+1225,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,9436,67,3,50,45.39612167,-124.4226133
+1228,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,952,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1929,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,15,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,9,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,1100,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,101,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,10745,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,134,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,18,67,3,sfc,45.39612167,-124.4226133
+1228,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,104,67,3,sfc,45.39612167,-124.4226133
+1228,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,230,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,238,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,553,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,557,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,11,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,11810,67,3,sfc,45.39612167,-124.4226133
+1228,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,895,67,3,sfc,45.39612167,-124.4226133
+1265,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,5,67,7,500,45.398275,-125.0283033
+1265,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,33,67,7,500,45.398275,-125.0283033
+1265,1,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,3,67,7,500,45.398275,-125.0283033
+1265,1,Actinopteri,Scombriformes,Scombridae%NA%NA,5953,67,7,500,45.398275,-125.0283033
+1265,1,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,56731,67,7,500,45.398275,-125.0283033
+1265,2,Actinopteri,Scombriformes,Scombridae%NA%NA,13326,67,7,500,45.398275,-125.0283033
+1265,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,118911,67,7,500,45.398275,-125.0283033
+1266,1,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,25,67,7,500,45.398275,-125.0283033
+1266,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,107558,67,7,500,45.398275,-125.0283033
+1266,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,11,67,7,500,45.398275,-125.0283033
+1266,2,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,98,67,7,500,45.398275,-125.0283033
+1266,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,79198,67,7,500,45.398275,-125.0283033
+1273,1,Actinopteri,Stomiiformes,Stomiidae%Tactostoma%Tactostoma macropus,129667,67,7,50,45.398275,-125.0283033
+1273,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,2068,67,7,50,45.398275,-125.0283033
+1273,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,3150,67,7,50,45.398275,-125.0283033
+1273,2,Actinopteri,Perciformes,Zoarcidae%NA%NA,3,67,7,50,45.398275,-125.0283033
+1274,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,64799,67,7,50,45.398275,-125.0283033
+1274,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,41383,67,7,50,45.398275,-125.0283033
+1274,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,23562,67,7,50,45.398275,-125.0283033
+1274,1,Actinopteri,Stomiiformes,Stomiidae%Aristostomias%Aristostomias scintillans,867,67,7,50,45.398275,-125.0283033
+1274,2,Actinopteri,Scombriformes,Scombridae%NA%NA,2941,67,7,50,45.398275,-125.0283033
+1274,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,59035,67,7,50,45.398275,-125.0283033
+1535,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,4088,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1793,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Clupeiformes,Clupeidae%Alosa%Alosa fallax,131,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,274,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,2027,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus keta,51214,77,1,sfc,47.063255,-124.396465
+1535,1,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,2834,77,1,sfc,47.063255,-124.396465
+1535,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,186,77,1,sfc,47.063255,-124.396465
+1535,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,172,77,1,sfc,47.063255,-124.396465
+1535,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus keta,48432,77,1,sfc,47.063255,-124.396465
+1535,2,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,1291,77,1,sfc,47.063255,-124.396465
+1535,2,Chondrichthyes,Lamniformes,Alopiidae%Isurus%Isurus oxyrinchus,751,77,1,sfc,47.063255,-124.396465
+1537,1,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,4415,77,1,50,47.063255,-124.396465
+1537,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,11318,77,1,50,47.063255,-124.396465
+1537,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1783,77,1,50,47.063255,-124.396465
+1537,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,18495,77,1,50,47.063255,-124.396465
+1537,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,3111,77,1,50,47.063255,-124.396465
+1537,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,4171,77,1,50,47.063255,-124.396465
+1537,1,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,3379,77,1,50,47.063255,-124.396465
+1537,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,7258,77,1,50,47.063255,-124.396465
+1537,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,35,77,1,50,47.063255,-124.396465
+1537,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,693,77,1,50,47.063255,-124.396465
+1537,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,88,77,1,50,47.063255,-124.396465
+1537,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,820,77,1,50,47.063255,-124.396465
+1537,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,811,77,1,50,47.063255,-124.396465
+1537,2,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,193,77,1,50,47.063255,-124.396465
+1537,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,441,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,768,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,5268,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Perciformes,Pholidae%Pholis%NA,319,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,6,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,2683,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,880,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,379,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,587,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,9327,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,9078,77,1,50,47.063255,-124.396465
+1538,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,1001,77,1,50,47.063255,-124.396465
+1538,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,9,77,1,50,47.063255,-124.396465
+1538,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,10896,77,1,50,47.063255,-124.396465
+1538,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,82,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1594,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,10254,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,432,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,2,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Gadiformes,Gadidae%Microgadus%NA,1987,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Perciformes,Cottidae%Leptocottus%Leptocottus armatus,6913,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,61,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,9358,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1152,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,42689,77,1,50,47.063255,-124.396465
+1538,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,27223,77,1,50,47.063255,-124.396465
+1538,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,12,77,1,50,47.063255,-124.396465
+1538,2,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,2436,77,1,50,47.063255,-124.396465
+1538,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,42690,77,1,50,47.063255,-124.396465
+1538,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,562,77,1,50,47.063255,-124.396465
+1538,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,952,77,1,50,47.063255,-124.396465
+1538,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1934,77,1,50,47.063255,-124.396465
+1538,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1675,77,1,50,47.063255,-124.396465
+1538,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,4024,77,1,50,47.063255,-124.396465
+1538,3,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2103,77,1,50,47.063255,-124.396465
+1538,3,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,436,77,1,50,47.063255,-124.396465
+1538,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,1135,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,263,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,12262,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,7895,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,3202,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,2859,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,10505,77,1,50,47.063255,-124.396465
+1538,4,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,13734,77,1,50,47.063255,-124.396465
+1538,4,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,176,77,1,50,47.063255,-124.396465
+1538,4,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,233,77,1,50,47.063255,-124.396465
+1538,4,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,505,77,1,50,47.063255,-124.396465
+1538,4,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,16339,77,1,50,47.063255,-124.396465
+1539,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,3413,77,1,25,47.063255,-124.396465
+1539,1,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,4850,77,1,25,47.063255,-124.396465
+1539,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1116,77,1,25,47.063255,-124.396465
+1539,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,69,77,1,25,47.063255,-124.396465
+1539,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,2038,77,1,25,47.063255,-124.396465
+1539,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,4401,77,1,25,47.063255,-124.396465
+1539,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,496,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,6870,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,6929,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,314,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,1089,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,3076,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,104,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,7097,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,735,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,332,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,2595,77,1,25,47.063255,-124.396465
+1539,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,2857,77,1,25,47.063255,-124.396465
+1539,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,3710,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,42,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,68,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,867,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1620,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,500,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,405,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,5421,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,342,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,4582,77,1,25,47.063255,-124.396465
+1540,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Pleuronichthys%Pleuronichthys decurrens,353,77,1,25,47.063255,-124.396465
+1540,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,2603,77,1,25,47.063255,-124.396465
+1540,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,189,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,7,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,2579,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,740,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,2173,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Perciformes,Cottidae%NA%NA,2253,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,21,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1131,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,216,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,8581,77,1,25,47.063255,-124.396465
+1540,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,9111,77,1,25,47.063255,-124.396465
+1540,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,2320,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,343,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,530,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,7774,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1745,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,5601,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,18307,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,4849,77,1,25,47.063255,-124.396465
+1540,3,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,21514,77,1,25,47.063255,-124.396465
+1540,3,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,708,77,1,25,47.063255,-124.396465
+1540,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,15784,77,1,25,47.063255,-124.396465
+1540,3,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,2541,77,1,25,47.063255,-124.396465
+1541,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,11014,77,2,sfc,47.06391667,-124.8705967
+1541,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,2949,77,2,sfc,47.06391667,-124.8705967
+1541,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,308,77,2,sfc,47.06391667,-124.8705967
+1541,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,615,77,2,sfc,47.06391667,-124.8705967
+1541,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,10073,77,2,sfc,47.06391667,-124.8705967
+1541,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,1249,77,2,sfc,47.06391667,-124.8705967
+1543,1,Actinopteri,Clupeiformes,Clupeidae%Alosa%Alosa fallax,1020,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Clupeiformes,Clupeidae%Alosa%NA,212,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,117,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,19890,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,14214,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,18185,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,11024,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,5486,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Perciformes,Zoarcidae%NA%NA,76831,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,6,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Atheresthes%Atheresthes evermanni|stomias,10423,77,2,143,47.06391667,-124.8705967
+1543,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Atheresthes%NA,2571,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Clupeiformes,Clupeidae%Alosa%Alosa fallax,833,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Clupeiformes,Clupeidae%Alosa%NA,475,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,26725,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Perciformes,Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,3514,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Perciformes,Zoarcidae%NA%NA,122386,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Atheresthes%Atheresthes evermanni|stomias,19100,77,2,143,47.06391667,-124.8705967
+1543,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Atheresthes%NA,811,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,2497,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,3,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Perciformes,Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,5792,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,15006,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Perciformes,Stichaeidae%Poroclinus%Poroclinus rothrocki,1715,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Perciformes,Zoarcidae%NA%NA,38957,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,14091,77,2,143,47.06391667,-124.8705967
+1544,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,10291,77,2,143,47.06391667,-124.8705967
+1544,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,5896,77,2,143,47.06391667,-124.8705967
+1544,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,41896,77,2,143,47.06391667,-124.8705967
+1544,2,Actinopteri,Perciformes,Zoarcidae%NA%NA,91997,77,2,143,47.06391667,-124.8705967
+1544,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,17671,77,2,143,47.06391667,-124.8705967
+1544,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,20702,77,2,143,47.06391667,-124.8705967
+1547,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1396,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1348,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,3844,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,7339,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Perciformes,Cottidae%NA%NA,66142,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,7958,77,2,50,47.06391667,-124.8705967
+1547,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus keta,6957,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,89,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,4606,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Cichliformes,Cichlidae%Oreochromis%NA,211,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Clupeiformes,Clupeidae%Alosa%Alosa fallax,2557,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Clupeiformes,Clupeidae%Alosa%NA,118,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,13337,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1509,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,3671,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Perciformes,Zoarcidae%NA%NA,3773,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,1685,77,2,50,47.06391667,-124.8705967
+1548,1,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,3447,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,26033,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,45,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Cichliformes,Cichlidae%Oreochromis%NA,5577,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,423,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,16,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,34,77,2,50,47.06391667,-124.8705967
+1548,2,Actinopteri,Scombriformes,Scombridae%Scomber%NA,60687,77,2,50,47.06391667,-124.8705967
+1573,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,4879,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,350,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,8630,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,11033,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,3972,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,504,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,1006,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,6069,77,6,sfc,47.06442,-125.2157667
+1573,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,339,77,6,sfc,47.06442,-125.2157667
+1573,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,586,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,13175,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,17732,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,608,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,5714,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,5473,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1100,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,4524,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,602,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3296,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,180,77,6,sfc,47.06442,-125.2157667
+1573,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,1166,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,96,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,2113,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,1630,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,543,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,10255,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,17300,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,11515,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,585,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,1909,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,7746,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,442,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Perciformes,Sebastidae%Sebastolobus%Sebastolobus altivelis,839,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,2400,77,6,sfc,47.06442,-125.2157667
+1574,1,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,1879,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,1865,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,354,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,4179,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,2907,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,282,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,9551,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,829,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,1927,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,2448,77,6,sfc,47.06442,-125.2157667
+1574,2,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,2138,77,6,sfc,47.06442,-125.2157667
+1575,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,112047,77,6,500,47.06442,-125.2157667
+1575,1,Actinopteri,Scombriformes,Scombridae%NA%NA,10361,77,6,500,47.06442,-125.2157667
+1575,1,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,56801,77,6,500,47.06442,-125.2157667
+1719,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,49736,81,1,sfc,47.72953333,-124.680385
+1719,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,4812,81,1,sfc,47.72953333,-124.680385
+1719,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1481,81,1,sfc,47.72953333,-124.680385
+1719,1,Actinopteri,Salmoniformes,Salmonidae%Salvelinus%NA,158,81,1,sfc,47.72953333,-124.680385
+1719,1,Actinopteri,Salmoniformes,Salmonidae%Salvelinus%Salvelinus environmental|leucomaenis|fontinalis,2257,81,1,sfc,47.72953333,-124.680385
+1719,1,Hexanauplia,Pedunculata,Pollicipedidae%Pollicipes%Pollicipes polymerus,13,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,1950,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,651,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,202,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,453,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,157,81,1,sfc,47.72953333,-124.680385
+1719,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Psettichthys%Psettichthys melanostictus,5854,81,1,sfc,47.72953333,-124.680385
+1723,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,288828,81,1,25,47.72953333,-124.680385
+1725,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3088,81,1,3,47.72953333,-124.680385
+1725,1,Actinopteri,Perciformes,Cottidae%NA%NA,7921,81,1,3,47.72953333,-124.680385
+1725,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,41,81,1,3,47.72953333,-124.680385
+1725,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,150863,81,1,3,47.72953333,-124.680385
+1725,1,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,114,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,5682,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Osmeriformes,Osmeridae%Hypomesus%Hypomesus pretiosus,3,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Perciformes,Cottidae%NA%NA,14046,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,50,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,31,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,259825,81,1,3,47.72953333,-124.680385
+1725,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,214,81,1,3,47.72953333,-124.680385
+1755,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,19003,81,5,50,47.73109333,-125.2471967
+1755,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,55487,81,5,50,47.73109333,-125.2471967
+1755,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,14782,81,5,50,47.73109333,-125.2471967
+1755,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,7814,81,5,50,47.73109333,-125.2471967
+1755,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,55702,81,5,50,47.73109333,-125.2471967
+1755,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,314,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,20734,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,111367,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,111,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,503,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,370,81,5,50,47.73109333,-125.2471967
+1755,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,2265,81,5,50,47.73109333,-125.2471967
+1756,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,101249,81,5,50,47.73109333,-125.2471967
+1756,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,38639,81,5,50,47.73109333,-125.2471967
+1756,2,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,1320,81,5,50,47.73109333,-125.2471967
+1756,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,10187,81,5,50,47.73109333,-125.2471967
+1756,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,2262,81,5,50,47.73109333,-125.2471967
+1756,2,Actinopteri,Perciformes,Liparidae%Liparis%Liparis fucensis|callyodon,431,81,5,50,47.73109333,-125.2471967
+1769,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,765,81,9,sfc,47.73233,-125.742555
+1769,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,11424,81,9,sfc,47.73233,-125.742555
+1769,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,14340,81,9,sfc,47.73233,-125.742555
+1769,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,1283,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Aulopiformes,Paralepididae%Magnisudis%Magnisudis atlantica,14,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,152,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,447,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,23407,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,19799,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,614,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,23,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,29,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,9,81,9,sfc,47.73233,-125.742555
+1769,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,4340,81,9,sfc,47.73233,-125.742555
+1769,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,122,81,9,sfc,47.73233,-125.742555
+1769,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,11,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,265,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,4070,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,17973,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,1265,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Scombriformes,Scombridae%NA%NA,1002,81,9,sfc,47.73233,-125.742555
+1770,1,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,7665,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,3102,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,518,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,31047,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,16655,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,136,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,20,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Scombriformes,Scombridae%NA%NA,59,81,9,sfc,47.73233,-125.742555
+1770,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,6730,81,9,sfc,47.73233,-125.742555
+1770,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,450,81,9,sfc,47.73233,-125.742555
+1779,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,4376,81,9,50,47.73233,-125.742555
+1779,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,231,81,9,50,47.73233,-125.742555
+1779,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1656,81,9,50,47.73233,-125.742555
+1779,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,3439,81,9,50,47.73233,-125.742555
+1779,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,2503,81,9,50,47.73233,-125.742555
+1779,2,Actinopteri,Perciformes,Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,709,81,9,50,47.73233,-125.742555
+1779,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,668,81,9,50,47.73233,-125.742555
+1780,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,3626,81,9,50,47.73233,-125.742555
+1780,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,11535,81,9,50,47.73233,-125.742555
+1780,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,6090,81,9,50,47.73233,-125.742555
+1780,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,25984,81,9,50,47.73233,-125.742555
+1780,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,40727,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,1159,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,9293,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,139,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,10662,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,23,81,9,50,47.73233,-125.742555
+1780,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,13562,81,9,50,47.73233,-125.742555
+282,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,2128,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,1459,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes ensifer,174,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,2197,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,8770,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Perciformes,Zaniolepididae%Zaniolepis%NA,573,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3645,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,187,35,1,48,40.065505,-124.1372783
+282,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,831,35,1,48,40.065505,-124.1372783
+282,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,1432,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1970,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,10978,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,5336,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes aleutianus|melanostictus,2629,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes miniatus,2006,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,3936,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,109,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,85105,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1544,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,979,35,1,48,40.065505,-124.1372783
+282,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,8,35,1,48,40.065505,-124.1372783
+282,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,199,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,12402,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,4903,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Cottidae%NA%NA,4599,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Hexagrammidae%Hexagrammos%Hexagrammos decagrammus,12035,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,16951,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Pholidae%Pholis%Pholis laeta,4478,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,177,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,4385,35,1,48,40.065505,-124.1372783
+283,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,726,35,1,48,40.065505,-124.1372783
+283,1,Hexanauplia,Sessilia,Balanidae%Balanus%NA,19,35,1,48,40.065505,-124.1372783
+283,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,34890,35,1,48,40.065505,-124.1372783
+283,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2482,35,1,48,40.065505,-124.1372783
+283,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,100416,35,1,48,40.065505,-124.1372783
+284,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,3880,35,1,25,40.065505,-124.1372783
+284,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,6700,35,1,25,40.065505,-124.1372783
+284,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,10,35,1,25,40.065505,-124.1372783
+284,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,348,35,1,25,40.065505,-124.1372783
+284,2,Actinopteri,Perciformes,Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,19867,35,1,25,40.065505,-124.1372783
+284,2,Actinopteri,Perciformes,Anarhichadidae%NA%NA,404,35,1,25,40.065505,-124.1372783
+285,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,1716,35,1,25,40.065505,-124.1372783
+285,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,69,35,1,25,40.065505,-124.1372783
+285,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,28622,35,1,25,40.065505,-124.1372783
+285,2,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,13199,35,1,25,40.065505,-124.1372783
+285,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,171,35,1,25,40.065505,-124.1372783
+286,1,Actinopteri,Atheriniformes,Atherinopsidae%Atherinops%Atherinops affinis,20,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,3550,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Osmeriformes,Osmeridae%Hypomesus%Hypomesus pretiosus,19918,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,142,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,12005,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,31,35,1,sfc,40.065505,-124.1372783
+286,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,64013,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,8,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,41087,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,9,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,1292,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,18130,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,408,35,1,sfc,40.065505,-124.1372783
+287,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,13,35,1,sfc,40.065505,-124.1372783
+287,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,30947,35,1,sfc,40.065505,-124.1372783
+287,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,744,35,1,sfc,40.065505,-124.1372783
+287,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,16117,35,1,sfc,40.065505,-124.1372783
+287,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,267,35,1,sfc,40.065505,-124.1372783
+310,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,9325,35,7,500,40.06181,-124.6436167
+310,1,Actinopteri,Argentiniformes,Bathylagidae%Pseudobathylagus%Pseudobathylagus milleri,218087,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,1896,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Argentiniformes,Bathylagidae%Pseudobathylagus%Pseudobathylagus milleri,44415,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,13,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%NA,29181,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%Nannobrachium regale,90059,35,7,500,40.06181,-124.6436167
+310,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,7,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,24,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,75,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,43794,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%NA,45,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,79,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,9324,35,7,500,40.06181,-124.6436167
+311,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,33734,35,7,500,40.06181,-124.6436167
+318,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1784,35,7,50,40.06181,-124.6436167
+318,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,94363,35,7,50,40.06181,-124.6436167
+318,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,648,35,7,50,40.06181,-124.6436167
+318,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,5262,35,7,50,40.06181,-124.6436167
+318,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,61864,35,7,50,40.06181,-124.6436167
+318,2,Actinopteri,Cichliformes,Cichlidae%Oreochromis%NA,220,35,7,50,40.06181,-124.6436167
+318,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,1503,35,7,50,40.06181,-124.6436167
+319,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,4884,35,7,50,40.06181,-124.6436167
+319,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,61456,35,7,50,40.06181,-124.6436167
+319,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,4,35,7,50,40.06181,-124.6436167
+320,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,34486,35,7,sfc,40.06181,-124.6436167
+320,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,91017,35,7,sfc,40.06181,-124.6436167
+320,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,13721,35,7,sfc,40.06181,-124.6436167
+320,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,124488,35,7,sfc,40.06181,-124.6436167
+320,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,783,35,7,sfc,40.06181,-124.6436167
+320,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,261,35,7,sfc,40.06181,-124.6436167
+321,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,20335,35,7,sfc,40.06181,-124.6436167
+321,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,113144,35,7,sfc,40.06181,-124.6436167
+321,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,2780,35,7,sfc,40.06181,-124.6436167
+321,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,156,35,7,sfc,40.06181,-124.6436167
+334,1,Actinopteri,Alepocephaliformes,Platytroctidae%Sagamichthys%Sagamichthys abei,6953,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,55,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,3,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,130,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,7,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,6,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,4,35,11,500,40.06377,-125.0781317
+334,1,Actinopteri,Stomiiformes,Stomiidae%Idiacanthus%Idiacanthus antrostomus,20060,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Argentiniformes,Bathylagidae%Bathylagus%Bathylagus stilbius,162,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,29072,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,5737,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,18526,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,6,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%NA,22027,35,11,500,40.06377,-125.0781317
+334,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,48,35,11,500,40.06377,-125.0781317
+334,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,10,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Argentiniformes,Bathylagidae%Bathylagus%Bathylagus stilbius,61448,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,12983,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,27634,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,62,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,6,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Stomiiformes,Gonostomatidae%Cyclothone%Cyclothone signata,204,35,11,500,40.06377,-125.0781317
+335,1,Actinopteri,Stomiiformes,Sternoptychidae%Sternoptyx%NA,62897,35,11,500,40.06377,-125.0781317
+335,2,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,28938,35,11,500,40.06377,-125.0781317
+335,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,34792,35,11,500,40.06377,-125.0781317
+335,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,15,35,11,500,40.06377,-125.0781317
+335,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,6,35,11,500,40.06377,-125.0781317
+342,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2748,35,11,50,40.06377,-125.0781317
+342,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,65656,35,11,50,40.06377,-125.0781317
+342,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,5858,35,11,50,40.06377,-125.0781317
+342,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,1266,35,11,50,40.06377,-125.0781317
+342,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,62032,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,45,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,82,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,1509,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,3138,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,6,35,11,50,40.06377,-125.0781317
+342,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,78,35,11,50,40.06377,-125.0781317
+343,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,22818,35,11,50,40.06377,-125.0781317
+343,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1697,35,11,50,40.06377,-125.0781317
+343,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,32899,35,11,50,40.06377,-125.0781317
+343,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,26143,35,11,50,40.06377,-125.0781317
+344,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,265,35,11,sfc,40.06377,-125.0781317
+344,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,4165,35,11,sfc,40.06377,-125.0781317
+344,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,5611,35,11,sfc,40.06377,-125.0781317
+344,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,1884,35,11,sfc,40.06377,-125.0781317
+345,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,755,35,11,sfc,40.06377,-125.0781317
+345,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2007,35,11,sfc,40.06377,-125.0781317
+345,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,44387,35,11,sfc,40.06377,-125.0781317
+345,1,Actinopteri,Scombriformes,Scombridae%Scomber%NA,131,35,11,sfc,40.06377,-125.0781317
+345,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,4163,35,11,sfc,40.06377,-125.0781317
+345,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2485,35,11,sfc,40.06377,-125.0781317
+345,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,46465,35,11,sfc,40.06377,-125.0781317
+345,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,4176,35,11,sfc,40.06377,-125.0781317
+345,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,460,35,11,sfc,40.06377,-125.0781317
+345,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,78,35,11,sfc,40.06377,-125.0781317
+456,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,6121,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3479,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Osmeriformes,Osmeridae%Allosmerus%Allosmerus elongatus,4780,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Osmeriformes,Osmeridae%NA%NA,3744,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Osmeriformes,Osmeridae%Spirinchus%Spirinchus starksi,554,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Perciformes,Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,5230,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Perciformes,Anarhichadidae%NA%NA,485,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Perciformes,Cottidae%NA%NA,512,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,784,39,1,42,40.72985,-124.3734867
+456,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,1728,39,1,42,40.72985,-124.3734867
+456,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,96,39,1,42,40.72985,-124.3734867
+456,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,128,39,1,42,40.72985,-124.3734867
+456,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,14,39,1,42,40.72985,-124.3734867
+456,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,1720,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,346,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,32189,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,43,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,549,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Osmeriformes,Osmeridae%Allosmerus%Allosmerus elongatus,933,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,9045,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Osmeriformes,Osmeridae%Spirinchus%Spirinchus starksi,265,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Perciformes,Cottidae%Artedius%Artedius fenestralis|lateralis,875,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Perciformes,Cottidae%Artedius%NA,52,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,54,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,290,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,10,39,1,42,40.72985,-124.3734867
+456,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,99,39,1,42,40.72985,-124.3734867
+456,2,Chondrichthyes,Carcharhiniformes,Scyliorhinidae%Apristurus%Apristurus brunneus,44,39,1,42,40.72985,-124.3734867
+456,2,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,46,39,1,42,40.72985,-124.3734867
+456,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,314,39,1,42,40.72985,-124.3734867
+457,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,11261,39,1,42,40.72985,-124.3734867
+457,1,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,407,39,1,42,40.72985,-124.3734867
+457,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,840,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,49569,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,975,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Osmeriformes,Osmeridae%Allosmerus%Allosmerus elongatus,5646,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,153,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Perciformes,Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,1145,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,80,39,1,42,40.72985,-124.3734867
+457,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,1687,39,1,42,40.72985,-124.3734867
+457,2,Chondrichthyes,Carcharhiniformes,Scyliorhinidae%Apristurus%Apristurus brunneus,255,39,1,42,40.72985,-124.3734867
+457,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,52,39,1,42,40.72985,-124.3734867
+458,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,84,39,1,25,40.72985,-124.3734867
+458,1,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,4445,39,1,25,40.72985,-124.3734867
+458,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,3382,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,32824,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,3,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,7835,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,1702,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,1522,39,1,25,40.72985,-124.3734867
+458,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,651,39,1,25,40.72985,-124.3734867
+458,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,507,39,1,25,40.72985,-124.3734867
+459,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,34078,39,1,25,40.72985,-124.3734867
+459,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,5513,39,1,25,40.72985,-124.3734867
+459,1,Actinopteri,Osmeriformes,Osmeridae%Hypomesus%Hypomesus pretiosus,13781,39,1,25,40.72985,-124.3734867
+459,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,110,39,1,25,40.72985,-124.3734867
+459,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus kisutch,4163,39,1,25,40.72985,-124.3734867
+459,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,5666,39,1,25,40.72985,-124.3734867
+459,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,22761,39,1,25,40.72985,-124.3734867
+459,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,9407,39,1,25,40.72985,-124.3734867
+459,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,21149,39,1,25,40.72985,-124.3734867
+462,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,11018,39,1,sfc,40.72985,-124.3734867
+462,1,Actinopteri,Perciformes,Cottidae%NA%NA,7,39,1,sfc,40.72985,-124.3734867
+462,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2089,39,1,sfc,40.72985,-124.3734867
+462,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,100,39,1,sfc,40.72985,-124.3734867
+462,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,10723,39,1,sfc,40.72985,-124.3734867
+462,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,176207,39,1,sfc,40.72985,-124.3734867
+463,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,451,39,1,sfc,40.72985,-124.3734867
+463,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,10003,39,1,sfc,40.72985,-124.3734867
+463,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,21951,39,1,sfc,40.72985,-124.3734867
+463,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%NA,403,39,1,sfc,40.72985,-124.3734867
+463,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,46718,39,1,sfc,40.72985,-124.3734867
+463,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,11,39,1,sfc,40.72985,-124.3734867
+463,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,8016,39,1,sfc,40.72985,-124.3734867
+463,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,158652,39,1,sfc,40.72985,-124.3734867
+478,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,52851,39,5,500,40.73091833,-124.6617817
+478,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,40,39,5,500,40.73091833,-124.6617817
+478,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,103456,39,5,500,40.73091833,-124.6617817
+478,1,Actinopteri,Perciformes,Zoarcidae%Lycodes%Lycodes diapterus,5329,39,5,500,40.73091833,-124.6617817
+478,1,Actinopteri,Perciformes,Zoarcidae%Lycodes%NA,968,39,5,500,40.73091833,-124.6617817
+478,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,8,39,5,500,40.73091833,-124.6617817
+478,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,34196,39,5,500,40.73091833,-124.6617817
+478,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,12,39,5,500,40.73091833,-124.6617817
+479,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,30086,39,5,500,40.73091833,-124.6617817
+479,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,3097,39,5,500,40.73091833,-124.6617817
+479,1,Actinopteri,Stomiiformes,Stomiidae%Tactostoma%Tactostoma macropus,117,39,5,500,40.73091833,-124.6617817
+479,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,172003,39,5,500,40.73091833,-124.6617817
+479,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%NA,91,39,5,500,40.73091833,-124.6617817
+479,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,14,39,5,500,40.73091833,-124.6617817
+486,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,563,39,5,50,40.73091833,-124.6617817
+486,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,18612,39,5,50,40.73091833,-124.6617817
+486,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,2518,39,5,50,40.73091833,-124.6617817
+486,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,3108,39,5,50,40.73091833,-124.6617817
+486,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,95,39,5,50,40.73091833,-124.6617817
+486,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,5254,39,5,50,40.73091833,-124.6617817
+486,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,22,39,5,50,40.73091833,-124.6617817
+486,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2762,39,5,50,40.73091833,-124.6617817
+486,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,33970,39,5,50,40.73091833,-124.6617817
+486,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,41257,39,5,50,40.73091833,-124.6617817
+486,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,3633,39,5,50,40.73091833,-124.6617817
+486,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,39683,39,5,50,40.73091833,-124.6617817
+486,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,21674,39,5,50,40.73091833,-124.6617817
+487,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,23,39,5,50,40.73091833,-124.6617817
+487,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,3880,39,5,50,40.73091833,-124.6617817
+487,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,41,39,5,50,40.73091833,-124.6617817
+487,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,41,39,5,50,40.73091833,-124.6617817
+487,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,5,39,5,50,40.73091833,-124.6617817
+487,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2653,39,5,50,40.73091833,-124.6617817
+487,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,15748,39,5,50,40.73091833,-124.6617817
+487,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,50670,39,5,50,40.73091833,-124.6617817
+487,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas,5502,39,5,50,40.73091833,-124.6617817
+487,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,935,39,5,50,40.73091833,-124.6617817
+488,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2593,39,5,sfc,40.73091833,-124.6617817
+488,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,43132,39,5,sfc,40.73091833,-124.6617817
+488,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,906,39,5,sfc,40.73091833,-124.6617817
+488,2,Actinopteri,Scombriformes,Scombridae%Scomber%NA,553,39,5,sfc,40.73091833,-124.6617817
+488,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,20251,39,5,sfc,40.73091833,-124.6617817
+489,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1335,39,5,sfc,40.73091833,-124.6617817
+489,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,41323,39,5,sfc,40.73091833,-124.6617817
+489,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,7,39,5,sfc,40.73091833,-124.6617817
+489,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,1203,39,5,sfc,40.73091833,-124.6617817
+489,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%NA,460,39,5,sfc,40.73091833,-124.6617817
+489,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1204,39,5,sfc,40.73091833,-124.6617817
+489,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,27795,39,5,sfc,40.73091833,-124.6617817
+489,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,1022,39,5,sfc,40.73091833,-124.6617817
+489,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%NA,397,39,5,sfc,40.73091833,-124.6617817
+489,3,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,2442,39,5,sfc,40.73091833,-124.6617817
+489,3,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,69290,39,5,sfc,40.73091833,-124.6617817
+489,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,7,39,5,sfc,40.73091833,-124.6617817
+489,3,Actinopteri,Perciformes,Cottidae%NA%NA,15,39,5,sfc,40.73091833,-124.6617817
+489,3,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus gorbuscha,243,39,5,sfc,40.73091833,-124.6617817
+489,3,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,17337,39,5,sfc,40.73091833,-124.6617817
+489,3,Chondrichthyes,Lamniformes,Alopiidae%Lamna%NA,697,39,5,sfc,40.73091833,-124.6617817
+502,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,3,39,9,500,40.72901667,-125.1001667
+502,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,61240,39,9,500,40.72901667,-125.1001667
+502,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus keta,32,39,9,500,40.72901667,-125.1001667
+502,1,Actinopteri,Tetraodontiformes,Molidae%Mola%Mola mola,4,39,9,500,40.72901667,-125.1001667
+503,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,61153,39,9,500,40.72901667,-125.1001667
+503,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,18,39,9,500,40.72901667,-125.1001667
+510,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,31104,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,322,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,87906,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,1887,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,33243,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,99881,39,9,50,40.72901667,-125.1001667
+510,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,4,39,9,50,40.72901667,-125.1001667
+510,2,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,127207,39,9,50,40.72901667,-125.1001667
+510,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,4341,39,9,50,40.72901667,-125.1001667
+510,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,82007,39,9,50,40.72901667,-125.1001667
+510,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,81132,39,9,50,40.72901667,-125.1001667
+510,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,6698,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,939,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,46168,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,5961,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,116358,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,8748,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,8864,39,9,50,40.72901667,-125.1001667
+511,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,8082,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,15671,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,25095,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,894,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,30,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,1053,39,9,50,40.72901667,-125.1001667
+511,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,9204,39,9,50,40.72901667,-125.1001667
+512,1,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,4,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,373,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,12657,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%NA,3131,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,66713,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,397,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,527,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3922,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2398,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,87,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,13227,39,9,sfc,40.72901667,-125.1001667
+512,1,Actinopteri,Stomiiformes,Stomiidae%Tactostoma%Tactostoma macropus,984,39,9,sfc,40.72901667,-125.1001667
+512,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,140,39,9,sfc,40.72901667,-125.1001667
+512,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%NA,136,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,481,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,22056,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,122,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,1975,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,10755,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,823,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,2352,39,9,sfc,40.72901667,-125.1001667
+512,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,2430,39,9,sfc,40.72901667,-125.1001667
+512,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,927,39,9,sfc,40.72901667,-125.1001667
+512,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%NA,491,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,321,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,22235,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,51489,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,6,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,6,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,8509,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,3528,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,50,39,9,sfc,40.72901667,-125.1001667
+513,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,431,39,9,sfc,40.72901667,-125.1001667
+513,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,16,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,1035,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,660,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,6142,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,7722,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,289,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,77,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,28223,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,6742,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,5102,39,9,sfc,40.72901667,-125.1001667
+513,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,96,39,9,sfc,40.72901667,-125.1001667
+513,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,1512,39,9,sfc,40.72901667,-125.1001667
+58,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,59799,26,1,50,38.56360833,-123.3499667
+58,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,53248,26,1,50,38.56360833,-123.3499667
+58,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,13020,26,1,50,38.56360833,-123.3499667
+58,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,36616,26,1,50,38.56360833,-123.3499667
+58,1,Actinopteri,NA,Sciaenidae%Genyonemus%Genyonemus lineatus,206,26,1,50,38.56360833,-123.3499667
+58,1,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,100,26,1,50,38.56360833,-123.3499667
+58,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,201,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,274,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,7784,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Perciformes,Zaniolepididae%Zaniolepis%NA,317,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Perciformes,Zaniolepididae%Zaniolepis%Zaniolepis latipinnis,3278,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,401,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,99,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,51899,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,8095,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2705,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,NA,Embiotocidae%NA%NA,1870,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,NA,Embiotocidae%Zalembius%Zalembius rosaceus,6027,26,1,50,38.56360833,-123.3499667
+59,1,Actinopteri,NA,Sciaenidae%Genyonemus%Genyonemus lineatus,6088,26,1,50,38.56360833,-123.3499667
+59,1,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,160,26,1,50,38.56360833,-123.3499667
+59,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,332,26,1,50,38.56360833,-123.3499667
+59,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja inornata,2231,26,1,50,38.56360833,-123.3499667
+59,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,94,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,5048,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,875,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,160,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,508,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,39,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,1936,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2977,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,406,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,NA,Embiotocidae%Zalembius%Zalembius rosaceus,717,26,1,50,38.56360833,-123.3499667
+59,2,Actinopteri,NA,Sciaenidae%Genyonemus%Genyonemus lineatus,4734,26,1,50,38.56360833,-123.3499667
+59,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,79,26,1,50,38.56360833,-123.3499667
+59,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,374,26,1,50,38.56360833,-123.3499667
+59,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja inornata,26958,26,1,50,38.56360833,-123.3499667
+59,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,900,26,1,50,38.56360833,-123.3499667
+60,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,73058,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,848,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,4782,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3785,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1182,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,3505,26,1,25,38.56360833,-123.3499667
+60,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,14625,26,1,25,38.56360833,-123.3499667
+60,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,2947,26,1,25,38.56360833,-123.3499667
+60,1,Hexanauplia,Sessilia,Balanidae%Balanus%NA,29,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,31396,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3983,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1699,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,1200,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,17086,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,25186,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%NA,304,26,1,25,38.56360833,-123.3499667
+60,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,40112,26,1,25,38.56360833,-123.3499667
+60,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja inornata,4552,26,1,25,38.56360833,-123.3499667
+60,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,17349,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,26880,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,873,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Perciformes,Zoarcidae%NA%NA,2809,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,2660,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,143,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,8662,26,1,25,38.56360833,-123.3499667
+61,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,768,26,1,25,38.56360833,-123.3499667
+61,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,106339,26,1,25,38.56360833,-123.3499667
+61,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,36878,26,1,25,38.56360833,-123.3499667
+61,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,73840,26,1,25,38.56360833,-123.3499667
+61,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,35335,26,1,25,38.56360833,-123.3499667
+61,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,55623,26,1,25,38.56360833,-123.3499667
+61,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,61100,26,1,25,38.56360833,-123.3499667
+61,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,34464,26,1,25,38.56360833,-123.3499667
+61,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3538,26,1,25,38.56360833,-123.3499667
+61,3,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,1508,26,1,25,38.56360833,-123.3499667
+61,3,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,14400,26,1,25,38.56360833,-123.3499667
+61,3,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,13841,26,1,25,38.56360833,-123.3499667
+61,3,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,3659,26,1,25,38.56360833,-123.3499667
+61,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,6751,26,1,25,38.56360833,-123.3499667
+61,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,5957,26,1,25,38.56360833,-123.3499667
+62,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,21061,26,1,sfc,38.56360833,-123.3499667
+62,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,10265,26,1,sfc,38.56360833,-123.3499667
+62,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,3017,26,1,sfc,38.56360833,-123.3499667
+62,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,2394,26,1,sfc,38.56360833,-123.3499667
+62,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,2241,26,1,sfc,38.56360833,-123.3499667
+62,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,2941,26,1,sfc,38.56360833,-123.3499667
+62,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,821,26,1,sfc,38.56360833,-123.3499667
+62,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,95,26,1,sfc,38.56360833,-123.3499667
+62,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,1836,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,6977,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Cottidae%Artedius%Artedius harringtoni,2422,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Cottidae%Artedius%NA,705,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Liparidae%Liparis%Liparis florae,527,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Liparidae%Liparis%NA,168,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,10030,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,1483,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,32470,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,145,26,1,sfc,38.56360833,-123.3499667
+63,1,Actinopteri,NA,Embiotocidae%Embiotoca%Embiotoca jacksoni|lateralis,101,26,1,sfc,38.56360833,-123.3499667
+63,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,52,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,444,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,120,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,120,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Cottidae%Artedius%Artedius harringtoni,2049,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Cottidae%NA%NA,658,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Jordaniidae%Jordania%Jordania zonope,360,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Liparidae%Liparis%Liparis florae,1025,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,944,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,593,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,9323,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,1788,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,237,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,808,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,398,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,978,26,1,sfc,38.56360833,-123.3499667
+63,2,Actinopteri,NA,Embiotocidae%Rhacochilus%Rhacochilus vacca,507,26,1,sfc,38.56360833,-123.3499667
+64,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,40,26,2,150,38.56174167,-123.6588383
+64,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,140860,26,2,150,38.56174167,-123.6588383
+64,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,15794,26,2,150,38.56174167,-123.6588383
+64,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,154291,26,2,150,38.56174167,-123.6588383
+64,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus keta,36,26,2,150,38.56174167,-123.6588383
+64,2,Chondrichthyes,Lamniformes,Alopiidae%Isurus%Isurus oxyrinchus,2,26,2,150,38.56174167,-123.6588383
+64,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,5351,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,8,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,74,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,85687,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Cottidae%NA%NA,12,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Hexagrammidae%Hexagrammos%Hexagrammos decagrammus,19,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Hexagrammidae%Ophiodon%Ophiodon elongatus,21,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Pholidae%Pholis%Pholis laeta,9,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,549,26,2,150,38.56174167,-123.6588383
+65,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes saxicola,19656,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,38,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,67350,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,1957,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,5889,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,53,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,22234,26,2,150,38.56174167,-123.6588383
+65,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Microstomus%Microstomus pacificus,11064,26,2,150,38.56174167,-123.6588383
+65,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,5021,26,2,150,38.56174167,-123.6588383
+65,2,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,10408,26,2,150,38.56174167,-123.6588383
+68,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,265,26,2,50,38.56174167,-123.6588383
+68,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3742,26,2,50,38.56174167,-123.6588383
+68,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,488,26,2,50,38.56174167,-123.6588383
+68,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,15,26,2,50,38.56174167,-123.6588383
+69,1,Actinopteri,Cichliformes,Cichlidae%Oreochromis%NA,15962,26,2,50,38.56174167,-123.6588383
+69,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,47437,26,2,50,38.56174167,-123.6588383
+70,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3896,26,2,sfc,38.56174167,-123.6588383
+70,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,20663,26,2,sfc,38.56174167,-123.6588383
+70,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%NA%NA,272,26,2,sfc,38.56174167,-123.6588383
+70,2,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,12692,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,2529,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,206,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Osmeriformes,Osmeridae%Hypomesus%Hypomesus pretiosus,9,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,2,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,2957,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,2149,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,84,26,2,sfc,38.56174167,-123.6588383
+71,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Eopsetta%Eopsetta jordani,4812,26,2,sfc,38.56174167,-123.6588383
+71,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,963,26,2,sfc,38.56174167,-123.6588383
+71,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja rhina,698,26,2,sfc,38.56174167,-123.6588383
+71,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,73,26,2,sfc,38.56174167,-123.6588383
+71,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,12410,26,2,sfc,38.56174167,-123.6588383
+71,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,23026,26,2,sfc,38.56174167,-123.6588383
+71,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,32530,26,2,sfc,38.56174167,-123.6588383
+72,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,95,26,3,500,38.56264167,-123.9785983
+72,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,26259,26,3,500,38.56264167,-123.9785983
+73,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,101614,26,3,500,38.56264167,-123.9785983
+73,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,24461,26,3,500,38.56264167,-123.9785983
+73,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,10,26,3,500,38.56264167,-123.9785983
+73,2,Actinopteri,Aulopiformes,Paralepididae%Lestidiops%Lestidiops ringens,11230,26,3,500,38.56264167,-123.9785983
+73,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,5,26,3,500,38.56264167,-123.9785983
+73,2,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%NA,14302,26,3,500,38.56264167,-123.9785983
+779,1,Actinopteri,Clupeiformes,Engraulidae%NA%NA,148,53,1,40,43.06397667,-124.480865
+779,1,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,7342,53,1,40,43.06397667,-124.480865
+779,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1263,53,1,40,43.06397667,-124.480865
+779,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,19168,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1348,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,34841,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,21853,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,26,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,14648,53,1,40,43.06397667,-124.480865
+779,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,42116,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,26,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Perciformes,Cottidae%Chitonotus%Chitonotus pugetensis,339,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,708,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,35225,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys stigmaeus,5619,53,1,40,43.06397667,-124.480865
+780,1,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,9873,53,1,40,43.06397667,-124.480865
+780,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,102,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,800,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,56023,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,1894,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,40654,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,2476,53,1,40,43.06397667,-124.480865
+780,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,33312,53,1,40,43.06397667,-124.480865
+793,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,245,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,29651,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,16812,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,73908,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,25440,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,137,53,3,280,43.0648,-124.87498
+793,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,4151,53,3,280,43.0648,-124.87498
+793,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,84980,53,3,280,43.0648,-124.87498
+793,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,7695,53,3,280,43.0648,-124.87498
+793,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,92638,53,3,280,43.0648,-124.87498
+793,2,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,4,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,79,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,80577,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,13,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,48,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Perciformes,Zoarcidae%Lycodes%Lycodes cortezianus,28969,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Perciformes,Zoarcidae%NA%NA,5204,53,3,280,43.0648,-124.87498
+794,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,44216,53,3,280,43.0648,-124.87498
+794,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,119529,53,3,280,43.0648,-124.87498
+794,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,3515,53,3,280,43.0648,-124.87498
+794,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,45983,53,3,280,43.0648,-124.87498
+794,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes diploproa,51262,53,3,280,43.0648,-124.87498
+794,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,13604,53,3,280,43.0648,-124.87498
+799,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,2864,53,3,50,43.0648,-124.87498
+799,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,79952,53,3,50,43.0648,-124.87498
+799,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes diploproa,86273,53,3,50,43.0648,-124.87498
+799,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,3560,53,3,50,43.0648,-124.87498
+799,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3399,53,3,50,43.0648,-124.87498
+799,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,129845,53,3,50,43.0648,-124.87498
+799,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes diploproa,132225,53,3,50,43.0648,-124.87498
+80,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,89,26,3,50,38.56264167,-123.9785983
+80,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,63,26,3,50,38.56264167,-123.9785983
+80,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3207,26,3,50,38.56264167,-123.9785983
+800,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,110,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,2088,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,10827,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes elongatus,3206,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Lyopsetta%Lyopsetta exilis,4180,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Scombriformes,Scombridae%Scomber%NA,278,53,3,50,43.0648,-124.87498
+800,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,9027,53,3,50,43.0648,-124.87498
+801,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,14,53,3,sfc,43.0648,-124.87498
+801,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,50003,53,3,sfc,43.0648,-124.87498
+801,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,327,53,3,sfc,43.0648,-124.87498
+802,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,21,53,3,sfc,43.0648,-124.87498
+802,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,31,53,3,sfc,43.0648,-124.87498
+802,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,91893,53,3,sfc,43.0648,-124.87498
+802,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,621,53,3,sfc,43.0648,-124.87498
+81,1,Actinopteri,Argentiniformes,Bathylagidae%Bathylagus%Bathylagus stilbius,13155,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,195,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,343,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,37919,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%NA,79,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,3131,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,1479,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,98,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,26619,26,3,50,38.56264167,-123.9785983
+81,1,Actinopteri,Scombriformes,Centrolophidae%Icichthys%Icichthys lockingtoni,3682,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,844,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,14069,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,760,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,4632,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes jordani,18315,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Scombriformes,Scombridae%Scomber%NA,1085,26,3,50,38.56264167,-123.9785983
+81,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,13591,26,3,50,38.56264167,-123.9785983
+81,4,Actinopteri,Argentiniformes,Bathylagidae%Bathylagus%Bathylagus stilbius,310,26,3,50,38.56264167,-123.9785983
+81,4,Actinopteri,Clupeiformes,Engraulidae%NA%NA,82,26,3,50,38.56264167,-123.9785983
+81,4,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,8407,26,3,50,38.56264167,-123.9785983
+81,4,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,5,26,3,50,38.56264167,-123.9785983
+81,4,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,21,26,3,50,38.56264167,-123.9785983
+83,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,130704,26,3,sfc,38.56264167,-123.9785983
+83,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,13786,26,3,sfc,38.56264167,-123.9785983
+83,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,97866,26,3,sfc,38.56264167,-123.9785983
+839,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,153,53,7,500,43.06521333,-125.248965
+839,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%NA%NA,415,53,7,500,43.06521333,-125.248965
+839,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,16140,53,7,500,43.06521333,-125.248965
+840,1,Actinopteri,Aulopiformes,Paralepididae%Lestidiops%Lestidiops ringens,22116,53,7,500,43.06521333,-125.248965
+840,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,23,53,7,500,43.06521333,-125.248965
+840,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,36,53,7,500,43.06521333,-125.248965
+840,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,41,53,7,500,43.06521333,-125.248965
+840,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%NA%NA,1365,53,7,500,43.06521333,-125.248965
+840,1,Chondrichthyes,Carcharhiniformes,Carcharhinidae%Prionace%Prionace glauca,25063,53,7,500,43.06521333,-125.248965
+840,1,Chondrichthyes,Squaliformes,Squalidae%Squalus%Squalus acanthias,21,53,7,500,43.06521333,-125.248965
+848,2,Actinopteri,Carangiformes,Carangidae%NA%NA,133,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,10208,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,8243,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,1811,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,242,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,374,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,555,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,212,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,72,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Osmeriformes,Osmeridae%NA%NA,28,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Osmeriformes,Osmeridae%Spirinchus%Spirinchus starksi,581,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Perciformes,Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,37,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,71,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1845,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2039,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,51,53,7,50,43.06521333,-125.248965
+848,2,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,168,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Carangiformes,Carangidae%NA%NA,445,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,19449,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,11556,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,3365,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,289,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Clupeiformes,Engraulidae%NA%NA,717,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Gadiformes,Gadidae%Microgadus%Microgadus proximus,897,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,284,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,205,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Osmeriformes,Osmeridae%NA%NA,43,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Osmeriformes,Osmeridae%Spirinchus%Spirinchus starksi,816,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,3358,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,4195,53,7,50,43.06521333,-125.248965
+848,3,Actinopteri,Scombriformes,Scombridae%Thunnus%Thunnus alalunga|obesus,306,53,7,50,43.06521333,-125.248965
+977,1,Actinopteri,Aulopiformes,Paralepididae%Magnisudis%Magnisudis atlantica,28792,60,4,500,44.23039833,-125.1583233
+977,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,109728,60,4,500,44.23039833,-125.1583233
+977,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,33911,60,4,500,44.23039833,-125.1583233
+977,1,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,12883,60,4,500,44.23039833,-125.1583233
+977,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,13,60,4,500,44.23039833,-125.1583233
+977,1,Chondrichthyes,Lamniformes,Alopiidae%Lamna%Lamna ditropis,4,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Argentiniformes,Bathylagidae%Leuroglossus%Leuroglossus schmidti,22668,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,18,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,5,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,19295,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,45,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%NA,29934,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,682,60,4,500,44.23039833,-125.1583233
+977,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas,5,60,4,500,44.23039833,-125.1583233
+978,1,Actinopteri,Argentiniformes,Microstomatidae%NA%NA,177658,60,4,500,44.23039833,-125.1583233
+985,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,496,60,4,50,44.23039833,-125.1583233
+985,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1924,60,4,50,44.23039833,-125.1583233
+985,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,40239,60,4,50,44.23039833,-125.1583233
+985,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,154,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,67,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,122,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,277,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,5123,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,110,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Osmeriformes,Osmeridae%Thaleichthys%Thaleichthys pacificus,5,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,12,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Pleuronectiformes,Pleuronectidae%Isopsetta%Isopsetta isolepis,25,60,4,50,44.23039833,-125.1583233
+985,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,1070,60,4,50,44.23039833,-125.1583233
+985,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,12,60,4,50,44.23039833,-125.1583233
+985,3,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,33150,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,1333,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,4765,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,237,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,43892,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,2745,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Myctophiformes,Myctophidae%Stenobrachius%Stenobrachius leucopsarus,916,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,1232,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes diploproa,1232,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Scombriformes,Scombridae%Scomber%NA,223,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,8334,60,4,50,44.23039833,-125.1583233
+985,4,Actinopteri,Stomiiformes,Stomiidae%Tactostoma%Tactostoma macropus,318,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,10,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,36,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,9,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,3276,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,41,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes entomelas|mystinus,375,60,4,50,44.23039833,-125.1583233
+986,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,470,60,4,50,44.23039833,-125.1583233
+986,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,17253,60,4,50,44.23039833,-125.1583233
+987,1,Actinopteri,Argentiniformes,Bathylagidae%NA%NA,52,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,712,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,39489,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,16,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,579,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Myctophiformes,Myctophidae%Nannobrachium%NA,300,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,640,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,328,60,4,sfc,44.23039833,-125.1583233
+987,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,38168,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,527,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,26951,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,2923,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,9164,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Clupeiformes,Engraulidae%NA%NA,116,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,595,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1126,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,770,60,4,sfc,44.23039833,-125.1583233
+987,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,14239,60,4,sfc,44.23039833,-125.1583233
+987,2,Chondrichthyes,Lamniformes,Alopiidae%Isurus%Isurus oxyrinchus,320,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,81,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,1067,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,229863,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,27,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,21,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,28,60,4,sfc,44.23039833,-125.1583233
+988,1,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,874,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Beloniformes,Belonidae%Cololabis%Cololabis saira,17,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,667,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,147981,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,125,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Clupeiformes,Engraulidae%Engraulis%Engraulis mordax,126,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,19,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,7,60,4,sfc,44.23039833,-125.1583233
+988,2,Actinopteri,Scombriformes,Scombridae%Scomber%Scomber japonicus,607,60,4,sfc,44.23039833,-125.1583233
+995,1,Actinopteri,Carangiformes,Carangidae%Trachurus%NA,455,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,5627,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,7262,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Perciformes,Cottidae%Radulinus%Radulinus asprellus,4,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,16729,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,628,60,2,86,44.23054833,-124.5392983
+995,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,29,60,2,86,44.23054833,-124.5392983
+995,1,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,12,60,2,86,44.23054833,-124.5392983
+995,1,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,19,60,2,86,44.23054833,-124.5392983
+995,2,Actinopteri,Argentiniformes,Bathylagidae%Lipolagus%Lipolagus ochotensis,101,60,2,86,44.23054833,-124.5392983
+995,2,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,114,60,2,86,44.23054833,-124.5392983
+995,2,Actinopteri,Clupeiformes,Clupeidae%Sardinops%Sardinops sagax,8076,60,2,86,44.23054833,-124.5392983
+995,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,5300,60,2,86,44.23054833,-124.5392983
+995,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,6,60,2,86,44.23054833,-124.5392983
+996,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,75,60,2,86,44.23054833,-124.5392983
+996,1,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,92,60,2,86,44.23054833,-124.5392983
+996,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,71,60,2,86,44.23054833,-124.5392983
+996,1,Actinopteri,Pleuronectiformes,Pleuronectidae%NA%NA,79,60,2,86,44.23054833,-124.5392983
+997,1,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,45882,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Argentiniformes,Microstomatidae%Nansenia%Nansenia candida,16,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Clupeiformes,Clupeidae%Clupea%Clupea pallasii,533,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Perciformes,Cottidae%NA%NA,154,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Perciformes,Cottidae%Radulinus%Radulinus asprellus,11387,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Perciformes,Sebastidae%Sebastes%NA,167,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Perciformes,Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,2090,60,2,50,44.23054833,-124.5392983
+998,2,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,72018,60,2,50,44.23054833,-124.5392983
+998,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,16433,60,2,50,44.23054833,-124.5392983
+998,2,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%NA,421,60,2,50,44.23054833,-124.5392983
+998,2,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,9135,60,2,50,44.23054833,-124.5392983
+998,2,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,10530,60,2,50,44.23054833,-124.5392983
+998,3,Actinopteri,Perciformes,Cottidae%Radulinus%Radulinus asprellus,4494,60,2,50,44.23054833,-124.5392983
+998,3,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,29636,60,2,50,44.23054833,-124.5392983
+998,3,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%Hydrolagus colliei,4618,60,2,50,44.23054833,-124.5392983
+998,3,Chondrichthyes,Chimaeriformes,Chimaeridae%Hydrolagus%NA,119,60,2,50,44.23054833,-124.5392983
+998,3,Chondrichthyes,Rajiformes,Rajidae%Raja%NA,2904,60,2,50,44.23054833,-124.5392983
+998,3,Chondrichthyes,Rajiformes,Rajidae%Raja%Raja binoculata,3279,60,2,50,44.23054833,-124.5392983
+999,1,Actinopteri,Carangiformes,Carangidae%Trachurus%Trachurus symmetricus,21,60,2,sfc,44.23054833,-124.5392983
+999,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,60302,60,2,sfc,44.23054833,-124.5392983
+999,1,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,219,60,2,sfc,44.23054833,-124.5392983
+999,1,Actinopteri,Salmoniformes,Salmonidae%Oncorhynchus%Oncorhynchus kisutch,28,60,2,sfc,44.23054833,-124.5392983
+999,2,Actinopteri,Gadiformes,Merlucciidae%Merluccius%Merluccius productus,12,60,2,sfc,44.23054833,-124.5392983
+999,2,Actinopteri,Myctophiformes,Myctophidae%Diaphus%Diaphus theta,21,60,2,sfc,44.23054833,-124.5392983
+999,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,176217,60,2,sfc,44.23054833,-124.5392983
+999,2,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,2531,60,2,sfc,44.23054833,-124.5392983
+999,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,149921,60,2,sfc,44.23054833,-124.5392983
+999,3,Actinopteri,Pleuronectiformes,Paralichthyidae%Citharichthys%NA,1571,60,2,sfc,44.23054833,-124.5392983

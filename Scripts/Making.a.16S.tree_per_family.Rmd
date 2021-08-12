@@ -1,0 +1,568 @@
+---
+title: "Insect.tree.16S"
+author: "Ramon Gallego"
+date: "11/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro
+The idea is to get all 16S sequences from chordates available in Genebank and make a searchable tree, so `insect` can assign taxonomy to the sequences we have generated in a MiSeq run.
+
+Let's load the needed libraries (`tidverse`, `insect`, `rentrez`, `here`) and the API key to query Genbank (you need your own)
+
+```{r libraries,include=FALSE, echo=FALSE}
+library(tidyverse)
+library(insect)
+library(rentrez)
+set_entrez_key("c7f054eeed8138a4c66f908db525226fb208")
+library(here)
+```
+
+# Step 1: Query Genebank, twice
+
+I have found out that you need to query genebank twice, once looking just for 16S sequences, another one querying for full mitochondrial genomes. We will wrap searchGB around `safely` so the output doesn't get lost if something goes wrong. 
+
+```{r find the accession numbers from all 16S sequences from chordates}
+
+query <- "Chordata[ORGN]+AND+16S[TITL]"
+
+query_full_mt <- "Chordata[ORGN]+AND+mitochondrion+complete+genome[TITL]"
+
+Full.search <- searchGB(query,taxIDs = T, sequences = T )
+
+MTgenomes <- searchGB(query_full_mt,taxIDs = T, sequences = F)
+
+safe_search <- safely(searchGB, otherwise = NA)
+
+MTgenomes %>% 
+  enframe(value = "Accession") %>% 
+  dplyr::filter(str_detect(Accession, "NC_")) %>% 
+  dplyr::select(Accession) %>% 
+  mutate( seqs = purrr::map (Accession, ~ safe_search(accession = .x, taxIDs = T, prompt = FALSE ))) -> chordata.genomes
+
+write_rds(chordata.genomes, here("Data", "Chordata_mt_genomes.rds"))
+write_rds(Full.search, here("Data", "Chordata_16S_Full.rds"))
+
+```
+
+Get the primers for the Prey
+```{r}
+Prey_for <- "GYAATCACTTGTCTTTTAAATGAAGACC"
+Prey_rev <- "GGATTGCGCTGTTATCCCTA"
+```
+
+Do the virtual PCR - the short one we can do it locally, the virtualPCR from mitogenomes needs to be done in the cluster. We will import both 
+
+```{r}
+Prey16s <- virtualPCR(Full.search, up = Prey_for, down = Prey_rev,
+                             trimprimers = TRUE,minamplen = 250, maxamplen = 400, cores = "autodetect")
+
+write_rds(Prey16s, here("Data", "Chordata_16S_Prey.rds"))
+```
+
+## Load the PREy Fragment from the first and second searches
+
+```{r load fragments}
+
+Prey_16S <- read_rds(here("Data", "Chordata_16S_Prey.rds"))
+
+Mito_16S <- read_rds(here("Data", "Prey_from_mitogenomes.rds")) 
+```
+
+
+Checks - are they repeated accessions
+```{r checking nothing is there twice}
+
+Seq.names.16S <- tibble(seq.name = names(Prey_16S),
+                    
+                    Search = "16S" )
+
+Seq.names.Mit <- tibble (seq.name = names(Mito_16S),
+                    
+                    Search = "Mit")
+
+Seq.names.16S %>%
+
+  separate(seq.name, into = c("Accession", "taxID"), sep = "\\|", remove = F) -> Seq.names.16S
+
+Seq.names.Mit %>%
+
+  separate(seq.name, into = c("Accession", "taxID"), sep = "\\|", remove = F) -> Seq.names.Mit
+
+summary (Seq.names.16S$Accession %in% Seq.names.Mit$Accession) # None of the bases seqs were in the full mit
+
+# Maybe they have a different format? Nope
+
+
+
+```
+
+Now we only need things with taxonomy labels on them, and nothing less than species
+
+
+Load the taxonomy
+
+```{r}
+worlds.taxonomy <- read_rds(here("Data", "all.taxonomy.rds"))
+
+
+```
+
+Combine the two sets of accessions, join them with the taxonomy information and remove everything that is not identified to species or subspecies
+
+```{r remove things with bad taxonomy}
+Seqs <- bind_rows(Seq.names.16S, Seq.names.Mit)
+
+Seqs %>% 
+  left_join(worlds.taxonomy %>% 
+              mutate(taxID = as.character(taxID))) %>% 
+  group_by (rank) %>% 
+  tally()
+
+Seqs %>% 
+  left_join(worlds.taxonomy %>% 
+              mutate(taxID = as.character(taxID))) %>% 
+  filter (str_detect(rank, "species")) %>% # We are discarding everything that does not have sp/subsp level
+  filter (!str_detect(name, "environmental sample")) -> to.keep # Sometimes the db has a species label but it is Family something environmental
+
+## Limit it by family # add the lineage to the unique taxIDS
+
+to.keep %>% 
+  distinct(taxID) %>% 
+  mutate(taxID = as.numeric(taxID)) %>% #slice(1:4) %>% 
+  pull() -> all.taxiDS 
+
+```
+
+
+```{r remove things with bad taxonomy 2}
+get_lineage(all.taxiDS,db = worlds.taxonomy, cores = 4) -> all.lineages
+
+all.lineages %>%
+  set_names(nm = all.taxiDS) %>% 
+  map(bind_rows) %>% 
+  # map(select, family, genus, species) %>%
+  bind_rows(.id = "taxID") -> all.lineages.tibble
+
+ write_rds(all.lineages.tibble,here("Data", "all.lineages.full.tibble.rds"))
+
+all.lineages.tibble %>% 
+  select(taxID,family, genus, species) %>% 
+  write_csv(here("Data","all.lineages.tibble.rds"))
+```
+
+
+```{r remove things with bad taxonomy 3}
+
+# Load the output
+
+all.lineages.tibble <- read_csv(here("Data","all.lineages.tibble.rds"))
+
+to.keep %>% 
+  pull(seq.name) -> to.keep.seqs
+
+
+all.lineages.tibble %>%
+  filter (family == "Carangidae") %>% 
+  semi_join(to.keep %>% 
+              mutate (taxID = as.numeric(taxID)), .) %>% 
+  pull(seq.name) -> Carangids
+
+
+```
+
+Make the short list
+
+```{r combine and remove}
+
+Prey_16S %>% 
+  append(Mito_16S) -> All.seqs 
+  
+All.seqs[to.keep.seqs] -> All.seqs
+
+All.seqs[Carangids] %>% 
+  writeFASTA(file = here("Data","Fasta_families", "Carangids.ref.fasta"))
+
+tibble(seq.name = names(All.seqs[Carangids])) %>% 
+  left_join(to.keep %>% 
+              select(seq.name, name)) %>% 
+  unite(seq.name, name, col = "name", sep = " ") %>% pull() %>% 
+  set_names(All.seqs[Carangids], nm = .)%>% 
+  writeFASTA(file = here("Data","Fasta_families", "Carangids.ref.fasta"))
+  
+```
+
+### Remove some weight
+
+Some of the taxa might have many instances of the same sequence - so we will keep unique ocurrences of sequences and taxa. 
+
+```{r transfer to tibble format}
+
+Seqs <- tibble(seq.name = names(All.seqs)) %>% 
+  
+  separate(seq.name, into = c("Accession", "taxID"), sep = "\\|", remove = F)
+  
+Seqs$Sequences <- hash(All.seqs)
+
+
+```
+
+Now let's group them by taxID and keep only unique sequences
+
+```{r}
+
+
+Seqs %>% 
+  group_by (taxID, Sequences) %>% 
+  slice (1) %>% 
+  pull(seq.name) -> to.keep
+  
+All.seqs[to.keep] -> one_list
+```
+
+
+```{r shared by spp}
+ambiguities <- tibble(Hash = hash(one_list),
+                      Seqs = names(one_list))
+
+# ambiguities %>% 
+#   group_by(Hash) %>% 
+#   nest() %>% 
+#   mutate(length = map_int(data, nrow)) -> ambiguities
+
+ambiguities %>% 
+  arrange(Hash) %>% 
+  # 
+  # filter(length >1) %>% 
+  # unnest(data) %>% 
+  separate (Seqs, into = c("Accession", "taxID"), sep = "\\|", remove = F) %>% 
+  left_join(worlds.taxonomy %>% mutate (taxID = as.character(taxID))) %>%  # we should keep only those that share parent_txID
+  group_by(Hash) %>% 
+  mutate (n_parents = n_distinct(parent_taxID),
+          n_taxa    = n_distinct(taxID)) -> ambiguities
+  
+ambiguities %>% 
+  group_by(n_taxa, n_parents, rank) %>% 
+  tally %>% 
+  pivot_wider(names_from = rank,
+              values_from = n)
+```
+
+So the approach to combine the database would be:
+
+IF there is one taxa per Hash - leave it as it is
+
+IF there are many taxa per Hash :
+
+    - Are they subspecies from the same species - let it be: Insect will asign it to the LCA -> the species
+    
+    - Are they species from the same genus: we want to create a label of the form Genus Sp1_sp2_sp3
+    
+    - Are they hybrids, and recognized like so: leave them, and let insect return the hybrid
+    
+    - Are they species from the same family: Leave them, and let insect deal with the mess
+    
+    - Are they species from different families: Dump them both
+    
+```{r Case 1 - One sp one hash}
+
+ambiguities %>% 
+  
+  mutate(new.name = case_when(n_taxa == 1  ~ name,
+                              rank == "subspecies" & n_parents == 1 ~ name, # Both are sub spp
+                              
+                              n_parents == 1 ~ "append_spp",
+                              
+                              TRUE           ~ "Check Family")) -> ambiguities
+```
+
+Case 2: Add d
+
+```{r }
+
+ambiguities %>% 
+  group_by(Hash) %>% 
+  mutate(num_words = str_count(name, "\\ ") +1) %>% 
+  nest %>% 
+  mutate(data = map (data, rownames_to_column)) %>% 
+  unnest(data) %>% 
+  separate(name, into = c("genus", "species", "subspecies"), sep = " ", remove = F, extra = "merge")  %>% 
+  mutate (species = case_when (str_detect (species, "\\.") ~ paste (species, subspecies, sep = " "),
+                               TRUE                        ~ species)) %>% 
+  
+  unite (genus, species, col = "Gen_sp", sep = " ", remove = F) %>% 
+  group_by(Hash) %>% 
+  mutate(n_genus = n_distinct(genus),
+         
+         Any_sub_spp = case_when(sum(str_count(rank, "subspecies")) > 0 ~ "Yes",
+                                 TRUE                                   ~ "No"),
+         
+         n_distinct_gen_sp = n_distinct(Gen_sp),
+         
+         new.name = case_when (new.name == name ~ name,
+                               n_distinct_gen_sp == 1 ~ Gen_sp,
+                               n_distinct_gen_sp > 1 & n_genus == 1  ~ "append_spp",
+                               n_genus > 1            ~ new.name)) -> ambiguities 
+  
+
+ambiguities %>% 
+  arrange(desc(Hash)) %>% 
+  filter (num_words > 2)
+
+
+# In all these cases, we have to merge species and subspecies
+
+ambiguities -> ambiguities
+```
+
+This is getting out of hand. Let's split the dataset according to the cases and we will combine them all at the end
+## One hash, one taxa
+```{r one hash one tax ID}
+
+One.hash.one.ID <- ambiguities %>% 
+  filter (n_taxa == 1)
+
+```
+
+## One hash, many taxa
+Let's see what's left
+
+```{r rest of the folks}
+
+Many.IDs <- ambiguities %>% 
+  filter (n_taxa != 1)
+
+```
+
+OK - so that's 7k observations. LEt's go for the next subgroup  - all of them are subspecies of the same species
+### One Hash, subspecies from the same species
+```{r}
+Many.IDs %>% 
+  group_by(Hash) %>% 
+  filter (Any_sub_spp == "Yes", n_distinct_gen_sp == 1) -> same.sp
+```
+ Cool  - Let's keep one entry for each of them, labelled as the species.
+ 
+ Start by keeping those hashes in which there is at least one species rank
+ 
+```{r}
+same.sp %>% 
+  group_by(Hash) %>% 
+  mutate (Any_sp = case_when(sum(str_count(rank, "^species")) > 0 ~ "Yes",
+                                 TRUE                                   ~ "No")) -> same.sp
+
+
+same.sp %>% 
+  filter (Any_sp == "Yes", rank == "species") %>% 
+  group_by(Hash) %>% 
+  slice (1) -> One.Hash.one.sp
+  
+
+```
+
+With the other ones, find the species they belong to using the parent ID
+
+```{r}
+same.sp %>% 
+  filter (Any_sp == "No") %>% ungroup %>% distinct(n_parents) # the parent_taxID is the same
+
+same.sp %>% 
+  filter (Any_sp == "No") %>% 
+  group_by(Hash) %>% 
+  slice (1) -> One.Hash.subsp
+
+# Check that all parent taxa are species 
+worlds.taxonomy %>% 
+  filter (taxID %in% One.Hash.subsp$parent_taxID) %>% 
+  distinct(rank) # pass
+
+One.Hash.subsp %>% 
+  mutate(new.seqs.label = paste(Accession, parent_taxID, sep = "|")) -> One.Hash.subsp
+```
+
+### One Hash, species and subspecies from the same genus
+
+```{r}
+Many.IDs %>% 
+  group_by(Hash) %>% 
+  filter ( n_distinct_gen_sp != 1, n_genus == 1) -> One.hash.same.genus
+```
+
+
+```{r}
+One.hash.same.genus %>% 
+  group_by(rank) %>% 
+  tally
+One.hash.same.genus %>% 
+  group_by(Hash) %>% 
+  distinct(parent_taxID) %>% 
+  left_join(worlds.taxonomy, by = c("parent_taxID" = "taxID"))
+
+```
+
+Can I get rid of the subspecies?
+
+```{r}
+One.hash.same.genus %>% 
+  filter (Any_sub_spp == "Yes")
+```
+
+```{r}
+One.hash.same.genus %>% 
+  group_by(Hash) %>% 
+  mutate(new.label = paste(species, sep = "|", collapse = "|"),
+         new.label = paste (genus, new.label, sep =  " ")) %>% 
+  slice(1) %>% # Create fake IDs for those that share seq for that locus starting by 5000000
+  rownames_to_column("Add") %>% 
+  mutate(NewTaxID = as.numeric(Add) + 5000000) %>% 
+  mutate(new.seqs.label = paste(Accession, NewTaxID, sep = "|")) -> One.hash.same.genus
+
+worlds.taxonomy
+  
+One.hash.same.genus %>% 
+  ungroup %>% 
+  select(taxID = NewTaxID,
+         parent_taxID,
+         rank,
+         name = new.label) %>% 
+  bind_rows(worlds.taxonomy, .) -> worlds.taxonomy
+
+```
+
+
+### One Hash, species and subspecies from different genera
+
+Who are these?
+```{r}
+Many.IDs %>% 
+  group_by(Hash) %>% 
+  filter ( n_distinct_gen_sp != 1, n_genus != 1) -> One.hash.many.genus
+```
+
+I am inclined to dump them all
+
+```{r}
+One.hash.many.genus %>% 
+  ungroup %>% 
+  distinct(taxID) -> taxa.in.dumpster
+
+ambiguities %>% 
+  filter (!Hash %in% One.hash.many.genus$Hash) %>% 
+  filter (taxID %in% taxa.in.dumpster$taxID) %>% 
+  ungroup %>% 
+  pull(taxID) -> redundant.taxa
+
+summary(taxa.in.dumpster$taxID %in% redundant.taxa)
+  
+One.hash.many.genus %>% 
+  mutate(taxID = as.numeric(taxID),
+         lineage = map (taxID, ~ get_lineage(.x, db = worlds.taxonomy)),
+         family = map_chr (lineage, ~.x["family"])) -> One.hash.many.genus 
+
+
+One.hash.many.genus %>% 
+  group_by(Hash) %>% 
+  summarise(n_fam = n_distinct(family)) %>% 
+  filter (n_fam >1) -> Hash.to.dump
+
+One.hash.many.genus %>% 
+  filter (! Hash %in% Hash.to.dump$Hash) %>% 
+  filter(! is.na(family)) %>% 
+  mutate (new.label = paste0(family, " spp.")) -> One.hash.many.genus
+  
+worlds.taxonomy %>% 
+  filter(rank == "family") %>% 
+  select (family = name, NewTaxID = taxID) %>% 
+    right_join(One.hash.many.genus) %>% 
+  mutate(New.seq.label = paste(Accession, NewTaxID, sep = "|")) -> One.hash.many.genus
+  
+One.hash.many.genus %>% 
+group_by(Hash) %>% 
+  slice(1) -> One.hash.many.genus
+  
+
+
+```
+
+# Combine all the sequences
+
+Get the list 
+```{r}
+# One hash one sp
+
+one_list[One.hash.one.ID$Seqs] -> One.hash.one.ID.seqs
+
+# One hash subspp of the same species
+one_list[One.Hash.one.sp$Seqs] -> One.Hash.subsp.onesp.seqs
+
+
+# One hash subspp and sp of the same species
+
+one_list[One.Hash.subsp$Seqs] -> One.Hash.subsp.seqs
+
+names(One.Hash.subsp.seqs) <- One.Hash.subsp$new.seqs.label
+# One hash one genus
+
+one_list[One.hash.same.genus$Seqs] -> One.hash.same.genus.seqs
+
+names(One.hash.same.genus.seqs) <- One.hash.same.genus$new.seqs.label
+
+# One hash many genus
+one_list[One.hash.many.genus$Seqs] -> One.hash.many.genus.seqs
+
+names(One.hash.many.genus.seqs) <- One.hash.many.genus$New.seq.label
+
+
+
+```
+
+## Combine them all 
+
+```{r}
+One.hash.one.ID.seqs %>% 
+  append(One.Hash.subsp.onesp.seqs) %>% 
+  append(One.Hash.subsp.seqs) %>% 
+  append(One.hash.same.genus.seqs) %>% 
+  append(One.hash.many.genus.seqs) -> Final.seqs.for.insect
+
+
+tibble (all = names(Final.seqs.for.insect)) %>% filter (str_detect(all, "NA"))
+
+write_rds(Final.seqs.for.insect, here ("Data", "All.chordates.trimmed.prey.rds"))
+
+write_rds(worlds.taxonomy, here("Data", "all.taxonomy.rds"))
+```
+
+### Final check
+
+```{r}
+check <- read_rds(here("Data", "All.chordates.trimmed.prey.rds"))
+
+check <- tibble (Seqs = names(check)) %>% 
+  separate(Seqs, into = c("accession", "taxID"), sep = "\\|", remove = F) %>% 
+  mutate (taxID = as.numeric(taxID))
+
+check %>% 
+  filter (is.na(taxID)) #WTF
+check %>% 
+  filter(str_detect(Seqs, "NA"))
+
+One.hash.one.ID %>% 
+  filter(Accession == "MG007754")
+One.Hash.one.sp %>% 
+  filter(Accession == "MG007754")
+One.Hash.subsp%>% 
+  filter(Accession == "MG007754")
+One.hash.same.genus %>% 
+   filter(Accession == "MG007754")
+One.hash.many.genus %>% 
+  filter(Accession == "MG007754")
+
+learn(Final.seqs.for.insect, db = worlds.taxonomy)
+
+```
+

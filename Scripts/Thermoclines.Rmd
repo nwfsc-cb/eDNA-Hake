@@ -52,8 +52,8 @@ all.CTDS.to.keep %>% #mutate (clas = map (CTD_Data, class))
   mutate (CTD_Data = map (CTD_Data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
           Thermocline = map_dbl (CTD_Data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermocline2
 
-thermocline2 %>% 
-  mutate(Thermocline = map_dbl (Thermocline, ~ .x %>% pull)) -> thermocline2
+# thermocline2 %>% 
+#   mutate(Thermocline = map_dbl (Thermocline, ~ .x %>% pull)) -> thermocline2
 
 list.of.stations.to.keep <- read_csv("cleaned_CTD_stations.csv")
 
@@ -81,10 +81,12 @@ thermocline2 %>%
   dplyr::select(CTD_Cast, Thermocline, Temp_diff, SST) %>% 
   left_join(list.of.stations.to.keep) -> data.with.lat
 
-write_rds(data.with.lat, here("Data", "thermocline.data.for.plotting"))
+write_rds(data.with.lat, here("Data", "thermocline.data.for.plotting.rds"))
 ```
 
 ```{r}
+
+data.with.lat <- read_rds(here("Data", "thermocline.data.for.plotting.rds"))
 data.with.lat %>% 
   ggplot(aes(x = Thermocline, y = lat, size = Temp_diff)) +
   geom_point(alpha = 0.5)

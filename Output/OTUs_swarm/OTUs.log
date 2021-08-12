@@ -1,0 +1,35 @@
+Swarm 3.0.0
+Copyright (C) 2012-2019 Torbjorn Rognes and Frederic Mahe
+https://github.com/torognes/swarm
+
+Mahe F, Rognes T, Quince C, de Vargas C, Dunthorn M (2014)
+Swarm: robust and fast clustering method for amplicon-based studies
+PeerJ 2:e593 https://doi.org/10.7717/peerj.593
+
+Mahe F, Rognes T, Quince C, de Vargas C, Dunthorn M (2015)
+Swarm v2: highly-scalable and high-resolution amplicon clustering
+PeerJ 3:e1420 https://doi.org/10.7717/peerj.1420
+
+CPU features:      mmx sse sse2 sse3 ssse3 sse4.1 sse4.2 popcnt avx avx2
+Database file:     /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/swarm.input.fasta
+Output file:       /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/OTUs_swarm/OTUs.swarm
+Statistics file:   /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/OTUs_swarm/stats.swarm
+Resolution (d):    1
+Threads:           8
+Break OTUs:        Yes
+Fastidious:        No
+
+Reading sequences: 100%
+Indexing database: 100%
+Abundance sorting: 100%
+Database info:     800056 nt in 2401 sequences, longest 420 nt
+Hashing sequences: 100%
+Building network:  100%
+Clustering:        100%
+Writing swarms:    100%
+Writing seeds:     100%
+Writing stats:     100%
+
+Number of swarms:  443
+Largest swarm:     254
+Max generations:   4

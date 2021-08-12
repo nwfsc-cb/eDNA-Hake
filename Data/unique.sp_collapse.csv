@@ -1,141 +1,141 @@
-taxa,family,genus,species,diet,morphology,habitat use,life history,diel migration,size(mm),source
-Agonidae%Chesnonia%Chesnonia verrucosa,Agonidae,Chesnonia,Chesnonia verrucosa,,Poacher,,,,,
-Agonidae%NA%NA,Agonidae,NA,NA,,Poacher,,,,,
-Alopiidae%Isurus%Isurus oxyrinchus,Alopiidae,Isurus,Isurus oxyrinchus,Fish ,Shark,surface-mid,ocean,,4000,
-Alopiidae%Lamna%Lamna ditropis,Alopiidae,Lamna,Lamna ditropis,Salmon,Shark,surface-mid,ocean,,3000,
-Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,Anarhichadidae,Anarrhichthys,Anarrhichthys ocellatus,invertebrates,Eel,"seafloor, shallow",ocean,,2400,
-Anarhichadidae%NA%NA,Anarhichadidae,NA,NA,invertebrates,Eel,"seafloor, shallow",ocean,,2400,
-Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,Anoplopomatidae,Anoplopoma,Anoplopoma fimbria,Fish ,cylinder,"seafloor, deep",ocean,Yes,1140,
-Anoplopomatidae%NA%NA,Anoplopomatidae,NA,NA,Fish ,cylinder,"seafloor, deep",ocean,Yes,1140,
-Atherinopsidae%NA%NA,Atherinopsidae,NA,NA,,herring,,,,,
-Bathylagidae%Bathylagus%Bathylagus stilbius,Bathylagidae,Bathylagus,Bathylagus stilbius,,smelt,midwater,ocean,Yes,150,
-Bathylagidae%Lipolagus%Lipolagus ochotensis,Bathylagidae,Lipolagus,Lipolagus ochotensis,,smelt,deepwater,ocean,,150,
-Bathylagidae%NA%NA,Bathylagidae,NA,NA,,smelt,,,,,
-Bathymasteridae%Ronquilus%Ronquilus jordani,Bathymasteridae,Ronquilus,Ronquilus jordani,,cylinder,"seafloor, shallow",ocean,,200,
-Belonidae%Cololabis%Cololabis saira,Belonidae,Cololabis,Cololabis saira,krill,long,surface-subsurface,ocean,none,300,https://doi.org/10.1111/j.1365-2419.2004.00310.x
-Belonidae%NA%NA,Belonidae,NA,NA,krill,long,surface-subsurface,ocean,none,300,
-Carangidae%NA%NA,Carangidae,NA,NA,filter feeders,Mackerel,surface-subsurface,ocean,,,
-Carangidae%Trachurus%NA,Carangidae,Trachurus,NA,filter feeders,Mackerel,surface-subsurface,ocean,,,
-Carangidae%Trachurus%Trachurus symmetricus,Carangidae,Trachurus,Trachurus symmetricus,filter feeders,Mackerel,surface-subsurface,ocean,,550,
-Carcharhinidae%NA%NA,Carcharhinidae,NA,NA,Fish ,Shark,surface-mid,ocean,,4000,
-Carcharhinidae%Prionace%Prionace glauca,Carcharhinidae,Prionace,Prionace glauca,Fish ,Shark,surface-mid,ocean,,4000,
-Centrolophidae%Icichthys%Icichthys lockingtoni,Centrolophidae,Icichthys,Icichthys lockingtoni,plankton,compressed,surface,ocean,,460,
-Centrolophidae%NA%NA,Centrolophidae,NA,NA,plankton,compressed,surface,ocean,,460,
-Chimaeridae%Hydrolagus%Hydrolagus colliei,Chimaeridae,Hydrolagus,Hydrolagus colliei,invertebrates,ratfish,seafloor,ocean,,970,
-Chimaeridae%NA%NA,Chimaeridae,NA,NA,invertebrates,ratfish,seafloor,ocean,,970,
-Cichlidae%NA%NA,Cichlidae,NA,NA,,,,,,,
-Cichlidae%Oreochromis%Oreochromis niloticus x Oreochromis aureus,Cichlidae,Oreochromis,Oreochromis niloticus x Oreochromis aureus,,,,,,,
-Clupeidae%Alosa%Alosa fallax,Clupeidae,Alosa,Alosa fallax,filter feeders,herring,surface-subsurface,anadromous,none,600,
-Clupeidae%Alosa%NA,Clupeidae,Alosa,NA,filter feeders,herring,surface-subsurface,anadromous,none,600,
-Clupeidae%Clupea%Clupea pallasii,Clupeidae,Clupea,Clupea pallasii,filter feeders,herring,surface-mid,ocean-estuary,,330,
-Clupeidae%Clupea%NA,Clupeidae,Clupea,NA,filter feeders,herring,surface-mid,ocean-estuary,,330,
-Clupeidae%Sardinops%NA,Clupeidae,Sardinops,NA,small zooplankton,sardine,surface-mid,ocean,,400,
-Clupeidae%Sardinops%Sardinops sagax,Clupeidae,Sardinops,Sardinops sagax,small zooplankton,sardine,surface-mid,ocean,,400,
-Cottidae%Artedius%Artedius fenestralis|lateralis,Cottidae,Artedius,Artedius fenestralis|lateralis,shrimp,sculpin,seafloor,,,140,
-Cottidae%Artedius%Artedius harringtoni,Cottidae,Artedius,Artedius harringtoni,,sculpin,seafloor,,,100,
-Cottidae%Artedius%NA,Cottidae,Artedius,NA,,sculpin,seafloor,,,100,
-Cottidae%Chitonotus%Chitonotus pugetensis,Cottidae,Chitonotus,Chitonotus pugetensis,,sculpin,seafloor,,,230,
-Cottidae%Leptocottus%Leptocottus armatus,Cottidae,Leptocottus,Leptocottus armatus,,sculpin,seafloor,,,450,
-Cottidae%NA%NA,Cottidae,NA,NA,,sculpin,seafloor,,,,
-Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,Cryptacanthodidae,Cryptacanthodes,Cryptacanthodes giganteus,,Eel,seafloor,,,1150,
-Embiotocidae%Embiotoca%Embiotoca jacksoni|lateralis,Embiotocidae,Embiotoca,Embiotoca jacksoni|lateralis,invertebrates,Perch,shallow,ocean,,380,
-Embiotocidae%NA%NA,Embiotocidae,NA,NA,invertebrates,Perch,shallow,ocean,,380,
-Embiotocidae%Rhacochilus%Rhacochilus vacca,Embiotocidae,Rhacochilus,Rhacochilus vacca,invertebrates,Perch,surface-subsurface,ocean,,400,
-Embiotocidae%Zalembius%Zalembius rosaceus,Embiotocidae,Zalembius,Zalembius rosaceus,,Perch,surface-subsurface,ocean,,200,
-Engraulidae%Engraulis%Engraulis mordax,Engraulidae,Engraulis,Engraulis mordax,filter feeders,anchovy,surface-mid,ocean,,250,
-Engraulidae%NA%NA,Engraulidae,NA,NA,filter feeders,anchovy,surface-mid,ocean,,250,
-Gadidae%Microgadus%Microgadus proximus,Gadidae,Microgadus,Microgadus proximus,"Fish, invertebrates",Cod,surface-mid,ocean,,305,
-Gadidae%Microgadus%NA,Gadidae,Microgadus,NA,"Fish, invertebrates",Cod,surface-mid,ocean,,305,
-Gonostomatidae%Cyclothone%NA,Gonostomatidae,Cyclothone,NA,plankton,bristlefish,deepwater,ocean,,100,
-Hexagrammidae%Hexagrammos%Hexagrammos decagrammus,Hexagrammidae,Hexagrammos,Hexagrammos decagrammus,invertebrates,kelpfish,"seafloor, shallow",ocean,,610,
-Hexagrammidae%Ophiodon%Ophiodon elongatus,Hexagrammidae,Ophiodon,Ophiodon elongatus,Fish ,Eel,"seafloor, shallow",ocean,,1500,
-Jordaniidae%Jordania%Jordania zonope,Jordaniidae,Jordania,Jordania zonope,invertebrates,sculpin,"seafloor, shallow",ocean,,150,
-Liparidae%Liparis%Liparis florae,Liparidae,Liparis,Liparis florae,,snailfish,"seafloor, shallow",ocean,,,
-Liparidae%Liparis%Liparis fucensis|callyodon,Liparidae,Liparis,Liparis fucensis|callyodon,,snailfish,,,,,
-Liparidae%Liparis%Liparis pulchellus,Liparidae,Liparis,Liparis pulchellus,,snailfish,,,,,
-Liparidae%Liparis%NA,Liparidae,Liparis,NA,,snailfish,,,,,
-Liparidae%NA%NA,Liparidae,NA,NA,,snailfish,,,,,
-Merlucciidae%Merluccius%Merluccius angustimanus|productus,Merlucciidae,Merluccius,Merluccius angustimanus|productus,"fish, plankton",Hake,midwater,ocean,yes,899,
-Merlucciidae%Merluccius%Merluccius productus,Merlucciidae,Merluccius,Merluccius productus,"fish, plankton",Hake,midwater,ocean,yes,900,
-Merlucciidae%Merluccius%NA,Merlucciidae,Merluccius,NA,"fish, plankton",Hake,midwater,ocean,yes,900,
-Microstomatidae%NA%NA,Microstomatidae,NA,NA,,argentine,deepwater,ocean,,219,
-Microstomatidae%Nansenia%Nansenia candida,Microstomatidae,Nansenia,Nansenia candida,,argentine,deepwater,ocean,,220,
-Molidae%Mola%Mola mola,Molidae,Mola,Mola mola,small fishes,sunfish,midwater,ocean,,4000,
-Molidae%NA%NA,Molidae,NA,NA,small fishes,sunfish,midwater,ocean,,4000,
-Myctophidae%Diaphus%Diaphus theta,Myctophidae,Diaphus,Diaphus theta,,Myctophid,deepwater,ocean,,,
-Myctophidae%Diaphus%NA,Myctophidae,Diaphus,NA,,Myctophid,deepwater,ocean,,,
-Myctophidae%NA%NA,Myctophidae,NA,NA,,Myctophid,deepwater,ocean,,,
-Myctophidae%Nannobrachium%Nannobrachium regale,Myctophidae,Nannobrachium,Nannobrachium regale,,Myctophid,deepwater,ocean,,,
-Myctophidae%Stenobrachius%NA,Myctophidae,Stenobrachius,NA,,Myctophid,deepwater,ocean,,,
-Myctophidae%Stenobrachius%Stenobrachius leucopsarus,Myctophidae,Stenobrachius,Stenobrachius leucopsarus,,Myctophid,deepwater,ocean,,,
-Osmeridae%Allosmerus%Allosmerus elongatus,Osmeridae,Allosmerus,Allosmerus elongatus,,smelt,,ocean-estuary,,230,
-Osmeridae%Hypomesus%Hypomesus pretiosus,Osmeridae,Hypomesus,Hypomesus pretiosus,,smelt,,ocean-estuary,,230,
-Osmeridae%NA%NA,Osmeridae,NA,NA,,smelt,,ocean-estuary,,230,
-Osmeridae%Spirinchus%Spirinchus starksi,Osmeridae,Spirinchus,Spirinchus starksi,,smelt,,ocean-estuary,,230,
-Osmeridae%Thaleichthys%Thaleichthys pacificus,Osmeridae,Thaleichthys,Thaleichthys pacificus,,smelt,,anadromous,,230,
-Paralepididae%Lestidiops%Lestidiops ringens,Paralepididae,Lestidiops,Lestidiops ringens,Fish ,Pelagic predator,midwater,ocean,,430,
-Paralepididae%Magnisudis%Magnisudis atlantica,Paralepididae,Magnisudis,Magnisudis atlantica,,Pelagic predator,midwater,ocean,,430,
-Paralepididae%Magnisudis%NA,Paralepididae,Magnisudis,NA,,Pelagic predator,midwater,ocean,,430,
-Paralepididae%NA%NA,Paralepididae,NA,NA,,Pelagic predator,midwater,ocean,,430,
-Paralichthyidae%Citharichthys%Citharichthys stigmaeus,Paralichthyidae,Citharichthys,Citharichthys stigmaeus,opportunistic,flat,"seafloor, shallow",ocean,,410,
-Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,Paralichthyidae,Citharichthys,Citharichthys xanthostigma|sordidus,opportunistic,flat,"seafloor, shallow",ocean,,410,https://www.fishbase.in/summary/Citharichthys-sordidus.html
-Paralichthyidae%Citharichthys%NA,Paralichthyidae,Citharichthys,NA,opportunistic,flat,"seafloor, shallow",ocean,,410,https://www.fishbase.in/summary/Citharichthys-sordidus.html
-Paralichthyidae%NA%NA,Paralichthyidae,NA,NA,opportunistic,flat,"seafloor, shallow",ocean,,410,
-Pholidae%Pholis%NA,Pholidae,Pholis,NA,,gunnel,"seafloor,shallow",ocean,,150,
-Pholidae%Pholis%Pholis laeta,Pholidae,Pholis,Pholis laeta,,gunnel,"seafloor,shallow",ocean,,150,
-Platytroctidae%Sagamichthys%Sagamichthys abei,Platytroctidae,Sagamichthys,Sagamichthys abei,,Myctophid,deepwater,ocean,,,
-Pleuronectidae%Atheresthes%Atheresthes evermanni|stomias,Pleuronectidae,Atheresthes,Atheresthes evermanni|stomias,,flat,"seafloor, deep",ocean,,,
-Pleuronectidae%Atheresthes%NA,Pleuronectidae,Atheresthes,NA,,flat,"seafloor, deep",ocean,,,
-Pleuronectidae%Eopsetta%Eopsetta jordani,Pleuronectidae,Eopsetta,Eopsetta jordani,,flat,"seafloor, deep",ocean,,,
-Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,Pleuronectidae,Glyptocephalus,Glyptocephalus zachirus,,flat,"seafloor, deep",ocean,,,
-Pleuronectidae%Isopsetta%Isopsetta isolepis,Pleuronectidae,Isopsetta,Isopsetta isolepis,opportunistic,flat,seafloor,ocean,,550,
-Pleuronectidae%Lyopsetta%Lyopsetta exilis,Pleuronectidae,Lyopsetta,Lyopsetta exilis,opportunistic,flat,"seafloor, deep",ocean,,350,
-Pleuronectidae%Microstomus%Microstomus pacificus,Pleuronectidae,Microstomus,Microstomus pacificus,,flat,seafloor,ocean,,,
-Pleuronectidae%NA%NA,Pleuronectidae,NA,NA,,flat,seafloor,ocean,,,
-Pleuronectidae%Parophrys%Parophrys vetulus,Pleuronectidae,Parophrys,Parophrys vetulus,,flat,"seafloor, shallow",ocean,,,
-Pleuronectidae%Pleuronichthys%Pleuronichthys decurrens,Pleuronectidae,Pleuronichthys,Pleuronichthys decurrens,,flat,seafloor,ocean,,,
-Pleuronectidae%Psettichthys%Psettichthys melanostictus,Pleuronectidae,Psettichthys,Psettichthys melanostictus,,flat,"seafloor, deep",ocean,,,
-Rajidae%Raja%NA,Rajidae,Raja,NA,invertebrates,Ray,seafloor,ocean,,,
-Rajidae%Raja%Raja binoculata,Rajidae,Raja,Raja binoculata,invertebrates,Ray,seafloor,ocean,,,
-Rajidae%Raja%Raja inornata,Rajidae,Raja,Raja inornata,invertebrates,Ray,seafloor,ocean,,,
-Rajidae%Raja%Raja rhina,Rajidae,Raja,Raja rhina,invertebrates,Ray,seafloor,ocean,,,
-Salmonidae%NA%NA,Salmonidae,NA,NA,,Salmon,surface-subsurface,anadromous,,,
-Salmonidae%Oncorhynchus%NA,Salmonidae,Oncorhynchus,NA,,Salmon,surface-subsurface,anadromous,,,
-Salmonidae%Oncorhynchus%Oncorhynchus keta,Salmonidae,Oncorhynchus,Oncorhynchus keta,,Salmon,surface-subsurface,anadromous,,,
-Salmonidae%Oncorhynchus%Oncorhynchus kisutch,Salmonidae,Oncorhynchus,Oncorhynchus kisutch,,Salmon,surface-subsurface,anadromous,,,
-Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,Salmonidae,Oncorhynchus,Oncorhynchus tshawytscha,,Salmon,surface-subsurface,anadromous,,,
-Salmonidae%Salvelinus%NA,Salmonidae,Salvelinus,NA,,Trout,surface,freshwater,,,
-Salmonidae%Salvelinus%Salvelinus environmental|leucomaenis|fontinalis,Salmonidae,Salvelinus,Salvelinus environmental|leucomaenis|fontinalis,,Trout,surface,freshwater,,,
-Sciaenidae%Genyonemus%Genyonemus lineatus,Sciaenidae,Genyonemus,Genyonemus lineatus,,Croaker,surface-subsurface,ocean-estuary,,,
-Scombridae%NA%NA,Scombridae,NA,NA,,Tuna,surface-mid,ocean,,,
-Scombridae%Scomber%Scomber japonicus,Scombridae,Scomber,Scomber japonicus,,Tuna,surface-mid,ocean,,,
-Scombridae%Thunnus%Thunnus alalunga|obesus,Scombridae,Thunnus,Thunnus alalunga|obesus,,Tuna,surface-mid,ocean,,,
-Scyliorhinidae%Apristurus%Apristurus brunneus,Scyliorhinidae,Apristurus,Apristurus brunneus,,Shark,"seafloor, deep",,,,
-Sebastidae%NA%NA,Sebastidae,NA,NA,,Rockfish,,,,,
-Sebastidae%Sebastes%NA,Sebastidae,Sebastes,NA,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes aleutianus|melanostictus,Sebastidae,Sebastes,Sebastes aleutianus|melanostictus,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,Sebastidae,Sebastes,Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,Sebastidae,Sebastes,Sebastes chrysomelas|caurinus|maliger,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,Sebastidae,Sebastes,Sebastes cortezi|melanosema|sinensis|diploproa,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes elongatus,Sebastidae,Sebastes,Sebastes elongatus,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes ensifer,Sebastidae,Sebastes,Sebastes ensifer,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes entomelas,Sebastidae,Sebastes,Sebastes entomelas,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes entomelas|mystinus,Sebastidae,Sebastes,Sebastes entomelas|mystinus,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes jordani,Sebastidae,Sebastes,Sebastes jordani,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes miniatus,Sebastidae,Sebastes,Sebastes miniatus,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes pinniger,Sebastidae,Sebastes,Sebastes pinniger,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes polyspinis|variabilis|ciliatus|crameri,Sebastidae,Sebastes,Sebastes polyspinis|variabilis|ciliatus|crameri,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes saxicola,Sebastidae,Sebastes,Sebastes saxicola,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,Sebastidae,Sebastes,Sebastes sp. NA|flavidus|melanops|serranoides,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,Sebastidae,Sebastes,Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,,Rockfish,,,,,
-Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,Sebastidae,Sebastes,Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,,Rockfish,,,,,
-Sebastidae%Sebastolobus%Sebastolobus altivelis,Sebastidae,Sebastolobus,Sebastolobus altivelis,,Rockfish,,,,,
-Squalidae%Squalus%Squalus acanthias,Squalidae,Squalus,Squalus acanthias,,Shark,"seafloor, deep",,,,
-Stichaeidae%Poroclinus%Poroclinus rothrocki,Stichaeidae,Poroclinus,Poroclinus rothrocki,,eelpouts,"seafloor, deep",,,,
-Stomiidae%Tactostoma%Tactostoma macropus,Stomiidae,Tactostoma,Tactostoma macropus,,eelpouts,"seafloor, deep",,,,
-Zaniolepididae%Zaniolepis%NA,Zaniolepididae,Zaniolepis,NA,,sculpin,seafloor,,,,
-Zaniolepididae%Zaniolepis%Zaniolepis latipinnis,Zaniolepididae,Zaniolepis,Zaniolepis latipinnis,,sculpin,seafloor,,,,
-Zoarcidae%Lycodapus%Lycodapus mandibularis,Zoarcidae,Lycodapus,Lycodapus mandibularis,,eelpouts,seafloor,,,,
-Zoarcidae%Lycodes%Lycodes cortezianus,Zoarcidae,Lycodes,Lycodes cortezianus,,eelpouts,seafloor,,,,
-Zoarcidae%Lycodes%Lycodes diapterus,Zoarcidae,Lycodes,Lycodes diapterus,,eelpouts,seafloor,,,,
-Zoarcidae%NA%NA,Zoarcidae,NA,NA,,eelpouts,seafloor,,,,
+taxa,family,genus,species,diet,morphology,habitat use,life history,diel migration,size(mm),source,new.morphotype,,nReads,npoints
+Agonidae%Chesnonia%Chesnonia verrucosa,Agonidae,Chesnonia,Chesnonia verrucosa,,Poacher,seafloor,ocean,,,,seafloor,Marine; demersal,319,1
+Agonidae%NA%NA,Agonidae,NA,NA,,Poacher,seafloor,ocean,,,,seafloor,Marine; demersal,1360,1
+Alopiidae%Isurus%Isurus oxyrinchus,Alopiidae,Isurus,Isurus oxyrinchus,Fish ,Shark,surface-mid,ocean,,4000,,Shark,Marine; pelagic-oceanic,1089,4
+Alopiidae%Lamna%Lamna ditropis,Alopiidae,Lamna,Lamna ditropis,Salmon,Shark,surface-mid,ocean,,3000,,Shark,Marine; pelagic-oceanic,22409,6
+Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,Anarhichadidae,Anarrhichthys,Anarrhichthys ocellatus,invertebrates,Eel,"seafloor, shallow",ocean,,2400,,"seafloor, shallow",Marine; demersal,33082,3
+Anarhichadidae%NA%NA,Anarhichadidae,NA,NA,invertebrates,Eel,"seafloor, shallow",ocean,,2400,,"seafloor, shallow",Marine; demersal,541,1
+Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,Anoplopomatidae,Anoplopoma,Anoplopoma fimbria,Fish ,cylinder,"seafloor, deep",ocean,Yes,1140,,"seafloor, deep",Marine; bathydemersal,83984,6
+Anoplopomatidae%NA%NA,Anoplopomatidae,NA,NA,Fish ,cylinder,"seafloor, deep",ocean,Yes,1140,,"seafloor, deep",Marine; bathydemersal,28113,4
+Atherinopsidae%NA%NA,Atherinopsidae,NA,NA,,herring,,,,,,smelt,Marine; pelagic-neritic,20,1
+Bathylagidae%Bathylagus%Bathylagus stilbius,Bathylagidae,Bathylagus,Bathylagus stilbius,,smelt,midwater,ocean,Yes,150,,smelt,Marine; bathypelagic,74913,2
+Bathylagidae%Lipolagus%Lipolagus ochotensis,Bathylagidae,Lipolagus,Lipolagus ochotensis,,smelt,deepwater,ocean,,150,,smelt,Marine; bathypelagic,48936,2
+Bathylagidae%NA%NA,Bathylagidae,NA,NA,,smelt,,,,,,smelt,Marine; bathypelagic,184301,6
+Bathymasteridae%Ronquilus%Ronquilus jordani,Bathymasteridae,Ronquilus,Ronquilus jordani,,cylinder,"seafloor, shallow",ocean,,200,,"seafloor, shallow",Marine; demersal,164,1
+Belonidae%Cololabis%Cololabis saira,Belonidae,Cololabis,Cololabis saira,krill,long,surface-subsurface,ocean,none,300,https://doi.org/10.1111/j.1365-2419.2004.00310.x,smelt,Marine; pelagic-oceanic,59269,12
+Belonidae%NA%NA,Belonidae,NA,NA,krill,long,surface-subsurface,ocean,none,300,,smelt,Marine; pelagic-oceanic,1415,3
+Carangidae%NA%NA,Carangidae,NA,NA,filter feeders,Mackerel,surface-subsurface,ocean,,,,smelt,Marine; pelagic-oceanic,28353,16
+Carangidae%Trachurus%NA,Carangidae,Trachurus,NA,filter feeders,Mackerel,surface-subsurface,ocean,,,,smelt,Marine; pelagic-oceanic,141857,24
+Carangidae%Trachurus%Trachurus symmetricus,Carangidae,Trachurus,Trachurus symmetricus,filter feeders,Mackerel,surface-subsurface,ocean,,550,,smelt,Marine; pelagic-oceanic,2113546,44
+Carcharhinidae%NA%NA,Carcharhinidae,NA,NA,Fish ,Shark,surface-mid,ocean,,4000,,Shark,Marine; pelagic-oceanic,3078,2
+Carcharhinidae%Prionace%Prionace glauca,Carcharhinidae,Prionace,Prionace glauca,Fish ,Shark,surface-mid,ocean,,4000,,Shark,Marine; pelagic-oceanic,55001,8
+Centrolophidae%Icichthys%Icichthys lockingtoni,Centrolophidae,Icichthys,Icichthys lockingtoni,plankton,compressed,surface,ocean,,460,,surface-subsurface,Marine; pelagic-oceanic,19365,8
+Centrolophidae%NA%NA,Centrolophidae,NA,NA,plankton,compressed,surface,ocean,,460,,surface-subsurface,Marine; pelagic-oceanic,2248,5
+Chimaeridae%Hydrolagus%Hydrolagus colliei,Chimaeridae,Hydrolagus,Hydrolagus colliei,invertebrates,ratfish,seafloor,ocean,,970,,seafloor,Marine; demersal,21964,8
+Chimaeridae%NA%NA,Chimaeridae,NA,NA,invertebrates,ratfish,seafloor,ocean,,970,,seafloor,Marine; demersal,540,1
+Cichlidae%NA%NA,Cichlidae,NA,NA,,,,,,,,,,34685,5
+Cichlidae%Oreochromis%Oreochromis niloticus x Oreochromis aureus,Cichlidae,Oreochromis,Oreochromis niloticus x Oreochromis aureus,,,,,,,,,,177156,8
+Clupeidae%Alosa%Alosa fallax,Clupeidae,Alosa,Alosa fallax,filter feeders,herring,surface-subsurface,anadromous,none,600,,smelt,Marine; freshwater; brackish; pelagic-neritic,4541,3
+Clupeidae%Alosa%NA,Clupeidae,Alosa,NA,filter feeders,herring,surface-subsurface,anadromous,none,600,,smelt,Marine; freshwater; brackish; pelagic-neritic,805,2
+Clupeidae%Clupea%Clupea pallasii,Clupeidae,Clupea,Clupea pallasii,filter feeders,herring,surface-mid,ocean-estuary,,330,,smelt,Marine; freshwater; brackish; pelagic-neritic,1196151,29
+Clupeidae%Clupea%NA,Clupeidae,Clupea,NA,filter feeders,herring,surface-mid,ocean-estuary,,330,,smelt,Marine; freshwater; brackish; pelagic-neritic,1399,1
+Clupeidae%Sardinops%NA,Clupeidae,Sardinops,NA,small zooplankton,sardine,surface-mid,ocean,,400,,smelt,Marine; pelagic-neritic,36133,12
+Clupeidae%Sardinops%Sardinops sagax,Clupeidae,Sardinops,Sardinops sagax,small zooplankton,sardine,surface-mid,ocean,,400,,smelt,Marine; pelagic-neritic,332681,19
+Cottidae%Artedius%Artedius fenestralis|lateralis,Cottidae,Artedius,Artedius fenestralis|lateralis,shrimp,sculpin,seafloor,,,140,,seafloor,Marine; demersal,2267,3
+Cottidae%Artedius%Artedius harringtoni,Cottidae,Artedius,Artedius harringtoni,,sculpin,seafloor,,,100,,seafloor,Marine; demersal,4471,1
+Cottidae%Artedius%NA,Cottidae,Artedius,NA,,sculpin,seafloor,,,100,,seafloor,Marine; demersal,52,1
+Cottidae%Chitonotus%Chitonotus pugetensis,Cottidae,Chitonotus,Chitonotus pugetensis,,sculpin,seafloor,,,230,,seafloor,Marine; demersal,1378,2
+Cottidae%Leptocottus%Leptocottus armatus,Cottidae,Leptocottus,Leptocottus armatus,,sculpin,seafloor,,,450,,seafloor,Marine; demersal,25143,2
+Cottidae%NA%NA,Cottidae,NA,NA,,sculpin,seafloor,,,,,seafloor,Marine; demersal,96484,10
+Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,Cryptacanthodidae,Cryptacanthodes,Cryptacanthodes giganteus,,Eel,seafloor,,,1150,,seafloor,Marine; demersal,10015,2
+Embiotocidae%Embiotoca%Embiotoca jacksoni|lateralis,Embiotocidae,Embiotoca,Embiotoca jacksoni|lateralis,invertebrates,Perch,shallow,ocean,,380,,surface-subsurface,Marine; demersal,101,1
+Embiotocidae%NA%NA,Embiotocidae,NA,NA,invertebrates,Perch,shallow,ocean,,380,,surface-subsurface,Marine; demersal,1870,1
+Embiotocidae%Rhacochilus%Rhacochilus vacca,Embiotocidae,Rhacochilus,Rhacochilus vacca,invertebrates,Perch,surface-subsurface,ocean,,400,,surface-subsurface,Marine; demersal,507,1
+Embiotocidae%Zalembius%Zalembius rosaceus,Embiotocidae,Zalembius,Zalembius rosaceus,,Perch,surface-subsurface,ocean,,200,,surface-subsurface,Marine; demersal,6737,1
+Engraulidae%Engraulis%Engraulis mordax,Engraulidae,Engraulis,Engraulis mordax,filter feeders,anchovy,surface-mid,ocean,,250,,smelt,Marine; pelagic-neritic,192102,17
+Engraulidae%NA%NA,Engraulidae,NA,NA,filter feeders,anchovy,surface-mid,ocean,,250,,smelt,Marine; pelagic-neritic,150995,17
+Gadidae%Microgadus%Microgadus proximus,Gadidae,Microgadus,Microgadus proximus,"Fish, invertebrates",Cod,surface-mid,ocean,,305,,Pelagic predator,Marine; brackish; demersal,106325,6
+Gadidae%Microgadus%NA,Gadidae,Microgadus,NA,"Fish, invertebrates",Cod,surface-mid,ocean,,305,,Pelagic predator,Marine; brackish; demersal,1987,1
+Gonostomatidae%Cyclothone%NA,Gonostomatidae,Cyclothone,NA,plankton,bristlefish,deepwater,ocean,,100,,deepwater,Marine; bathypelagic,204,1
+Hexagrammidae%Hexagrammos%Hexagrammos decagrammus,Hexagrammidae,Hexagrammos,Hexagrammos decagrammus,invertebrates,kelpfish,"seafloor, shallow",ocean,,610,,"seafloor, shallow",Marine; demersal,11402,2
+Hexagrammidae%Ophiodon%Ophiodon elongatus,Hexagrammidae,Ophiodon,Ophiodon elongatus,Fish ,Eel,"seafloor, shallow",ocean,,1500,,"seafloor, shallow",Marine; demersal,132675,6
+Jordaniidae%Jordania%Jordania zonope,Jordaniidae,Jordania,Jordania zonope,invertebrates,sculpin,"seafloor, shallow",ocean,,150,,seafloor,Marine; demersal,360,1
+Liparidae%Liparis%Liparis florae,Liparidae,Liparis,Liparis florae,,snailfish,"seafloor, shallow",ocean,,,,"seafloor, shallow",Marine; demersal,1552,1
+Liparidae%Liparis%Liparis fucensis|callyodon,Liparidae,Liparis,Liparis fucensis|callyodon,,snailfish,seafloor,,,,,seafloor,Marine; demersal,431,1
+Liparidae%Liparis%Liparis pulchellus,Liparidae,Liparis,Liparis pulchellus,,snailfish,seafloor,,,,,seafloor,Marine; demersal,2850,2
+Liparidae%Liparis%NA,Liparidae,Liparis,NA,,snailfish,seafloor,,,,,seafloor,Marine; demersal,586,1
+Liparidae%NA%NA,Liparidae,NA,NA,,snailfish,seafloor,,,,,seafloor,Marine; demersal,168,1
+Merlucciidae%Merluccius%Merluccius angustimanus|productus,Merlucciidae,Merluccius,Merluccius angustimanus|productus,"fish, plankton",Hake,midwater,ocean,yes,899,,Pelagic predator,Marine; brackish; pelagic-neritic,6599,1
+Merlucciidae%Merluccius%Merluccius productus,Merlucciidae,Merluccius,Merluccius productus,"fish, plankton",Hake,midwater,ocean,yes,900,,Pelagic predator,Marine; brackish; pelagic-neritic,2179647,47
+Merlucciidae%Merluccius%NA,Merlucciidae,Merluccius,NA,"fish, plankton",Hake,midwater,ocean,yes,900,,Pelagic predator,Marine; brackish; pelagic-neritic,388737,34
+Microstomatidae%NA%NA,Microstomatidae,NA,NA,,argentine,deepwater,ocean,,219,,deepwater,Marine; bathypelagic,156759,2
+Microstomatidae%Nansenia%Nansenia candida,Microstomatidae,Nansenia,Nansenia candida,,argentine,deepwater,ocean,,220,,deepwater,Marine; bathypelagic,236544,8
+Molidae%Mola%Mola mola,Molidae,Mola,Mola mola,small fishes,sunfish,midwater,ocean,,4000,,Pelagic predator,Marine; pelagic-oceanic,4607,3
+Molidae%NA%NA,Molidae,NA,NA,small fishes,sunfish,midwater,ocean,,4000,,Pelagic predator,Marine; pelagic-oceanic,4679,2
+Myctophidae%Diaphus%Diaphus theta,Myctophidae,Diaphus,Diaphus theta,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,290274,18
+Myctophidae%Diaphus%NA,Myctophidae,Diaphus,NA,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,148167,8
+Myctophidae%NA%NA,Myctophidae,NA,NA,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,86103,14
+Myctophidae%Nannobrachium%Nannobrachium regale,Myctophidae,Nannobrachium,Nannobrachium regale,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,90059,1
+Myctophidae%Stenobrachius%NA,Myctophidae,Stenobrachius,NA,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,174608,11
+Myctophidae%Stenobrachius%Stenobrachius leucopsarus,Myctophidae,Stenobrachius,Stenobrachius leucopsarus,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,396011,15
+Osmeridae%Allosmerus%Allosmerus elongatus,Osmeridae,Allosmerus,Allosmerus elongatus,,smelt,smelt,ocean-estuary,,230,,smelt,Marine; demersal; non-migratory,11887,2
+Osmeridae%Hypomesus%Hypomesus pretiosus,Osmeridae,Hypomesus,Hypomesus pretiosus,,smelt,smelt,ocean-estuary,,230,,smelt,Marine; brackish; benthopelagic,32788,4
+Osmeridae%NA%NA,Osmeridae,NA,NA,,smelt,smelt,ocean-estuary,,230,,smelt,,42792,9
+Osmeridae%Spirinchus%Spirinchus starksi,Osmeridae,Spirinchus,Spirinchus starksi,,smelt,smelt,ocean-estuary,,230,,smelt,Marine; benthopelagic,1364,2
+Osmeridae%Thaleichthys%Thaleichthys pacificus,Osmeridae,Thaleichthys,Thaleichthys pacificus,,smelt,smelt,anadromous,,230,,smelt,Marine; freshwater; brackish; pelagic-neritic; anadromous,12624,5
+Paralepididae%Lestidiops%Lestidiops ringens,Paralepididae,Lestidiops,Lestidiops ringens,Fish ,Pelagic predator,midwater,ocean,,430,,Pelagic predator,Marine; bathypelagic,21113,1
+Paralepididae%Magnisudis%Magnisudis atlantica,Paralepididae,Magnisudis,Magnisudis atlantica,,Pelagic predator,midwater,ocean,,430,,Pelagic predator,Marine; pelagic-oceanic,27705,2
+Paralepididae%Magnisudis%NA,Paralepididae,Magnisudis,NA,,Pelagic predator,midwater,ocean,,430,,Pelagic predator,Marine; pelagic-oceanic,1101,1
+Paralepididae%NA%NA,Paralepididae,NA,NA,,Pelagic predator,midwater,ocean,,430,,Pelagic predator,Marine; pelagic-oceanic,9981,1
+Paralichthyidae%Citharichthys%Citharichthys stigmaeus,Paralichthyidae,Citharichthys,Citharichthys stigmaeus,opportunistic,flat,"seafloor, shallow",ocean,,410,,"seafloor, shallow",Marine; demersal,68404,11
+Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,Paralichthyidae,Citharichthys,Citharichthys xanthostigma|sordidus,opportunistic,flat,"seafloor, shallow",ocean,,410,https://www.fishbase.in/summary/Citharichthys-sordidus.html,"seafloor, shallow",Marine; demersal,1029251,31
+Paralichthyidae%Citharichthys%NA,Paralichthyidae,Citharichthys,NA,opportunistic,flat,"seafloor, shallow",ocean,,410,https://www.fishbase.in/summary/Citharichthys-sordidus.html,"seafloor, shallow",Marine; demersal,276994,33
+Paralichthyidae%NA%NA,Paralichthyidae,NA,NA,opportunistic,flat,"seafloor, shallow",ocean,,410,,"seafloor, shallow",Marine; demersal,3447,7
+Pholidae%Pholis%NA,Pholidae,Pholis,NA,,gunnel,"seafloor, shallow",ocean,,150,,"seafloor, shallow",Marine; demersal,319,1
+Pholidae%Pholis%Pholis laeta,Pholidae,Pholis,Pholis laeta,,gunnel,"seafloor, shallow",ocean,,150,,"seafloor, shallow",Marine; demersal,4487,2
+Platytroctidae%Sagamichthys%Sagamichthys abei,Platytroctidae,Sagamichthys,Sagamichthys abei,,Myctophid,deepwater,ocean,,,,deepwater,Marine; bathypelagic,6953,1
+Pleuronectidae%Atheresthes%Atheresthes evermanni|stomias,Pleuronectidae,Atheresthes,Atheresthes evermanni|stomias,,flat,"seafloor, deep",ocean,,,,"seafloor, deep",Marine; demersal,29523,1
+Pleuronectidae%Atheresthes%NA,Pleuronectidae,Atheresthes,NA,,flat,"seafloor, deep",ocean,,,,"seafloor, deep",Marine; demersal,3382,1
+Pleuronectidae%Eopsetta%Eopsetta jordani,Pleuronectidae,Eopsetta,Eopsetta jordani,,flat,"seafloor, deep",ocean,,,,"seafloor, deep",Marine; demersal,79520,6
+Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,Pleuronectidae,Glyptocephalus,Glyptocephalus zachirus,,flat,"seafloor, deep",ocean,,,,"seafloor, deep",Marine; demersal,15318,6
+Pleuronectidae%Isopsetta%Isopsetta isolepis,Pleuronectidae,Isopsetta,Isopsetta isolepis,opportunistic,flat,seafloor,ocean,,550,,seafloor,Marine; demersal,190259,7
+Pleuronectidae%Lyopsetta%Lyopsetta exilis,Pleuronectidae,Lyopsetta,Lyopsetta exilis,opportunistic,flat,"seafloor, deep",ocean,,350,,"seafloor, deep",Marine; demersal,107769,7
+Pleuronectidae%Microstomus%Microstomus pacificus,Pleuronectidae,Microstomus,Microstomus pacificus,,flat,seafloor,ocean,,,,seafloor,Marine; demersal,42019,6
+Pleuronectidae%NA%NA,Pleuronectidae,NA,NA,,flat,seafloor,ocean,,,,seafloor,Marine; demersal,836145,24
+Pleuronectidae%Parophrys%Parophrys vetulus,Pleuronectidae,Parophrys,Parophrys vetulus,,flat,"seafloor, shallow",ocean,,,,"seafloor, shallow",Marine; demersal,16343,1
+Pleuronectidae%Pleuronichthys%Pleuronichthys decurrens,Pleuronectidae,Pleuronichthys,Pleuronichthys decurrens,,flat,seafloor,ocean,,,,seafloor,Marine; demersal,353,1
+Pleuronectidae%Psettichthys%Psettichthys melanostictus,Pleuronectidae,Psettichthys,Psettichthys melanostictus,,flat,"seafloor, deep",ocean,,,,"seafloor, deep",Marine; demersal,6164,3
+Rajidae%Raja%NA,Rajidae,Raja,NA,invertebrates,Ray,seafloor,ocean,,,,seafloor,Marine; demersal,26777,10
+Rajidae%Raja%Raja binoculata,Rajidae,Raja,Raja binoculata,invertebrates,Ray,seafloor,ocean,,,,seafloor,Marine; demersal,146316,13
+Rajidae%Raja%Raja inornata,Rajidae,Raja,Raja inornata,invertebrates,Ray,seafloor,ocean,,,,seafloor,Marine; demersal,33741,2
+Rajidae%Raja%Raja rhina,Rajidae,Raja,Raja rhina,invertebrates,Ray,seafloor,ocean,,,,seafloor,Marine; demersal,103425,10
+Salmonidae%NA%NA,Salmonidae,NA,NA,,Salmon,surface-subsurface,anadromous,,,,Salmon,Marine; freshwater; brackish; benthopelagic; anadromous ,677230,11
+Salmonidae%Oncorhynchus%NA,Salmonidae,Oncorhynchus,NA,,Salmon,surface-subsurface,anadromous,,,,Salmon,Marine; freshwater; brackish; benthopelagic; anadromous ,144852,14
+Salmonidae%Oncorhynchus%Oncorhynchus keta,Salmonidae,Oncorhynchus,Oncorhynchus keta,,Salmon,surface-subsurface,anadromous,,,,Salmon,Marine; freshwater; brackish; benthopelagic; anadromous ,97223,4
+Salmonidae%Oncorhynchus%Oncorhynchus kisutch,Salmonidae,Oncorhynchus,Oncorhynchus kisutch,,Salmon,surface-subsurface,anadromous,,,,Salmon,Marine; freshwater; brackish; benthopelagic; anadromous ,187,2
+Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,Salmonidae,Oncorhynchus,Oncorhynchus tshawytscha,,Salmon,surface-subsurface,anadromous,,,,Salmon,Marine; freshwater; brackish; benthopelagic; anadromous ,409754,11
+Salmonidae%Salvelinus%NA,Salmonidae,Salvelinus,NA,,Trout,surface,freshwater,,,,surface-subsurface,Marine; freshwater; brackish; benthopelagic; anadromous ,158,1
+Salmonidae%Salvelinus%Salvelinus environmental|leucomaenis|fontinalis,Salmonidae,Salvelinus,Salvelinus environmental|leucomaenis|fontinalis,,Trout,surface,freshwater,,,,surface-subsurface,Marine; freshwater; brackish; benthopelagic; anadromous ,2257,1
+Sciaenidae%Genyonemus%Genyonemus lineatus,Sciaenidae,Genyonemus,Genyonemus lineatus,,Croaker,surface-subsurface,ocean-estuary,,,,surface-subsurface,Marine; benthopelagic,11028,1
+Scombridae%NA%NA,Scombridae,NA,NA,,Tuna,surface-mid,ocean,,,,Pelagic predator,Marine; pelagic-oceanic,32921,5
+Scombridae%Scomber%Scomber japonicus,Scombridae,Scomber,Scomber japonicus,,Tuna,surface-mid,ocean,,,,Pelagic predator,Marine; pelagic-neritic,196735,12
+Scombridae%Thunnus%Thunnus alalunga|obesus,Scombridae,Thunnus,Thunnus alalunga|obesus,,Tuna,surface-mid,ocean,,,,Pelagic predator,Marine; pelagic-oceanic,315339,7
+Scyliorhinidae%Apristurus%Apristurus brunneus,Scyliorhinidae,Apristurus,Apristurus brunneus,,Shark,"seafloor, deep",,,,,"seafloor, deep",Marine; demersal,299,1
+Sebastidae%NA%NA,Sebastidae,NA,NA,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,16311,12
+Sebastidae%Sebastes%NA,Sebastidae,Sebastes,NA,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,86084,18
+Sebastidae%Sebastes%Sebastes aleutianus|melanostictus,Sebastidae,Sebastes,Sebastes aleutianus|melanostictus,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,2629,1
+Sebastidae%Sebastes%Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,Sebastidae,Sebastes,Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,17894,2
+Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,Sebastidae,Sebastes,Sebastes chrysomelas|caurinus|maliger,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,44477,5
+Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,Sebastidae,Sebastes,Sebastes cortezi|melanosema|sinensis|diploproa,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,257012,3
+Sebastidae%Sebastes%Sebastes elongatus,Sebastidae,Sebastes,Sebastes elongatus,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,22472,5
+Sebastidae%Sebastes%Sebastes ensifer,Sebastidae,Sebastes,Sebastes ensifer,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,174,1
+Sebastidae%Sebastes%Sebastes entomelas,Sebastidae,Sebastes,Sebastes entomelas,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,26652,3
+Sebastidae%Sebastes%Sebastes entomelas|mystinus,Sebastidae,Sebastes,Sebastes entomelas|mystinus,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,59341,9
+Sebastidae%Sebastes%Sebastes jordani,Sebastidae,Sebastes,Sebastes jordani,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,68175,7
+Sebastidae%Sebastes%Sebastes miniatus,Sebastidae,Sebastes,Sebastes miniatus,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,2006,1
+Sebastidae%Sebastes%Sebastes pinniger,Sebastidae,Sebastes,Sebastes pinniger,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,44,1
+Sebastidae%Sebastes%Sebastes polyspinis|variabilis|ciliatus|crameri,Sebastidae,Sebastes,Sebastes polyspinis|variabilis|ciliatus|crameri,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,10278,1
+Sebastidae%Sebastes%Sebastes saxicola,Sebastidae,Sebastes,Sebastes saxicola,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,19656,1
+Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,Sebastidae,Sebastes,Sebastes sp. NA|flavidus|melanops|serranoides,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,111642,14
+Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,Sebastidae,Sebastes,Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,3014,3
+Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,Sebastidae,Sebastes,Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,341076,13
+Sebastidae%Sebastolobus%Sebastolobus altivelis,Sebastidae,Sebastolobus,Sebastolobus altivelis,,Rockfish,Rockfish,,,,,Rockfish,Marine; demersal,839,1
+Squalidae%Squalus%Squalus acanthias,Squalidae,Squalus,Squalus acanthias,,Shark,"seafloor, deep",,,,,"seafloor, deep",Marine; brackish; benthopelagic,130597,13
+Stichaeidae%Poroclinus%Poroclinus rothrocki,Stichaeidae,Poroclinus,Poroclinus rothrocki,,eelpouts,"seafloor, deep",,,,,"seafloor, deep",Marine; demersal,1715,1
+Stomiidae%Tactostoma%Tactostoma macropus,Stomiidae,Tactostoma,Tactostoma macropus,,eelpouts,"seafloor, deep",,,,,"seafloor, deep",Marine; bathypelagic,94218,3
+Zaniolepididae%Zaniolepis%NA,Zaniolepididae,Zaniolepis,NA,,sculpin,seafloor,,,,,seafloor,Marine; demersal,1569,2
+Zaniolepididae%Zaniolepis%Zaniolepis latipinnis,Zaniolepididae,Zaniolepis,Zaniolepis latipinnis,,sculpin,seafloor,,,,,seafloor,Marine; demersal,2599,1
+Zoarcidae%Lycodapus%Lycodapus mandibularis,Zoarcidae,Lycodapus,Lycodapus mandibularis,,eelpouts,seafloor,,,,,seafloor,Marine; bathypelagic,5702,1
+Zoarcidae%Lycodes%Lycodes cortezianus,Zoarcidae,Lycodes,Lycodes cortezianus,,eelpouts,seafloor,,,,,seafloor,Marine; bathypelagic,28969,1
+Zoarcidae%Lycodes%Lycodes diapterus,Zoarcidae,Lycodes,Lycodes diapterus,,eelpouts,seafloor,,,,,seafloor,Marine; bathypelagic,5329,1
+Zoarcidae%NA%NA,Zoarcidae,NA,NA,,eelpouts,seafloor,,,,,seafloor,Marine; bathypelagic,343251,7

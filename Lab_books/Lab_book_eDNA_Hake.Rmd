@@ -13,690 +13,89 @@ library (here)
 library (tidyverse)
 library (knitr)
 library(kableExtra)
-library(googlesheets4)
-library (eDNAfuns)
 ```
 
-<!-- For this Library Prep, the Samples selected are in our googlesheet, and we created a new sheet with the samples selected and the well in which we have put them for PCR1 cleanup  -->
-<!-- ```{r load dataset, message = F} -->
-<!-- Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>%  -->
-<!--   pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%  -->
-<!--   mutate (Plate = "Plate22") -->
-
-<!-- Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>%  -->
-<!--   pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%  -->
-<!--   mutate (Plate = "Plate23") -->
-
-<!-- Samples_to_Sequence <- bind_rows(Plate22, Plate23) -->
-<!-- ``` -->
-
-<!-- ## Amplification Success so far -->
-
-<!-- I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment.  -->
-
-
-
-<!-- These samples were amplified 3 times - hence the .1, .2 and .3 labels at the end of their names. The Rx were PCRs 274, 275, 277 for May_17 samples and 285 and 286 for June_17. Gaps were filled in PCRs 284 and 294.  -->
-
-<!-- I run AMPureXP cleanup protocol in the successful samples: I used 2x Ampure (10 uL PCR product, 20 uL Ampure). I eluted the DNA in 20 uL of PCR water, that would become the template for PCR2.  -->
-
-<!-- Before running PCR2 we need to randomly assigned tags and libraries to samples, to avoid any systematic bias in our libraries. We are going to use 16 Tags and 6 libraries (6x16 = 96 unique combinations) to label 93 samples. -->
-
-<!-- ```{r} -->
-<!-- Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>%  -->
-<!--   rownames_to_column("Position") %>%  -->
-<!--   slice(1:96) %>%  -->
-<!--   mutate(Row = rep(LETTERS[1:8], 12),  -->
-<!--          Column = rep(1:12,each = 8)) %>%  -->
-<!--   unite(Row,Column, sep = "", col = "Well", remove = F) -->
-
-<!-- Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate -->
-<!-- Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well -->
-<!-- Norm_table[Norm_table < 2] <- "."  -->
-<!--   Norm_table[Norm_table > 20] <- "."  -->
-<!--     kable (Norm_table, align= "c", format = "html") %>% -->
-<!--       kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>% -->
-<!--       column_spec(1, bold=T) %>% -->
-<!--       column_spec(1:13, width= "1cm") -->
-
-
-<!-- ``` -->
-
-
-<!-- ```{r PCR50} -->
-<!-- Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>%  -->
-<!--   rownames_to_column("Position") %>%  -->
-<!--   slice(1:48) %>%  -->
-<!--   mutate(Row = rep(LETTERS[1:8], 6),  -->
-<!--          Column = rep(5:10,each = 8)) %>%  -->
-<!--   unite(Row,Column, sep = "", col = "Well", remove = F) -->
-
-<!-- Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate -->
-<!-- Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well -->
-<!-- Norm_table[Norm_table < 2] <- "."  -->
-<!--   Norm_table[Norm_table > 20] <- "."  -->
-<!--     kable (Norm_table, align= "c", format = "html") %>% -->
-<!--       kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>% -->
-<!--       column_spec(1, bold=T) %>% -->
-<!--       column_spec(1:13, width= "1cm") -->
-
-<!-- ``` -->
-
-## MArch 2021
-
-```{r}
-gs4_find()
-```
-
-```{r}
-read_sheet("1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", col_types = "c") -> SuccesfulPCRs
-```
-
-
-```{r}
-# SuccesfulPCRs %>% 
-#   filter (!is.na(Sample)) %>% 
-#   group_by(Sample) %>% 
-#   add_tally()  %>%
-#   #filter (n == 3) %>%
-#   mutate(Keepers = TRUE) %>% sheet_write(ss = "1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", sheet = "updated")
-
-SuccesfulPCRs %>% 
-  filter (!is.na(Sample)) %>% 
-  group_by(Sample) %>% 
-  add_tally()  %>%
-  filter (n == 3) %>% 
-  arrange(Sample)
-  # nest() %>% 
-  # 
-  # mutate (data = map (data, ~.x %>% 
-  #                       rownames_to_column("count") %>% 
-  #                       
-  #                       mutate ( count = as.numeric(count),
-  #                                Keepers = count <= 2))) %>% 
-  # unnest(data) %>% 
-  # separate (Well, into = c("Row", "Column"), sep = 1, convert = T, remove = F) %>% 
-  # arrange(Column, Row) %>% 
-  # filter (Keepers == FALSE)
-```
-
-# Updated some info with desired bands
-
-```{r}
-Updated.PCRs <- read_sheet(ss = "1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", sheet = "updated")
-
-Updated.PCRs %>% 
-  filter (Keepers == TRUE) %>% 
-  select (-n) %>% 
-  group_by(Sample) %>% 
-  add_tally() %>% 
-  arrange(desc(n)) # THis is the sucess so far. If we keep those for which we have 2 - is it enough for a MiSeq run?
-
-Updated.PCRs %>% 
-  filter (Keepers == TRUE) %>% 
-  select (-n) %>% 
-  group_by(Sample) %>% 
-  add_tally() %>% 
-  filter (n == 2) # 64 samples + those in PCR51&52
-
-
-
-```
-
-Get what we already have indexed
-```{r}
-gs4_find()
-Updated.PCR52 <- eDNAfuns::read_indexing_PCR("1rLval2cNGmrnkRDOj1hekDMnqRrt64MQV4hFetwqBlM")
-
-Updated.PCR52 %>% 
-  filter (!is.na(Sample)) -> Updated.PCR52# 84 samples
-
-Updated.PCR52 %>% 
-  filter (str_detect(Sample, "T")) # 2 tilapias already, I won't need a third
-
-
-
-# Total for Run 84 + 64 = 148
-
-# Creagte a plate for AMPURE
-
-PCR.Plate <- tibble (Row = rep(LETTERS[1:8], 12),
-                     Column = rep(1:12, each = 8)) %>% 
-  unite(Row,Column,col = "Well", sep = "", remove= F) %>% 
-  rownames_to_column("Position")
-
-Updated.PCRs %>% 
-  filter (Keepers == TRUE) %>% 
-  select (-n) %>% 
-  group_by(Sample) %>% 
-  add_tally() %>% 
-  filter (n == 2) %>% # remove the Well 
-  select(-Well) %>% 
-  rownames_to_column("Position") %>% 
-  left_join(PCR.Plate) -> AMPURE_to_do # This is the plate we are going to index; we need to choose unused indices
-
-Updated.PCR52 %>% 
-  filter (Set == "B") # From Set B, I can Use BArcodes A1-H7
-
-AMPURE_to_do %>% 
-  pivot_wider(names_from = Column, id_cols = Row, values_from = PCR_of_Origin) -> PCR_plate_of_PCRs
-  
-AMPURE_to_do %>% 
-  pivot_wider(names_from = Column, id_cols = Row, values_from = Well_of_Origin) -> PCR_plate_of_Wells
-
-AMPURE_to_do %>% 
-  pivot_wider(names_from = Column, id_cols = Row, values_from = Sample) -> PCR_plate_of_Samples
-
-AMPURE_to_do %>% 
- sheet_write(ss = "1aFAH7cHVSk-asckTv1oEEwqlLmX8IAlXnt65GUXu70o", sheet = "March_2021")
-```
-
-
-Where to get the samples
-```{r}
-AMPURE_to_do %>% 
-  mutate(
-  Well_of_Origin = cell_spec(Well_of_Origin, color = ifelse(PCR_of_Origin == "RGS_053", "white",
-                                                            if_else(PCR_of_Origin == "RGS_054","black",
-                                                                    if_else(PCR_of_Origin == "RGS_056","white","blue"))),
-                  background = ifelse(PCR_of_Origin == "RGS_053", "red",
-                                      if_else(PCR_of_Origin == "RGS_056", "black","white")),
-                  bold = ifelse(PCR_of_Origin == "RGS_053|RGS_055", T, F))) %>% 
- 
-  pivot_wider(names_from = Column, id_cols = Row, values_from = Well_of_Origin) %>% 
-   kable(escape = F) %>% 
-  kable_styling()
-
-```
-
-
-```{r}
-write_indexing_PCR(AMPURE_to_do, "PCR057_Indexing")
-```
-
-
-## What is left to do?
-
-```{r}
-Updated.PCRs %>% 
-  anti_join(AMPURE_to_do, by = c("Sample")) %>% 
-  filter (Keepers == T) %>% 
-  arrange (as.numeric(Sample)) -> One_success
-```
-
-
-```{r load aspirational dataset, message = F}
-Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>%
-  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%
+For this Library Prep, the Samples selected are in our googlesheet, and we created a new sheet with the samples selected and the well in which we have put them for PCR1 cleanup 
+```{r load dataset, message = F}
+Plate22 <- read_csv(here("Data", "Samples_To_Sequence", "plate22.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
   mutate (Plate = "Plate22")
 
-Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>%
-  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>%
+Plate23 <- read_csv(here("Data", "Samples_To_Sequence", "plate23.csv")) %>% 
+  pivot_longer(-Row, names_to = "Column", values_to = "sample") %>% 
   mutate (Plate = "Plate23")
 
 Samples_to_Sequence <- bind_rows(Plate22, Plate23)
 ```
 
-Load the Qubit
-```{r}
-all.sheets %>% 
-  filter (str_detect(name, "Qubit")) %>% pull(id) %>% 
-  read_sheet(ss = .) -> qubit
+## Amplification Success so far
 
-qubit %>% 
-  mutate(Qubit2 =  map_dbl (Qubit,  ~ as.numeric(.x)[1])) -> qubit
-
-qubit %>% 
-  select(Sample, Qubit = Qubit2) -> qubit
+I have done a number of PCRs so far. For each PCR Rx, we should record at least the success of each sample and the locus amplified. Another option would be to include here the PCR Conditions for assesment. 
 
 
+```{r randomnly assign Tags and Libraries to samples}
+Ntags=16
+NtotalSamples=nrow(OA_Samples)
 
-left_join(Samples_to_Sequence, qubit, by = c("sample" = "Sample"))
+Nlibraries=ceiling(NtotalSamples/Ntags) 
 
-left_join(Samples_to_Sequence, One_success %>% mutate(sample = as.numeric(Sample))) %>% 
-  left_join(qubit %>% rename(sample = Sample)) %>% 
-  mutate(Column = as.numeric(Column)) %>% 
-  arrange( Plate, Column)
+tagNames=paste0("Tag_", seq(01:Ntags)) # tags names: 1 to 16
+libNames=paste0("Lib_", LETTERS[1:Nlibraries]) # lib names: A to F
 
-left_join(One_success %>% mutate(Sample = as.numeric(Sample)), qubit) 
+all_combos=crossing(Tag = tagNames,Lib = libNames) %>% #create all combinations of tags and libraries
+  mutate(Combo=paste(Tag ,Lib , sep=".")) %>% # paste them together
+  sample_n(size=NtotalSamples) #Randonmize and select as many cases as needed
+
+
+output=bind_cols(OA_Samples, all_combos) #Bind the columnns
 ```
 
-# Ready to go
-```{r}
-bind_rows(PCR51, PCR57) %>% 
-  filter (!is.na(Sample)) -> ready.to.seq
-
-ready.to.seq %>% 
-  select(Sample) %>% 
-  mutate(Status = "ready", n=2) -> ready.to.seq
-
-qubit %>% 
-  mutate (Sample = as.character(Sample)) -> qubit
-
-
-Samples_to_Sequence %>%
-  mutate(Sample = as.character(sample)) -> Samples_to_Sequence
-
-# left_join(Samples_to_Sequence, ready.to.seq) %>% 
-  
-bind_rows(One_success, ready.to.seq) %>% 
-  right_join(Samples_to_Sequence) %>% 
-  left_join(qubit) -> all.info.I.have
-
-all.info.I.have %>% 
-  mutate(Column = fct_reorder(Column, as.numeric(Column))) %>% 
-  ggplot(aes(x = Column, y = Row))+
-  geom_tile(aes(color = Status, fill = Qubit), size = 4 ) +
-  geom_text(aes(label = n)) +
-  scale_y_discrete(limits=rev) +
-  facet_wrap(~Plate) 
+One last check that no library-Tag combo has been used more than once
+```{r table to check}
+with (output, table(Lib,Tag))
 ```
-
-
-
-```{r}
-Samples_to_Sequence %>% 
-  mutate(Sample = as.character(sample),
-         Column = as.numeric(Column)) %>% 
- arrange( Column) %>% 
-  anti_join(AMPURE_to_do, by ="Sample") %>% 
-  left_join(One_success %>% select(Sample, n)) %>% 
-  # mutate(sample = cell_spec(sample, ))
-  group_by(Plate) %>% 
-  group_split() %>% 
-  map(~.x %>% 
-           pivot_wider(names_from = Column, id_cols = Row, values_from = sample) %>% 
-        arrange(Row))
-
+If all numbers are 1 or 0, then proceed to save the output in the googlesheet. Will skip it this time as I have already done it 
+```{r saving to gsheet}
+#gs_title("Samples_OA_good") %>% gs_edit_cells( ws = "Sequencing_run_Apr_18b", input = output)	
 ```
-
-PCR51 goog
-
+I prepare now some tables with the samples that go with each Tag - so it's easier to load the right primers into PCR2. In this case, I'm using OA_Samples (You could also use 'output', but this data has already been uploaded to the googlesheet).
 ```{r}
-PCR51 <- read_indexing_PCR("1rLval2cNGmrnkRDOj1hekDMnqRrt64MQV4hFetwqBlM")
+Samples.46 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_046_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:96) %>% 
+  mutate(Row = rep(LETTERS[1:8], 12), 
+         Column = rep(1:12,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
 
-```
-
-PCR57
-```{r}
-PCR57 <- read_indexing_PCR("1tJwmPWZ2Ruog4gOAfnQHfFoYsy-WApAZ2oRC_JFOLMQ")
-```
-
-
-Metadata for run20210326
-```{r}
-bind_rows(PCR51, PCR57) %>% 
-  filter (!is.na(Sample))
-```
-
-
-
-## April 2021
-
-Take the metadata that we have ready to go
-
-```{r}
-Already.pooled <- bind_rows(PCR51, PCR57) %>% 
-  filter (!is.na(Sample))
-```
-
-
-Take the succesful pcrs
-```{r}
-succesful.pcr <- read_csv(here("Data", "succesful.prcs.csv"))
-```
-
-what's ready to go
-```{r}
-Already.pooled %>% 
-  group_by(Sample) %>% 
-  tally() %>% 
-  filter (n == 2) -> done
-
-Already.pooled %>% 
-  group_by(Sample) %>% 
-  tally() %>% 
-  filter (n < 2) -> half_done
-
-succesful.pcr %>% 
-  filter (Success %in% c("Y","y")) -> true.succeses
-
-```
-
-```{r}
-
-Actual.run <- read_csv(here("Data/FASTQ_raw/Run20210326/noprimers/noprimers/output.metadata.csv"))
-
-Actual.run %>% 
-  separate(Sample_name, into= c("Sample", "replicate"), sep = "\\.") %>% 
-  group_by(Sample) %>% 
-  tally() %>% 
-  filter (n <2) %>% 
-  left_join(true.succeses) %>% write_csv("step.1.csv")
-```
-
-
-THose are the samples that, although I only succeded once now, I should sequence because I have another one ready to go
-
-Next go those samples for which I have two
-
-```{r}
-true.succeses %>% 
-  anti_join(Already.pooled, by = "Sample") -> new.hits
-
-new.hits %>% 
-  group_by(Sample) %>% 
-  add_tally() %>% 
-  arrange(as.numeric(Sample)) %>% write_csv("Step2.csv")
-
-new.hits %>% 
-  group_by(Sample) %>% 
-  add_tally() %>% 
-  filter (n >=2) %>% 
-  nest() %>% 
-  mutate (data = map (data, ~.x %>% slice (1:2))) %>% 
-  unnest() %>%
-  arrange(as.numeric(Sample)) %>% write.csv("to.run.2.csv")
-```
-
-
-# Nano run
-
-Add what we know didn't work on the pooled libraries
-
-```{r}
-
-read.counts <- read_delim(here("Data", "FASTQ_raw/Run20210326/noprimers/noprimers/read.counts.txt"), delim = " ", col_names= c("lines", "words", "chars", "file")) %>% 
-  mutate(lines = as.numeric(lines)) %>% 
-  select (1,4) %>% 
-  arrange ((lines))
- 
-
-```
-
-Sample 996.1 didn't work well
-
-```{r}
-anti_join(Actual.run, read.counts, by = c("file1"="file"))
-```
-
-
-So for the nano run, add 996 to the list of things we had in step1
-
-```{r}
-true.succeses %>% 
-  filter (Sample == 996)
-```
-
-
-Not really because I don't have a second one. 
-
-```{r}
-read_csv("step.1.csv") %>% 
-  filter (!is.na(Success))
-```
-
-## Compare runs depth after and before filtering 
-
-```{r}
-list.files(path = here("Data", "Pipeline_output", "comparing_filters"), full.names = T) %>% 
-  map(~read_delim(.x,  delim = " ", col_names= c("seqs", "file")) %>%  
-         mutate(seqs = as.numeric(seqs)/4,
-                sample = str_remove(file, "Locus_16S_Prey_"),
-                sample = str_remove(sample, "_L001_R1_001.fastq")) %>% 
-        select(seqs, sample)) %>% set_names(nm= list.files(path = here("Data", "Pipeline_output", "comparing_filters"))) %>% 
-  bind_rows(.id = "Source") %>% 
-  separate(Source, into = c("Run", "Stage")) %>% 
-  
-
-pivot_wider(names_from = Stage, values_from = seqs) -> before.dada2  
-
-before.dada2 %>% 
-  mutate(loss = ((before-after)/before)*100) %>% 
-  ggplot (aes(loss)) +
-  geom_density(aes(fill = Run))
-
-## Only in a few samples filtering has taken more than  1 % of the sequences
-
-
-  
-```
-
-
-
-# Get the dada2 Outputs
-
-```{r}
-list (Run7 = read_csv(here("Data", "Pipeline_output", "Run7","output" ,"dada2_summary.csv")),
-      Run8 = read_csv(here("Data", "Pipeline_output", "Run8","output" ,"dada2_summary.csv"))) %>% 
-  bind_rows(.id = "Run") -> dada2.process
-
-
-before.dada2 %>% 
-  separate(sample, into = "Sample_name", sep = "_") %>% 
-  left_join(dada2.process) %>% 
-  select(-after, -Locus) %>% 
-  # slice(1:5) %>% 
-  pivot_longer(cols = c(-Run, -Sample_name), names_to = "Step", values_to = "nseqs") %>% 
-  mutate(Step = fct_relevel(Step, "before", "input", "filtered", "denoised_F", "denoised_R", "merged", "tabled")) %>% 
-ggplot(aes(x = Step, y = nseqs, group =  Sample_name, color = Run)) +
-  geom_line() +
-  facet_wrap(~Sample_name, scales = "free_y") +
-  guides(color = "none")
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.46, cbind(Row,Column))] <- with(Samples.46, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
+      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
+      column_spec(1, bold=T) %>%
+      column_spec(1:13, width= "1cm")
+       
 
 ```
 
 
+```{r PCR50}
+Samples.50 <- read_csv(here("Data","Samples_To_Sequence","PCR_RGS_050_Indexing - Sheet2.csv")) %>% 
+  rownames_to_column("Position") %>% 
+  slice(1:48) %>% 
+  mutate(Row = rep(LETTERS[1:8], 6), 
+         Column = rep(5:10,each = 8)) %>% 
+  unite(Row,Column, sep = "", col = "Well", remove = F)
 
-Get one Fastq and see why on hell is this happening. Sample 1001
-
-
-
-```{r}
-read.seqs <- function(file){
-    insect::readFASTQ(file, bin=F) -> temp
-    tibble(names = names(temp),
-           seqs = temp)}
-
-
-Fwds <- list.files(here("Data","Pipeline_output", "comparing_filters"), pattern  = "*_R1_001.fastq", full.names = T)
-Fwds.names <- list.files(here("Data","Pipeline_output", "comparing_filters"), pattern  = "*_R1_001.fastq")
-
-Fwds %>%
-  map(read.seqs) -> all.fwds
-  set_names(all.fwds , Fwds.names) -> all.fwds
-
-Rev <- list.files(here("Data","Pipeline_output", "comparing_filters"), pattern  = "*_R2_001.fastq", full.names = T)
-Rev.names <- list.files(here("Data","Pipeline_output", "comparing_filters"), pattern  = "*_R2_001.fastq")
-
-Rev %>% 
-  map (read.seqs)-> all.revs
-set_names(all.revs , Rev.names) -> all.revs
-
-Sample_1001_F <- insect::readFASTQ(file = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_1001-1_S100_L001_R1_001.fastq"), bin = F)
-
-Sample_1001_R <- insect::readFASTQ(file = here("Data","Pipeline_output","comparing_filters", "Locus_16S_Prey_1001-1_S100_L001_R2_001.fastq"), bin = F)
-
-list (Fwd = Sample_1001_F, Rev = Sample_1001_R) %>% 
-  map(~ tibble(names = names(.x),
-               seqs = .x)) %>% 
-  bind_rows(.id = "Direction") -> Sample_1001
-
-# Find the stops
-
-Sample_1001 <- Sample_1001 %>% 
-  mutate(number_ns = str_count(seqs, "N"),
-         length = str_length(seqs))
-
-Sample_1001 %>% 
-  ggplot(aes(x = number_ns)) +
-  geom_density(aes(fill =  Direction))
-
-Sample_1001 %>% 
-  ggplot(aes(x = length)) +
-  geom_density(aes(fill =  Direction))
-
-```
-
-Seems like most are 0, but some have a lot, and all of them are of similar size
-
-```{r}
-Sample_1001 %>% 
-  filter (number_ns !=0)
-
-```
-
-Only 200 reads have more than 1 N
-
-THEN WHY WERE THEY filtered out?
-
-Current filtering parameters:
-trimming.length1
-trimming.length2
-maxN=0,
-maxEE=c(2,2), 
-truncQ=2,
-rm.phix=TRUE
-
-```{r}
-library(ShortRead)
-Biostrings::readQualityScaledDNAStringSet(here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_1001-1_S100_L001_R1_001.fastq")) -> Fwd
-
-
-encoding(quality(Fwd) )
-```
-
-
-Try by removing steps
-
-```{r}
-fwd = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_1001-1_S100_L001_R1_001.fastq")
-rev = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_1001-1_S100_L001_R2_001.fastq")
-filtf1 = here("Data","Pipeline_output", "comparing_filters","Filtered_1001-1_S100_L001_R1_001.fastq")
-filtR1 = here("Data","Pipeline_output", "comparing_filters","Filtered_1001-1_S100_L001_R2_001.fastq")
-
-filterAndTrim(fwd = fwd, filt = filtf1, rev = rev,  filt.rev = filtR1, 
-              truncLen=c(250,170),
-               maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=TRUE) -> out
-out
-```
-
-
-
-A function to check the nu
-```{r}
-Run8 <- read_csv(here("Data", "Pipeline_output", "Run8","output" ,"dada2_summary.csv"))
-
-Run8 %>% 
-  mutate(prop.filter = 1 - (filtered/input),
-         prop.deno   = 1 - (denoised_R/filtered),
-         prop.merged = 1 - (merged/denoised_R)) %>% 
-  pivot_longer(starts_with("prop."), names_to = "Step", values_to = "proportion") %>% 
-  ggplot(aes(proportion )) +
-    geom_density(aes(fill = Step))
-
-Run8 %>% 
-  mutate(prop.filter = 1 - (filtered/input),
-         prop.deno   = 1 - (denoised_R/filtered),
-         prop.merged = 1 - (merged/denoised_R)) %>% 
-  pivot_longer(starts_with("prop."), names_to = "Step", values_to = "proportion") %>% 
-  mutate(Step = fct_relevel(Step, "prop.filter", "prop.deno")) %>% 
-  ggplot(aes(x = Step, y = proportion, fill = Step)) + 
-  geom_boxplot() +
-  geom_point(position = "jitter",alpha = 0.5, aes(color = input ))
-
-
-Plot.source <- function (dada.summary){
-  
-  dada.summary %>% 
-     mutate(prop.filter = 1 - (filtered/input),
-         prop.deno   = 1 - (denoised_R/filtered),
-         prop.merged = 1 - (merged/denoised_R)) %>% 
-  pivot_longer(starts_with("prop."), names_to = "Step", values_to = "proportion") %>% 
-  mutate(Step = fct_relevel(Step, "prop.filter", "prop.deno")) %>% 
-  ggplot(aes(x = Step, y = proportion, fill = Step)) + 
-  geom_boxplot() +
-  geom_point(position = "jitter",alpha = 0.5, aes(color = input ))
-}
-Plot.source(Run7.summary)
-
-Arrange.source <- function (dada.summary){
-  dada.summary %>% 
-     mutate(prop.filter = 1 - (filtered/input),
-         prop.deno   = 1 - (denoised_R/filtered),
-         prop.merged = 1 - (merged/denoised_R)) %>%
-    arrange(desc(prop.filter))
-    
-  
-}
-
-Arrange.source(Run8)
-Arrange.source(Run7.summary)
-```
-
-
-```{r}
-fwd = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_80-1_S124_L001_R1_001.fastq")
-rev = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_80-1_S124_L001_R2_001.fastq")
-filtf1 = here("Data","Pipeline_output", "comparing_filters","Filtered_80-1_S124_L001_R1_001.fastq")
-filtR1 = here("Data","Pipeline_output", "comparing_filters","Filtered_80-1_S124_L001_R2_001.fastq")
-
-filterAndTrim(fwd = fwd, filt = filtf1, rev = rev,  filt.rev = filtR1, 
-              truncLen=c(250,170),
-               maxN=0, maxEE=c(Inf,Inf), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=TRUE) -> out
-
-plotQualityProfile(c(fwd,rev))
-
-plotQualityProfile(c(filtf1, filtR1))
-
-
-
-```
-
-
-
-```{r}
-Run8 %>% select(-Sample_name, -Locus) %>% 
-  summarise(across(.fns = sum))
-
-Run7.summary %>% select(-Sample_name, -Locus) %>% 
-  summarise(across(.fns = sum))
-
-```
-
-```{r}
-fwd = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_998-1_S26_L001_R1_001.fastq")
-rev = here("Data","Pipeline_output", "comparing_filters","Locus_16S_Prey_998-1_S26_L001_R2_001.fastq")
-filtf1 = here("Data","Pipeline_output", "comparing_filters","Filtered_998-1_S26_L001_R1_001.fastq")
-filtR1 = here("Data","Pipeline_output", "comparing_filters","Filtered_998-1_S26_L001_R2k_001.fastq")
-
-list.files(path = here("Data","Pipeline_output", "comparing_filters"), pattern = "Locus_16S_Prey_998")
-
-filterAndTrim(fwd = fwd, filt = filtf1, rev = rev,  filt.rev = filtR1, 
-              truncLen=c(250,170),
-               maxN=0, maxEE=c(Inf,Inf), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=TRUE) -> out
-
-plotQualityProfile(c(fwd,rev))
-
-plotQualityProfile(c(filtf1, filtR1))
-
-
-
-```
-
-```{r Tiara}
-read.seqs.FASTA <- function(file){
-    insect::readFASTA(file, bin=F) -> temp
-    tibble(names = names(temp),
-           seqs = temp)}
-read.seqs.FASTA("/Users/ramon.gallegosimon/Projects/Tiara_bioinf/Data/Sequencing/Run1_16S/hash_key.fasta") %>% 
-  mutate(l = purrr::map_dbl(seqs,str_length))
-
-read.seqs.FASTA("/Users/ramon.gallegosimon/Projects/Tiara_bioinf/Data/Sequencing/Run1_18S/hash_key.fasta") %>% 
-  mutate(l = purrr::map_dbl(seqs,str_length))
-
+Norm_table<-matrix(nrow=8, ncol=12, dimnames = list(LETTERS[1:8], 1:12)) #Empty 96 well plate
+Norm_table[with (Samples.50, cbind(Row,Column))] <- with(Samples.50, H20_to_4nM) # Populate it with the Tag that goes on each well
+Norm_table[Norm_table < 2] <- "." 
+  Norm_table[Norm_table > 20] <- "." 
+    kable (Norm_table, align= "c", format = "html") %>%
+      kable_styling(bootstrap_options= "striped", full_width = F, position = "center") %>%
+      column_spec(1, bold=T) %>%
+      column_spec(1:13, width= "1cm")
+       
 ```
 

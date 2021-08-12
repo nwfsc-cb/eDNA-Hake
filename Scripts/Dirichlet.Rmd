@@ -53,6 +53,10 @@ test1
 ```
 Turns out if we try to estimate sigma for all spp then it takes forever
  
+ 
+ Ole suggestes 
+ dna.index ~ transect + depth + upwelling
+ 
 ## Collapsing taxa
 
 Bring up a list of all taxa
@@ -64,6 +68,12 @@ By.taxa.dataset %>%
   arrange() %>% 
   separate(taxa, into = c("family", "genus", "species"), extra = "merge", remove = F) %>% 
   write_csv(here("Data", "unique.sp.csv"))
+
+By.taxa.dataset %>% 
+  group_by(taxa) %>% 
+  summarise(nReads = sum(nReads),
+            npoints = n_distinct(Transect,position,depth)) %>% 
+  write_csv(here("Data", "taxa.counts.csv"))
 ```
 
 ### Load list of major groups
@@ -72,9 +82,9 @@ By.taxa.dataset %>%
 sp_groups <- read_csv(here("Data", "unique.sp_collapse.csv"))
 
 sp_groups %>% 
-  select(taxa, morpho.group = morphology, habitat = `habitat use` ) -> grouping
+  select(taxa, morpho.group = new.morphotype, habitat = `habitat use` ) -> grouping
 
-
+grouping %>%  distinct(morpho.group)
 
 ```
 
@@ -84,8 +94,18 @@ sp_groups %>%
 By.taxa.dataset %>% 
   filter(!str_detect(taxa, "Cich")) %>% #no tilapias
   left_join(grouping) %>% 
-  group_by(eDNA.sample, morpho.group, habitat) %>% 
-  summarise (nReads = sum(nReads))
+  unite (Transect, position, depth, col = "META", sep = "|") %>% 
+  group_by(META,  morpho.group) %>% 
+  # left_join(metadata, )
+  summarise (nReads = sum(nReads)) %>% 
+  # select(-habitat) %>% ungroup %>% 
+  # mutate(eDNA.sample = as.character(eDNA.sample)) %>% 
+  pivot_wider(names_from = morpho.group, values_from = nReads, values_fill = 0) %>% 
+  pivot_longer(-META,  names_to = "taxa", values_to = "nReads") %>% 
+  group_by(taxa,  Zeroes = nReads ==0) %>% 
+  tally() %>% 
+  filter (Zeroes == T) %>% 
+  arrange(n)
 
 ```
 
