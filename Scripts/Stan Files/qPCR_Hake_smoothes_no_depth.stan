@@ -7,6 +7,7 @@ data { /////////////////////////////////////////////////////////////////////////
     int N_control_sample; // Number of samples used for negative controls.
     int N_station_depth; // Number of station-depth combinations observed.
     int N_pcr ;    // Number of PCR plates
+    int N_depth ;    // Number of depth categories
     
     int N_stand_bin ;   // Number of observations for binomial part of the standards model
     int N_stand_pos ; // Number of observations for count part of the standards model
@@ -57,6 +58,7 @@ data { /////////////////////////////////////////////////////////////////////////
     real Ct_bin_idx[N_sample] ;
     int sample_control_idx[N_control_sample]    ;
     int station_depth_idx[N_station_depth] ;
+    int depth_idx[N_sample] ;
 
     // Sample related indices
     int sample_bin_idx[N_obs_bin]      ;
@@ -157,7 +159,7 @@ parameters { ///////////////////////////////////////////////////////////////////
 
     // Variance parameters for observation and random effects
        real<lower=0> sigma_stand_int ;
-       real<lower=0> tau_sample ;
+       real<lower=0> tau_sample[N_depth] ;
        real<lower=0> sigma_pcr ; 
 
     // Student-t degrees of freedom;
@@ -424,7 +426,9 @@ model {/////////////////////////////////////////////////////////////////////////
       phi_0 ~ normal(2, 2) ;
       phi_1 ~ normal(4, 2) ;
 
-      delta ~ normal(0,tau_sample) ;
+      for(i in 1:N_sample){
+        delta[i] ~ normal(0,tau_sample[depth_idx[i]]) ;
+      }
       target += normal_lpdf(tau_sample | 0, 1)  - 1 * normal_lccdf(0 | 0, 1);
 
       mu_contam ~ normal(0,3) ;

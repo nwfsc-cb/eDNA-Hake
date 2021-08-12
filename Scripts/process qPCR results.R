@@ -23,7 +23,7 @@ SP <- "hake" # options: hake, lamprey, eulachon
 MODEL.TYPE = "lat.long.smooth"
 ###########################################################################
 # identifier
-MODEL.ID <- "4_10_fix_nu"
+MODEL.ID <- "4_10_fix_nu_T"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
@@ -46,7 +46,7 @@ script.dir <- paste0(base.dir,"/Scripts")
 setwd(data.dir)
 dat.all <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
 dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.csv")
-dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2020-12-15 sample details.csv")
+dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2021-07-15 sample details.csv")
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
 # load and run the acoustic data. this is needed to reference the offshore-ness of 
@@ -109,7 +109,8 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
                             bottom.depth.consensus = ifelse(water.depth<100 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
                             bottom.depth.consensus = ifelse(water.depth<600 & water.depth>400 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
                             bottom.depth.consensus = ifelse(water.depth<1100 & water.depth>1000 & bathy.bottom.depth>2000,bathy.bottom.depth,bottom.depth.consensus),
-                            bottom.depth.consensus = ifelse(water.depth<0,bathy.bottom.depth,bottom.depth.consensus))
+                            bottom.depth.consensus = ifelse(water.depth<0,bathy.bottom.depth,bottom.depth.consensus),
+                            bottom.depth.consensus = ifelse(water.depth>1000 & bathy.bottom.depth<200,bathy.bottom.depth,bottom.depth.consensus))
 
   dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, station, transect) %>%
                             # this combines the latitude and longitude to make a single concensus value for each Station.
@@ -356,9 +357,9 @@ if(SP == "hake"){
                                                #1552,   # Two orders of magnitude large than pair.
                                                #1419,   # Two orders of magnitude large than pair.
                                                1326,   # This is a 25m deep spot so gets dropped anyway.
-                                               536,535,    # Removed both of this pair() 
+                                               536,535    # Removed both of this pair() 
                                                #55,    # This is a 25m deep spot so gets dropped anyway.
-                                               1807 # THIS IS outlier among washed samples (dropped on tabletop)
+                                               #1807 # THIS IS outlier among washed samples (dropped on tabletop)
   )) 
 }
 ######
@@ -916,17 +917,17 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 N_CHAIN = 4
-Warm = 1200
-Iter = 2000
+Warm = 1500
+Iter = 9000
 Treedepth = 11
-Adapt_delta = 0.85
+Adapt_delta = 0.88
 
 LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)
 
 if(MODEL.TYPE=="Base"){
   stanMod = stan(file = "qPCR_Hake.stan" ,data = stan_data, 
-                        verbose = FALSE, chains = N_CHAIN, thin = 5, 
+                        verbose = FALSE, chains = N_CHAIN, thin = 6, 
                         warmup = Warm, iter = Warm + Iter, 
                         control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                         pars = stan_pars,
@@ -942,7 +943,7 @@ if(MODEL.TYPE=="Base"){
 if(MODEL.TYPE=="lat.long.smooth"){
   if(MODEL.VAR=="Base_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes.stan" ,data = stan_data, 
-               verbose = FALSE, chains = N_CHAIN, thin = 2, 
+               verbose = FALSE, chains = N_CHAIN, thin = 4, 
                warmup = Warm, iter = Warm + Iter, 
                control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
                pars = stan_pars,

@@ -393,10 +393,13 @@ model {/////////////////////////////////////////////////////////////////////////
     
     pos_stand   ~ normal(kappa_stand, sigma_all_stand) ;
     pos_obs     ~ student_t(3, kappa_obs, sigma_all_samp) ;
+    //pos_obs     ~ normal( kappa_obs, sigma_all_samp) ;
     if(single_n_control_pos==1){
       pos_control[1] ~ student_t(3, kappa_control[1], sigma_all_samp) ;
+      //pos_control[1] ~ normal( kappa_control[1], sigma_all_samp) ;
     }else{
       pos_control ~ student_t(3, kappa_control, sigma_all_samp) ;
+      //pos_control ~ normal( kappa_control, sigma_all_samp) ;
     }
     
     } //LOCAL VARIABLES DECLARATION END 

@@ -1,0 +1,832 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{lineno}
+\linenumbers
+\usepackage{setspace}\singlespacing
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\hypertarget{environmental-dna-provides-quantitative-estimates-of-abundance-and-distribution-in-support-of-fisheries-management.}{%
+\subsection{Environmental DNA provides quantitative estimates of
+abundance and distribution in support of fisheries
+management.}\label{environmental-dna-provides-quantitative-estimates-of-abundance-and-distribution-in-support-of-fisheries-management.}}
+
+Authors\ldots{} in no particular order at present. Andrew Olaf
+Shelton\(^{1*}\), Linda Park\(^1\), Krista Nichols\(^1\), Ana
+Ramon-Laca, Abigail Wells\(^2\), Sandra L.
+Parker-Stetter\(^{3\dagger}\), Rebecca Thomas\(^{3}\), Chu\(^{3}\),
+Julia\(^{3}\), Ryan P. Kelly\(^{4}\), Jameal F. Samhouri\(^{1}\), Blake
+E. Feist\(^1\)
+
+\(^1\)Conservation Biology Division, Northwest Fisheries Science Center,
+National Marine Fisheries Service, National Oceanic and Atmospheric
+Administration, 2725 Montlake Blvd. E, Seattle, WA 98112, U.S.A.
+
+\(^2\) Lynker Associates, Under contract to Northwest Fisheries Science
+Center, National Marine Fisheries Service, National Oceanic and
+Atmospheric Administration, 2725 Montlake Blvd. E, Seattle, WA 98112,
+U.S.A.
+
+\(^{3}\)Fisheries Resource Analysis and Monitoring Division, Northwest
+Fisheries Science Center, National Marine Fisheries Service, National
+Oceanic and Atmospheric Administration, 2725 Montlake Blvd. E, Seattle,
+WA 98112, U.S.A.
+
+\(^{4}\) University of Washington, School of Marine and Environmental
+Affairs, 3707 Brooklyn Ave NE, Seattle, WA 98105, U.S.A.
+
+\(^{\dagger}\) AFSC
+
+\(^{*}\) corresponding author:
+\href{mailto:ole.shelton@noaa.gov}{\nolinkurl{ole.shelton@noaa.gov}}
+
+\emph{Keywords}:
+
+\pagebreak
+
+PNAS requirements:
+
+Research reports describe the results of original research of
+exceptional importance. The preferred length of these articles is 6
+pages, but PNAS allows articles up to a maximum of 12 pages. A standard
+6-page article is approximately 4,000 words, 50 references, and 4
+medium-size graphical elements (i.e., figures and tables).
+
+Primary research Article
+
+\pagebreak
+
+\hypertarget{abstract}{%
+\subsection{Abstract}\label{abstract}}
+
+All creatures inevitably leave genetic traces in their environments, and
+the resulting environmental DNA (eDNA) therefore reflects the species
+present in a given habitat. It remains unclear, however, whether eDNA
+signals are sufficiently quantitative for use in regulatory or policy
+decisions on which human livelihoods or conservation successes may
+depend. Here, we report the results of the largest eDNA ocean survey to
+date (spanning 86,000 km\(^2\) to depths of 500m) to understand Pacific
+hake (\emph{Merluccius productus}), the target of the largest finfish
+fishery along the west coast of the United States. We sampled eDNA in
+parallel with traditional acoustic survey methods and show how eDNA
+provides a spatially smooth signature of hake relative to the patterns
+seen in traditional acoustic survey methods. Despite local differences,
+when aggregated to management relevant scales the two methods yield
+comparable information about the broad-scale spatial distribution and
+abundance of hake. This occurs despite eDNA arising from a limited
+number of discrete samples within the larger acoustic survey. The
+analysis also yields novel information about depth-specific spatial
+patterns of eDNA at a large spatial scale with strong depth-specific
+patterns in eDNA abundance and variability. We demonstrate the potential
+power and efficacy of eDNA sampling for applied problems and posit that
+eDNA methods have general quantitative applications that will prove
+especially valuable in data- or resource-limited contexts.
+
+(1)
+
+\pagebreak
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+Environmental DNA, in which the DNA from target organisms is collected
+from an environmental medium (e.g.~soil or water), can detect species in
+a wide range of terrestrial, aquatic, and marine habitats (2) . As a
+result, eDNA may efficiently survey species diversity and changes in
+community membership {[}{]} REFs. However, most applied natural resource
+questions depend upon estimates of abundance (e.g.~fisheries or managing
+species of conservation concern) and for these topics, eDNA must provide
+information about abundance in order to be useful. While most studies
+find a positive relationship between eDNA concentrations and other
+survey methods (3), uncertainty about the strength of the eDNA-abundance
+relationship due to the complexity of eDNA generation, transport,
+degredation, and detection have limited the application of eDNA in many
+quantitative applications (4). While the use of eDNA methods has
+skyrocketed, growing XXX\% over the past Y years (3), reflecting
+widespread adoption of eDNA technologies, basic questions about the
+behavior of eDNA limit its practical application and slow its adoption
+in environmental management.
+
+Rigorous, well designed surveys underlie the successful management and
+conservation of wild populations. But field surveys are expensive --
+open oceans surveys involve ship time costing tens of thousands of
+dollars per day, for example -- and are typically tailored to a single
+or relatively narrow suite of species. eDNA methods are appealing for
+open-ocean or other difficult-to-sample locations because sampling can
+be fast, standardized, and non-lethal for many species simultaneously;
+sampling involves only the collection and processing of environmental
+samples. Even modest improvements in sampling efficiency from current
+surveys can reduce the duration of surveys potentially yielding
+substantial cost savings for focal species surveys and freeing survey
+time to be reallocated to other understudied communities. However, much
+of this kind of implementation depends upon providing eDNA-based
+estimates of abundance at management-relevant scales (5--7).
+
+Observations of eDNA differ in varying degrees from observations that
+use traditional methods (e.g.~visual (8, 9), capture (10, 11), or
+acoustic (7) surveys) and the degree of agreement between individual
+samples of eDNA and traditional methods collected simultaneously often
+determines whether eDNA is viewed as successful or a failure (7, 11).
+However, eDNA observations arise from fundamentally different processes
+than observations from these traditional survey methods -- most
+dramatically, by exponential amplification of DNA molecules in an
+environmental sample, but also because the distribution of eDNA itself
+in the environment differs significantly from the distribution of its
+source organisms. In the case of microbial eDNA, this distributional
+distinction is negligible, but for animals of management relevance --
+such as pelagic fishes -- it is not. Conceptually, fish are discrete,
+while the genetic traces they leave in the water are continuous,
+smoothing their environmental fingerprint over space and time.
+
+If two methods are sampling different phenomena over different spatial
+or temporal scales, we expect individual observations from those methods
+to differ. For example, acoustic trawls used in fisheries stock
+assessments reflect the highly patchy density of schooling fishes in
+space and time. By comparison, we might expect the associated eDNA to be
+distributed more evenly as a result of the lag between shedding and
+decay processes. Understanding the ecology of eDNA (12) makes possible
+an honest assessment of the potential uses and limitations of eDNA for
+applied environmental problems, and lets us use each data stream to its
+best advantage.
+
+Here, we leverage the most spatially extensive eDNA survey of the oceans
+to date -- spanning over 86,000 km\(^2\) across 10 degrees of latitude,
+an area of ocean approximately equivalent to the land area Portugal, and
+to depths of 500m -- to document the empirical patterns of eDNA for a
+commercially important and abundant species, Pacific hake
+\emph{Merluccius productus}. Hake is a semi-pelagic schooling species
+and is among the most abundant species in the California Current
+Ecosystem (13, 14), supporting a large and important fishery along the
+Pacific coasts of US and Canada with coastwide catches in excess of
+400,000t annually from 2017 to 2019 (14). The rich datasets available
+for hake provide an opportunity to compare available information from
+traditional surveys with eDNA.
+
+We demonstrate the presence of large-scale, depth-specific spatial
+patterns of hake DNA in the ocean ocean using a quantitative PCR assay.
+We then show how eDNA can be aggregated to provide a depth-integrated
+index of hake abundance comparable to acoustic-trawl survey results used
+for commercial stock assessments. Consistent with the different expected
+distributions of eDNA and acoustic-trawl data, the two indices are only
+modestly correlated at local scales (tens of \(km^2\)) but very strongly
+correlated when aggregated to managment-relevant scales (thousands of
+km\(^2\)). We derive metrics of the species' spatial distribution
+consistent with acoustics results, and find that eDNA provides nearly
+identical model precision as the acoustic data with {[}a fraction of the
+data \textbar{} discrete bottle samples, etc{]}.
+
+\clearpage
+
+EXTRA JUNK EXTRA JUNK EXTRA JUNK.
+
+We and that eDNA has several appealing statistical characteristics of
+
+(9) SALMON
+
+(5) PNAS Using river distribution models to estimate abundance (SPATIAL
+STUFF)
+
+people who have made rinky-dink joint models: (15)
+
+(4) Review of eDNA processes (production, transport, etc.)
+
+(10) used gillnets in combination with metabarcoding, lakes.
+
+(11) Metabarcoding and trawls. New Jersey.
+
+Here we show how statistical methods from the fields of ecology and
+fisheries to bear on eDNA data and yield inference about the abundance
+and distribution of a commercially important fish, Pacific hake
+\emph{Merc\ldots{}}. We focus on hake because the rich datasets
+available for this species provided an opportunity to compare and
+contrast available information with eDNA. We pair the largest eDNA
+survey of the coastal ocean to date (spanning \ldots{} ) to traditional
+acoustic-trawl methods conducted in parallel with eDNA samples to
+understand the
+
+We show how eDNA can simultaneously differ substantially from acoustics
+estimates at local scales (kms) and yet provide very similar patterns of
+abundace at large spatial scales.
+
+In addition, we illustrate how the patterns of hake eDNA vary
+substantially spatially and by depth, revealing new insights into the
+ecology of eDNA. Specifically, we show how small scale variability in
+eDNA appears to decline with depth, and does not follow
+
+Our work demonstrates that there is certainly a complex and interesting
+ecology of eDNA that needs additional study. While this complexity
+obscures the relationships
+
+eDNA has the potential to provide information simultaneously on a wide
+range of species including many that are currently unstudied.
+
+resulting in species of economic importance, exceptional charisma, or
+severe conservation concern, being targeted for surveys while most
+species are ignored. In the context of a changing climate, this bias in
+surveys leaves us blind to shifting distributions\ldots{} other things.
+
+A correlary to this fact is that we are treating eDNA samples as
+conceptually identical
+
+More importantly, the question of what can be reasonably inferred from a
+given eDNA data set
+
+Birds (Christmas counts), mammals (), fisheries In the oceans,
+
+Integrated models are widely used in fisheries applications
+
+By analogy deep understanding of the ``ecology" of eDNA
+
+While the promise of eDNA has been widely described and associated
+laboratory methods have been widely reviewed, case greatly democratise
+which species can be surveyed as
+
+sight unseen detection
+
+\begin{itemize}
+\tightlist
+\item
+  Behavior of dna in the world
+\item
+  Depth stratification - unveiling a third dimension
+\item
+  Comparison acoustics to dna
+\item
+  Interpretation depends on spatial scale; box of interest
+\item
+  Transboundary; why matters for rules
+\item
+  Rarefaction - how little sample could we do and get same answer?
+\end{itemize}
+
+however, in most field applications that have relevance to management or
+conservation, the scale of interest is not the scale of an individual
+sample but how multiple samples can be combined to infer the status and
+trend of large units - a population, a meta-population, an evolutionary
+significant units, etc. --
+
+Things that are interesting.
+
+\begin{itemize}
+\tightlist
+\item
+  3D plot of hake by depth.
+\item
+  methods of eDNA give and explicit estimate of detection thresholds.
+\item
+  Comparison acoustics to dna
+\item
+  Interpretation depends on spatial scale; box of interest
+\item
+  Transboundary; why matters for rules
+\item
+  Rarefaction - how little sample could we do and get same answer?
+\end{itemize}
+
+\hypertarget{results}{%
+\subsection{Results}\label{results}}
+
+We provide the depth-specific distributions of hake eDNA over 10 degrees
+of coastal ocean. Patterns of mean hake DNA concentration are distinct
+with highest concentration observed between 100 and 300m depths along
+the continental shelf break and south of the Oregon-California border at
+42\(^{\circ}\)N. Concentrations at 500m were generally low and showed
+limited spatial variation while the near surface layers (3m, 50m) showed
+generally higher concentrations near the coast and in more northerly
+parts of the range (Figs. 1a, 1b). There was also a large difference in
+the uncertainty around DNA concentration near the surface; among the
+predicted grid cells, the median coefficient of variation (CV) was
+larger than 1 for both 3m and 50m but only about 0.2 for depths 100m and
+deeper (Fig. 1g). Such uncertainty large observed differences DNA
+concentration between replicate samples taken at the same sample
+location and substantial differences among proximate sampling locations.
+Together, hake DNA concentration was far more predictable at depth than
+near the surface.
+
+We combined DNA information between 50 and 500m to produce a
+depth-integrated estimate of hake DNA concentration comparable to the
+acoustic-trawl survey results (Fig. \ref{fig:surface.compare}). The eDNA
+index showed strong spatial patterning with highest values along the
+continental shelf break. In comparison results acoustic-trawl were more
+spatially variable, with some areas of very high hake density and others
+with very low density. At the scale of individual 5km grid cells, eDNA
+and acoustic surveys were positively correlated (\(\rho\) = 0.488,
+Pearson product-moment correlation) but there is considerable scatter in
+the relationship. High eDNA values never occurred at locations which had
+very low acoustic biomass, but very high acoustic estimates corresponded
+to moderate values of eDNA. Notably, across all 3,455 grid cells,
+acoustic biomass estimates had a very right-skewed distribution -- most
+values were near zero with very few high values -- while eDNA values
+were decidedly less skewed (Fig. \ref{fig:surface.compare}).
+
+When aggregated to larger spatial scales, the correlation between eDNA
+and acoustics increased substantially (\(\rho\) = 0.821; Fig.
+\ref{fig:surface.compare}) with acoustics and eDNA scaling approximately
+linearly. Such increased correlation is not dependant upon the one
+degree breaks in Fig. \ref{fig:surface.compare} (see Supplement SX for
+alternate spatial groupings) and shows that in terms of total biomass,
+eDNA and acoustic-trawls are providing nearly equivalent information
+about relative spatial abundance. At a coast-wide scale, the CV of the
+acoustic-trawl estimate and eDNA index were both 0.096 . This similarity
+in CV occurred despite the eDNA only being collected at 186 point
+stations whereas the acoustic-trawl data includes 4,841 individual
+acoustic segments and 45 mid-water trawls to determine age- and
+length-structure of the hake.
+
+Within the projection bounds of this survey, we show very similar
+estimates of spatial distribution. The methods produced nearly identical
+estimates of the center of gravity (median of the distributed biomass)
+and very similar cumulative distributions (Fig. \ref{fig:COG}). The
+\(90\%\)CI overlapping for the two methos for the entire latitudinal
+range sampled.
+
+\clearpage
+
+\hypertarget{discussion}{%
+\subsection{Discussion}\label{discussion}}
+
+\begin{itemize}
+\item
+  Building spatialstatistical model for eDNA is new, methods comparable
+  to acoustics and to trawl surveys
+\item
+  Replication of DNA allows partitioning of uncertainty ways that are
+  largely impossible in other methods.
+\item
+  DNA is derived from many fewer observations, but provides comparable
+  answers at management scales
+\item
+  Comparable answers between do not occur at the local level.
+\item
+  DNA is a wholly independent measure of abundance derived from the same
+  amount of ship time.
+\item
+  DNA is not in the units of biomass\ldots. which hinders direct
+  interpretation.
+\item
+  Many metrics of abundance are like this\ldots{} (e.g.~CPUE)
+\item
+  Acoustic and eDNA provide very similar CVs even though eDNA is
+\item
+  Need to think about age-structure, other sources of biomass and eDNA.
+\end{itemize}
+
+Acoustic and eDNA are independently derived estimates. They are both
+related to the true abundance of fish, but no information from the
+acoustics informs eDNA or vice versa. The application of eDNA, has, in
+effect doubled your information about abundance without expanding the
+amount of ship-time at all.
+
+There have been some rinky-dink attempts to make joint models for eDNA
+and other methods {[}(15); fukaya2020estimating{]} but they make the
+mistake of assuming that the area sampled by each method is equivalent
+(eDNA,individual
+
+RANDO PARAGRAPH: Despite this debate, most papers that use eDNA
+implicitly assume that eDNA accurately reflects abundance of the
+targeted community; all analyses that calculate common diversity or
+community metrics (e.g.~Shannon diversity, Simpson diveristy,
+Bray-Curtis divergence) from eDNA are making the assumption that
+observed eDNA accurately reflects the true or at least the relative
+abundance of species within the sampled community. It has been well
+documented that this will rarely be true when using (Kelly et al.~2019,
+Amy's paper, several other.)
+
+\clearpage
+
+\hypertarget{methods}{%
+\subsection{Methods}\label{methods}}
+
+\hypertarget{hake-biology-summary.}{%
+\subsubsection{Hake biology summary.}\label{hake-biology-summary.}}
+
+cite Mike Malick, cite stock assessment, cite Martin Dorn,
+
+\hypertarget{field-sampling-and-sample-processing}{%
+\subsubsection{Field sampling and sample
+processing}\label{field-sampling-and-sample-processing}}
+
+We collected eDNA samples during the 2019 Joint US-Canada Acoustic trawl
+survey (16). We collected water from up to six depths (3, 50, 100, 150,
+300, and 500m) at 186 CTD stations spread across 36 acoustic transects
+(Fig. \ref{fig:surface.compare}). We included 1769 individual 2.5L water
+samples collected at 892 depth-station combinations (a small number of
+samples were contaminated or lost during processing). 710 depth-staions
+were collected at 50m deep or deeper using Niskin bottles. For each
+Niskin sampled station, two 10L bottles were closed and after CTD
+retrieval, 2.5L was collected from each bottle. Water samples from 3m
+were collected from the ship's salt water intake line (MORE DETAILS). In
+addition we include 49 control samples collected ship board (SEE THIS
+SECTION) and performed over 6,000 quantitative PCR reactions to produce
+an unprecedented description of hake DNA in the coastal ocean. All CTD
+casts and therefore water collection for eDNA occurred at night.
+Detailed water sampling and processing protocols can be found HERE
+(SUPPLEMENT? OTHER PAPER?)
+
+In parallel with water collection, we incorporate data on hake from the
+Joint US-Canada acoustic-trawl survey (16). We include data from 4483 km
+of acoustics transects representing 57 acoustic transects. 45 midwater
+trawls were deployed that provide information on the age, size and
+therefore signal strength of hake (14, 16). We use derived estimates of
+biomass concentration (\(mt\) \(km^{-2}\)) that integrate the biomass in
+the water column between depths of 50 and 500m in all analyses. All
+acoustic data and associated trawls were collected during daylight
+hours. Therefore there is a lag between collection of acoustic and eDNA
+data, though for nearly all cases collection were separated by less than
+24 hours. Methods for converting raw acoustic and trawl data to biomass
+concentrations can be found in (13, 14) and references therein.
+
+\hypertarget{water-filtration-preservation-and-dna-extraction}{%
+\paragraph{Water filtration, preservation, and DNA
+extraction}\label{water-filtration-preservation-and-dna-extraction}}
+
+Overall, we follow the methods developed by and described in Ramon-Laca
+et al In review. We briefly describe the sample processing steps but
+refer readers to Ramon-Laca et al.~(2021) for a detailed description of
+methods.
+
+\hypertarget{quantitative-pcr-methods}{%
+\paragraph{Quantitative PCR methods}\label{quantitative-pcr-methods}}
+
+Include stuff on wash error here. How many samples, how we partitioned
+some sampled sites to experimentally wash one sample and not the other.
+
+\hypertarget{controls-and-contamination}{%
+\subsubsection{Controls and
+contamination}\label{controls-and-contamination}}
+
+We found very low levels of contamination in control samples. We present
+examination of the magnitude and consequences of contamination in
+supplement S2.
+
+\hypertarget{spatial-edna-model}{%
+\subsubsection{Spatial eDNA Model}\label{spatial-edna-model}}
+
+We developed a Bayesian state-space framework for modeling DNA
+concentration in the coastal ocean. State-space models separate the true
+biological process from the methods used to observe the process
+(see\ldots{} )
+
+We use a relatively simple process model. Let \(D_{xyd}\) be the true,
+but unobserved concentration of hake DNA (DNA \(copies\) \(L^{-1}\))
+present at spatial coordinates \(\{x,y\}\) (northings and eastings,
+respectively, in km) and sample depth \(d\) (meters). We model the DNA
+concentration as a spatially smooth process at each depth sampled
+(\(d =\) 3, 50, 100, 150, 300, or 500m) and linear on the \(\log_{10}\)
+scale,
+
+\begin{align}
+  & \log_{10}D_{xyd}=\gamma_d + s(b) + t_d(x,y)
+\end{align}
+
+where \(\gamma_d\) is the spatial intercept for each depth, \(s(b)\)
+indicates a smoothing spline of as a function of bottom depth in meters
+(\(b\)), and \(t_d(x,y)\) is a tensor-product smooth that provides an
+independent spatial smooth for each depth. We use cubic regression
+splines for both univariate and tensor-product smoothes.
+
+From this process model, we construct a multi-level observation model.
+First, we model the DNA concentration in each Niskin bottle \(i\), as a
+random deviation from the true DNA concentration at that depth and
+location and include three offsets to account for variation in the
+processing of eDNA extracted from Niskin bottles. \begin{align}
+  \log_{10}E_{i} &= \log_{10}D_{xyb} + \delta_i + \mathbf{I}\omega + \log_{10}{V_i} + \log_{10}{I_i} \\
+  \delta_i & \sim Normal(0,\tau)
+\end{align} where \(V_i\) is the proportion of 2.5 L filtered from
+Niskin \(i\) (in nearly all cases this is 1), \(I_i\) is the known
+dilution used to on sample \(i\) to eliminate PCR inhibition, and
+\(\mathbf{I}\omega\) is an estimated offset for a ethanol wash error
+(\(\omega\) is the estimated effect of the wash error and \(\mathbf{I}\)
+is an indicator variable where \(\mathbf{I}=1\) for affected samples and
+\(\mathbf{I}=0\) otherwise; see PCR methods below for additional
+description of each offset).
+
+When using qPCR, we do not directly observe eDNA concentration, we
+observe the PCR cycle at which each sample can be detected (or if it was
+never detected during the PCR). We use a hurdle model to account for the
+fact that there is a detection threshold (the PCR cycle of amplification
+is detected \(G=1\) or it is not \(G=0\)). Conditional on being
+detected, we observe the PCR cycle (\(C\)) as a continuous variable that
+follows a t-distribution, ADD CONDITIONING BAR FOR THESE EQUATIONS.
+
+\begin{align}
+  G_{ijr} &\sim Bernoulli(\phi_{0j}+\phi_{1j}\log_{10}E_{ij})\\
+  C_{ijr} &\sim T(\nu,\beta_{0j}+\beta_{1j}\log_{10}E_{ij},\eta)
+\end{align}
+
+Here \(j\) indexes the PCR plate on which sample \(i\) and replicate
+\(r\) were run. We conducted 3 PCR reactions for each \(E_i\). Note that
+there are different intercept \((\phi_{0j},\beta_{0j})\) and slope
+\((\phi_{1j},\beta_{1j})\) parameters for the \(j\)th PCR plate to allow
+for among-plate variation. The t-distribution allows for heavier tails
+than a normal distribution. We fix \(\nu = 3\), and estimate the
+remaining parameters.
+
+To calibrate the relationship between the number of DNA copies and PCR
+cycle, each PCR plate has replicate samples with a known number of DNA
+copies. These standards span six orders of magnitude (1 to 100,000
+copies) and determine the relationship between copy number and PCR cycle
+of detection. Let \(K_j\) be the known copy number in PCR plate \(j\),
+then, ADD CONDITIONING BAR FOR THESE EQUATIONS. \begin{align}
+  G_{jr} &\sim Bernoulli(\phi_{0j}+\phi_{1j}\log_{10}K_{j})\\
+  C_{jr} &\sim Normal(\beta_{0j}+\beta_{1j}\log_{10}K_{j},\sigma)
+\end{align} where for the standards we do not allow for heavy tails in
+the observed PCR counts and use a normal likelihood rather than a
+t-distributed likelihood.
+
+Not that the use of standards provides an explicit model for the
+detection threshold of eDNA when using qPCR and this detection threshold
+can be directly incorporated to understand the ability to measure DNA
+concentrations in field samples.
+
+\hypertarget{spatial-models-for-acoustic-trawl-data}{%
+\subsubsection{Spatial models for acoustic-trawl
+data}\label{spatial-models-for-acoustic-trawl-data}}
+
+In parallel with the model for qPCR data, we estimated a spatial model
+for the hake biomass derived from the acoustic-trawl survey. The biomass
+index created from the acoustic-trawl data for the entire survey area
+(34.4\(^{\circ}\)N to 5XX\(^{\circ}\)N; ) is used in stock assessments
+that determine the allowable catch and allocation of hake catch for
+fleets from the United States, Canada, and Tribal Nations (14). As the
+eDNA samples only cover a portion of this range (38.3\(^{\circ}\)N to
+48.6\(^{\circ}\)N), we used the biomass observations from the subset of
+transects on which we sampled eDNA to generate spatially smooth
+estimates of biomass. Acoustic transects are divided into 0.926km
+(0.5nm) segments and the biomass concentration within each segment is
+used as data.
+
+Unlike the eDNA data, age-specific biomass estimates are available only
+as a biomass integrated across the entire water column (from depths of
+50 to 500m). We fit a Bayesian hurdle model using a form similar to the
+eDNA, modeling biomass concentration (\(F_{xy}\); units: \(mt km^{-2}\))
+using two separate spatial submodels: the probability of occurrence and
+a model for abundance conditional on the presence of hake. We model both
+components as a function of a smooth of bottom depth and a spatial
+smooth,
+
+\begin{align}
+  H_{xy} &\sim Bernoulli(logit^{-1}(\zeta_H + s_H(b) + t_H(x,y)))\\
+  F_{xy} &\sim LogNormal(\zeta_F + s_F(b) + t_F(x,y)) - 0.5\kappa^2,\kappa)
+\end{align}
+
+where H\_\{xy\} is 1 if the observed biomass concentration is non-zero
+and 0 otherwise.
+
+where \(\zeta\) is the spatial intercept for each model component,
+\(s(b)\) indicates a smoothing spline of as a function of bottom depth
+in meters (\(b\)), and \(t(x,y)\) is a tensor-products smooth for each
+model component.
+
+\hypertarget{model-estimation}{%
+\subsubsection{Model Estimation}\label{model-estimation}}
+
+We implemented both the eDNA and acoustic-trawl models using the Stan
+programing language as implemented in R (\emph{Rstan}) language. All
+relevant code and data are provided in the online supplement. For the
+eDNA model, we ran 4 MCMC chains using 1200 warm up and 2000 sampling
+iterations. For the acoustic-trawl model, we ran 4 MCMC chains using
+1200 warm up and 2000 sampling iterations.
+
+We used traceplots and \(\hat{R}\) diagnostics to confirm convergence
+(\(\hat{R} < 1.01\) for all parameters). There were no divergent
+transitions in the sampling iterations. To generate matrices necessary
+for estimating smoothes we used the R package \(brms\) (REF).
+
+\hypertarget{coordinate-systems-covariates-and-spatial-predictions}{%
+\subsubsection{Coordinate systems, covariates, and spatial
+predictions}\label{coordinate-systems-covariates-and-spatial-predictions}}
+
+We project both the acoustic-trawl model and the eDNA model to a shared
+grid to enable direct comparisons between methods.
+
+Reference Blake's 5km grid. We used bottom depth as a covariate. We
+derived bottom depth from HERE AND THERE. To ensure comparability
+between eDNA and acoustics, we project our results to a common grid
+(equal area\ldots{} etc.) and between LAT and LAT. Bottom depth on this
+grid is depth-integrated across the entire grid cell.
+
+To create a spatial prediction for eDNA we take 2,000 draws from the
+joint posterior and use eq. 1 to generate predictions for the centroid
+of each grid cell and calculate posterior means and uncertainty bounds
+among posterior draws. Importantly, as DNA concentration were the values
+of interest, this projection does not include projection information
+about the detailed observation process -- replicated Niskin samples from
+a site for example.
+
+Blake will write a paragraph about area-weighted mean depth used as a
+covariate.
+
+Ref for the 5im grid:
+
+(17)
+
+\hypertarget{creating-an-edna-index}{%
+\subsubsection{Creating an eDNA index}\label{creating-an-edna-index}}
+
+Our model provides direct predictions for hake DNA concentration at
+depths of 50, 100, 150, 300, and 500m. To produce an index spanning
+depths of 50 to 500m, we need to equally weight depths between 50 and
+500m. As we lack observations at other depths, we used linear
+interpolation between the closest depths using the posterior predictions
+at each depth to provide predicted DNA densities at 200, 250, 350, 400,
+and 450m for each 5km grid cell. For example, a prediction for a grid
+cell at 400m would be the mean of the predicted value for that grid cell
+from a single posterior draw for 300m and 500m. Because some spatial
+locations have depths of less than 500m, we only include predicted DNA
+concentrations to a depth appropriate for the bathymetry (e.g.~a
+location with a depth of 180m only includes values from 50, 100 and
+150m). We sum across all depths (between 50 and up to 500m) to generate
+a depth-integrated index of hake DNA. This index will be proportional to
+the hake DNA found in the water column. However, as we are only summing
+across discrete depths, not integrating values across the entire water
+column nor multiplying by the total water volume within each grid cell,
+the absolute value of the index will depend upon the number of discrete
+depths we use. As such, we refer to this as a DNA index to differentiate
+it from the predictions to a specific depths which have units of copies
+per liter.
+
+\newpage
+\clearpage
+
+\hypertarget{figures}{%
+\section{Figures}\label{figures}}
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{./Pub_Figs/Hake maps Mean depth manual facet v2} \caption{\label{fig:mean.maps} Predicted DNA concentration for six water depths. }\label{fig:fig.mean.maps}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{./Pub_Figs/Hake maps combined to surface} \caption{\label{fig:surface.compare} 2019 survey locations (left; red circles show eDNA sampling locations, lines show acoustic transects), depth-integrated  index of hake DNA (middle) and hake biomass from acoustic surveys (right).  Both DNA and acoustic estimates are mean predicted values projected to a 5km grid and include information between 50 and 500m deep. All panels show one degree latitudinal bins used to aggregate abundance estimates over larger spatial scales (see also Fig. 3).    }\label{fig:fig.surface.compare}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{./Pub_Figs/Hake point-level and 1 degree} \caption{\label{fig:pairwise} Pairwise comparison between  DNA and acoustics-derived biomass. Left panel show the posterior mean prediction from each method among the 3,455 25km2 grid cells and includes the marginal histogram of posterior mean values for each method (RHO = 0.488).  Right panel showes correlation between methods among the 11, one degree bins (posterior mean, 90 CI; RHO = 0.8208). Numbers indicate associated region identified in Fig. 2.  }\label{fig:fig.pairwise}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{./Pub_Figs/Hake compare distribution} \caption{\label{fig:COG} Estimates of distribution from acoustic and eDNA methods. left: Cumulative distribution between 38.3 and 48.6N ( posterior means and 90 CI). Right: Center of gravity (median of distribution) for each method (posterior means and 90 CI).  Only areas within the projection grid are included in this calculation (Figs. 1, 2) are included.}\label{fig:fig.COG}
+\end{figure}
+
+\clearpage
+
+\hypertarget{citations}{%
+\subsection*{Citations}\label{citations}}
+\addcontentsline{toc}{subsection}{Citations}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-murakami2019dispersion}{}%
+1. H. Murakami\emph{et al.}, Dispersion and degradation of environmental
+dna from caged fish in a marine environment. \emph{Fisheries science}
+\textbf{85}, 327--337 (2019).
+
+\leavevmode\hypertarget{ref-thomsen2015environmental}{}%
+2. P. F. Thomsen, E. Willerslev, Environmental DNA--an emerging tool in
+conservation for monitoring past and present biodiversity.
+\emph{Biological Conservation} \textbf{183}, 4--18 (2015).
+
+\leavevmode\hypertarget{ref-rourke2021environmental}{}%
+3. M. L. Rourke\emph{et al.}, Environmental dna (eDNA) as a tool for
+assessing fish biomass: A review of approaches and future considerations
+for resource surveys. \emph{Environmental DNA} (2021).
+
+\leavevmode\hypertarget{ref-harrison2019predicting}{}%
+4. J. B. Harrison, J. M. Sunday, S. M. Rogers, Predicting the fate of
+eDNA in the environment and implications for studying biodiversity.
+\emph{Proceedings of the Royal Society B} \textbf{286}, 20191409 (2019).
+
+\leavevmode\hypertarget{ref-carraro2018estimating}{}%
+5. L. Carraro, H. Hartikainen, J. Jokela, E. Bertuzzo, A. Rinaldo,
+Estimating species distribution and abundance in river networks using
+environmental dna. \emph{Proceedings of the National Academy of
+Sciences} \textbf{115}, 11724--11729 (2018).
+
+\leavevmode\hypertarget{ref-shelton2019biocons}{}%
+6. A. O. Shelton\emph{et al.}, Environmental dna provides quantitative
+estimates of a threatened salmon species. \emph{Biological Conservation}
+\textbf{237}, 383--391 (2019).
+
+\leavevmode\hypertarget{ref-Fukaya2020estimating}{}%
+7. K. Fukaya\emph{et al.}, Estimating fish population abundance by
+integrating quantitative data on environmental dna and hydrodynamic
+modelling. \emph{Molecular ecology} (2020).
+
+\leavevmode\hypertarget{ref-port2016assessing}{}%
+8. J. A. Port\emph{et al.}, Assessing vertebrate biodiversity in a kelp
+forest ecosystem using environmental DNA. \emph{Molecular Ecology}
+\textbf{25}, 527--541 (2016).
+
+\leavevmode\hypertarget{ref-tillotson2018concentrations}{}%
+9. M. D. Tillotson\emph{et al.}, Concentrations of environmental DNA
+(eDNA) reflect spawning salmon abundance at fine spatial and temporal
+scales. \emph{Biological Conservation} \textbf{220}, 1--11 (2018).
+
+\leavevmode\hypertarget{ref-hanfling2016gillnet}{}%
+10. B. Hänfling\emph{et al.}, Environmental dna metabarcoding of lake
+fish communities reflects long-term data from established survey
+methods. \emph{Molecular ecology} \textbf{25}, 3101--3119 (2016).
+
+\leavevmode\hypertarget{ref-stoeckle2021trawl}{}%
+11. M. Y. Stoeckle\emph{et al.}, Trawl and eDNA assessment of marine
+fish diversity, seasonality, and relative abundance in coastal new
+jersey, usa. \emph{ICES Journal of Marine Science} \textbf{78}, 293--304
+(2021).
+
+\leavevmode\hypertarget{ref-barnes2016ecology}{}%
+12. M. A. Barnes, C. R. Turner, The ecology of environmental dna and
+implications for conservation genetics. \emph{Conservation genetics}
+\textbf{17}, 1--17 (2016).
+
+\leavevmode\hypertarget{ref-malick2020relationships}{}%
+13. M. J. Malick\emph{et al.}, Relationships between temperature and
+pacific hake distribution vary across latitude and life-history stage.
+\emph{Marine Ecology Progress Series} \textbf{639}, 185--197 (2020).
+
+\leavevmode\hypertarget{ref-grandin2020assessment}{}%
+14. C. J. Grandin, K. F. Johnson, A. W. Edwards, A. M. Berger, ``Status
+of the pacific hake (whiting) stock in u.s. And canadian waters in
+2020.'' (Prepared by the Joint Technical Committee of the U.S.; Canada
+Pacific Hake/Whiting Agreement, National Marine Fisheries Service;
+Fisheries; Oceans Canada, 2020).
+
+\leavevmode\hypertarget{ref-chambert2018analytical}{}%
+15. T. Chambert, D. S. Pilliod, C. S. Goldberg, H. Doi, T. Takahara, An
+analytical framework for estimating aquatic species density from
+environmental dna. \emph{Ecology and evolution} \textbf{8}, 3468--3477
+(2018).
+
+\leavevmode\hypertarget{ref-deBlois2020survey}{}%
+16. S. de Blois, The 2019 joint u.s.--Canada integrated ecosystem and
+pacific hake acoustic-trawl survey: Cruise report sh-19-06. \emph{U.S.
+Department of Commerce, NOAA Processed Report NMFS-NWFSC-PR-2020-03}
+(2020).
+
+\leavevmode\hypertarget{ref-feist2021footprints}{}%
+17. B. E. Feist, J. F. Samhouri, K. A. Forney, L. E. Saez, Footprints of
+fixed-gear fisheries in relation to rising whale entanglements on the us
+west coast. \emph{Fisheries Management and Ecology} \textbf{28},
+283--294 (2021).
+
+\end{document}

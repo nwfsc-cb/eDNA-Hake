@@ -163,8 +163,10 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
   p_log_D[[as.name("binom")]] <-
     base_map_trim_proj +
     geom_point(data= D_pred_bin_combined ,
-            aes(x=lon,y=lat,color=Mean),alpha=1,size=SIZE,stroke=STROKE) +
+            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
     scale_color_viridis_c(name="Probability of\n Occurrence",option=OPT,limits=z.lim.bin,breaks=z.bin.breaks) +
+    scale_fill_viridis_c(name="Probability of\n Occurrence",option=OPT,trans="sqrt",limits=z.lim.bin,breaks=z.bin.breaks) +
+    
     theme_bw() 
   p_log_D$binom
     
@@ -172,8 +174,9 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
   p_log_D[[as.name("pos")]] <- 
     base_map_trim_proj +
     geom_point(data= D_pred_pos_combined,
-               aes(x=lon,y=lat,color=Mean),alpha=1,size=SIZE,stroke=STROKE) +
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
     scale_color_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),option=OPT,trans="sqrt",breaks=sqrt_breaks) +
+    scale_fill_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),option=OPT,trans="sqrt",breaks=sqrt_breaks) +
     theme_bw() 
   p_log_D$pos
   
@@ -394,6 +397,10 @@ Acoustic.dat.figs <- list(
   D_pred_uncond_mt_combined = D_pred_uncond_mt_combined,
   D_acoustic_uncond_cum_sum = D_acoustic_uncond_cum_sum,
   D_acoustic_uncond_total_mt = D_acoustic_uncond_total_mt,
+  
+  D_1.0_uncond_resample = D_1.0_uncond_resample, 
+  D_0.5_uncond_resample = D_0.5_uncond_resample,
+  D_grid.cell_uncond_resample = D_grid.cell_uncond_resample,
   
   # Map Plots
   p_Acoustics_lat_0.5 = p_Acoustics_lat_0.5,

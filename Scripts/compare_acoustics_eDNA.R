@@ -5,11 +5,11 @@ library(ggExtra)
 library(paletteer)
 library(dplyr)
 library(cowplot)
+library(viridis)
 
 results.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Stan Model Fits/_Summarized_Output"
 setwd(results.dir)
 plot.dir   <- "/Users/ole.shelton/Github/eDNA-Hake/Plots and figures"
-
 
 load("Acoustics 2019 lat.long.smooth 7_14_6_10_smooth_hurdle Base_Var Derived Q.RData")
 
@@ -18,7 +18,7 @@ D_acoustics_lat_equal <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_
 D_acoustics_lat_1.0   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_1.0
 D_acoustics_lat_0.5   <- Acoustic.dat.figs$smooth.projections$D_acoustic_uncond_mt_lat_0.5
 
-load("Qpcr_summaries_lat.long.smooth_Base_Var_4_10_fix_nu.RData")
+load("Qpcr_summaries_lat.long.smooth_Base_Var_4_10_fix_nu_T.RData")
 
 D_DNA_points    <- Output.summary.qpcr$D_final_projected
 D_DNA_lat_equal <- Output.summary.qpcr$D_final_lat_equal
@@ -130,6 +130,54 @@ Both_equal_1000[,2:ncol(Both_equal_1000)] <-Both_equal_1000[,2:ncol(Both_equal_1
 Both_lat_0.5_1000[,2:ncol(Both_lat_0.5_1000)] <- Both_lat_0.5_1000[,2:ncol(Both_lat_0.5_1000)] /1000
 Both_lat_1.0_1000[,2:ncol(Both_lat_1.0_1000)] <- Both_lat_1.0_1000[,2:ncol(Both_lat_1.0_1000)] /1000
 
+##### Calculate pairwise correlation between eDNA and Acoustics using MCMC draws.
+A.resamp.grid <- Acoustic.dat.figs$D_grid.cell_uncond_resample %>% rename(A.val = D)
+DNA.resamp.grid <- Output.summary.qpcr$D_grid.cell_resample %>% rename(DNA.val = tot)
+
+A.resamp.1.0 <-Acoustic.dat.figs$D_1.0_uncond_resample %>% rename(A.val = tot)
+DNA.resamp.1.0 <- Output.summary.qpcr$D_1.0_resample %>% rename(DNA.val = tot)
+
+A.resamp.0.5 <-Acoustic.dat.figs$D_0.5_uncond_resample %>% rename(A.val = tot)
+DNA.resamp.0.5 <- Output.summary.qpcr$D_0.5_resample  %>% rename(DNA.val = tot)
+
+# Do CI for grid.cell by grid.cell
+resamp.grid.comb <- full_join(A.resamp.grid,DNA.resamp.grid)
+
+resamp.grid.summary <- resamp.grid.comb %>% group_by(Gridcell_ID) %>% summarise(A.mean = mean(A.val),DNA.mean =mean(DNA.val))
+
+cor.grid <- resamp.grid.comb %>% group_by(MCMC.rep) %>% summarise(COR =cor(A.val,DNA.val,method="pearson"))
+
+ggplot(resamp.grid.comb) +
+    geom_point()
+
+# Get CI from 1.0 degree bins
+resamp.1.0.comb <- full_join(A.resamp.1.0,DNA.resamp.1.0)
+cor.1.0.vals <- resamp.1.0.comb %>% group_by(MCMC.rep) %>% summarise(COR =cor(A.val,DNA.val,method="pearson")) 
+cor.1.0.vals.summary <- cor.1.0.vals %>% ungroup() %>% summarise(Mean = mean(COR), 
+                            Median = median(COR),
+                            Q.25 = quantile(COR,probs=0.25),
+                            Q.75 = quantile(COR,probs=0.75),
+                            Q.05 = quantile(COR,probs=0.05),
+                            Q.95 = quantile(COR,probs=0.95),
+                            Q.025 = quantile(COR,probs=0.025),
+                            Q.975 = quantile(COR,probs=0.975))
+
+# Get CI from 0.5 degree bins
+resamp.0.5.comb <- full_join(A.resamp.0.5,DNA.resamp.0.5)
+
+cor.0.5.vals <- resamp.0.5.comb %>% group_by(MCMC.rep) %>% summarise(COR =cor(A.val,DNA.val,method="pearson"))
+cor.0.5.vals.summary <- cor.0.5.vals %>%
+  ungroup() %>% summarise(Mean = mean(COR), 
+                          Median = median(COR),
+                          Q.25 = quantile(COR,probs=0.25),
+                          Q.75 = quantile(COR,probs=0.75),
+                          Q.05 = quantile(COR,probs=0.05),
+                          Q.95 = quantile(COR,probs=0.95),
+                          Q.025 = quantile(COR,probs=0.025),
+                          Q.975 = quantile(COR,probs=0.975))
+                            
+
+resamp.0.5.comb <-
 ##############################################################################
 
 ggplot(Both_equal) +
@@ -164,19 +212,19 @@ p_cor_1.0 <- ggplot(Both_lat_1.0_1000) +
   theme_classic()
 
 setwd(plot.dir)
-quartz(file="Hake DNA-Acoustic bivariate correlation_1.0.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+quartz(file="Hake_DNA-Acoustic_bivariate_correlation_1.0.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
 print(p_cor_1.0)
 dev.off()
 
 setwd(plot.dir)
-quartz(file="Hake DNA-Acoustic bivariate correlation_0.5.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
+quartz(file="Hake_DNA-Acoustic_bivariate_correlation_0.5.jpeg",height=4.5,width=5,dpi=600,type="jpeg")
 print(p_cor_0.5)
 dev.off()
 
 
 
-cor.test(Both_equal$Mean_ac,Both_equal$Mean_dna)
-cor.test(Both_lat_1.0$Mean_ac,Both_lat_1.0$Mean_dna)
+cor.test(Both_equal$Mean_ac,Both_equal$Mean_dna,conf.level=0.90)
+cor.test(Both_lat_1.0$Mean_ac,Both_lat_1.0$Mean_dna,conf.level=0.90)
 cor.test(Both_lat_1.0$Mean_ac[Both_lat_1.0$ID.lat.1.0!=7],
          Both_lat_1.0$Mean_dna[Both_lat_1.0$ID.lat.1.0!=7])
 
@@ -185,7 +233,7 @@ cor.test(Both_lat_0.5$Mean_ac[Both_lat_0.5$ID.lat.0.5!=12],
 cor.test(Both_lat_0.5$Mean_ac,
           Both_lat_0.5$Mean_dna)
 
-cor.test(Both_points$Mean_ac,Both_points$Mean_dna)
+cor.test(Both_points$Mean_ac,Both_points$Mean_dna,conf.level=0.90)
 
 
 # Make pairwise plot of acoustics and DNA with marginal densities.
@@ -232,7 +280,7 @@ lay = rbind(c(1,1,NA),
             c(2,2,3))
 
 setwd(plot.dir)
-quartz(file="Hake bivariate point-level.jpeg",height=5.5,width=6,dpi=600,type="jpeg")
+quartz(file="Hake_bivariate_point-level.jpeg",height=5.5,width=6,dpi=600,type="jpeg")
   grid.arrange(g_top,g_base,g_right,
       widths = c(1, 1, 0.5),
       heights=c(0.5,1,1),
@@ -242,7 +290,7 @@ dev.off()
 # Combine point level and 1 degree plots into one figure.
 
 setwd(plot.dir)
-quartz(file="Hake point-level and 1 degree.jpeg",height=4,width=8,dpi=600,type="jpeg")
+quartz(file="Hake_point-level_and_1_degree.jpeg",height=4,width=8,dpi=600,type="jpeg")
 grid.arrange(
     g_top,
     g_base,
@@ -278,7 +326,7 @@ size.regions = 3
 y.axis.text <- 12
 
 setwd(plot.dir)
-quartz(file="Hake maps combined to surface.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
+quartz(file="Hake_maps_combined_to_surface.jpeg",height=7.5,width=9,dpi=600,type="jpeg")
   grid.arrange(survey.map + xlab("") +
                 geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                              linetype="dashed")+
@@ -328,7 +376,7 @@ lay = rbind(c(1,2,3,4),
 
 axis.text <- 9
 title.text <-11
-quartz(file="Hake maps Mean depth manual facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
+quartz(file="Hake_maps_Mean_depth_manual_facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
   grid.arrange(survey.map + xlab("") + ggtitle("Survey")+
                  #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                  #              linetype="dashed")+
@@ -418,14 +466,17 @@ CV.summary <- Output.summary.qpcr$D_pred_combined %>% group_by(depth_cat_factor)
                 ) %>%
         mutate(plot_depth=ifelse(depth_cat_factor==0,3,depth_cat_factor))
   
+MAX.CV <- CV.summary$cv.q.90 %>% max()
+
+
 CV_marg_plot <- ggplot(CV.summary) +
     geom_errorbarh(aes(y=plot_depth,xmin=cv.q.10,xmax=cv.q.90),height=0) +
     geom_errorbarh(aes(y=plot_depth,xmin=cv.q.25,xmax=cv.q.75),height=0,size=2) +
     geom_point(aes(y=plot_depth,x=grand.mean.cv),shape=21,fill="white",size=1.5) +
     geom_point(aes(y=plot_depth,x=grand.median.cv),shape="|",size=5) +
     scale_y_reverse("Depth (m)")+
-    scale_x_continuous("CV",expand=c(0.0,0.0),limits = c(0,7.2),
-                       breaks=c(0,0.5,1,2,4,6), labels=c(0,0.5,1,2,4,6)) +
+    scale_x_continuous("CV",expand=c(0.0,0.0),limits = c(0,3.25),
+                       breaks=c(0,0.5,1,2,3), labels=c(0,0.5,1,2,3)) +
     theme_classic() +
     ggtitle("g)")
 
@@ -435,7 +486,7 @@ lay = rbind(c(1,2,3,4),
 
 axis.text <- 9
 title.text <-11
-quartz(file="Hake maps Mean depth manual facet V2.jpeg",height=9,width=8,dpi=600,type="jpeg")
+quartz(file="Hake_maps_Mean_depth_manual_facet_V2.jpeg",height=9,width=8,dpi=600,type="jpeg")
 grid.arrange(
                # #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                # #              linetype="dashed")+
@@ -519,7 +570,7 @@ dev.off()
 #### Make Grid of CV Predictions 
 axis.text <- 9
 title.text <-11
-quartz(file="Hake maps CV depth manual facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
+quartz(file="Hake_maps_CV_depth_manual_facet.jpeg",height=9,width=8,dpi=600,type="jpeg")
 grid.arrange(
         survey.map + xlab("") + ggtitle("Survey")+
           #geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
@@ -666,8 +717,6 @@ dna.series <- ggplot(Both_lat_1.0_1000) +
   xlab("Region") +
   theme_bw()
 
-
-
 gA <- ggplotGrob(acoustic.series)
 gB <- ggplotGrob(dna.series)
 maxWidth = grid::unit.pmax(gA$widths[2:5], gB$widths[2:5])
@@ -728,7 +777,7 @@ both.series_nondim <- ggplot(Both_lat_1.0_1000_nondim) +
     legend.justification = c("right", "top"),
     legend.box.just = "right")
 
-quartz(file="Hake relative index.jpeg",height=4,width=6,dpi=600,type="jpeg")
+quartz(file="Hake_relative_index.jpeg",height=4,width=6,dpi=600,type="jpeg")
   print(both.series_nondim)
 dev.off()
 
@@ -767,7 +816,7 @@ lat.breaks.plot <- lat.breaks %>% as.data.frame() %>%
 dat.500 <- dat.project %>% filter(bottom.depth.consensus < 750,bottom.depth.consensus > 400) %>% 
   mutate(lat.bin = cut(lat,breaks=lat.breaks))
 lat.lab <- data.frame(lat.bin=levels(dat.500$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
-  left_join(.,lat.breaks.plot %>% select(-"."))
+  left_join(.,lat.breaks.plot %>% dplyr::select(-"."))
 dat.500 <- left_join(dat.500,lat.lab) %>%
   group_by(depth_cat_factor,lat.group) %>% 
   summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
@@ -776,7 +825,7 @@ dat.500 <- left_join(dat.500,lat.lab) %>%
 dat.300 <- dat.project %>% filter(bottom.depth.consensus < 400,bottom.depth.consensus > 225) %>% 
               mutate(lat.bin = cut(lat,breaks=lat.breaks))
 lat.lab <- data.frame(lat.bin=levels(dat.300$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
-                left_join(.,lat.breaks.plot %>% select(-"."),grand.cv=grand.sd/grand.mean)
+                left_join(.,lat.breaks.plot %>% dplyr::select(-"."),grand.cv=grand.sd/grand.mean)
 dat.300 <- left_join(dat.300,lat.lab) %>%
               group_by(depth_cat_factor,lat.group) %>% 
               summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
@@ -784,7 +833,7 @@ dat.300 <- left_join(dat.300,lat.lab) %>%
 dat.150 <- dat.project %>% filter(bottom.depth.consensus < 225,bottom.depth.consensus > 125) %>% 
                   mutate(lat.bin = cut(lat,breaks=lat.breaks))
 lat.lab <- data.frame(lat.bin=levels(dat.150$lat.bin)) %>% as.data.frame() %>% mutate(id= 1:n()) %>% 
-                  left_join(.,lat.breaks.plot %>% select(-"."))
+                  left_join(.,lat.breaks.plot %>% dplyr::select(-"."))
 dat.150 <- left_join(dat.150,lat.lab) %>%
               group_by(depth_cat_factor,lat.group) %>% 
               summarise(grand.mean=mean(Mean),grand.sd = sd(Mean),grand.cv=mean(CV))
@@ -896,7 +945,7 @@ cog_plot <-
     scale_color_viridis_d("Center of Gravity\n   (Median)",end = 0.4)
 
 
-quartz(file="Hake compare distribution.jpeg",height=4,width=8,dpi=600,type="jpeg")
+quartz(file="Hake_compare_distribution.jpeg",height=4,width=8,dpi=600,type="jpeg")
   grid.arrange(
       cdf_dist_plot + theme(plot.margin = unit(c(0.25,0.25,0.25,0.25), "lines"),
                             legend.position = c(0.75, .4),
