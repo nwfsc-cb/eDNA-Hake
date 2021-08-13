@@ -87,6 +87,7 @@ write_rds(data.with.lat, here("Data", "thermocline.data.for.plotting.rds"))
 ```{r}
 
 data.with.lat <- read_rds(here("Data", "thermocline.data.for.plotting.rds"))
+base.map.Hake <- 
 data.with.lat %>% 
   ggplot(aes(x = Thermocline, y = lat, size = Temp_diff)) +
   geom_point(alpha = 0.5)
