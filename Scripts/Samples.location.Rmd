@@ -1,12 +1,15 @@
 ---
 title: "Samples location"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
 A first step is to place on a map the location of the CTD casts and eDNA samples. THe idea is to have a visualization of the depth, latitude and longitude of the samples, and use it to prioritize which samples are to be analyzed
 
 Start with libraries
 ```{r}
 library (tidyverse)
+library(here)
 library(rnaturalearth)
 library(marmap)
 ```
@@ -22,7 +25,7 @@ We have three starting datasets:
 
 ```{r eDNA file}
 
-eDNA.samples <- read_csv("../Data/eDNA hake water samples.csv")
+eDNA.samples <- read_csv(here("Data","eDNA hake water samples.csv"))
 
 #  Let's tidy this a little bit:
 
@@ -67,7 +70,7 @@ eDNA.samples %>%
   filter (is.na(depth)) # Those are flow, so change depth to 0
 
 eDNA.samples %>% 
-  select (Date = `Date UTC`,
+  dplyr::select (Date = `Date UTC`,
           Sample = `Tube #`,
           Station = `CTD cast`,
           Origin = Niskin,
@@ -90,7 +93,7 @@ eDNA.samples %>%
 
 ```{r transect stations}
 
-CTD.stations <- read_csv("../Data/CTD_hake_data_10-2019.csv")
+CTD.stations <- read_csv(here("Data","CTD_hake_data_10-2019.csv"))
 
 # Tidy_up the data in a similar way
 
@@ -100,7 +103,7 @@ CTD.stations %>%
            as.numeric(str_sub(`SciGPS-Lat`,3,9 ))/60,
          lon = -(as.numeric(str_sub(`SciGPS-Lon`,1,3 ) ) +
            as.numeric(str_sub(`SciGPS-Lon`,4,10 ))/60)) %>% 
-  select(Date,Time,Button,Station=`Station #`,lat,lon, CTD_Cast = `CTD Cast #`) %>% 
+  dplyr::select(Date,Time,Button,Station=`Station #`,lat,lon, CTD_Cast = `CTD Cast #`) %>% 
   mutate(Station=as.character(Station)) %>%
   filter(Button=="CTD at Depth") -> CTD.stations
 
@@ -117,7 +120,9 @@ CTD.stations %>%
   slice(1)  %>% 
   semi_join(eDNA.samples) -> list.of.stations.to.keep
   
-  
+  eDNA.samples %>% 
+    left_join(list.of.stations.to.keep) %>% 
+    select(Station, depth)
   
 #   pull -> duplicated.entries
 # 
@@ -139,6 +144,7 @@ CTD.stations %>%
 # list.of.stations.to.keep %>% 
 #   write_csv("../Data/cleaned_CTD_stations.csv")
 #   
+  list.of.stations.to.keep <- read_csv(here("Data", "cleaned_CTD_stations.csv"))
 ```
 # Make a Plot
 
@@ -224,7 +230,10 @@ ggplot(data=world) +
   coord_sf(xlim=c(limits.for.map["lon_Max"], limits.for.map["lon_Min"]),ylim=c(limits.for.map["lat_Max"], limits.for.map["lat_Min"]),expand=F) +
   xlab("Longitude") +
   ylab("Latitude") +
-  theme_bw() -> base_map_hake
+  theme_bw()+
+  labs(fill = "depth")-> base_map_hake
+save_rds(base_map_hake, here("Data", "Hake_map.rds"))
+
 base_map_hake +  
 
 geom_point(data=list.of.stations.to.keep,aes(y=lat,x=lon),col="red",alpha=0.75) +
@@ -236,11 +245,12 @@ geom_point(data=list.of.stations.to.keep,aes(y=lat,x=lon),col="red",alpha=0.75) 
 list.of.stations.to.keep %>% 
   ungroup() %>% 
   separate(Station, into = c("Transect", "Stop"), remove = F) %>% 
-  group_by(Transect, Date) %>% 
+  group_by(Transect) %>% 
   summarise(xstart = max(lon),
             xend = min(lon),
             ystart = mean(lat),
-            yend  = mean(lat)) %>% 
+            yend  = mean(lat),
+            Date  = first(Date)) %>% 
   mutate(MonthDay = paste(lubridate::month(Date, label = T), 
                           lubridate::day(Date), sep = "-")) -> Transects
 
@@ -252,5 +262,71 @@ plot +
   geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
   geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold") +
   ggsave("../Plots and figures/Samples_with_Transects_depth.png",height=10,dpi = 300 )
+```
+
+# Vertical profiles
+
+```{r}
+
+eDNA.samples %>% 
+    left_join(list.of.stations.to.keep) %>% 
+    distinct(Station, depth, lat, lon) %>% 
+  mutate (depth  = case_when (depth == "sfc" ~ 0, 
+                              TRUE  ~ as.numeric(depth))) -> depth.profiles
+
+read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
+  filter (!str_detect(station,"zP"), ! station %in% c("7", "9"), !transect %in% c("HA", "VN", "NH", "Mo")) %>% 
+  
+  select(Station = station , bottom.depth.consensus) -> Ole.depth
+
+depth.profiles %>% 
+
+left_join( Ole.depth) %>% 
+  filter (!is.na(depth))-> Sample.info
+
+Sample.info
+
+```
+
+Add opennes
+```{r}
+Sample.info %>%
+  separate(Station, into = c("Transect", "stop"), remove = F) %>% 
+  # semi_join(By.taxa.dataset.metadata , by = c("Transect", "position" = "stop")) %>% 
+   group_by(Transect) %>% 
+  mutate (center.point = mean(c(max(lon),min(lon))), 
+          distance.to.center = abs(lon-center.point)) %>% 
+  mutate(Openness = case_when (stop == min(stop) ~ "Onshore",
+                               stop == max(stop) ~ "Offshore", 
+                               distance.to.center == min(distance.to.center) ~ "Center",
+                               TRUE                      ~ "Transition")) -> Sample.info
+```
+
+
+
+```{r}
+Step1 %>% 
+  filter (Transect %in% c( 35,  55)) %>% 
+  mutate (Openness = fct_reorder(Openness, -lon),
+          Transect = as.character(Transect)) %>% 
+  mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
+  ungroup() %>% 
+  mutate(max.depth = max(max.depth)) %>% 
+  ggplot() +
+ 
+  geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
+   geom_point (aes(y = depth, x = -lon, color = (Openness != "Transition"))) +
+  geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
+  facet_wrap(~Transect, ncol = 2, scale = "free_x") +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = "lightblue")) +
+   scale_y_reverse()+
+  # scale_y_continuous(trans = trans_reverser('log10')) +
+  # scale_y_continuous(trans= trans_reverser('log10')) +
+  scale_x_reverse()+
+  scale_color_brewer(type = "div", palette = 5,direction = -1) +
+  labs (y = "Depth", x= "Longitude", color = "Selected")
+
+ggsave(here("Presentations", "images", "depth.profile.png"), width =  10, height = 3 )
 ```
 

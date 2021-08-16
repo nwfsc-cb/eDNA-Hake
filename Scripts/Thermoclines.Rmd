@@ -1,6 +1,8 @@
 ---
 title: "Thermoclines"
 output: html_notebook
+editor_options: 
+  chunk_output_type: console
 ---
 
 We want to map  which stations have a marked thermocline, and which don't. We want to choose a few stations from each and build a test like so
@@ -87,7 +89,7 @@ write_rds(data.with.lat, here("Data", "thermocline.data.for.plotting.rds"))
 ```{r}
 
 data.with.lat <- read_rds(here("Data", "thermocline.data.for.plotting.rds"))
-base.map.Hake <- 
+base.map.Hake <- read_rds(here("Data", "Hake_map.rds"))
 data.with.lat %>% 
   ggplot(aes(x = Thermocline, y = lat, size = Temp_diff)) +
   geom_point(alpha = 0.5)
@@ -145,7 +147,8 @@ base_map_hake +
                separate(Station, into = c("transect", "station")), aes(x = lon, y = lat, label = station ) ,size = 2.5, fontface = "bold") +
   geom_segment (data = Transects, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect)) +
     geom_text(data = Transects, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold")+ 
-  theme(legend.position = "bottom") -> station.plot
+  theme(legend.position = "bottom") +
+  labs(fill ="depth" )-> station.plot
 
 library(cowplot)
 library(patchwork)
@@ -155,11 +158,20 @@ legend_right <- get_legend(sst.plot)
 legends <- cowplot::plot_grid(list(legend_left, legend_right))
 
 Temp.diff.plot +
-sst.plot +station.plot+
-  ggsave("../Plots and figures/plots.for.choosing.png", height=10,width = 10, dpi = 300 )
+sst.plot +station.plot
+  ggsave(here("Plots and figures","plots.for.choosing.png"), height=10,width = 10, dpi = 300 )
 
 ```
 
+```{r}
+station.plot +
+theme(legend.key.width = unit( 0.5, "in" ))
+ggsave(
+# ggsave(plot = station.plot,
+filename =  here("Plots and figures", "station.plot.png"),
+height = 10, width = 4, dpi = "retina")
+
+```
 
 # Get the fluoresence
 
@@ -185,9 +197,8 @@ eDNA.samples %>%
 Samples.with.Flour %>% 
   select(Station, depth, Tube = `Tube #`, Flour_at_sample) %>% 
   write_csv(here("Data", "Flouresnce_by_sample.csv"))
-
+Samples.with.Flour <- read_csv(here("Data", "Flouresnce_by_sample.csv"))
 Samples.with.Flour %>% 
-  select (Station, depth, Tube = `Tube #`, Flour_at_sample) %>% 
   separate(Station, into = c("Transect", NA), remove = F) %>% 
   ggplot(aes(x = Flour_at_sample, y = depth, color = Station, group = Station)) +
   geom_line() +

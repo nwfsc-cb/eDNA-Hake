@@ -15,6 +15,7 @@ library(rnaturalearth)
 library(mapdata)
 library(metR)
 library(raster)
+library(here)
 ```
 
 
@@ -24,7 +25,7 @@ Change this accordingly to the project at hand. Make sure latitude and longitude
 
 ```{r samples}
 
-eDNA.samples <- read_csv("cleaned_CTD_stations.csv")
+eDNA.samples <- read_csv(here("Data","cleaned_CTD_stations.csv"))
 
 named_pull <- function(x, values_from, names_from){
 names.output<- pull(x, {{names_from}})
@@ -47,10 +48,12 @@ return(output)
 
 # Get the coordinates
 
-metadata %>% 
+eDNA.samples %>% 
   summarise(across(c("lat", "lon"), .fns = list( Max = ~ round( max(.x, na.rm = T) + 1,0) ,
-                                              Min = ~ round( min(.x, na.rm = T) - 1,0)))) %>% pivot_longer(cols = everything(),names_to = "Corner",
-                                                                                               values_to = "Coordinates") %>% named_pull(Coordinates, Corner)-> limits.for.map
+                                              Min = ~ round( min(.x, na.rm = T) - 1,0)))) %>%
+  pivot_longer(cols = everything(),names_to = "Corner",
+               values_to = "Coordinates") %>%
+  named_pull(Coordinates, Corner)-> limits.for.map
 
 
 # Bathymetry
@@ -76,35 +79,35 @@ sf::st_crs(base_map)
 
 # And all together for future use
 
-ggplot(base_map) +
-  
-  geom_tile(data = b %>%  filter (z < 0),
-              aes(x=x, y=y, fill=z)) + 
-
-  geom_sf() +
-  
-  coord_sf(xlim=c(limits.for.map["lon_Min"], limits.for.map["lon_Max"]),
-           ylim=c(limits.for.map["lat_Min"], limits.for.map["lat_Max"]),expand=F) +
-
-  geom_contour(data = b %>%  filter (z < 0), 
-               aes(x=x, y=y, z=z),
-               breaks=c(  -250),
-               size=c(0.3),
-               colour="grey")  +
-  geom_text_contour (data = b %>%  filter (z < 0,y < 47), 
-               aes(x=x, y=y,   z = z),
-               stroke = 0.2,
-               label.placement = label_placement_flattest(),
-               rotate = F,
-               breaks=c( -250),
-               check_overlap = T,
-               colour="black")+
-  theme_minimal() +
-  xlab("") +
-  ylab("") +
-  labs(fill = "depth")  -> base_plot
-
-base_plot %>% write_rds(here("Data/Hake_map.rds"))
+# ggplot(base_map) +
+#   
+#   geom_tile(data = b %>%  filter (z < 0),
+#               aes(x=x, y=y, fill=z)) + 
+# 
+#   geom_sf() +
+#   
+#   coord_sf(xlim=c(limits.for.map["lon_Min"], limits.for.map["lon_Max"]),
+#            ylim=c(limits.for.map["lat_Min"], limits.for.map["lat_Max"]),expand=F) +
+# 
+#   geom_contour(data = b %>%  filter (z < 0), 
+#                aes(x=x, y=y, z=z),
+#                breaks=c(  -250),
+#                size=c(0.3),
+#                colour="grey")  +
+#   geom_text_contour (data = b %>%  filter (z < 0,y < 47), 
+#                aes(x=x, y=y,   z = z),
+#                stroke = 0.2,
+#                label.placement = label_placement_flattest(),
+#                rotate = F,
+#                breaks=c( -250),
+#                check_overlap = T,
+#                colour="black")+
+#   theme_minimal() +
+#   xlab("") +
+#   ylab("") +
+#   labs(fill = "depth")  -> base_plot
+# 
+# base_plot %>% write_rds(here("Data","Hake_map.rds"))
 
 
 base_plot +

@@ -4,7 +4,7 @@ output:
   html_document:
     df_print: paged
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
 params:
   file:
     label: 'Input dataset:'
@@ -45,6 +45,29 @@ Get the taxonomy file from insect
 ```{r}
 here()
 taxonomy <- read_rds(here("Data","all.taxonomy.rds"))
+
+taxonomy %>% 
+  filter (str_detect(name, "Eviota") & rank == "species")
+
+taxonomy %>% 
+  filter (taxID == 166746)
+
+# Add the taxonomy of Eviota thamani
+
+max(taxonomy$taxID)
+
+# Make up a taxID for E. thamani
+
+taxonomy %>% 
+  add_case(taxID = 6000000,
+           parent_taxID = 166746,
+           rank = "species",
+           name = "Eviota thamani") -> taxoomy.2
+
+insect::get_lineage(6000000, taxoomy.2)
+
+
+
 ```
 
 Now - get  the taxids are probably shared between them.

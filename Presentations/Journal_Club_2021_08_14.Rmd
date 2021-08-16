@@ -63,40 +63,73 @@ options(htmltools.dir.version = FALSE)
 
 ---
 name: Intro 
-class: nord-light, middle
-
+class: nord-light
+layout: true
 ## .center[Introductions]
 
-.leftmost-column[
+---
+
 ### .fancy[Ramón Gallego]
 </br>
-
+.pull-left[
 ```{r, echo = F}
 knitr::include_graphics("images/PNW.jpg")
 ```
+]
 
-</br>
-
+.pull-right[
 ```{r, echo = F}
 knitr::include_graphics("images/RGS.jpg")
 ```
 ]
 
---
+---
 
-.center-column[
-### *environmental DNA*
 
-![*The best DNA there is*](images/900x600-pacific-whiting-noaa.jpeg)
 
-]
+### .fancy[*environmental DNA*]
 
-.rightmost-column[
 
-## *Coastal Upwelling*
-]
+
+```{r,echo=F, out.width='50%', fig.align='center'}
+knitr::include_graphics("images/messages_0.jpeg")
+```
 
 ---
+
+### .fancy[*environmental DNA*]
+
+
+- *DNA that can be extracted from environmental samples (such as soil, water or air), without first isolating any target organisms*, Taberlet et al. 2012
+
+
+
+
+```{r,echo=F, out.width='60%', fig.align='center'}
+knitr::include_graphics("images/eDNA_concept.png")
+```
+
+
+
+
+
+
+---
+### .fancy[ *Coastal Upwelling*]
+
+.left-column[
+- Deep water comes to surface
+- Driven by prevailing winds
+- Brings up nutrient rich, low oxygen water
+]
+.right-column[
+```{r,echo=F, out.width='80%', fig.align='center'}
+knitr::include_graphics("images/coast_upwelling.png")
+```
+
+]
+---
+layout: false
 name: Hake survey 
 class: nord-dark, center, middle
 
@@ -109,35 +142,43 @@ class: nord-dark, center, middle
 ---
 name: Hake survey 1
 class: nord-light, highlight-last-item
-<!-- background-size: contain -->
-<!-- background-image: linear-gradient(150deg,rgba(255,255,255, 50%),rgba(0, 0, 255, 20%)), url(images/900x600-pacific-whiting-noaa.jpeg) -->
+
 
 # *Hake survey*
 
-.pull-right[
-![*The best DNA there is*](images/900x600-pacific-whiting-noaa.jpeg)
+.right-column[
+```{r,echo=F, out.width='80%', out.height = '60%',fig.align='center'}
+knitr::include_graphics("images/station.plot.png")
+```
+
 ]
 
-.pull-left[
+.left-column[
 - Run every two years
 
---
+
 
 - Covers onshore/offshore transects
 
---
+
 
 - Estimates Hake abundance, age classes, maturity
 
---
+
 
 - In 2019 started an eDNA program
 ]
 ---
 name: Hake
 class: nord-dark
+background-image: url(images/900x600-pacific-whiting-noaa.jpeg)
+background-position: right
+background-size: 50% 50%
+
 
 # .huge.center[*Hake*]
+ .center[_Merluccius productus_]
+</br>
 .pull-left[ 
 
  - *semi-pelagic fish*
@@ -151,103 +192,143 @@ class: nord-dark
 ]
 
 
-.pull-right[ 
 
-<img src="images/900x600-pacific-whiting-noaa.jpeg" alt="HAKE" />
-Image credit: [NOAA](images/)
+
+
+
+
+
+
+---
+name: eDNA sampling
+class: nord-light, middle
+
+
+# eDNA Component
+
+.pull-left[
+```{r,echo=F,  out.width = '75%',fig.align='center'}
+knitr::include_graphics("images/station.plot.png")
+```
 ]
 
+.pull-right[
 
+- 1930 eDNA samples 
 
+- From 36 longitudinal transects
 
+- ~ 6 stops per transect
 
+- ~ 5 depths per stop
 
-.footnote[
-[1] 
+- 2 Niskins bottles per depth (2.5L per Niskin = 1 eDNA sample)
 
+- \>350 samples from Flow-through system
+
+- All working from sunset to sunrise
 
 ]
 
 ---
+name: eDNA sampling
+class: nord-light
+
+# Where do we sample?
 
 
-# Hello Ninja
+- Near the surface
+- Mid water 
+- Up to 500m depth
 
-As a presentation ninja, you certainly should not be satisfied by the "Hello World" example. You need to understand more about two things:
+- So in some stations surface-midwater-near bottom
+- in others quite far from there
 
-1. The [remark.js](https://remarkjs.com) library;
+```{r,echo=F,  out.width = '75%',fig.align='center'}
+knitr::include_graphics("images/depth.profile.png")
+```
 
-1. The **xaringan** package;
 
-Basically **xaringan** injected the chakra of R Markdown (minus Pandoc) into **remark.js**. The slides are rendered by remark.js in the web browser, and the Markdown source needed by remark.js is generated from R Markdown (**knitr**).
-
----
-
-# remark.js
-
-You can see an introduction of remark.js from [its homepage](https://remarkjs.com). You should read the [remark.js Wiki](https://github.com/gnab/remark/wiki) at least once to know how to
-
-- create a new slide (Markdown syntax<sup>*</sup> and slide properties);
-
-- format a slide (e.g. text alignment);
-
-- configure the slideshow;
-
-- and use the presentation (keyboard shortcuts).
-
-It is important to be familiar with remark.js before you can understand the options in **xaringan**.
-
-.footnote[[*] It is different with Pandoc's Markdown! It is limited but should be enough for presentation purposes. Come on... You do not need a slide for the Table of Contents! Well, the Markdown support in remark.js [may be improved](https://github.com/gnab/remark/issues/142) in the future.]
 
 ---
-background-image: url(`r xaringan:::karl`)
-background-size: cover
-class: center, bottom, inverse
+name: Where is the eDNA coming
+class: nord-dark, center, middle
 
-# I was so happy to have discovered remark.js!
+
+# .huge[*But where does the eDNA come from?*]
+
 
 ---
 class: inverse, middle, center
+class: nord-light
 
-# Using xaringan
+# Where does the eDNA come from
+
+ Two interconnected questions:
+
+- .huge[*Does upwelling bring eDNA from deeper water?*]
+
+--
+</br>
+- .huge[*Does an established Thermocline function as a barrier for eDNA flow?* ]
 
 ---
 
-# xaringan
+name: Experimental design
+class: nord-dark, center, middle
 
-Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
+# .huge[*Experimental design*]
 
-```yaml
 ---
-title: "A Cool Presentation"
-output:
-  xaringan::moon_reader:
-    yolo: true
-    nature:
-      autoplay: 30000
+name: Experimental design 1
+class: nord-light
+layout: true
+
+# Experimental design
+
 ---
+name: Exp design2
+
+- *Metabarcoding of eDNA targetting Fishes with 16S*
+</br>
+.push-right[
+</br>
+- Potentitally amplifying cartilaginous and bony fishes
+- Target fragment ~ 350 bp 
+- Sequencing on an Illumina MiSeq
+
+]
+---
+name: Exp design3
+- Metabarcoding of eDNA targetting Fishes with 16S
+- *Choosing Transects with / without established Thermocline*
+
+
+```{r,echo=F,  out.width = '65%', out.height="75%" , fig.align='center'}
+knitr::include_graphics("images/plots.for.choosing.png")
 ```
 
-See the help page `?xaringan::moon_reader` for all possible options that you can use.
-
 ---
 
-# remark.js vs xaringan
+name: Exp design4
+- Metabarcoding of eDNA targetting Fishes with 16S
+- *Choosing Transects with / without established Thermocline*
 
-Some differences between using remark.js (left) and using **xaringan** (right):
+
+```{r,echo=F,  out.width = '65%', out.height="75%" , fig.align='center'}
+knitr::include_graphics("images/choosen2.png")
+```
+
+---
+name: Exp design5
+
+- Metabarcoding of eDNA targetting Fishes with 16S
+- Choosing Transects
+- *Statistical framework*
 
 .pull-left[
-1. Start with a boilerplate HTML file;
+Community analysis:
 
-1. Plain Markdown;
-
-1. Write JavaScript to autoplay slides;
-
-1. Manually configure MathJax;
-
-1. Highlight code with `*`;
-
-1. Edit Markdown source and refresh browser to see updated slides;
 ]
 
 .pull-right[

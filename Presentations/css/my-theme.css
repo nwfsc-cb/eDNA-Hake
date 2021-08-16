@@ -1,0 +1,137 @@
+a, a > code {
+  color: rgb(249, 38, 114);
+  text-decoration: none;
+}
+.footnote {
+  position: absolute;
+  bottom: 3em;
+  padding-right: 4em;
+  font-size: 90%;
+}
+.remark-code-line-highlighted     { background-color: #ffff88; }
+
+.inverse {
+  background-color: #272822;
+  color: #d6d6d6;
+  text-shadow: 0 0 20px #333;
+}
+.inverse h1, .inverse h2, .inverse h3 {
+  color: #f3f3f3;
+}
+/* Two-column layout */
+.left-column {
+  color: #777;
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+.left-column h2:last-of-type, .left-column h3:last-child {
+  color: #000;
+}
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 1em;
+}
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right ~ * {
+  clear: both;
+}
+/* Three-column layout */
+.leftmost-column {
+  color: #777;
+  width: 20%;
+  height: 92%;
+  float: left;
+  padding-top: 1em;
+}
+.leftmost-column h2:last-of-type, .leftmost-column h3:last-child {
+  color: #000;
+}
+.center-column {
+  display: inline-block; 
+  width: 37%;
+  padding-top: 1em;
+  padding-left: 1em;
+}
+.rightmost-column {
+  color: #777;
+  width: 28%;
+  height: 92%;
+  float: right;
+  padding-top: 1em;
+}
+/* Three-column-all-the-same layout */
+.column1 {
+  color: #777;
+  width: 32%;
+  height: 92%;
+  float: left;
+  padding-top: 1em;
+}
+.column1 h2:last-of-type, .column1 h3:last-child {
+  color: #000;
+}
+.column2 {
+  display: inline-block; 
+  width: 32%;
+  padding-top: 1em;
+  padding-left: 1em;
+}
+.column3 {
+  color: #777;
+  width: 32%;
+  height: 92%;
+  float: right;
+  padding-top: 1em;
+}
+.pull-left3 {
+  float: left;
+  width: 32%;
+}
+.pull-center3{
+  display: inline-block; 
+  width: 32%;
+}
+.pull-right3 {
+  float: right;
+  width: 32%;
+}
+.pull-right3 ~ * {
+  clear: both;
+}
+img, video, iframe {
+  max-width: 100%;
+}
+blockquote {
+  border-left: solid 5px lightgray;
+  padding-left: 1em;
+}
+.remark-slide table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+.remark-slide table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) { background: #eee }
+
+@page { margin: 0; }
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+.bold { font-weight: bold; }
+.yellow { color: yellow; }

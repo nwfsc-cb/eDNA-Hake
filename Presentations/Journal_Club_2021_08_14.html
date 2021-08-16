@@ -4,14 +4,13 @@
     <title>eDNA metabarcoding</title>
     <meta charset="utf-8" />
     <meta name="author" content="Ramón Gallego" />
-    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <script src="libs/htmlwidgets/htmlwidgets.js"></script>
     <script src="libs/jquery/jquery.min.js"></script>
     <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
     <script src="libs/leaflet/leaflet.js"></script>
     <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
-    <script src="libs/proj4/proj4.min.js"></script>
+    <script src="libs/Proj4Leaflet/proj4-compressed.js"></script>
     <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
     <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
     <script src="libs/leaflet-binding/leaflet.js"></script>
@@ -80,36 +79,63 @@ background-image: linear-gradient(150deg,rgba(46, 52, 64, 10%),rgba(46, 52, 64, 
 
 ---
 name: Intro 
-class: nord-light, middle
-
+class: nord-light
+layout: true
 ## .center[Introductions]
 
-.leftmost-column[
+---
+
 ### .fancy[Ramón Gallego]
 &lt;/br&gt;
-
+.pull-left[
 &lt;img src="images/PNW.jpg" width="2549" /&gt;
+]
 
-&lt;/br&gt;
-
+.pull-right[
 &lt;img src="images/RGS.jpg" width="3648" /&gt;
 ]
 
---
+---
 
-.center-column[
-### *environmental DNA*
 
-![*The best DNA there is*](images/900x600-pacific-whiting-noaa.jpeg)
 
-]
+### .fancy[*environmental DNA*]
 
-.rightmost-column[
 
-## *Coastal Upwelling*
-]
+
+&lt;img src="images/messages_0.jpeg" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
+
+### .fancy[*environmental DNA*]
+
+
+- *DNA that can be extracted from environmental samples (such as soil, water or air), without first isolating any target organisms*, Taberlet et al. 2012
+
+
+
+
+&lt;img src="images/eDNA_concept.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+---
+### .fancy[ *Coastal Upwelling*]
+
+.left-column[
+- Deep water comes to surface
+- Driven by prevailing winds
+- Brings up nutrient rich, low oxygen water
+]
+.right-column[
+&lt;img src="images/coast_upwelling.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+]
+---
+layout: false
 name: Hake survey 
 class: nord-dark, center, middle
 
@@ -122,30 +148,41 @@ class: nord-dark, center, middle
 ---
 name: Hake survey 1
 class: nord-light, highlight-last-item
-&lt;!-- background-size: contain --&gt;
-&lt;!-- background-image: linear-gradient(150deg,rgba(255,255,255, 50%),rgba(0, 0, 255, 20%)), url(images/900x600-pacific-whiting-noaa.jpeg) --&gt;
+
 
 # *Hake survey*
 
+.right-column[
+&lt;img src="images/station.plot.png" width="80%" height="60%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.left-column[
 - Run every two years
 
---
+
 
 - Covers onshore/offshore transects
 
---
+
 
 - Estimates Hake abundance, age classes, maturity
 
---
+
 
 - In 2019 started an eDNA program
-
+]
 ---
 name: Hake
 class: nord-dark
+background-image: url(images/900x600-pacific-whiting-noaa.jpeg)
+background-position: right
+background-size: 50% 50%
+
 
 # .huge.center[*Hake*]
+ .center[_Merluccius productus_]
+&lt;/br&gt;
 .pull-left[ 
 
  - *semi-pelagic fish*
@@ -159,103 +196,135 @@ class: nord-dark
 ]
 
 
-.pull-right[ 
 
-&lt;img src="images/900x600-pacific-whiting-noaa.jpeg" alt="HAKE" /&gt;
-Image credit: [NOAA](images/)
+
+
+
+
+
+
+---
+name: eDNA sampling
+class: nord-light, middle
+
+
+# eDNA Component
+
+.pull-left[
+&lt;img src="images/station.plot.png" width="75%" style="display: block; margin: auto;" /&gt;
 ]
 
+.pull-right[
 
+- 1930 eDNA samples 
 
+- From 36 longitudinal transects
 
+- ~ 6 stops per transect
 
+- ~ 5 depths per stop
 
-.footnote[
-[1] 
+- 2 Niskins bottles per depth (2.5L per Niskin = 1 eDNA sample)
 
+- \&gt;350 samples from Flow-through system
+
+- All working from sunset to sunrise
 
 ]
 
 ---
+name: eDNA sampling
+class: nord-light
+
+# Where do we sample?
 
 
-# Hello Ninja
+- Near the surface
+- Mid water 
+- Up to 500m depth
 
-As a presentation ninja, you certainly should not be satisfied by the "Hello World" example. You need to understand more about two things:
+- So in some stations surface-midwater-near bottom
+- in others quite far from there
 
-1. The [remark.js](https://remarkjs.com) library;
+&lt;img src="images/depth.profile.png" width="75%" style="display: block; margin: auto;" /&gt;
 
-1. The **xaringan** package;
 
-Basically **xaringan** injected the chakra of R Markdown (minus Pandoc) into **remark.js**. The slides are rendered by remark.js in the web browser, and the Markdown source needed by remark.js is generated from R Markdown (**knitr**).
-
----
-
-# remark.js
-
-You can see an introduction of remark.js from [its homepage](https://remarkjs.com). You should read the [remark.js Wiki](https://github.com/gnab/remark/wiki) at least once to know how to
-
-- create a new slide (Markdown syntax&lt;sup&gt;*&lt;/sup&gt; and slide properties);
-
-- format a slide (e.g. text alignment);
-
-- configure the slideshow;
-
-- and use the presentation (keyboard shortcuts).
-
-It is important to be familiar with remark.js before you can understand the options in **xaringan**.
-
-.footnote[[*] It is different with Pandoc's Markdown! It is limited but should be enough for presentation purposes. Come on... You do not need a slide for the Table of Contents! Well, the Markdown support in remark.js [may be improved](https://github.com/gnab/remark/issues/142) in the future.]
 
 ---
-background-image: url(https://github.com/yihui/xaringan/releases/download/v0.0.2/karl-moustache.jpg)
-background-size: cover
-class: center, bottom, inverse
+name: Where is the eDNA coming
+class: nord-dark, center, middle
 
-# I was so happy to have discovered remark.js!
+
+# .huge[*But where does the eDNA come from?*]
+
 
 ---
 class: inverse, middle, center
+class: nord-light
 
-# Using xaringan
+# Where does the eDNA come from
 
----
+ Two interconnected questions:
 
-# xaringan
+- .huge[*Does upwelling bring eDNA from deeper water?*]
 
-Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
-
-```yaml
----
-title: "A Cool Presentation"
-output:
-  xaringan::moon_reader:
-    yolo: true
-    nature:
-      autoplay: 30000
----
-```
-
-See the help page `?xaringan::moon_reader` for all possible options that you can use.
+--
+&lt;/br&gt;
+- .huge[*Does an established Thermocline function as a barrier for eDNA flow?* ]
 
 ---
 
-# remark.js vs xaringan
+name: Experimental design
+class: nord-dark, center, middle
 
-Some differences between using remark.js (left) and using **xaringan** (right):
+# .huge[*Experimental design*]
+
+---
+name: Experimental design 1
+class: nord-light
+layout: true
+
+# Experimental design
+
+---
+name: Exp design2
+
+- *Metabarcoding of eDNA targetting Fishes with 16S*
+&lt;/br&gt;
+.push-right[
+&lt;/br&gt;
+- Potentitally amplifying cartilaginous and bony fishes
+- Target fragment ~ 350 bp 
+- Sequencing on an Illumina MiSeq
+
+]
+---
+name: Exp design3
+- Metabarcoding of eDNA targetting Fishes with 16S
+- *Choosing Transects with / without established Thermocline*
+
+
+&lt;img src="images/plots.for.choosing.png" width="65%" height="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+name: Exp design4
+- Metabarcoding of eDNA targetting Fishes with 16S
+- *Choosing Transects with / without established Thermocline*
+
+
+&lt;img src="images/choosen2.png" width="65%" height="75%" style="display: block; margin: auto;" /&gt;
+
+---
+name: Exp design5
+
+- Metabarcoding of eDNA targetting Fishes with 16S
+- Choosing Transects
+- *Statistical framework*
 
 .pull-left[
-1. Start with a boilerplate HTML file;
+Community analysis:
 
-1. Plain Markdown;
-
-1. Write JavaScript to autoplay slides;
-
-1. Manually configure MathJax;
-
-1. Highlight code with `*`;
-
-1. Edit Markdown source and refresh browser to see updated slides;
 ]
 
 .pull-right[
@@ -418,8 +487,10 @@ library(leaflet)
 leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
 ```
 
-<div id="htmlwidget-83d55c372dc84e04c011" style="width:100%;height:432px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-83d55c372dc84e04c011">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
+```{=html}
+&lt;div id="htmlwidget-cff8c122bd4ab4107b26" style="width:100%;height:432px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-cff8c122bd4ab4107b26"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
 
 ---
 
@@ -431,8 +502,10 @@ DT::datatable(
 )
 ```
 
-<div id="htmlwidget-5dd651aa2eca90a462ce" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5dd651aa2eca90a462ce">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+```{=html}
+&lt;div id="htmlwidget-68a8b9d2c3a4f753b308" style="width:100%;height:auto;" class="datatables html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-68a8b9d2c3a4f753b308"&gt;{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"&lt;table class=\"display\"&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt; &lt;\/th&gt;\n      &lt;th&gt;Sepal.Length&lt;\/th&gt;\n      &lt;th&gt;Sepal.Width&lt;\/th&gt;\n      &lt;th&gt;Petal.Length&lt;\/th&gt;\n      &lt;th&gt;Petal.Width&lt;\/th&gt;\n      &lt;th&gt;Species&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+```
 
 ---
 
@@ -755,18 +828,16 @@ names(xaringan:::list_css())
 ```
 ##  [1] "chocolate-fonts"  "chocolate"        "default-fonts"   
 ##  [4] "default"          "duke-blue"        "fc-fonts"        
-##  [7] "fc"               "glasgow_template" "hygge-duke"      
-## [10] "hygge"            "ki-fonts"         "ki"              
-## [13] "kunoichi"         "lucy-fonts"       "lucy"            
-## [16] "metropolis-fonts" "metropolis"       "middlebury-fonts"
-## [19] "middlebury"       "nhsr-fonts"       "nhsr"            
-## [22] "ninjutsu"         "rladies-fonts"    "rladies"         
-## [25] "robot-fonts"      "robot"            "rutgers-fonts"   
-## [28] "rutgers"          "shinobi"          "tamu-fonts"      
-## [31] "tamu"             "uio-fonts"        "uio"             
-## [34] "uo-fonts"         "uo"               "uol-fonts"       
-## [37] "uol"              "useR-fonts"       "useR"            
-## [40] "uwm-fonts"        "uwm"
+##  [7] "fc"               "hygge-duke"       "hygge"           
+## [10] "ki-fonts"         "ki"               "kunoichi"        
+## [13] "lucy-fonts"       "lucy"             "metropolis-fonts"
+## [16] "metropolis"       "middlebury-fonts" "middlebury"      
+## [19] "ninjutsu"         "rladies-fonts"    "rladies"         
+## [22] "robot-fonts"      "robot"            "rutgers-fonts"   
+## [25] "rutgers"          "shinobi"          "tamu-fonts"      
+## [28] "tamu"             "uo-fonts"         "uo"              
+## [31] "uol-fonts"        "uol"              "useR-fonts"      
+## [34] "useR"
 ```
 
 ---

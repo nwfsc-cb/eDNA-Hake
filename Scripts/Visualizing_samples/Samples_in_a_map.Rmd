@@ -33,7 +33,7 @@ Run7 <- read_csv(here("Data/Pipeline_output/Run7/output_no_MaxEE/ASV_table.csv")
 
 Run8 <- read_csv(here("Data/Pipeline_output/Run8/output/ASV_table.csv"))
 
-classified.hashes <- read_csv(here("Data/Pipeline_output/Run7/output_no_MaxEE/All.hash.classified.csv"))
+classified.hashes <- read_csv(here("Output/All.hash.classified.csv"))
 ```
 
 Now get the map
@@ -140,8 +140,8 @@ b = marmap::getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
 
 b <- fortify(b)
 
-b %>% write_csv("temp.csv")
-sf::read_sf("temp.csv",  options=c("X_POSSIBLE_NAMES=x","Y_POSSIBLE_NAMES=y")) -> b
+b %>% write_csv(here("Data","bathymetry.csv"))
+sf::read_sf(here("Data","bathymetry.csv"),  options=c("X_POSSIBLE_NAMES=x","Y_POSSIBLE_NAMES=y")) -> b
 
 sf::read_sf(here("Data", "eDNA.samples.with.lat.lon.csv"),
             options = c("X_POSSIBLE_NAMES=lon","Y_POSSIBLE_NAMES=lat")) -> metadata

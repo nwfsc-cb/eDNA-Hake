@@ -26,6 +26,7 @@ library (tidyverse)
 library(here)
 library(eDNAfuns)
 library(vegan)
+library(ggforce)
 library (patchwork)
 ```
 
@@ -195,6 +196,7 @@ read_rds(here("Data/Hake_map_transects.rds")) +
    
    
 ```
+
 ```{r}
 ready.for.map %>% ungroup() %>% 
                 filter (str_detect(taxa, "Engraulis mordax")) %>% 
@@ -343,7 +345,7 @@ mutate (Openness = fct_reorder(Openness, -lon),
           Transect = as.character(Transect)) %>% 
   mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
   ggplot() +
- 
+  
   geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
   geom_line (aes(x = -lon, y = Thermocline_depth), color = "green") + 
   
@@ -354,9 +356,14 @@ mutate (Openness = fct_reorder(Openness, -lon),
   theme(panel.background = element_rect(fill = "lightblue")) +
   # scale_y_reverse()+
   # scale_y_continuous(trans = trans_reverser('log10')) +
-  scale_y_continuous(trans= trans_reverser('log10')) +
+ scale_y_continuous(trans= trans_reverser('log2')) +
+  scale_x_reverse()+
   scale_color_brewer(type = "div", palette = 5,direction = -1) +
-  labs (y = "Depth", x= "longitude", color = "Selected") 
+  labs (y = "Depth", x= "Longitude", color = "Selected") +
+  guides(color = "none")
+
+ggsave(here("Plots and Figures", "depth.samples.selected.png"))
+
 ```
 
 ```{r}

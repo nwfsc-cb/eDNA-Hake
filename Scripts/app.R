@@ -8,7 +8,7 @@ library(shinycssloaders)
 library(gifski)
 library(here)
 
-map.new.samples <-  read_rds(here("Figures", "base.map.rds"))
+map.new.samples <-  read_rds(here("Data", "base_plot_eDNA.rds"))
 
 Ab.table       <- read_csv(here("Data", "Abundance_table_BLAST.csv"))
 
