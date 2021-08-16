@@ -234,8 +234,10 @@ By.taxa.dataset.metadata %>%
    left_join(Step2) -> Joined.dataset
   
 Joined.dataset %>% 
-ungroup() %>%
-  # group_by(Transect) %>% 
+ filter (!str_detect(taxon, "Cichlidae")) %>%
+  filter(!str_detect(eDNA.sample, "978")) %>% 
+# ungroup() %>%
+  group_by(Transect) %>%
   nest() %>% 
   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
           jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
@@ -267,12 +269,17 @@ ungroup() %>%
 ```
 ```{r, message= F, warning=F}
 First.analysis %>% 
-  select(mds.points) %>% 
+  select(Transect, mds.points) %>% 
   unnest() %>% 
   ggplot(aes(x = MDS1, y = MDS2)) +
-  geom_point(aes(color = position)) +
-  geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = #glue::glue(Station, depth, .sep = "-")
-                                               eDNA.sample))
+  
+  # geom_label(aes(x = MDS1, y = MDS2, label = #glue::glue(Station, depth, .sep = "-")
+  #                                              position)) +
+  geom_point(aes(color = position, shape = groups)) +
+  facet_wrap(~Transect, nrow =2) +
+  theme_linedraw() +
+  scale_color_brewer( palette = "Dark2")
+ggsave(here("Presentations", "images", "MDS.plot.png"), width = 9)
 ```
 ## Same disticntiviness by PA
 

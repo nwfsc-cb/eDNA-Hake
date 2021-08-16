@@ -57,13 +57,13 @@ a, a > code {
 }
 .center-column {
   display: inline-block; 
-  width: 37%;
+  width: 35%;
   padding-top: 1em;
   padding-left: 1em;
 }
 .rightmost-column {
   color: #777;
-  width: 28%;
+  width: 35%;
   height: 92%;
   float: right;
   padding-top: 1em;
@@ -135,3 +135,14 @@ th, td { padding: 5px; }
 }
 .bold { font-weight: bold; }
 .yellow { color: yellow; }
+/*Adding vertical justification (centered )*/
+.center-left {
+  position:          relative;
+  top:               50%;
+  transform:         translateY(50%);
+}
+.center-right {
+  position:          relative;
+  top:               50%;
+  transform:         translateY(30%);
+}

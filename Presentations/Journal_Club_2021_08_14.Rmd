@@ -118,10 +118,12 @@ knitr::include_graphics("images/eDNA_concept.png")
 ### .fancy[ *Coastal Upwelling*]
 
 .left-column[
+
+- Prevailing winds displace surface waters
+
 - Deep water comes to surface
-- Driven by prevailing winds
-- Brings up nutrient rich, low oxygen water
-]
+- Brings up nutrient rich, low oxygen water]
+
 .right-column[
 ```{r,echo=F, out.width='80%', fig.align='center'}
 knitr::include_graphics("images/coast_upwelling.png")
@@ -139,35 +141,7 @@ class: nord-dark, center, middle
 
 ### Integrated ecosystem acoustic and trawl survey
 
----
-name: Hake survey 1
-class: nord-light, highlight-last-item
 
-
-# *Hake survey*
-
-.right-column[
-```{r,echo=F, out.width='80%', out.height = '60%',fig.align='center'}
-knitr::include_graphics("images/station.plot.png")
-```
-
-]
-
-.left-column[
-- Run every two years
-
-
-
-- Covers onshore/offshore transects
-
-
-
-- Estimates Hake abundance, age classes, maturity
-
-
-
-- In 2019 started an eDNA program
-]
 ---
 name: Hake
 class: nord-dark
@@ -200,19 +174,68 @@ background-size: 50% 50%
 
 
 ---
-name: eDNA sampling
-class: nord-light, middle
+
+name: Hake survey 1
+class: nord-light
+background-image: url(images/station.plot.png)
+background-position: 0% 0%
+background-size: 30% 100%
+
+# .right[*Hake survey*]
 
 
-# eDNA Component
-
-.pull-left[
-```{r,echo=F,  out.width = '75%',fig.align='center'}
-knitr::include_graphics("images/station.plot.png")
-```
-]
 
 .pull-right[
+.center-right[
+- Run every two years
+
+- Covers onshore/offshore transects
+
+- Estimates Hake abundance, age classes, maturity
+
+- Uses acoustic signal  + trawl
+
+- In 2019 started an eDNA program
+
+- Sampling spans ~ 2 months
+]]
+---
+name: Acoustivs
+class: nord-light
+background-image: url(images/station.plot.png)
+background-position: 0% 0%
+background-size: 30% 100%
+
+## .right[*Acoustics Component*]
+
+
+.pull-right[
+
+- Distinct backscatter pattern
+
+- Fish ID corroborated with trawls
+
+- Stock biomass
+
+- Age-class & maturity information
+
+```{r,echo=F,  out.width = '100%',fig.align='center'}
+knitr::include_graphics("images/Hake_scatter.jpg")
+```
+
+
+]
+---
+name: eDNA sampling
+class: nord-light
+background-image: url(images/station.plot.png)
+background-position: 0% 0%
+background-size: 25% 100%
+
+# .right[*eDNA Component*]
+
+.leftmost-column[]
+.center-column[
 
 - 1930 eDNA samples 
 
@@ -221,7 +244,9 @@ knitr::include_graphics("images/station.plot.png")
 - ~ 6 stops per transect
 
 - ~ 5 depths per stop
+]
 
+.rightmost-column[
 - 2 Niskins bottles per depth (2.5L per Niskin = 1 eDNA sample)
 
 - \>350 samples from Flow-through system
@@ -229,12 +254,17 @@ knitr::include_graphics("images/station.plot.png")
 - All working from sunset to sunrise
 
 ]
+```{r,echo=F,  out.width = '70%',fig.align='right'}
+knitr::include_graphics("images/filter_crew2.png")
+```
 
 ---
 name: eDNA sampling
 class: nord-light
-
-# Where do we sample?
+background-image: url(images/depth.profile.png)
+background-position: 50% 80%
+background-size: contain
+## *Where do we sample?*
 
 
 - Near the surface
@@ -244,9 +274,6 @@ class: nord-light
 - So in some stations surface-midwater-near bottom
 - in others quite far from there
 
-```{r,echo=F,  out.width = '75%',fig.align='center'}
-knitr::include_graphics("images/depth.profile.png")
-```
 
 
 
@@ -255,14 +282,14 @@ name: Where is the eDNA coming
 class: nord-dark, center, middle
 
 
-# .huge[*But where does the eDNA come from?*]
+# .huge[*But where is this eDNA coming from?*]
 
 
 ---
 class: inverse, middle, center
 class: nord-light
 
-# Where does the eDNA come from
+## Where is eDNA coming from
 
  Two interconnected questions:
 
@@ -272,6 +299,18 @@ class: nord-light
 </br>
 - .huge[*Does an established Thermocline function as a barrier for eDNA flow?* ]
 
+--
+
+.pull-left[
+```{r,echo=F,  out.width = '85%',fig.align='center'}
+knitr::include_graphics("images/coast_upwelling.png")
+```
+]
+.pull-right[
+```{r,echo=F,  out.width = '100%',fig.align='center'}
+knitr::include_graphics("images/CTD.plot.png")
+```
+]
 ---
 
 name: Experimental design
@@ -319,74 +358,120 @@ name: Exp design4
 knitr::include_graphics("images/choosen2.png")
 ```
 
+
+---
+
+name: Exp design4.5
+- Metabarcoding of eDNA targetting Fishes with 16S
+- Choosing Transects with / without established Thermocline
+- *Decontamination, denoising and taxonomical assignment*
+    - cutadapt -> DADA2 -> Decontamination script -> insect 
+
+
 ---
 name: Exp design5
 
 - Metabarcoding of eDNA targetting Fishes with 16S
 - Choosing Transects
+- Decontamination, denoising and taxonomical assignment
 - *Statistical framework*
+ 
+ </br>
 
-.pull-left[
-Community analysis:
+   - _Community analysis_:
 
+$$\bar{Comm}\sim Transect + Depth + Upwelling$$
+--
+
+   - _Individual species analysis_:
+ 
+$$\bar{X}_i \sim Transect + Depth + Upwelling$$ 
+
+
+
+---
+
+name: Results
+layout: false
+class: nord-dark, middle
+
+# .huge[*Results*]
+
+---
+
+name: Results
+layout: true
+class: nord-light
+
+# Results
+
+---
+### The numbers
+
+- We sequenced 115 biological samples, 215 technical replicates
+
+--
+- After QC and taxonomical assignment: 16M reads from 138 taxa
+
+--
+- 
+
+---
+```{r, echo = F, message = F, warning=F}
+library(DT)
+library(tidyverse)
+library(here)
+library(kableExtra)
+
+By.taxa.dataset <-  read_csv(here("Data", "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+metadata  <- read_csv(here("Data", "Final_metadata.csv"))
+
+#### Join it together through eDNA sample
+
+By.taxa.dataset %>% 
+  filter (!str_detect(taxa, "Cichlidae")) %>%
+  select(eDNA.sample, rep, taxa, nReads) %>% 
+  left_join(metadata) -> Joined.dataset
+
+By.taxa.dataset %>% 
+  filter (!str_detect(taxa, "Cichlidae")) %>% 
+  group_by(taxa) %>% 
+  summarise (`#Sequences` = sum(nReads),
+             `#samples found` = n_distinct(eDNA.sample)) %>%
+  arrange((taxa)) %>% 
+  separate(taxa, into = c("Family", NA, "Species"), sep = "%")  %>% 
+DT::datatable(class = "compact", rownames = F, 
+             # extensions = "Buttons",
+             options = list(dom = 'fpt',
+                            pagelenght = 8)) 
+# kable(align = "c", format = "html") %>%
+# kable_styling(full_width = F) %>%
+# column_spec(1, bold = T) %>%
+# collapse_rows(columns = 1, valign = "top")
+```
+
+
+---
+
+.left-column[
+## Alpha diversity
 ]
 
-.pull-right[
-1. Start with an R Markdown document;
-
-1. R Markdown (can embed R/other code chunks);
-
-1. Provide an option `autoplay`;
-
-1. MathJax just works;<sup>*</sup>
-
-1. Highlight code with `{{}}`;
-
-1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
+.right-column[
+```{r alpha, echo = F, warning=F, message=F}
+Joined.dataset %>% 
+  group_by(eDNA.sample, Transect, Station, depth,position, groups) %>% 
+  summarise(n.taxa = n_distinct(taxa)) %>% 
+  ggplot(aes(y = n.taxa, x = position, fill = groups)) +
+  geom_boxplot()
+```
 ]
 
-.footnote[[*] Not really. See next page.]
-
 ---
 
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# R Code
-
-```{r comment='#'}
-# a boring regression
-fit = lm(dist ~ 1 + speed, data = cars)
-coef(summary(fit))
-dojutsu = c('地爆天星', '天照', '加具土命', '神威', '須佐能乎', '無限月読')
-grep('天', dojutsu, value = TRUE)
-```
-
----
-
-# R Plots
-
-```{r cars, fig.height=4, dev='svg'}
-par(mar = c(4, 4, 1, .1))
-plot(cars, pch = 19, col = 'darkgray', las = 1)
-abline(fit, lwd = 2)
+## Community Composition Analysis
+```{r,echo=F,  out.width = '90%',  fig.align='center'}
+knitr::include_graphics("images/MDS.plot.png")
 ```
 
 ---

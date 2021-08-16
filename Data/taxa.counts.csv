@@ -1,0 +1,141 @@
+taxa,nReads,npoints
+Agonidae%Chesnonia%Chesnonia verrucosa,319,1
+Agonidae%NA%NA,1360,1
+Alopiidae%Isurus%Isurus oxyrinchus,1089,4
+Alopiidae%Lamna%Lamna ditropis,22409,6
+Anarhichadidae%Anarrhichthys%Anarrhichthys ocellatus,33082,3
+Anarhichadidae%NA%NA,541,1
+Anoplopomatidae%Anoplopoma%Anoplopoma fimbria,83984,6
+Anoplopomatidae%NA%NA,28113,4
+Atherinopsidae%NA%NA,20,1
+Bathylagidae%Bathylagus%Bathylagus stilbius,74913,2
+Bathylagidae%Lipolagus%Lipolagus ochotensis,48936,2
+Bathylagidae%NA%NA,184301,6
+Bathymasteridae%Ronquilus%Ronquilus jordani,164,1
+Belonidae%Cololabis%Cololabis saira,59269,12
+Belonidae%NA%NA,1415,3
+Carangidae%NA%NA,28353,16
+Carangidae%Trachurus%NA,141857,24
+Carangidae%Trachurus%Trachurus symmetricus,2113546,44
+Carcharhinidae%NA%NA,3078,2
+Carcharhinidae%Prionace%Prionace glauca,55001,8
+Centrolophidae%Icichthys%Icichthys lockingtoni,19365,8
+Centrolophidae%NA%NA,2248,5
+Chimaeridae%Hydrolagus%Hydrolagus colliei,21964,8
+Chimaeridae%NA%NA,540,1
+Cichlidae%NA%NA,34685,5
+Cichlidae%Oreochromis%Oreochromis niloticus x Oreochromis aureus,177156,8
+Clupeidae%Alosa%Alosa fallax,4541,3
+Clupeidae%Alosa%NA,805,2
+Clupeidae%Clupea%Clupea pallasii,1196151,29
+Clupeidae%Clupea%NA,1399,1
+Clupeidae%Sardinops%NA,36133,12
+Clupeidae%Sardinops%Sardinops sagax,332681,19
+Cottidae%Artedius%Artedius fenestralis|lateralis,2267,3
+Cottidae%Artedius%Artedius harringtoni,4471,1
+Cottidae%Artedius%NA,52,1
+Cottidae%Chitonotus%Chitonotus pugetensis,1378,2
+Cottidae%Leptocottus%Leptocottus armatus,25143,2
+Cottidae%NA%NA,96484,10
+Cryptacanthodidae%Cryptacanthodes%Cryptacanthodes giganteus,10015,2
+Embiotocidae%Embiotoca%Embiotoca jacksoni|lateralis,101,1
+Embiotocidae%NA%NA,1870,1
+Embiotocidae%Rhacochilus%Rhacochilus vacca,507,1
+Embiotocidae%Zalembius%Zalembius rosaceus,6737,1
+Engraulidae%Engraulis%Engraulis mordax,192102,17
+Engraulidae%NA%NA,150995,17
+Gadidae%Microgadus%Microgadus proximus,106325,6
+Gadidae%Microgadus%NA,1987,1
+Gonostomatidae%Cyclothone%NA,204,1
+Hexagrammidae%Hexagrammos%Hexagrammos decagrammus,11402,2
+Hexagrammidae%Ophiodon%Ophiodon elongatus,132675,6
+Jordaniidae%Jordania%Jordania zonope,360,1
+Liparidae%Liparis%Liparis florae,1552,1
+Liparidae%Liparis%Liparis fucensis|callyodon,431,1
+Liparidae%Liparis%Liparis pulchellus,2850,2
+Liparidae%Liparis%NA,586,1
+Liparidae%NA%NA,168,1
+Merlucciidae%Merluccius%Merluccius angustimanus|productus,6599,1
+Merlucciidae%Merluccius%Merluccius productus,2179647,47
+Merlucciidae%Merluccius%NA,388737,34
+Microstomatidae%NA%NA,156759,2
+Microstomatidae%Nansenia%Nansenia candida,236544,8
+Molidae%Mola%Mola mola,4607,3
+Molidae%NA%NA,4679,2
+Myctophidae%Diaphus%Diaphus theta,290274,18
+Myctophidae%Diaphus%NA,148167,8
+Myctophidae%NA%NA,86103,14
+Myctophidae%Nannobrachium%Nannobrachium regale,90059,1
+Myctophidae%Stenobrachius%NA,174608,11
+Myctophidae%Stenobrachius%Stenobrachius leucopsarus,396011,15
+Osmeridae%Allosmerus%Allosmerus elongatus,11887,2
+Osmeridae%Hypomesus%Hypomesus pretiosus,32788,4
+Osmeridae%NA%NA,42792,9
+Osmeridae%Spirinchus%Spirinchus starksi,1364,2
+Osmeridae%Thaleichthys%Thaleichthys pacificus,12624,5
+Paralepididae%Lestidiops%Lestidiops ringens,21113,1
+Paralepididae%Magnisudis%Magnisudis atlantica,27705,2
+Paralepididae%Magnisudis%NA,1101,1
+Paralepididae%NA%NA,9981,1
+Paralichthyidae%Citharichthys%Citharichthys stigmaeus,68404,11
+Paralichthyidae%Citharichthys%Citharichthys xanthostigma|sordidus,1029251,31
+Paralichthyidae%Citharichthys%NA,276994,33
+Paralichthyidae%NA%NA,3447,7
+Pholidae%Pholis%NA,319,1
+Pholidae%Pholis%Pholis laeta,4487,2
+Platytroctidae%Sagamichthys%Sagamichthys abei,6953,1
+Pleuronectidae%Atheresthes%Atheresthes evermanni|stomias,29523,1
+Pleuronectidae%Atheresthes%NA,3382,1
+Pleuronectidae%Eopsetta%Eopsetta jordani,79520,6
+Pleuronectidae%Glyptocephalus%Glyptocephalus zachirus,15318,6
+Pleuronectidae%Isopsetta%Isopsetta isolepis,190259,7
+Pleuronectidae%Lyopsetta%Lyopsetta exilis,107769,7
+Pleuronectidae%Microstomus%Microstomus pacificus,42019,6
+Pleuronectidae%NA%NA,836145,24
+Pleuronectidae%Parophrys%Parophrys vetulus,16343,1
+Pleuronectidae%Pleuronichthys%Pleuronichthys decurrens,353,1
+Pleuronectidae%Psettichthys%Psettichthys melanostictus,6164,3
+Rajidae%Raja%NA,26777,10
+Rajidae%Raja%Raja binoculata,146316,13
+Rajidae%Raja%Raja inornata,33741,2
+Rajidae%Raja%Raja rhina,103425,10
+Salmonidae%NA%NA,677230,11
+Salmonidae%Oncorhynchus%NA,144852,14
+Salmonidae%Oncorhynchus%Oncorhynchus keta,97223,4
+Salmonidae%Oncorhynchus%Oncorhynchus kisutch,187,2
+Salmonidae%Oncorhynchus%Oncorhynchus tshawytscha,409754,11
+Salmonidae%Salvelinus%NA,158,1
+Salmonidae%Salvelinus%Salvelinus environmental|leucomaenis|fontinalis,2257,1
+Sciaenidae%Genyonemus%Genyonemus lineatus,11028,1
+Scombridae%NA%NA,32921,5
+Scombridae%Scomber%Scomber japonicus,196735,12
+Scombridae%Thunnus%Thunnus alalunga|obesus,315339,7
+Scyliorhinidae%Apristurus%Apristurus brunneus,299,1
+Sebastidae%NA%NA,16311,12
+Sebastidae%Sebastes%NA,86084,18
+Sebastidae%Sebastes%Sebastes aleutianus|melanostictus,2629,1
+Sebastidae%Sebastes%Sebastes aurora|chlorostictus|ensifer|eos|exsul|helvomaculatus|nigrocinctus|notius|rosenblatti|rufus|simulator|spinorbis,17894,2
+Sebastidae%Sebastes%Sebastes chrysomelas|caurinus|maliger,44477,5
+Sebastidae%Sebastes%Sebastes cortezi|melanosema|sinensis|diploproa,257012,3
+Sebastidae%Sebastes%Sebastes elongatus,22472,5
+Sebastidae%Sebastes%Sebastes ensifer,174,1
+Sebastidae%Sebastes%Sebastes entomelas,26652,3
+Sebastidae%Sebastes%Sebastes entomelas|mystinus,59341,9
+Sebastidae%Sebastes%Sebastes jordani,68175,7
+Sebastidae%Sebastes%Sebastes miniatus,2006,1
+Sebastidae%Sebastes%Sebastes pinniger,44,1
+Sebastidae%Sebastes%Sebastes polyspinis|variabilis|ciliatus|crameri,10278,1
+Sebastidae%Sebastes%Sebastes saxicola,19656,1
+Sebastidae%Sebastes%Sebastes sp. NA|flavidus|melanops|serranoides,111642,14
+Sebastidae%Sebastes%Sebastes sp. UW150000|glaucus|matsubarae|vulpes|aleutianus|trivittatus|borealis|proriger|diploproa,3014,3
+Sebastidae%Sebastes%Sebastes sp. UW150443|emphaeus|variegatus|wilsoni|zacentrus,341076,13
+Sebastidae%Sebastolobus%Sebastolobus altivelis,839,1
+Squalidae%Squalus%Squalus acanthias,130597,13
+Stichaeidae%Poroclinus%Poroclinus rothrocki,1715,1
+Stomiidae%Tactostoma%Tactostoma macropus,94218,3
+Zaniolepididae%Zaniolepis%NA,1569,2
+Zaniolepididae%Zaniolepis%Zaniolepis latipinnis,2599,1
+Zoarcidae%Lycodapus%Lycodapus mandibularis,5702,1
+Zoarcidae%Lycodes%Lycodes cortezianus,28969,1
+Zoarcidae%Lycodes%Lycodes diapterus,5329,1
+Zoarcidae%NA%NA,343251,7
