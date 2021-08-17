@@ -90,7 +90,7 @@ knitr::include_graphics("images/RGS.jpg")
 ### .fancy[*environmental DNA*]
 
 
-
+--
 ```{r,echo=F, out.width='50%', fig.align='center'}
 knitr::include_graphics("images/messages_0.jpeg")
 ```
@@ -144,7 +144,7 @@ class: nord-dark, center, middle
 
 ---
 name: Hake
-class: nord-dark
+class: nord-light
 background-image: url(images/900x600-pacific-whiting-noaa.jpeg)
 background-position: right
 background-size: 50% 50%
@@ -534,8 +534,7 @@ $$Bray-Curtis\sim Transect + Depth + Upwelling$$
 
 
 ```{r, echo = F, warning=F,message=F}
-read_rds(here("Output", "Permanova.rds")) %>% pull(PERMANOVA) %>% map(broom::tidy) -> permanova
-permanova[[1]] %>%
+read_csv(here("Output", "permanova.csv")) %>%
   datatable(rownames = F,
             class = "display",
             options = list(info= F, filter =F, paging = F, ordering = F)) %>% 
@@ -557,12 +556,72 @@ $$\bar{Comm}\sim Transect + Depth + Upwelling$$
 
 is not constrained to one value per sample pair, but a matrix of proportions
 
+```{r, echo=F, message=FALSE}
+tibble(Sample = c("S1", "S2", "...", "Sn"),
+       Spp1   = c(50, 4000, 0, 0),
+       Spp2   = c(300, 250, 0, 400),
+       Spp3  = c(0,0, 0,0),
+       Sppn   = c(5000, 300, 0,350)) %>% 
+  rename(`Spp...` = 4) -> abundance.tibble
+
+abundance.tibble %>% mutate(Spp... = "-") %>% 
+
+
+datatable(rownames = F,
+            class = "display",
+            options = list(info= F, filter =F, paging = F, ordering = F, 
+                           columnDefs = list(list(className = 'dt-center', targets = 0:4))))
+```
+---
+
+## Community Analysis - Another way
+
+  - Our hypothesis can better be tested using a Dirichlet Regression:
+  
+  so our Community in the original
+  
+$$\bar{Comm}\sim Transect + Depth + Upwelling$$ 
+
+is not constrained to one value per sample pair, but a matrix of proportions
+
+```{r, echo =  F, message=F}
+rowSums(abundance.tibble[,2:5]) -> rwosums
+
+abundance.tibble %>%
+  mutate(across(.cols = starts_with("Spp"),~.x/rwosums)) %>% 
+  mutate(across(.cols = starts_with("Spp"),~case_when(.x == NaN~0,TRUE~.x))) %>% 
+  mutate(Spp... = "-") -> temp
+
+temp[3,c(2,3,5)]<- 0
+
+
+datatable(temp,rownames = F,
+            class = "display",
+            options = list(info= F, filter =F, paging = F, ordering = F, 
+                           columnDefs = list(list(className = 'dt-center', targets = 0:4)))) %>% 
+  DT::formatRound(columns = c(2,3,5))
+```
+
 ---
 
 ## Community Analysis - Another way
 
   - Dirichilet does not bode well with many zeroes
   - Combining taxa into functional categories
+```{r, echo = F, message=FALSE}
+read_csv(here("Data", "unique.sp_collapse.csv")) %>% 
+  rename (Group = 13) %>% 
+  group_by(Group) %>% 
+  summarise('Number of taxa' = n(),
+             'Number of families' = n_distinct(family)) %>% 
+  filter(!is.na(Group)) %>% 
+  slice(1:8) %>% 
+  datatable(rownames = F,
+            class = "display",
+            options = list(info= F, filter =F, paging = F, ordering = F, 
+                           columnDefs = list(list(className = 'dt-center', targets = 0:2))))
+
+```
   
 --
 

@@ -1,0 +1,90 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library (tidyverse)
+
+Index1 <- read_table2("Data/Nano_run/Index1.txt")
+
+Index2 <- read_table2("Data/Nano_run/Index2.txt")
+
+Sample.sheet <- read_csv("Data/Nano_run/SampleSheet_2021-04-21.csv", skip = 22)
+
+```
+
+
+```{r}
+
+Index1 %>% bind_rows(Index2, .id = "Index") %>% 
+  group_by(Index) %>% 
+  summarise(sum(Hits))
+
+
+??dist.dna
+
+library(ape)
+
+ape::dist.dna(insect::char2dna(Index1$Sequence), model = "N", as.matrix = T) -> distances
+
+distances[!lower.tri(distances)] <- NA
+
+colnames(distances)<- Index1$Sequence
+ 
+rownames(distances)<- Index1$Sequence
+
+distances %>% 
+  as_tibble(rownames = "var1") %>% 
+  pivot_longer(-var1, names_to = "var2", values_to = "Mismatches") %>% 
+  drop_na() %>% 
+  filter (Mismatches <= 2) %>% 
+  left_join(Sample.sheet %>% 
+              select(Sample_ID, I7_Index_ID, var2 = index )) %>% 
+  left_join(Index1 %>% select(var1 = Sequence, Hits)) %>% 
+  group_by(I7_Index_ID) %>% 
+  summarise (n_variants = n_distinct(var1),
+             n_reads = sum(Hits))
+  
+
+```
+
+And now Index2
+```{r}
+ape::dist.dna(insect::char2dna(Index2$Sequence), model = "N", as.matrix = T) -> distances
+
+distances[!lower.tri(distances)] <- NA
+
+colnames(distances)<- Index2$Sequence
+ 
+rownames(distances)<- Index2$Sequence
+
+distances %>% 
+  as_tibble(rownames = "var1") %>% 
+  pivot_longer(-var1, names_to = "var2", values_to = "Mismatches") %>% 
+  drop_na() %>% 
+  filter (Mismatches == 1) %>% 
+  left_join(Sample.sheet %>% 
+              select(Sample_ID, I5_Index_ID, var2 = index2 )) %>% 
+  left_join(Index2 %>% select(var1 = Sequence, Hits)) %>% 
+  group_by(I5_Index_ID) %>% 
+  summarise (n_variants = n_distinct(var1),
+             n_reads = sum(Hits))
+
+
+# Dissimilaries with Wierd
+
+distances %>% 
+  as_tibble(rownames = "var1") %>% 
+  pivot_longer(-var1, names_to = "var2", values_to = "Mismatches") %>% 
+  drop_na() %>% 
+  filter (var2 == "TCTTTCCCTA") %>% 
+  left_join(Sample.sheet %>%  select (I5_Index_ID, var1 = index2)) %>% 
+  ggplot (aes (x = I5_Index_ID, y = Mismatches)) +
+  geom_point()
+```
+
