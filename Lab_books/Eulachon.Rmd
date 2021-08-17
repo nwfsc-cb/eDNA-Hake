@@ -113,15 +113,26 @@ thermoclines2 %>%
 #### Add bottom depth
 
 ```{r}
+# read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
+#   mutate(bottom.depth.consensus = case_when(station == "60-1" ~ bathy.bottom.depth,
+#                                             TRUE              ~ bottom.depth.consensus)) %>% 
+#   write_csv(here("Data", "Water_depth_consensus.csv"))
+
 Ole.depth <- read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
-  
-  # separate(station, into= c("Transect", "position"), sep = "-") %>% 
+
+# separate(station, into= c("Transect", "position"), sep = "-") %>% 
    select(Station = station , bottom.depth.consensus)
 ```
  Get a final metadata
+```{r}
+ read_csv(here ("Data", "Water_depth_consensus.csv")) %>% 
+  filter (!str_detect(station,"zP"), ! station %in% c("7", "9"), !transect %in% c("HA", "VN", "NH", "Mo")) %>% 
+  
+  select(Station = station , bottom.depth.consensus) -> Ole.depth
+```
  
 ```{r}
-Samples_Eulachon_with_Thermocline <- read_csv(here("Data", "Samples_Eulachon_with_Thermocline.csv"))
+Samples_Eulachon_with_Thermocline <- read_csv(here("Data", "Samples_with_Thermocline.csv"))
 
 left_join(Samples_Eulachon_with_Thermocline, Ole.depth) -> Sample.info
 ```
@@ -130,7 +141,7 @@ left_join(Samples_Eulachon_with_Thermocline, Ole.depth) -> Sample.info
 
   
 Sample.info %>%
-  #separate()
+  separate(Station, into = c("Transect", "stop"), remove = F) %>% 
   # semi_join(By.taxa.dataset.metadata , by = c("Transect", "position" = "stop")) %>% 
    group_by(Transect) %>% 
   mutate (center.point = mean(c(max(lon),min(lon))), 
@@ -143,7 +154,7 @@ Sample.info %>%
  ### Reduce 
 ```{r}
 Sample.info %>% 
-  distinct(Station, Openness) %>% 
+  distinct(Station, Openness, depth) %>% 
   group_by(Transect, Openness) %>% 
   slice(1) -> Stations.to.keep
 
@@ -187,12 +198,12 @@ Step2 %>%
   
    geom_point (aes(y = depth, x = -lon, color = (Openness != "Transition"))) +
   geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
-  facet_wrap(~fct_relevel(Transect,'77','73','71','69'), ncol = 1, scale = "free_x") +
+  facet_wrap(~fct_relevel(Transect,'81','77','67','60', '53', "39", "35", "26"), ncol = 1, scale = "free_x") +
   theme_minimal() +
   theme(panel.background = element_rect(fill = "lightblue")) +
-  # scale_y_reverse(limits = c(500,0))+
+   scale_x_reverse()+
   # scale_y_continuous(trans = trans_reverser('log10')) +
-  scale_y_continuous(trans= trans_reverser('log10')) +
+  scale_y_continuous(trans= ggforce::trans_reverser('log10')) +
   scale_color_brewer(type = "div", palette = 5,direction = -1) +
   labs (y = "Depth", x= "longitude", color = "Selected") -> right
 right     

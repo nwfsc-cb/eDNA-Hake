@@ -236,8 +236,8 @@ By.taxa.dataset.metadata %>%
 Joined.dataset %>% 
  filter (!str_detect(taxon, "Cichlidae")) %>%
   filter(!str_detect(eDNA.sample, "978")) %>% 
-# ungroup() %>%
-  group_by(Transect) %>%
+  ungroup() %>%
+  # group_by(Transect) %>%
   nest() %>% 
   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
           jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
@@ -251,7 +251,7 @@ Joined.dataset %>%
              geom_point(aes(x = MDS1, y = MDS2, color = Station))
          }),
          
-         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) }),
+         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~ as.factor(Transect) +  position + groups,data = .y, permutations = 9999) }),
          CAP_lat = map2(bc, env, function(.x,.y ){
            
            capscale(.x~lat,data = .y)
@@ -430,7 +430,13 @@ taxa.plotter <- function (df, taxa){
 
 ```{r, warning=F, message=F}
 for.explanatory.plots %>% 
-  taxa.plotter("Merluccius")
+  taxa.plotter("Raja") & guides (fill  = "none") -> raja
+
+for.explanatory.plots %>% 
+  taxa.plotter("Stenobrachius") & guides (fill  = "none") -> stenobrachius
+
+for.explanatory.plots %>% 
+  taxa.plotter("Clupea") & guides (fill  = "none") -> Clupea
 ```
 
 Head to head plots
@@ -509,7 +515,7 @@ Second.analysis %>%
   
 ```
 ```{r}
-First.analysis %>% pull(PERMANOVA)
+First.analysis %>% pull(PERMANOVA) %>% map(broom::tidy)
 Second.analysis %>% pull(PERMANOVA)
 ```
 
