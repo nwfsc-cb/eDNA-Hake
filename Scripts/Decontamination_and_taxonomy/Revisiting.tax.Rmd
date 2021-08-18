@@ -73,18 +73,37 @@ Swarm.conversion <- read_csv(here("Output", "OTUs_swarm","dups_to_otus.csv")) %>
 n_distinct(Swarm.conversion$Match)
 
 ```
+
 ```{r combine}
 
 Combine.clas <- left_join(Classification, Swarm.conversion) %>% 
   separate(Match, into = "New.Hash") %>% 
   filter (Hash == New.Hash) 
 
+n_distinct(Swarm.conversion$Match) # We had 443 Swarm OTUs
+n_distinct(Combine.clas$New.Hash)  # We found taxonomy for 368 of them
+Combine.clas %>% 
+  group_by(New.Hash) %>% 
+  add_tally() %>% 
+  filter (n > 1) # There is one New.Hash with two confronting identifications
+
+Combine.clas %>% 
+  group_by(New.Hash) %>% 
+  slice(1) -> Combine.clas #%>% filter (New.Hash == "e5b505705fe64fe02348aa9612ad44e82b0d800e")
+  
+  
+  
 Swarm.conversion %>% 
   separate(Match, into = "New.Hash") %>% 
   left_join(Classification, by = c("New.Hash" = "Hash")) -> new.Classification
 
-new.Classification %>% 
-  select(-New.Hash) %>% 
+new.Classification %>% # Now keep only one match from each New Hash
+  # select(-New.Hash) %>% 
+  group_by(Hash) %>% 
+  slice(1)-> new.Classification #filter (New.Hash == "e5b505705fe64fe02348aa9612ad44e82b0d800e")
+
+new.Classification %>%   
+select(-New.Hash) %>% 
   write_csv(here("Output", "Hashes.classified.swarm.csv"))
 
 
@@ -164,13 +183,33 @@ So, of the 4 ASVs identified only to genus, 1 went to the M productus cluster, t
 ## Group by family, generate heatmaps
 
 ```{r}
+dna.dist.possible <- possibly(dist.dna, otherwise = NA)
+
+dist.dna
 names(Sequences) == Seqs$Hash
-?split
+ 
+new.Classification %>% 
+  group_by(Hash) %>% 
+  add_tally() %>% 
+  filter (n >1)
+
 left_join(Seqs, new.Classification) %>% 
   pull(family) -> fams
+str(fams)
 
 split(Sequences, fams) ->by.fam
 
+tibble(by.fam) %>% mutate(family = names(by.fam)) -> by.fam.tibble
+
+by.fam.tibble %>% 
+  mutate(nseqs = map_dbl(by.fam, length)) %>% 
+  slice(2) %>%
+  group_by(family) %>% 
+  mutate(lengths =  map(by.fam,function(.x) map_dbl(.x, length)),
+          lengths = map(lengths,~ bind_cols(.x) %>% mutate(seq = names(.x)) )
+         ) %>% 
+  pull(lengths)
+  map(dna.dist.possible, model = "N", pairwise.deletion = T, as.matrix = T)
 
 dna.dist.possible <- possibly(dist.dna, otherwise = NA)
 map(by.fam, dna.dist.possible, model = "N", pairwise.deletion = T, as.matrix = T) %>% 
