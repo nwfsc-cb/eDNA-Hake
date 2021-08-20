@@ -82,30 +82,77 @@ By.taxa.dataset %>%
 sp_groups <- read_csv(here("Data", "unique.sp_collapse.csv"))
 
 sp_groups %>% 
-  select(taxa, morpho.group = new.morphotype, habitat = `habitat use` ) -> grouping
+  select(taxa, morpho.group = new.morphotype, habitat = `habitat use`, final.morphotype = 13 ) -> grouping
 
-grouping %>%  distinct(morpho.group)
+# Combine even furhter
 
+grouping %>% 
+  mutate(collapsed = case_when(str_detect (final.morphotype, "Marine; freshwater; brackish; pelagic-neritic") ~ "Coastal;pelagic-neritic",
+                               str_detect(final.morphotype, "pelagic-neritic") ~ "Open; pelagic-neritic",
+                               str_detect(final.morphotype, " brackish; demersal")~ "Coastal; demersal",
+                               str_detect(final.morphotype, "demersal"  )          ~ "Open; demersal",
+                               str_detect(final.morphotype, "brackish; benthopelagic"  )          ~ "Coastal; benthopelagic",
+                               
+         TRUE       ~ final.morphotype)) -> grouping
+
+grouping %>%  distinct(final.morphotype) %>% View
+grouping %>% 
+  filter (is.na(final.morphotye))
 ```
 
 ### COllapse
 
 ```{r}
-By.taxa.dataset %>% 
-  filter(!str_detect(taxa, "Cich")) %>% #no tilapias
-  left_join(grouping) %>% 
-  unite (Transect, position, depth, col = "META", sep = "|") %>% 
-  group_by(META,  morpho.group) %>% 
-  # left_join(metadata, )
-  summarise (nReads = sum(nReads)) %>% 
-  # select(-habitat) %>% ungroup %>% 
-  # mutate(eDNA.sample = as.character(eDNA.sample)) %>% 
-  pivot_wider(names_from = morpho.group, values_from = nReads, values_fill = 0) %>% 
-  pivot_longer(-META,  names_to = "taxa", values_to = "nReads") %>% 
-  group_by(taxa,  Zeroes = nReads ==0) %>% 
-  tally() %>% 
-  filter (Zeroes == T) %>% 
-  arrange(n)
 
+By.taxa.dataset %>% 
+  filter(!str_detect(taxa, "Cich")) %>% 
+   left_join(grouping) %>% 
+  # select(eDNA.sample,  final.morphotype, nReads) %>% 
+  group_by(eDNA.sample, collapsed) %>% 
+  summarise (nReads = sum(nReads)) %>% 
+  filter(!is.na(collapsed )) %>% 
+  pivot_wider (names_from = collapsed, values_from = nReads, values_fill = 0) -> wide.biol
+
+wide.biol %>% 
+  #no tilapias
+  left_join(metadata %>% 
+              select(eDNA.sample, Transect, position, Openness, groups, depth)) %>% 
+  column_to_rownames("eDNA.sample") -> ready.by.cat
+
+ready.by.cat %>% 
+  mutate(Transect = as.factor(Transect)) -> ready.by.cat
+
+Y <-  DR_data(wide.biol%>% 
+  column_to_rownames("eDNA.sample"))
+
+
+```
+
+### Fitting
+
+
+```{r}
+test1 <- DirichReg(Y ~ Transect + depth +  groups, data = ready.by.cat , model = "alternative")
+
+augmented.df <- ready.by.cat %>%  distinct(Transect,groups ) %>% 
+  group_by(Transect,groups) %>% 
+  nest() %>% 
+  mutate(depth = map(data,~ tibble (depth = seq(0,500, by = 20)) )) %>% 
+  select(-data) %>% 
+  unnest(depth)
+interaction(depth = 1:500)
+
+predict(test1, augmented.df, T,T,T) %>% 
+  map(~ as_tibble(.x) %>%
+ bind_cols(augmented.df)) -> predictions
+
+colnames(predictions[[1]])[1:8] <- colnames(ready.by.cat)[1:8]
+
+```
+
+# Plot
+
+```{r}
+predictions[[1]] %>% 
 ```
 
