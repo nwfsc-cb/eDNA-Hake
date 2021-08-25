@@ -96,8 +96,8 @@ grouping %>%
          TRUE       ~ final.morphotype)) -> grouping
 
 grouping %>%  distinct(final.morphotype) %>% View
-grouping %>% 
-  filter (is.na(final.morphotye))
+# grouping %>% 
+#   filter (is.na(final.morphotye))
 ```
 
 ### COllapse
