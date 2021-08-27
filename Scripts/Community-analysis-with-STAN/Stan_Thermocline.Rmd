@@ -1,0 +1,31 @@
+---
+title: "STAN for Thermocline"
+author: "Ramon Gallego"
+date: "8/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Making a STAN model for hypothesis testing of metabarcoding data
+
+We have one problem with the application of metabarcoding data for hypothesis testing - we can't really be sure if the weight we are putting on number of reads, sequencing depth data transformation and algorithm to estimate sample dissimilarity are the ones driving the change and therefore could mask the real biological effect.
+I include below the libraries I used
+```{r libraries, echo=T, message=FALSE, warning=FALSE}
+library(here)
+library (tidyverse)
+library(rstan)
+```
+
+### Get the data, prepare the data
+
+You remember from previous adventures how picky STAN with regards to the structure of the data. starting with the tibbles with the metadata and the counts, and we'll move from there
+
+```{r pressure, echo=FALSE}
+abundance.table <- read_csv(here("Data",  "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+
+metadata  <- read_csv(here("Data", "Final_metadata.csv"))
+```
+
