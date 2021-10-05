@@ -1,0 +1,102 @@
+---
+title: "Stan"
+author: "Ramon Gallego"
+date: "9/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(tidyverse)
+library(rstan)
+library(bayesplot)
+library(here)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+ 
+  stan_init_f2 <- function(n.chain,I_mifish,N_station_rep_idx){#J_seb,K_seb){ 
+    A <- list()
+    for(i in 1:n.chain){
+      A[[i]] <- list(
+        #log_eta_mifish = runif(1, -4, 0),
+        #log_eta_sebastes = runif(1,-4, 0),
+        a_mifish = runif(I_mifish,0.4,0.6),
+        a_sebastes_all = .5,
+        tau_mifish = runif(1,0.5,1.5),
+        tau_sebastes = runif(1,0.5,1.5) 
+      )
+    }
+    return(A)
+  }
+
+  
+  # Define the MCMC, and run
+  N_CHAIN = 3
+  Warm = 100
+  Iter = 200
+  Treedepth = 12
+  Adapt_delta = 0.95
+  
+  rstan_options(auto_write = TRUE)
+  options(mc.cores = parallel::detectCores())
+```
+
+```{r}
+stan_data <- read_rds( here("Data/ole_data_calcofi/Calcofi_STAN_data.rds"))
+
+ stan_pars = c(
+    "b_master",
+    "b_master_grid",
+    "b_mifish",
+    "b_sebastes",
+    "b_count",
+    "a_mifish",
+    "a_sebastes_all",
+    "tau_mifish",
+    "tau_sebastes",
+    "log_eta_mifish",
+    "log_eta_sebastes",
+    "log_eta_mifish_mean",
+    "log_eta_sebastes_mean"
+    #"log_b_mifish_sardine",
+    #"sim_obs"
+    #"nu"
+  )   
+  
+```
+
+```{r}
+stanMod = stan(file = here("Data/ole_data_calcofi/CalCOFI_20210617_randomEta.stan") ,
+                 data = stan_data, 
+                 verbose = FALSE, chains = N_CHAIN, thin = 1, 
+                 warmup = Warm, iter = Warm + Iter, 
+                 control = list(max_treedepth=Treedepth,
+                                stepsize=0.01,
+                                adapt_delta=Adapt_delta,
+                                metric="diag_e"),
+                 pars = stan_pars,
+                 refresh = 10,
+                 boost_lib = NULL,
+                 #sample_file = here("Data/ole_data_calcofi/twoTau_tmp.csv"),
+                 init = stan_init_f2(n.chain=N_CHAIN,
+                                     I_mifish = I_mifish,
+                                     N_station_rep_idx=stan_data$N_station_rep_idx)
+  )
+  
+  
+```
+
