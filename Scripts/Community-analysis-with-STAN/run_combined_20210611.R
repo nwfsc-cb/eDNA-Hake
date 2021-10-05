@@ -1,24 +1,25 @@
 library(tidyverse)
 library(rstan)
 library(bayesplot)
+library(here)
 options(mc.cores = parallel::detectCores())
 rstan_options("auto_write" = TRUE)
 
   #library prep data, w PCR pipetting info
-  lib_mifish <- read.csv("./data/mifish_library_prep.csv")
+  lib_mifish <- read.csv("Scripts/Community-analysis-with-STAN/mifish_library_prep.csv")
       lib_mifish$New_name <-  paste0(   #need to match format of other dataset
         substr(lib_mifish$New_name, 1, 4), "_",
         substr(lib_mifish$New_name, 8, nchar(as.character(lib_mifish$New_name)))
       )
   
   # library prep data, w PCR pipetting info
-  lib_sebastes <- read.csv("./data/sebastes_library_prep.csv")
+  lib_sebastes <- read.csv("Scripts/Community-analysis-with-STAN/sebastes_library_prep.csv")
   lib_sebastes$New_name <-  paste0(   #need to match format of other dataset
       substr(lib_sebastes$New_name, 1, 4), "_",
       substr(lib_sebastes$New_name, 8, nchar(as.character(lib_sebastes$New_name)))
     )
 
-  dat.mifish <- readRDS("./data/mifish_tech_nReads.RDS") %>% 
+  dat.mifish <- readRDS("Scripts/Community-analysis-with-STAN/mifish_tech_nReads.RDS") %>% 
     filter(!ID_mifish %in% c("MISSING", ""),
            !is.na(mifish_reads)) %>% 
     dplyr::select(Sample, ID_mifish, mifish_reads, "station_id", "ext_rep", "tech_rep", ) %>% 
@@ -54,7 +55,7 @@ rstan_options("auto_write" = TRUE)
   dat.mifish.init <- dat.mifish %>% 
     filter(ID_mifish %in% common_sp) #take just common species, for now
   
-  dat.sebastes <- readRDS("./data/sebastes_tech_nReads.RDS") %>% 
+  dat.sebastes <- readRDS("Scripts/Community-analysis-with-STAN/sebastes_tech_nReads.RDS") %>% 
     filter(!ID_sebastes %in% c("MISSING", "", "Unidentified"),
            !is.na(sebastes_reads)) %>% 
     dplyr::select(Sample, ID_sebastes, sebastes_reads, "station_id", "ext_rep", "tech_rep", ) %>% 
@@ -81,7 +82,7 @@ rstan_options("auto_write" = TRUE)
   dat.sebastes <- dat.sebastes %>% filter(!ID_sebastes %in% drop.these.sebastes)
     
   
-  dat.count <- readRDS("./data/microscopy_tech_nReads.RDS") %>% 
+  dat.count <- readRDS("Scripts/Community-analysis-with-STAN/microscopy_tech_nReads.RDS") %>% 
     filter(!ID_microscopy %in% c("MISSING", "", "Disintegrated fish larvae")) %>% 
     filter(station_id %in% unique(dat.mifish$station_id)) %>% 
   #dat.count$larval_counts[dat.count$ID_microscopy == "Vinciguerria sp."] <- 0  #DATA problem; check w Zack
@@ -123,7 +124,7 @@ rstan_options("auto_write" = TRUE)
     filter(ID_microscopy %in% common_count)  #take just common species, for now
 
     # pull appropriate species from microscopy counts
-  species_mapping <- read.csv("./data/20210610_species_mapping_file.csv") %>% 
+  species_mapping <- read.csv("Scripts/Community-analysis-with-STAN/20210610_species_mapping_file.csv") %>% 
     filter(ID_mifish %in% dat.mifish.init$ID_mifish  | 
              ID_microscopy %in% dat.count.init$ID_microscopy | 
              ID_sebastes %in% dat.sebastes$ID_sebastes) %>% 
@@ -242,9 +243,9 @@ rstan_options("auto_write" = TRUE)
                                     distinct() %>% pull(ID_sebastes)
       
       #write these to file, for checking accuracy
-      write.csv(M_to_count, "M_to_count.csv")
-      write.csv(M_to_mifish, "M_to_mifish.csv")
-      write.csv(M_to_sebastes, "M_to_sebastes.csv")
+      write.csv(M_to_count, "Scripts/Community-analysis-with-STAN/M_to_count.csv")
+      write.csv(M_to_mifish, "Scripts/Community-analysis-with-STAN/M_to_mifish.csv")
+      write.csv(M_to_sebastes, "Scripts/Community-analysis-with-STAN/M_to_sebastes.csv")
       
       
     ## CHECK THESE MATRICES. CHARACTERISTICS SHOULD BE:
