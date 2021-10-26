@@ -511,7 +511,7 @@ rstan_options("auto_write" = TRUE)
                   print("YOUR PAL, OLE")
                   }else{
                     
-  stanMod = stan(file = "CalCOFI_20210611_twoTau.stan" ,data = stan_data, 
+  stanMod = stan(file = "Scripts/Community-analysis-with-STAN/CalCOFI_20210611_twoTau.stan" ,data = stan_data, 
                  verbose = FALSE, chains = N_CHAIN, thin = 1, 
                  warmup = Warm, iter = Warm + Iter, 
                  control = list(max_treedepth=Treedepth,
