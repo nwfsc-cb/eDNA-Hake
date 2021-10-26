@@ -32,15 +32,15 @@ data {
   
    int<lower=0> N_fish_station_rep_idx;
    vector[N_fish_station_rep_idx] log_r_mifish;
-   real N_pcr_mifish;
+   real N_pcr_fish;
    
    // Indexes
 #  int<lower=0> count_station_idx[N_count_obs];
-  int<lower=0> count_sp_idx[N_count_obs];
+#  int<lower=0> count_sp_idx[N_count_obs];
   
-  int<lower=0> mifish_station_idx[N_mifish_obs];
-  int<lower=0> mifish_sp_idx[N_mifish_obs]; // this is the index to the list of species only found by mifish primer
-  int<lower=0> mifish_station_rep_idx[N_mifish_obs];
+  int<lower=0> fish_station_idx[N_fish_obs];
+  int<lower=0> fish_sp_idx[N_fish_obs]; // this is the index to the list of species only found by mifish primer
+  int<lower=0> fish_station_rep_idx[N_fish_obs];
   
   int<lower=0> master_station_idx[N_station_species_master] ;
   int<lower=0> master_sp_idx[N_station_species_master] ;

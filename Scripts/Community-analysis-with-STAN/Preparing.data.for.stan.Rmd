@@ -71,9 +71,15 @@ init.data %>%
 
 N_fish_station_rep_idx <- n_distinct(init.data$statio_rep_idx)
 
+N_pcr_fish <- 43 ## Adding PCr1 and 2 - but the process is different
+
+
 ## Create indices
 
+fish_station_idx <- # Index of each station (no biol)
 
+fish_sp_idx
+
+fish_station_rep_idx
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
