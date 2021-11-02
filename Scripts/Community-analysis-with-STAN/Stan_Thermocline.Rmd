@@ -19,9 +19,39 @@ library (tidyverse)
 library(rstan)
 ```
 
+
+## The design
+
+We have sampled eDNA from locations in the Pacific Coast, at different depths. At each location and depth, we collected up to two Niskin Bottles, and each of them was amplified and sequenced twice (some of them more, some less).
+
+The idea is to get to a posterior probability of the proportion of DNA from each taxa at each lat,lon,depth point, taking into account the number of PCR cycles, the primer efficiency and the stochasticity of the PCR process. 
+
+The Amount of DNA in the water from taxa *i* $D_i$ is unknown but we can express it as function of the number of Amplicons detected $A_i$ and the process that generates those: Amplification at the efficiency ($\alpha$) for a number of PCR cycles. We don't see all the amplicons we generate, only a proportion of them end up in the sequencing machine. $\eta$
+
+$$ A_{ij} = C_{ij}(1+\alpha)^{N_{PCR}} \times  \eta $$
+And in log space
+
+$$ log(A_{ij}) = log (C_{ij}) + N_{PCR} \times log(1+\alpha) + log (\eta)$$
+But we can express the original Counts as the proportion of DNA copies from species *i* in the sample so
+$$ B_{ij} = \frac{C_{ij}}{\sum_{i}C_{ij}} $$
+
+$$log(B_{ij}) = log(C_{ij}) - log(\sum_i C_{ij})$$
+And the last term is the same for all values from sample *j*.
+
+So the equation that brings the 
+
+Now we change $A_{ij}$ - which assumes a deterministic process from a proportion of copies of DNA and number of PCR cycles, and thus make it $\lambda_{ijk}$ where *k* is the particular PCR reaction from that *j* and the Observed values come from a negative binomial distribution
+
+$$log(\lambda_{ij}) = log(B_{ij})  + N_{PCR} \times log(1+\alpha) + log (\eta_j) \\ Y_{ij} \sim {\sf NegativeBinomial}(\lambda_{ij}, \tau)$$
+
+And the variance is $\lambda_{ijk} + \frac{\lambda^2_{ijk}}{\tau}$
+
+As it is, we are assuming that PCRs from two niskins from the same station reflect the same, (aka biological replicates are perfect). But we can bring the concentration of DNA at site l (a combination of lat, lon and depth) as: 
+
+$$log(\lambda_{ijl}) = \gamma_{il} + \delta_{ijl} \\ \delta_{ijl} ∼ Normal(0,$$
 ### Get the data, prepare the data
 
-You remember from previous adventures how picky STAN with regards to the structure of the data. starting with the tibbles with the metadata and the counts, and we'll move from there
+You remember from previous adventures how picky STAN is with regards to the structure of the data. starting with the tibbles with the metadata and the counts, and we'll move from there
 
 ```{r pressure, echo=FALSE}
 abundance.table <- read_csv(here("Data",  "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
