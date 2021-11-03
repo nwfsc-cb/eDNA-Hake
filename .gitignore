@@ -12,3 +12,4 @@ Data/*.html
 ../Scripts/Choosing.for.thermocline.html ../Scripts/Comparing_insect_and_blast.nb.html ../Scripts/Dirichlet.nb.html ../Scripts/Nano_run.nb.html ../Scripts/Parsing_BLAST.html ../Scripts/Prey.insect.html ../Scripts/Samples.location.nb.html ../Scripts/Stats.plan.nb.html ../Scripts/Thermoclines.nb.html ../Scripts/Thermoclines_2021.nb.html ../Scripts/gaps_metabarcoding.nb.html ../Scripts/mapping_oceanic_samples.nb.html
 *.html
 Data/*.rds
+Presentations/*.html
