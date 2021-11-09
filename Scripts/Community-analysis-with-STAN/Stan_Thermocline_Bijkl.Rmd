@@ -27,7 +27,7 @@ We have sampled eDNA from locations in the Pacific Coast, at different depths. A
 
 The idea is to get to a posterior probability of the proportion of DNA from each taxa  (*i*) at each lat,lon,depth  point (*j*), taking into account the number of PCR cycles, the primer efficiency and the stochasticity of the PCR process. 
 
-The Amount of DNA in the water from taxa *i* \(D_i\) is unknown but we can express it as function of the number of Amplicons detected \(A_i\) and the process that generates those: Amplification at the efficiency (\(\alpha\)) for a number of PCR cycles. We don't see all the amplicons we generate, only a proportion of them end up in the sequencing machine. \(\eta\).
+The Amount of DNA in the water from taxa *i* \(D_i\) is unknown but we can express it as function of the number of Amplicons detected \(A_i\) and the process that generates those: Amplification at the efficiency (\(\alpha\)) for a number of PCR cycles. We don't see all the amplicons we generate, only a proportion of them end up in the sequencing machine, \(\eta\).
 
 We take several samples from each *j* point, and those are the ones we sequence, so we have between 2-6 looks at each *j*. These replicates *k* are where we detect \lambda
 
@@ -36,37 +36,15 @@ We take several samples from each *j* point, and those are the ones we sequence,
 log(\lambda_{ijk}) = log (\beta_{ijk}) + N_{PCR} \times log(1+\alpha) + log (\eta_{jk})
 \end{equation}
 
-And we get that the 
-
+And we get that these \beta_{ijk} are actually drawn from a negative binomial distribution, with a mean of the real proportion of copies of DNA in that part of the world (*C_{ij}*) and a variance of (\phi)
 \begin{equation}
- B_{ij} = \frac{C_{ij}}{\sum_{i}C_{ij}} 
+
+C_{ij} \~ NegativeBinomial(\lambda_{ijk}, \phi)
 \end{equation}
 
-\begin{equation}
-log(B_{ij}) = log(C_{ij}) - log(\sum_i C_{ij})
-\end{equation}
 
-And the last term is the same for all values from sample *j*.
+## What this model will look like 
 
-So the equation that brings the 
-
-Now we change \(A_{ij}\) - which assumes a deterministic process from a proportion of copies of DNA and number of PCR cycles, and thus make it \(\lambda_{ijk}\) where *k* is the particular PCR reaction from that *j* and the Observed values come from a negative binomial distribution
-
-\begin{equation}
-log(\lambda_{ijkl}) = log(B_{ijkl})  + N_{PCR} \times log(1+\alpha) + log (\eta_{jkl}) \\ Y_{ijkl} \sim {\sf NegativeBinomial}(\lambda_{ijkl}, \tau)
-
-\end{equation}
-
-And the variance is 
-\begin{equation}
-\lambda_{ijkl} + \frac{\lambda^2_{ijkl}}{\tau}
-\end{equation}
-
-As it is, we are assuming that PCRs from two Niskins from the same station reflect the same, (aka biological replicates are perfect). But we can bring the concentration of DNA at site *j* (a combination of lat, lon and depth) as: 
-
-\begin{equation}
-log(\lambda_{ijl}) = \gamma_{il} + \delta_{ijl} \\ \delta_{ijl} ∼ Normal(0,\sigma^2)
-\end{equation}
 
 ### Get the data, prepare the data
 
