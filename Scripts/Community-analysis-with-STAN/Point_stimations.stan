@@ -9,10 +9,18 @@
 //    https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 //
 
-// The input data is a vector 'y' of length 'N'.
+// The input data is a series of vectors - the first one is the observed abundances of each species
+// in each replicate. We want to estimate the relative abundace of each species on each point in space
+// so we need to map each replicate to their point of origin
+
+// We need to know how many are there I species, J stations, N replicates, IJ combinations
+// We need to 
+
+
 data {
   // species
-  int<lower=0> I_taxa;
+  int<lower=0> I_taxa; // Number of taxa to estimate
+  int<lower=0> N_mifish_station_rep; // Number of unique units sequenced (samples times rep)
   // stations
   int<lower=0> J_stations;
   //replicates
@@ -31,8 +39,8 @@ data {
    int<lower=0> station_idx[Number_taxa_obs];
    int<lower=0> taxa_idx[Number_taxa_obs];
    int<lower=0> replicate_idx[Number_taxa_obs];
-   
-  
+ 
+  real beta_prior_mifish[2];
 }
 
 // The parameters accepted by the model. Our model
@@ -40,14 +48,20 @@ data {
 parameters {
    real<upper = 0>log_eta_mifish_mean;
    real<lower = 0> phi;
-   vector<upper=0>[N_mifish_station_rep_idx] log_eta_mifish ; // This is the fraction of total amplicons that is read by the sequencer (a scalar)
+   vector<upper=0>[N_mifish_station_rep] log_eta_mifish ; // This is the fraction of total amplicons that is read by the sequencer (a scalar)
    vector<lower=0,upper=1>[taxa_idx] a_mifish ;
 }
 
 transformed parameters{
-vector[]  
+vector[I_taxa][J_stations]b_mifish  
   
-  
+   for(k in 1:J_stations){
+    b_mifish[k] = (M_to_mifish * b_master_grid[k]) /
+                  sum((M_to_mifish * b_master_grid[k])) ; // everything here is in proportion space, I will probably want to declare b_mifish[] as a simplex for each - YOu don;t have all species on all samples
+                  
+                  // Move b to the parameters instead of the Bmaster. B points to the data not estimated - True Zeroes  or non-observation. It is more complicated. Assuming that there are there but rare and not detected. 
+                  
+  } 
 }
 // The model to be estimated. We model the output
 // 'y' to be normally distributed with mean 'mu'
@@ -73,9 +87,9 @@ model {
     
     }
     //models 
-    b_master ~ normal(0,4) ;
     
+    phi ~ normal(0, 2);
     a_mifish ~ beta(beta_prior_mifish[1],beta_prior_mifish[2]);
-    tau_mifish ~ gamma(5, 5);
+   
 }
 
