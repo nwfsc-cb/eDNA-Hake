@@ -17,7 +17,7 @@ data {
   int<lower=0> I_fish;//n_distinct_morphogroups
   //sites
  // int<lower=0> K_master ;
-  int<lower=0> K_fish ;//n_distinct_stations(minus tech)
+  int<lower=0> K_fish ;//n_distinct_stations(minus tech, minus Niskin)
   //replicates
   int<lower=0> J_fish; // max replication level
   int<lower=0> J_fish_vec[K_fish];

@@ -1,10 +1,3 @@
-//
-// This Stan program defines a simple model, with a
-// vector of values 'y' modeled as normally distributed
-// with mean 'mu' and standard deviation 'sigma'.
-//
-// Learn more about model development with Stan at:
-//
 //    http://mc-stan.org/users/interfaces/rstan.html
 //    https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 //
@@ -24,12 +17,12 @@ data {
   // stations
   int<lower=0> J_stations;
   //replicates
-  int<lower=0> K_reps; //max replication level 
-  int<lower=0> K_reps_vector[J_stations]; // vector with the number of replicates for each stations
+// int<lower=0> K_reps; //max replication level 
+//  int<lower=0> K_reps_vector[J_stations]; // vector with the number of replicates for each stations
   //Combos
   int<lower=0> Number_station_taxa; # length of the vector of Combinations to estimate
   //Observations
-  int<lower=0> Number_taxa_obs; # length of the vector of input values
+  int<lower=0> Number_taxa_obs; # length of the vector of input values - The same as above ?
   int<lower=0> D_taxa_obs[Number_taxa_obs]; # vector of input values
   // Covariates?
   
@@ -39,8 +32,9 @@ data {
    int<lower=0> station_idx[Number_taxa_obs];
    int<lower=0> taxa_idx[Number_taxa_obs];
    int<lower=0> replicate_idx[Number_taxa_obs];
- 
-  real beta_prior_mifish[2];
+   real beta_prior_mifish[2];
+  
+  
 }
 
 // The parameters accepted by the model. Our model
@@ -49,21 +43,26 @@ parameters {
    real<upper = 0>log_eta_mifish_mean;
    real<lower = 0> phi;
    vector<upper=0>[N_mifish_station_rep] log_eta_mifish ; // This is the fraction of total amplicons that is read by the sequencer (a scalar)
-   vector<lower=0,upper=1>[taxa_idx] a_mifish ;
+   real<lower=0,upper=1> a_mifish ;
+    vector[I_taxa] b_fish; // THis is a vector of the proportions of each species in a sample
 }
 
 transformed parameters{
-vector[I_taxa][J_stations]b_mifish  
+  vector[I_taxa]b_mifish[J_stations]; 
+  
+  for (j in 1:J_stations){
+    b_mifish[j] = rep_vector(0,I_taxa);  // I think this creates the empty canvas
+  }
   
    for(k in 1:J_stations){
-    b_mifish[k] = (M_to_mifish * b_master_grid[k]) /
-                  sum((M_to_mifish * b_master_grid[k])) ; // everything here is in proportion space, I will probably want to declare b_mifish[] as a simplex for each - YOu don;t have all species on all samples
+    b_mifish[k] = b_fish[k] /      // each element k is a vector, as long as species there are
+                  sum( b_fish[k]) ; // and the denominator is the one value for every k
                   
-                  // Move b to the parameters instead of the Bmaster. B points to the data not estimated - True Zeroes  or non-observation. It is more complicated. Assuming that there are there but rare and not detected. 
+                  // I think this 
                   
   } 
 }
-// The model to be estimated. We model the output
+// The model to be estimated. 
 // 'y' to be normally distributed with mean 'mu'
 // and standard deviation 'sigma'.
 model {
@@ -73,7 +72,7 @@ model {
     for(q in 1:Number_taxa_obs){
       log_lambda[q] =  -1.609438 + //log(0.2); the fraction of each sample subsampled, pipetting. 
                               log(b_mifish[station_idx[q],taxa_idx[q]]) + 
-                              N_pcr_mifish*log(1.0 + a_mifish[taxa_idx[q]]) +
+                              N_pcr_mifish*log(1.0 + a_mifish) +
                               log_r_mifish[replicate_idx[q]] + // add a vector of known sample fractions
                               log_eta_mifish[replicate_idx[q]] // fraction of amplicons getting sequenced into reads
                               ; 
