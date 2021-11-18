@@ -88,7 +88,7 @@ parameters {
 
 
   // Master list log-intercept parameters (includes all species, all communities with non-zero observations)
-  vector[N_station_species_master] b_master ;// This is a vector possible species / species groups.
+  vector[N_station_species_master] b_master ;// This is a vector possible species / species groups. Bring b_
 }
 
 transformed parameters{

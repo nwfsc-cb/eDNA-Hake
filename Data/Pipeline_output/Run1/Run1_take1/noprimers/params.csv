@@ -1,0 +1,11 @@
+
+Argument,value
+folder,/home/rgallegosimon/data/pipeline_output/Run1_take1//noprimers
+  hash, TRUE 
+  trimming.length.Read1, 220 
+  trimming.length.Read2, 150 
+  metadata, output.metadata.csv 
+  output.folder, output
+  keep.mid.files, TRUE
+  merge.overlap, 10
+
