@@ -53,19 +53,19 @@ PROBS <- c(0.025,0.05,0.10,0.25,0.5,0.75,0.9,0.95,0.975)
 Log   <- paste0("log",PROBS)
 
 theta_bin_out <- data.frame(trans_id= dat.acoustic.bin$trans_id, 
-                        Mean.logit=apply(pars$theta_bin,2,mean),
-                        Sd.logit=apply(pars$theta_bin,2,sd),
-                        Logit.Val=data.frame(t(apply(pars$theta_bin,2,quantile,probs=PROBS))),
-                        Mean=apply(inv.logit(pars$theta_bin),2,mean),
-                        Sd=apply(inv.logit(pars$theta_bin),2,sd),
-                        Val=data.frame(t(apply(inv.logit(pars$theta_bin),2,quantile,probs=PROBS))))
+                        Mean.logit=apply(pars$theta_bin_pred,2,mean),
+                        Sd.logit=apply(pars$theta_bin_pred,2,sd),
+                        Logit.Val=data.frame(t(apply(pars$theta_bin_pred,2,quantile,probs=PROBS))),
+                        Mean=apply(inv.logit(pars$theta_bin_pred),2,mean),
+                        Sd=apply(inv.logit(pars$theta_bin_pred),2,sd),
+                        Val=data.frame(t(apply(inv.logit(pars$theta_bin_pred),2,quantile,probs=PROBS))))
 D_pos_out <- data.frame(trans_id= dat.acoustic.pos$trans_id, 
-                                Mean.log=apply(pars$D_pos,2,mean),
-                                Sd.log=apply(pars$D_pos,2,sd),
-                                Log.Val=data.frame(t(apply(pars$D_pos,2,quantile,probs=PROBS))),
-                                Mean=apply(exp(pars$D_pos),2,mean),
-                                Sd=apply(exp(pars$D_pos),2,sd),
-                                Val=data.frame(t(apply(exp(pars$D_pos),2,quantile,probs=PROBS))))
+                                Mean.log=apply(pars$D_pos_pred,2,mean),
+                                Sd.log=apply(pars$D_pos_pred,2,sd),
+                                Log.Val=data.frame(t(apply(pars$D_pos_pred,2,quantile,probs=PROBS))),
+                                Mean=apply(exp(pars$D_pos_pred),2,mean),
+                                Sd=apply(exp(pars$D_pos_pred),2,sd),
+                                Val=data.frame(t(apply(exp(pars$D_pos_pred),2,quantile,probs=PROBS))))
 
 ##############################
 ## Project Surfaces for lat.long.smooth and lat.long.smooth.base MODEL.TYPE
@@ -391,19 +391,14 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
 # Calculation for Observed-Predicted and Residual
 pred_obs_bin <- bind_cols(dat.acoustic.bin %>% 
                            dplyr::select(transect,lat,lon,utm.lat,utm.lon,bin_weight_dens,weight_dens_mt_km2,bathy.bottom.depth),
-                         theta_bin_out)
+                          theta_bin_out)
 
 pred_obs_pos <- bind_cols(dat.acoustic.pos %>% 
                             dplyr::select(transect,lat,lon,utm.lat,utm.lon,bin_weight_dens,weight_dens_mt_km2,bathy.bottom.depth),
                           D_pos_out) %>%
-                mutate(resid = weight_dens_mt_km2 - Mean) #log.resid=log(resid))
-
+                          mutate(resid = weight_dens_mt_km2 - Mean) #log.resid=log(resid))
 
 ###  
-
-
-
-
 # Combine the necessary data.frames into a list for use later.
 Output.summary <- list(
 

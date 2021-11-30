@@ -16,6 +16,7 @@ SAMPLES <- Output.qpcr$SAMPLES
 MODEL.TYPE <- Output.qpcr$MODEL.TYPE
 MODEL.VAR <- Output.qpcr$MODEL.VAR
 MODEL.ID <- Output.qpcr$MODEL.ID
+NO.SURFACE = Output.qpcr$NO.SURFACE
 #dat_raster_fin <- Output.qpcr$dat_raster_fin
 depth.fact <- sort(unique(STATION.DEPTH$depth_cat_factor))
 TRACE <- Output.qpcr$TRACE
@@ -231,7 +232,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
     new_data <- rbind(new_data,temp)
   }
   
-  # Drop the 300m observation for Gridcell 133469 
+  # Drop the 300m observation for Gridcell 133469 (deep spot right near Cape Flattery)
   new_data_1 <- new_data %>% 
                 filter(Gridcell_ID!=133469)
   new_data <- bind_rows(new_data_1,
@@ -278,8 +279,8 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
       smooth.dat.pred$Zs_2_1 %*% pars$s_2_1[i,] + smooth.dat.pred$Zs_2_2 %*% pars$s_2_2[i,] + smooth.dat.pred$Zs_2_3 %*% pars$s_2_3[i,] + 
       smooth.dat.pred$Zs_3_1 %*% pars$s_3_1[i,] + smooth.dat.pred$Zs_3_2 %*% pars$s_3_2[i,] + smooth.dat.pred$Zs_3_3 %*% pars$s_3_3[i,] + 
       smooth.dat.pred$Zs_4_1 %*% pars$s_4_1[i,] + smooth.dat.pred$Zs_4_2 %*% pars$s_4_2[i,] + smooth.dat.pred$Zs_4_3 %*% pars$s_4_3[i,] + 
-      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] + 
-      smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,] 
+      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] 
+      
     #smooth.dat.pred$Zs_7_1 %*% pars$s_7_1[i,]
     D_orig_pred[,ID$id[ID$N.ID==i]] <- orig.dat.pred$X %*% pars$b[i,] +
       orig.dat.pred$Xs %*% pars$bs[i,] +
@@ -287,10 +288,16 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
       orig.dat.pred$Zs_2_1 %*% pars$s_2_1[i,] + orig.dat.pred$Zs_2_2 %*% pars$s_2_2[i,] + orig.dat.pred$Zs_2_3 %*% pars$s_2_3[i,] + 
       orig.dat.pred$Zs_3_1 %*% pars$s_3_1[i,] + orig.dat.pred$Zs_3_2 %*% pars$s_3_2[i,] + orig.dat.pred$Zs_3_3 %*% pars$s_3_3[i,] + 
       orig.dat.pred$Zs_4_1 %*% pars$s_4_1[i,] + orig.dat.pred$Zs_4_2 %*% pars$s_4_2[i,] + orig.dat.pred$Zs_4_3 %*% pars$s_4_3[i,] + 
-      orig.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + orig.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + orig.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] + 
-      orig.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + orig.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + orig.dat.pred$Zs_6_3 %*% pars$s_6_3[i,] 
+      orig.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + orig.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + orig.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] 
+      
     
-    if(MODEL.TYPE=="lat.long.smooth"){
+    if(NO.SURFACE!="TRUE"){
+      D_pred[,ID$id[ID$N.ID==i]] <- D_pred[,ID$id[ID$N.ID==i]] +
+          smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,] 
+      D_orig_pred[,ID$id[ID$N.ID==i]] <- D_orig_pred[,ID$id[ID$N.ID==i]] +
+          orig.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + orig.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + orig.dat.pred$Zs_6_3 %*% pars$s_6_3[i,] 
+    }  
+    if(MODEL.TYPE=="lat.long.smooth" & NO.SURFACE!="TRUE"){
       D_pred[,ID$id[ID$N.ID==i]] <- D_pred[,ID$id[ID$N.ID==i]] + smooth.dat.pred$Zs_7_1 %*% pars$s_7_1[i,]
       D_orig_pred[,ID$id[ID$N.ID==i]] <- D_orig_pred[,ID$id[ID$N.ID==i]] + orig.dat.pred$Zs_7_1 %*% pars$s_7_1[i,]
       
@@ -300,15 +307,27 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
         smooth.dat.pred$Zs_7_1 %*% pars$s_7_1[i,]
     }
     
+    if(MODEL.TYPE=="lat.long.smooth" & NO.SURFACE=="TRUE"){
+      D_pred[,ID$id[ID$N.ID==i]] <- D_pred[,ID$id[ID$N.ID==i]] + smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,]
+      D_orig_pred[,ID$id[ID$N.ID==i]] <- D_orig_pred[,ID$id[ID$N.ID==i]] + orig.dat.pred$Zs_6_1 %*% pars$s_6_1[i,]
+      
+      # Calculate the conditional effect for bottom.depth
+      D_pred_bottom_depth[,ID$id[ID$N.ID==i]] <-
+        smooth.dat.pred$Xs[,ncol(smooth.dat.pred$Xs)] * pars$bs[i,ncol(smooth.dat.pred$Xs)] +
+        smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,]
+    }
     
-    D_smooth[,ID$id[ID$N.ID==i]] <-         smooth.dat.pred$Xs[,(1:ncol(smooth.dat.pred$Xs)-1)] %*% pars$bs[i,(1:ncol(smooth.dat.pred$Xs)-1)] +
+    D_smooth[,ID$id[ID$N.ID==i]] <-         smooth.dat.pred$Xs[,(1:(ncol(smooth.dat.pred$Xs)-1))] %*% pars$bs[i,(1:(ncol(smooth.dat.pred$Xs)-1))] +
       smooth.dat.pred$Zs_1_1 %*% pars$s_1_1[i,] + smooth.dat.pred$Zs_1_2 %*% pars$s_1_2[i,] + smooth.dat.pred$Zs_1_3 %*% pars$s_1_3[i,] +
       smooth.dat.pred$Zs_2_1 %*% pars$s_2_1[i,] + smooth.dat.pred$Zs_2_2 %*% pars$s_2_2[i,] + smooth.dat.pred$Zs_2_3 %*% pars$s_2_3[i,] +
       smooth.dat.pred$Zs_3_1 %*% pars$s_3_1[i,] + smooth.dat.pred$Zs_3_2 %*% pars$s_3_2[i,] + smooth.dat.pred$Zs_3_3 %*% pars$s_3_3[i,] +
       smooth.dat.pred$Zs_4_1 %*% pars$s_4_1[i,] + smooth.dat.pred$Zs_4_2 %*% pars$s_4_2[i,] + smooth.dat.pred$Zs_4_3 %*% pars$s_4_3[i,] +
-      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] +
-      smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,]
-    
+      smooth.dat.pred$Zs_5_1 %*% pars$s_5_1[i,] + smooth.dat.pred$Zs_5_2 %*% pars$s_5_2[i,] + smooth.dat.pred$Zs_5_3 %*% pars$s_5_3[i,] 
+      
+    if(NO.SURFACE!="TRUE"){ 
+      D_smooth[,ID$id[ID$N.ID==i]] <-  D_smooth[,ID$id[ID$N.ID==i]] +
+        smooth.dat.pred$Zs_6_1 %*% pars$s_6_1[i,] + smooth.dat.pred$Zs_6_2 %*% pars$s_6_2[i,] + smooth.dat.pred$Zs_6_3 %*% pars$s_6_3[i,]
+    }
   }    
   
   D_pred_summary <- data.frame(Mean=rowMeans(10^(D_pred+LOG.EXPAND)),
@@ -389,7 +408,7 @@ if(MODEL.TYPE =="lat.long.smooth" | MODEL.TYPE=="lat.long.smooth.base"){
 }
 
 
-# Calculate some residuals and pred-observed  
+# Calculate some residuals and pred-observed for the NISKIN-MEAN FIELD COMPARISONS.  
 Resid <- D_delta_out_liter %>% dplyr::select(sample_idx,Mean.log,Mean) %>% 
           left_join(.,
              SAMPLES %>% 
@@ -417,25 +436,33 @@ p_resid$p1 <- ggplot(Resid) +
     geom_point(aes(y=obs.mean.log,x=pred.mean.log),alpha=0.3) +
     geom_abline(intercept=0,slope=1,color="red") +
     theme_bw()
-    
+
+Resid <- Resid %>% mutate(depth_cat_factor2 = depth_cat_factor,
+                          depth_cat_factor2 = as.character(depth_cat_factor2),
+                          depth_cat_factor2=ifelse(depth_cat_factor2=="0","3",depth_cat_factor2),
+                          depth_cat_factor2 = as.factor(depth_cat_factor2))
+Resid$depth_cat_factor2 <- factor(Resid$depth_cat_factor2,levels=sort(as.numeric(as.character(unique(Resid$depth_cat_factor2)))))
+
 p_resid$p2 <- ggplot(Resid) +
   geom_point(aes(y=obs.mean.log,x=pred.mean.log),alpha=0.3) +
   geom_abline(intercept=0,slope=1,color="red") +
+  xlab("prediction (log_10)") +
+  ylab("observation (log_10)") + 
   theme_bw() +
-  facet_wrap(~depth_cat_factor)
+  facet_wrap(~depth_cat_factor2)
 
 p_resid$p3 <- ggplot(Resid) +
   geom_point(aes(y=obs.mean,x=pred.mean),alpha=0.3) +
   geom_abline(intercept=0,slope=1,color="red") +
   theme_bw() +
-  facet_wrap(~depth_cat_factor)
+  facet_wrap(~depth_cat_factor2)
 
 
 p_resid$p4 <- ggplot(Resid) +
   geom_point(aes(y=Resid.log,x=pred.mean.log),alpha=0.3) +
   geom_abline(intercept=0,slope=0,color="red") +
   theme_bw() +
-  facet_wrap(~depth_cat_factor)
+  facet_wrap(~depth_cat_factor2)
 
 p_resid$p5 <- ggplot(Resid) +
   geom_point(aes(y=Resid.log,x=lat),alpha=0.3) +
@@ -443,9 +470,48 @@ p_resid$p5 <- ggplot(Resid) +
   theme_bw() +
   facet_wrap(~depth_cat_factor)
 
+## Make a second set of resid for the actual qPCR count numbers predicted vs. observed.
+
+
+# Calculate some predicted - observed for the raw, observed Ct 
+##    Both some presence-absence and postive Ct.
+
+p_pred_bin <- 1 / (1+exp(-Output.qpcr$pred_bin))
+
+dat.temp.bin <- dat.obs.bin %>% dplyr::select(sample_idx,qPCR,sample,Ct,Ct_bin,Niskin, 
+                       depth,date,transect,lat,lon,bottom.depth,station.depth,
+                       depth_cat_factor) %>% bind_cols(.,p_pred_bin)
+
+p_resid$p_raw_bin_resid1 <- ggplot(dat.temp.bin) +
+    geom_jitter(aes(y=Ct_bin,x=Mean),alpha=0.2,width=0,height=0.1)+
+    geom_abline(intercept=0,slope=1,color="red") +
+    theme_bw()
 
 
 
+dat.temp.pos <- dat.obs.pos %>% dplyr::select(sample_idx,qPCR,sample,Ct,Ct_bin,Niskin, 
+                                        depth,date,transect,lat,lon,bottom.depth,station.depth,
+                                        depth_cat_factor) %>% bind_cols(.,Output.qpcr$pred_pos)
+
+# This is for the raw observations
+p_resid$p_raw_pos_resid1 <-  ggplot(dat.temp.pos) +
+  geom_jitter(aes(y=Ct,x=Mean),alpha=0.2,width=0,height=0.1)+
+  geom_abline(intercept=0,slope=1,color="red") +
+  theme_bw()
+
+dat.temp.pos <- dat.obs.pos %>% dplyr::select(sample_idx,qPCR,sample,Ct,Ct_bin,Niskin, 
+                                              depth,date,transect,lat,lon,bottom.depth,station.depth,
+                                              depth_cat_factor) %>% bind_cols(.,Output.qpcr$pred_pos)
+
+dat.temp.pos.sum <- dat.temp.pos %>% group_by(sample_idx,qPCR,sample,Niskin, 
+                                              depth,date,transect,lat,lon,bottom.depth,station.depth,
+                                              depth_cat_factor) %>% 
+                                    summarise(Ct.mean = mean(Ct),pred_Ct = mean(Mean))
+
+p_resid$p_raw_pos_resid2 <-ggplot(dat.temp.pos.sum) +
+  geom_jitter(aes(y=Ct.mean,x=pred_Ct),alpha=0.2,width=0,height=0.1)+
+  geom_abline(intercept=0,slope=1,color="red") +
+  theme_bw()
 
 #############################################
 #############################################

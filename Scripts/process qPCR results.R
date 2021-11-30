@@ -23,11 +23,13 @@ SP <- "hake" # options: hake, lamprey, eulachon
 MODEL.TYPE = "lat.long.smooth"
 ###########################################################################
 # identifier
-MODEL.ID <- "4_10_fix_nu_T"
+MODEL.ID <- "4_10_fix_nu_T-FIN"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
 ###########################################################################
+NO.SURFACE <- "FALSE"
+
 #set.seed(111)
 # Construct smoothes for each 
 # define knots.
@@ -249,16 +251,24 @@ dat.samp <- dat.all %>% dplyr::select(all_of(THESE),useful,Zymo,dilution,grep(SP
                         IPC_Ct=as.numeric(IPC_Ct)) %>%
                   filter(type=="unknowns")
 
-dat.samp <- left_join(dat.samp,dat.id.samp,by="sample") 
+dat.samp <- left_join(dat.samp,dat.id.samp,by="sample")
+
 # Classify each depth into one of a few categories.
 dat.samp <- dat.samp %>% mutate(depth_cat=case_when(depth < 25 ~ 0,
                                                           depth ==25 ~ 25,  
-                                                          depth > 25  & depth <= 50  ~ 50,
-                                                          depth > 50  & depth <= 100 ~ 100,
+                                                          depth > 25  & depth <= 60  ~ 50,
+                                                          depth > 60  & depth <= 100 ~ 100,
                                                           depth > 119 & depth <= 150 ~ 150,
                                                           depth > 151 & depth <= 200 ~ 200,
                                                           depth > 240 & depth <= 350 ~ 300,
                                                           depth > 400 & depth <= 500 ~ 500))
+
+#### THIS IS A SWITCH.  IF NO.SURFACE == "TRUE", drop all surface samples.
+if(NO.SURFACE=="TRUE"){
+  dat.samp <- dat.samp %>% filter(depth_cat!=0)
+}
+
+
 
 # Do some modifications to all of the samples first.
 # Calculate the volume sampled for each sample
@@ -479,12 +489,21 @@ these_samp <- dat.samp %>% group_by(station.depth) %>% summarise(Ct_bin_idx = ma
 SAMPLES <- left_join(SAMPLES,these_samp) 
 
 # Make index for depth category 
+if(NO.SURFACE!="TRUE"){
 SAMPLES <- SAMPLES %>% mutate(depth_idx = case_when(depth_cat == 0 ~ 1,
                                                     depth_cat == 50 ~ 2,
                                                     depth_cat == 100 ~ 3,
                                                     depth_cat == 150 ~ 4,
                                                     depth_cat == 300 ~ 5,
                                                     depth_cat == 500 ~ 6))
+}else{
+  SAMPLES <- SAMPLES %>% mutate(depth_idx = case_when(depth_cat == 50 ~ 1,
+                                                      depth_cat == 100 ~ 2,
+                                                      depth_cat == 150 ~ 3,
+                                                      depth_cat == 300 ~ 4,
+                                                      depth_cat == 500 ~ 5))
+}
+
 N_depth <- length(unique(SAMPLES$depth_cat))
 
 SAMPLES.CONTROL <- data.frame(sample=unique(dat.control.field.neg$sample),
@@ -790,24 +809,39 @@ stan_data = list(
   # basis function matrices
   "Zs_5_1"= smooth.dat$Zs_5_1,
   "Zs_5_2"= smooth.dat$Zs_5_2,
-  "Zs_5_3"= smooth.dat$Zs_5_3,
-  
-  # data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)500
+  "Zs_5_3"= smooth.dat$Zs_5_3
+) 
+if(NO.SURFACE != "TRUE"){
+  stan_data = c(stan_data,
+  list(# data for spline t2(utm.lon,utm.lat,k=c(N.knots.lon,N.knots.lat),bs="cr",by=depth_cat_factor)500
   "nb_6" = smooth.dat$nb_6,  # number of bases
   "knots_6"= smooth.dat$knots_6,  # number of knots
   # basis function matrices
   "Zs_6_1"= smooth.dat$Zs_6_1,
   "Zs_6_2"= smooth.dat$Zs_6_2,
-  "Zs_6_3"= smooth.dat$Zs_6_3
-) 
-if(MODEL.TYPE == "lat.long.smooth"){
-  stan_data = c(stan_data,
-  list(# data for spline s(bottom.depth,k=N.knots.bd)
-  "nb_7"= smooth.dat$nb_7,  # number of bases
-  "knots_7"= smooth.dat$knots_7,  # number of knots
-  # basis function matrices
-  "Zs_7_1"= smooth.dat$Zs_7_1))
+  "Zs_6_3"= smooth.dat$Zs_6_3))
+  if(MODEL.TYPE == "lat.long.smooth"){
+    stan_data = c(stan_data,
+                  list(# data for spline s(bottom.depth,k=N.knots.bd)
+                    "nb_7"= smooth.dat$nb_7,  # number of bases
+                    "knots_7"= smooth.dat$knots_7,  # number of knots
+                    # basis function matrices
+                    "Zs_7_1"= smooth.dat$Zs_7_1))
+  }
 }
+if(NO.SURFACE == "TRUE"){
+  if(MODEL.TYPE == "lat.long.smooth"){
+    stan_data = c(stan_data,
+                  list(# data for spline s(bottom.depth,k=N.knots.bd)
+                    "nb_7"= smooth.dat$nb_7,  # number of bases
+                    "knots_7"= smooth.dat$knots_7,  # number of knots
+                    # basis function matrices
+                    "Zs_7_1"= smooth.dat$Zs_7_1))
+  }
+}
+
+
+
 
 stan_pars = c(
   "beta_0", # intercept for standards
@@ -830,12 +864,13 @@ stan_pars = c(
   "sigma_stand_int",
   #"nu",
   "delta",  # random effect for sample #
-  "tau_sample",# sd among samples given station-depth 
-  "log_lik"
-  
+  "tau_sample"# sd among samples given station-depth 
+  # "pred_bin",
+  # "pred_pos",
+  # "log_lik"
   )   
 
-if(MODEL.TYPE=="lat.long.smooth"){
+if(MODEL.TYPE=="lat.long.smooth" & NO.SURFACE !="TRUE"){
   stan_pars <- c(stan_pars,
     # smooth and linear coefficients
     "D",
@@ -855,6 +890,27 @@ if(MODEL.TYPE=="lat.long.smooth"){
                       "N.knots.lat"=N.knots.lat,
                       "N.knots.bd"=N.knots.bd)
 }
+if(MODEL.TYPE=="lat.long.smooth" & NO.SURFACE =="TRUE"){
+  stan_pars <- c(stan_pars,
+                 # smooth and linear coefficients
+                 "D",
+                 "D_delta",
+                 # "Intercept",
+                 "b",
+                 "bs",
+                 "s_1_1","s_1_2","s_1_3",
+                 "s_2_1","s_2_2","s_2_3",
+                 "s_3_1","s_3_2","s_3_3",
+                 "s_4_1","s_4_2","s_4_3",
+                 "s_5_1","s_5_2","s_5_3",
+                 "s_6_1"
+  ) 
+  N_knots_all <- list("N.knots.lon"=N.knots.lon,
+                      "N.knots.lat"=N.knots.lat,
+                      "N.knots.bd"=N.knots.bd)
+}
+
+
 if(MODEL.TYPE=="lat.long.smooth.base"){
   stan_pars <- c(stan_pars,
                  # smooth and linear coefficients
@@ -919,8 +975,8 @@ options(mc.cores = parallel::detectCores())
 N_CHAIN = 4
 Warm = 1500
 Iter = 9000
-Treedepth = 11
-Adapt_delta = 0.88
+Treedepth = 13
+Adapt_delta = 0.86
 
 LOC <- paste0(base.dir,"Scripts/Stan Files/")
 setwd(LOC)
@@ -942,6 +998,7 @@ if(MODEL.TYPE=="Base"){
 
 if(MODEL.TYPE=="lat.long.smooth"){
   if(MODEL.VAR=="Base_Var"){
+    if(NO.SURFACE!="TRUE"){
     stanMod = stan(file = "qPCR_Hake_smoothes.stan" ,data = stan_data, 
                verbose = FALSE, chains = N_CHAIN, thin = 4, 
                warmup = Warm, iter = Warm + Iter, 
@@ -954,6 +1011,21 @@ if(MODEL.TYPE=="lat.long.smooth"){
                                    N_station_depth = N_station_depth,
                                    N_control_sample = N_control_sample)
     )
+    }
+    if(NO.SURFACE=="TRUE"){
+      stanMod = stan(file = "qPCR_Hake_smoothes_no_surf.stan" ,data = stan_data, 
+                     verbose = FALSE, chains = N_CHAIN, thin = 4, 
+                     warmup = Warm, iter = Warm + Iter, 
+                     control = list(max_treedepth=Treedepth,adapt_delta=Adapt_delta,metric="diag_e"),
+                     pars = stan_pars,
+                     boost_lib = NULL,
+                     sample_file = paste0("./Output files/",MODEL.TYPE,"_",MODEL.ID,"_",MODEL.VAR,".csv"),
+                     init = stan_init_f2(n.chain=N_CHAIN,
+                                         N_pcr= N_pcr,
+                                         N_station_depth = N_station_depth,
+                                         N_control_sample = N_control_sample)
+      )
+    }
   }
   if(MODEL.VAR=="Linear_Var"){
     stanMod = stan(file = "qPCR_Hake_smoothes_VAR2.stan" ,data = stan_data, 
@@ -1004,22 +1076,22 @@ if(MODEL.TYPE=="lat.long.smooth.base"){
 
 # get_adaptation_info(stanMod)
 pars <- rstan::extract(stanMod, permuted = TRUE)
-log_lik_1 <- extract_log_lik(stanMod, merge_chains = FALSE)
-r_eff <- relative_eff(exp(log_lik_1))
-loo_val <- loo(log_lik_1, r_eff = r_eff)
-print(loo_val)
-plot(loo_val)
+# log_lik_1 <- extract_log_lik(stanMod, merge_chains = FALSE)
+# r_eff <- relative_eff(exp(log_lik_1))
+# loo_val <- loo(log_lik_1, r_eff = r_eff)
+# print(loo_val)
+# plot(loo_val)
 
-bad <- loo_val$pointwise %>% as.data.frame()
-bad$ID <- 1:nrow(bad)
-bad2 <- bad %>% filter(influence_pareto_k>1)
-
-bad.dat <- dat.samp[bad2$ID,]
-dim(bad.dat)
-
-ggplot()+
-    geom_histogram(data=bad.dat %>% filter(Ct>0),aes(Ct),fill="red",alpha=0.5) +
-   geom_histogram(data=dat.samp %>% filter(Ct>0),aes(Ct),fill="blue",alpha=0.5) + theme_bw()
+# bad <- loo_val$pointwise %>% as.data.frame()
+# bad$ID <- 1:nrow(bad)
+# bad2 <- bad %>% filter(influence_pareto_k>1)
+# 
+# bad.dat <- dat.samp[bad2$ID,]
+# dim(bad.dat)
+# 
+# ggplot()+
+#     geom_histogram(data=bad.dat %>% filter(Ct>0),aes(Ct),fill="red",alpha=0.5) +
+#    geom_histogram(data=dat.samp %>% filter(Ct>0),aes(Ct),fill="blue",alpha=0.5) + theme_bw()
 ###############3333
 
 samp_params <- get_sampler_params(stanMod)
@@ -1040,6 +1112,7 @@ stanMod_summary_parts[[as.name("param")]] <- summary(stanMod,pars=c(
                                          "sigma_pcr"#,"nu"
                                          ))$summary     # variability among samples, given individual bottle, site, and month ))$summary
 if(MODEL.TYPE == "lat.long.smooth"){
+  if(NO.SURFACE != "TRUE"){
   stanMod_summary_parts[[as.name("smoothes")]] <- summary(stanMod, pars=c("b", "bs",
                                                "s_1_1","s_1_2","s_1_3",  
                                                "s_2_1","s_2_2","s_2_3",
@@ -1048,7 +1121,15 @@ if(MODEL.TYPE == "lat.long.smooth"){
                                                "s_5_1","s_5_2","s_5_3",
                                                "s_6_1","s_6_2","s_6_3",
                                                "s_7_1"))$summary
-  
+  }else{
+    stanMod_summary_parts[[as.name("smoothes")]] <- summary(stanMod, pars=c("b", "bs",
+                                                                            "s_1_1","s_1_2","s_1_3",  
+                                                                            "s_2_1","s_2_2","s_2_3",
+                                                                            "s_3_1","s_3_2","s_3_3",
+                                                                            "s_4_1","s_4_2","s_4_3",
+                                                                            "s_5_1","s_5_2","s_5_3",
+                                                                            "s_6_1"))$summary
+  }
 }
 if(MODEL.TYPE == "lat.long.smooth.base"){
   stanMod_summary_parts[[as.name("smoothes")]] <- summary(stanMod, pars=c("b", "bs",
@@ -1099,16 +1180,21 @@ TRACE[[as.name("Beta1")]] <- traceplot(stanMod,pars=c("lp__","beta_1"),inc_warmu
 TRACE[[as.name("Contam")]] <- traceplot(stanMod,pars=c("lp__","wash_offset","mu_contam","sigma_contam"),inc_warmup=FALSE)
 
 if(MODEL.TYPE=="lat.long.smooth"){
-TRACE[[as.name("b")]] <- traceplot(stanMod,pars=c("b"),inc_warmup=FALSE)
-TRACE[[as.name("bs")]] <- traceplot(stanMod,pars=c("bs"),inc_warmup=FALSE)
+  TRACE[[as.name("b")]] <- traceplot(stanMod,pars=c("b"),inc_warmup=FALSE)
+  TRACE[[as.name("bs")]] <- traceplot(stanMod,pars=c("bs"),inc_warmup=FALSE)
 
-TRACE[[as.name("s_1")]] <- traceplot(stanMod,pars=c("s_1_1","s_1_2","s_1_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_2")]] <- traceplot(stanMod,pars=c("s_2_1","s_2_2","s_2_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_3")]] <- traceplot(stanMod,pars=c("s_3_1","s_3_2","s_3_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_4")]] <- traceplot(stanMod,pars=c("s_4_1","s_4_2","s_4_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_5")]] <- traceplot(stanMod,pars=c("s_5_1","s_5_2","s_5_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_6")]] <- traceplot(stanMod,pars=c("s_6_1","s_6_2","s_6_3"),inc_warmup=FALSE)
-TRACE[[as.name("s_7")]] <- traceplot(stanMod,pars=c("s_7_1"),inc_warmup=FALSE)
+  TRACE[[as.name("s_1")]] <- traceplot(stanMod,pars=c("s_1_1","s_1_2","s_1_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_2")]] <- traceplot(stanMod,pars=c("s_2_1","s_2_2","s_2_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_3")]] <- traceplot(stanMod,pars=c("s_3_1","s_3_2","s_3_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_4")]] <- traceplot(stanMod,pars=c("s_4_1","s_4_2","s_4_3"),inc_warmup=FALSE)
+  TRACE[[as.name("s_5")]] <- traceplot(stanMod,pars=c("s_5_1","s_5_2","s_5_3"),inc_warmup=FALSE)
+  
+  if(NO.SURFACE!="TRUE"){
+    TRACE[[as.name("s_6")]] <- traceplot(stanMod,pars=c("s_6_1","s_6_2","s_6_3"),inc_warmup=FALSE)
+    TRACE[[as.name("s_7")]] <- traceplot(stanMod,pars=c("s_7_1"),inc_warmup=FALSE)
+  }else{
+    TRACE[[as.name("s_6")]] <- traceplot(stanMod,pars=c("s_6_1"),inc_warmup=FALSE)
+  }
 }else if(MODEL.TYPE=="lat.long.smooth.base"){
   TRACE[[as.name("b")]] <- traceplot(stanMod,pars=c("b"),inc_warmup=FALSE)
   TRACE[[as.name("bs")]] <- traceplot(stanMod,pars=c("bs"),inc_warmup=FALSE)
@@ -1133,6 +1219,26 @@ TRACE$Contam
 TRACE$b
 TRACE$bs
 
+#### Get rid of all the predictions for likelihood and for individual observations
+#### from pars.  
+#### Save only the mean prediction for each observation and the loo summary
+#### to maintain a reasonable file size.
+
+# pred_bin <- apply(pars$pred_bin,2,quantile,probs=c(0.025,0.05,0.25,0.5,0.75,0.95,0.975))
+# pred_bin_mean <- colMeans(pars$pred_bin)
+# pred_bin <- pred_bin %>% t() %>% as.data.frame() %>% bind_cols(pred_bin_mean,.) %>% as.data.frame()
+# colnames(pred_bin) <- c("Mean",paste0("X.",c(0.025,0.05,0.25,0.5,0.75,0.95,0.975)))
+# 
+# pred_pos <- apply(pars$pred_pos,2,quantile,probs=c(0.025,0.05,0.25,0.5,0.75,0.95,0.975))
+# pred_pos_mean <- colMeans(pars$pred_pos)
+# pred_pos <- pred_pos %>% t() %>% as.data.frame() %>% bind_cols(pred_pos_mean,.) %>% as.data.frame()
+# colnames(pred_pos) <- c("Mean",paste0("X.",c(0.025,0.05,0.25,0.5,0.75,0.95,0.975)))
+
+#pars2 <- pars
+# pars$pred_bin <- NULL
+# pars$pred_pos <- NULL
+# pars$log_lik <- NULL
+
 #### WRITE TO FILE
 Output.qpcr <- list(
                     # STAN MODEL ASSOCIATED THINGS
@@ -1147,7 +1253,7 @@ Output.qpcr <- list(
                     stanMod_summary_parts = stanMod_summary_parts,
                     #stanMod_summary_D = stanMod_summary_D,
                     samp = pars, samp_params=samp_params,
-                    TRACE = TRACE,
+                    #TRACE = TRACE,
                     SPECIES = SP,
                     MODEL.TYPE = MODEL.TYPE,
                     MODEL.VAR = MODEL.VAR,
@@ -1174,17 +1280,16 @@ Output.qpcr <- list(
                     N_station_depth=N_station_depth,
                     N_sample = N_sample,   # Number of site-month-bottle combinations.
                     N_pcr    = N_pcr,    # Number of PCR plates
-                    dat_raster_fin = dat_raster_fin
+                    dat_raster_fin = dat_raster_fin,
+                    NO.SURFACE = NO.SURFACE
                     #dat_raster_trim = dat_raster_trim
-                    
+                    #Predictions
+                    # pred_bin = pred_bin,
+                    # pred_pos = pred_pos
                     )
 
+base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
 setwd(base.dir)
 setwd("./Stan Model Fits/")
-save(Output.qpcr,file=paste("qPCR 2019",SP,MODEL.TYPE,MODEL.ID,MODEL.VAR,"Fitted.RData"))
-#################################################################
-##################################
-# if(SP=="hake"){
-#   dat.wash.offset <- data.frame(Mean = mean(pars$wash_offset),SD = sd(pars$wash_offset))
-#   write.csv(dat.wash.offset, "wash_offset_hake.csv",row.names = F)
-# }
+save(Output.qpcr,file=paste("qPCR 2019",SP,MODEL.TYPE,MODEL.ID,MODEL.VAR,"Fitted NO.SURFACE=",NO.SURFACE,".RData"))
+

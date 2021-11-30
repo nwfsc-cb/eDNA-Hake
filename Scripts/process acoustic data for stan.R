@@ -1,5 +1,5 @@
-# This script is for reading in qPCR data, merging it with locations, and starting a set of plots.  
-# It will likely be called in a rMarkdown file later.
+# This script is for reading in acoustic data, merging it with locations,
+# estimating a stan model file, and writing results to file.
 
 # Libraries
 library(tidyverse)
@@ -17,20 +17,21 @@ library(loo)
 ## 
 
 # Working directories
-base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
+base.dir <- "/Users/ole.shelton/Github/eDNA-Hake-public/"
 data.dir <- paste0(base.dir,"Data/acoustics 2019")
 script.dir <- paste0(base.dir,"/Scripts")
 plot.dir <- paste0(base.dir,"Plots and figures")
 
 ###########################################################################
 # Make a choice about the kind of model to run.
-# Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
+# Options are 
+  # "lat.long.smooth" - a model with  "lat.long.smooth.base"
 MODEL.TYPE = "lat.long.smooth"
 ###########################################################################
 DATA.INCLUDED = "raw" # options are "raw" or "combined"
 ###########################################################################
 # identifier
-MODEL.ID <- "7_14_6_10_smooth_hurdle"
+MODEL.ID <- "6_14_6_10_smooth_hurdle"
 ###########################################################################
 # variance scenario # options are "Base_Var", "Linear_Var"
 MODEL.VAR <- "Base_Var" #
@@ -38,7 +39,7 @@ MODEL.VAR <- "Base_Var" #
 #set.seed(111)
 # Construct smoothes for each 
 # define knots.
-N.knots.lon.pos  <- 7
+N.knots.lon.pos  <- 6
 N.knots.lat.pos  <- 14
 N.knots.lon.bin  <- 6
 N.knots.lat.bin  <- 10
@@ -132,39 +133,6 @@ dat.acoustic.pos  <- dat.acoustic.bin[1:N_obs_pos,]
 ### Go get the projected points for the coast from Blake's data
 dat_raster_fin <- readRDS(file="../Data/_projection_rds/dat_raster_fin.rds")   
 
-# Information from Chu on detection thresholds.
-
-#  Email string from April 12,2021.
-# Chu says:
-#   In exporting the NASC from echoview, we set a threshold of Sv = -70 dB (RT - correct me if I am wrong), 
-#   the resultant minimum NASC_min = 4*pi*1852^2*H*10^(-70/10) = 43.1 m^2/nmi^2 with H=10 m. 
-#   here is an approximate estimate of minimum value of biomass density:
-#   1) for adult hake, say 40-cm long: TS = 35.96 dB, sA = 4*pi*10^(TS/10) = 0.032  m^2
-#   2) the biomass of the average hake of 40-cm is  wgt_sngle_hake40 = 0.45 kg
-#   3) the minimum aerial biomass density =  NASC_min/sA*wgt_single_hake40 = 606 kg/nmi^2
-#   
-#   So the value of 606 kg/nmi^2 is the roughly estimated threshold of aerial biomass density.
-#   
-#   Rebecca.Thomas - NOAA Federal
-#   Chu-
-#     Interesting, I had never thought about it this way before. However, our threshold is -69 dB, not -70.  
-#     Close :-)  I guess if you want to get technical, you could run to the calculation again with -69.
-# 
-#     I see what you are saying Chu, that the smallest number we could produce would be ~606 kg per nautical mile squared. 
-#     I think in reality our cut off would be significantly higher than that, but since it would be difficult 
-#     to put a number on what is essentially a subjective process, your number is probably the best one we can produce. 
-#     At the scales you're talking about, we are just as likely to have false positives as well as real positives.  
-#     Some of the zeros that we have almost certainly have hake in them, but we don't know when they would, of course.
-# 
-#   RT
-# 
-#   Hi RT,
-# 
-#   Thank RT for correcting me on the export threshold, i.e.  -69 dB instead of -17 dB.  
-#   Using the same calculation in my previous email, this 1 dB difference will result in 10^0.1 = 1.2589 time difference in biomass estimate, 
-#   i.e. the minimum aerial biomass density =  NASC_min/sA*wgt_single_hake40 = 1.2589*606 kg/nmi^2 = 763  kg/nmi^2
-#   
-
 #### Here are some data plots..
 setwd(script.dir)
 source("Base_map.R")
@@ -184,8 +152,6 @@ base_map_trim +
                  alpha=0.5))+
   scale_color_viridis_c()
 
-
-
 # Plot on log scale
 ggplot(dat.acoustic %>% filter(transect<40)) +
   geom_point(aes(x=utm.lon,y=log(weight_dens_mt_km2)))+
@@ -196,10 +162,6 @@ ggplot(dat.acoustic.trim %>% filter(transect<40)) +
   geom_point(aes(x=utm.lon,y=log(weight_dens_mt_km2)))+
   facet_wrap(~transect,scales="free_x") +
   theme_bw()
-
-
-
-
 
 # Plot on identity scale
 ggplot(dat.acoustic %>% filter(transect<40)) +
@@ -216,53 +178,11 @@ ggplot(dat.acoustic.trim %>% filter(transect<40)) +
 thresh_mt_km2 <- 0.763 / 3.43429 # This is the threshold determined from emails pasted above.
 prob_val      <- 0.99  # This is the probability of observing presence at the threshold.
 
-# cloglog calculations.
-phi0 <- log(-log(1-0.99))
-phi1 <- 2
-
-x <- seq(-5,5,length.out=1000)
-y <- 1- exp(-exp(phi0+phi1*x))
-plot(y~x)
-
-# Look at intecept with cloglog
-phi_0_mean <- log(-log(1-prob_val))  
-phi_0_fix <- phi_0_mean
-phi_0_sd   <- 0.1
-phi_0_rand <- rnorm(1e6,phi_0_mean,phi_0_sd)
-test<-1- exp(-exp(phi_0_rand))
-hist(test,breaks=1000)
-mean(test)
-
-# priors for phi_1 (normal prior)
-phi_1_mean <- 20
-phi_1_sd  <- 3
-
-x <- seq(0,3,length.out=1000)
-y1 <- 1- exp(-exp(phi0+0.9*x))
-y2 <- 1- exp(-exp(phi0+1.5*x))
-y3 <- 1- exp(-exp(phi0+2.1*x))
-
-##### LOGIT CALCULATIONS
-phi0 <- -log(1/prob_val - 1)
-phi1 <- 20
-offset = 0.76
-
-x <- seq(0,3,length.out=1000)
-y <- 1 / (1+exp(-(phi0+phi1*(x-offset))))
-
-plot(y~x)
-abline(h=prob_val,v=offset,col=2)
-
-# Look at intecept with logit
-phi_0_mean <- -log(1/prob_val - 1)
-phi_0_fix  <- phi_0_mean
-
-
 ###################################################################
 ###################################################################
 ###################################################################
 if(MODEL.TYPE == "lat.long.smooth"){
-  # THis is a new version.  Derive basis function set up from the positive observations, make a second set of 
+  # Derive basis function set up from the positive observations, make a second set of 
   # projections to the binomial components.
   
   ## FILL THIS IN TO HAVE A MODEL WITHOUT THE Bathymetry term.
@@ -313,7 +233,7 @@ if(MODEL.TYPE == "lat.long.smooth"){
 }
 
 if(MODEL.TYPE == "lat.long.smooth.base"){
-  # THis is a new version.  Derive basis function set up from the positive observations, make a second set of 
+  # Derive basis function set up from the positive observations, make a second set of 
   # projections to the binomial components.
   
   ## FILL THIS IN TO HAVE A MODEL WITHOUT THE Bathymetry term.
@@ -324,7 +244,6 @@ if(MODEL.TYPE == "lat.long.smooth.base"){
   knots.lat.pos    <- seq(utm.lat.lims[1],utm.lat.lims[2],length.out=N.knots.lat.pos)
   
   # bottom.depth smooth
-  #N.knots.bd <- 6
   bd.lims <- c(min(dat.acoustic.bin$bathy.bottom.depth), max(dat.acoustic.bin$bathy.bottom.depth))
   knots.bd <- seq(bd.lims[1],bd.lims[2],length.out=N.knots.bd)
   
@@ -384,8 +303,6 @@ stan_data = list(
 
   # SMOOTH COMPONENTS.
   # Data for linear effects
-  # "K" = smooth.dat$K, # number of population-level effects
-  # "X" = smooth.dat$X,  # population-level design matrix
   
   # data for splines (positive values)
   "Ks_pos" = smooth.dat.pos$Ks, # number of linear effects
@@ -447,14 +364,14 @@ if(MODEL.TYPE=="lat.long.smooth"){
     # smooth and linear coefficients
     "Intercept_pos",
     "Intercept_bin",
-    # "b",
+    
     "bs_pos",
     "bs_bin",
     "s_1_1_pos","s_1_2_pos","s_1_3_pos",
     "s_1_1_bin","s_1_2_bin","s_1_3_bin",
     "s_2_1_pos","s_2_1_bin",
-    "theta_bin",
-    "D_pos")
+    "theta_bin_pred",
+    "D_pos_pred")
      
   N_knots_all <- list("N.knots.lon.pos"=N.knots.lon.pos,
                       "N.knots.lat.pos"=N.knots.lat.pos,
@@ -467,15 +384,13 @@ if(MODEL.TYPE=="lat.long.smooth.base"){
                  # smooth and linear coefficients
                   "Intercept_pos",
                   "Intercept_bin",
-                 # "b",
                   "bs_pos",
                   "bs_bin",
                   "s_1_1_pos","s_1_2_pos","s_1_3_pos",
                   "s_1_1_bin","s_1_2_bin","s_1_3_bin",
-                 "theta_bin",
-                 "D_pos")
+                 "theta_bin_pred",
+                 "D_pos_pred")
                  
-  #)   
   N_knots_all <- list("N.knots.lon.pos"=N.knots.lon.pos,
                       "N.knots.lat.pos"=N.knots.lat.pos,
                       "N.knots.lon.bin"=N.knots.lon.bin,
@@ -510,8 +425,8 @@ rstan_options(auto_write = TRUE)
 options(mc.cores = parallel::detectCores())
 
 N_CHAIN = 4
-Warm = 1000
-Iter = 2000
+Warm = 1200
+Iter = 3000
 Treedepth = 12
 Adapt_delta = 0.99
 
@@ -528,10 +443,6 @@ if(MODEL.TYPE=="lat.long.smooth"){
                  boost_lib = NULL,
                  sample_file = paste0("./Output files/",MODEL.TYPE,"_",MODEL.ID,"_Acoustics.csv"),
                  init = stan_init_f2(n.chain=N_CHAIN)
-                                     # phi_0_mean = phi_0_mean,
-                                     # phi_0_sd   = phi_0_sd,
-                                     # phi_1_mean = phi_1_mean,
-                                     # phi_1_sd   = phi_1_sd)
   )
   }
 }
@@ -551,7 +462,6 @@ if(MODEL.TYPE=="lat.long.smooth.base"){
 }
 
 samp_params <- get_sampler_params(stanMod)
-#samp_params 
 stanMod_summary <- summary(stanMod)$summary
 pars <- rstan::extract(stanMod, permuted = TRUE)
 #########################################################################
@@ -606,8 +516,8 @@ if(MODEL.TYPE == "lat.long.smooth.base"){
 
 ##### MAKE SOME DIAGNOSTIC PLOTS
 TRACE <- list()
-TRACE[[as.name("D_pos")]] <- traceplot(stanMod,pars=c("lp__","D_pos[12]","D_pos[234]","D_pos[456]","D_pos[855]"),inc_warmup=FALSE)
-TRACE[[as.name("theta_bin")]] <- traceplot(stanMod,pars=c("lp__","theta_bin[12]","theta_bin[234]","theta_bin[456]","theta_bin[855]"),inc_warmup=FALSE)
+TRACE[[as.name("D_pos_pred")]] <- traceplot(stanMod,pars=c("lp__","D_pos_pred[12]","D_pos_pred[234]","D_pos_pred[456]","D_pos_pred[855]"),inc_warmup=FALSE)
+TRACE[[as.name("theta_bin_pred")]] <- traceplot(stanMod,pars=c("lp__","theta_bin_pred[12]","theta_bin_pred[234]","theta_bin_pred[456]","theta_bin_pred[855]"),inc_warmup=FALSE)
 #TRACE[[as.name("mu_smooth")]] <- traceplot(stanMod,pars=c("lp__","mu_smooth[12]","mu_smooth[234]","mu_smooth[456]","mu_smooth[878]"),inc_warmup=FALSE)
 
 if(MODEL.TYPE=="lat.long.smooth"){
@@ -657,11 +567,3 @@ setwd(base.dir)
 setwd("./Stan Model Fits/")
 save(Output.acoustic,file=paste("Acoustics 2019",MODEL.TYPE,MODEL.ID,MODEL.VAR,"Fitted.RData"))
 ######
-
-
-
-
-
-
-
-

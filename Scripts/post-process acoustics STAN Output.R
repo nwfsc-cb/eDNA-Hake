@@ -33,7 +33,8 @@ setwd(results.dir)
 SPECIES <- "hake" # eulachon, hake 
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("Acoustics 2019 lat.long.smooth 7_14_6_10_smooth_hurdle Base_Var Fitted.RData")
+load("Acoustics 2019 lat.long.smooth 6_14_6_10_smooth_hurdle Base_Var Fitted.RData")
+
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 # Read in agreed upon dat_raster_fin that has been trimmed to 
@@ -64,10 +65,16 @@ pred_obs_pos_p1 <- ggplot(pred_obs_pos) +
                     theme_bw()
 
 pred_obs_pos_p2 <- ggplot(pred_obs_pos) + 
-                  geom_point(aes(x=log(Mean),y=log(weight_dens_mt_km2)),alpha=0.5) +
-                  geom_smooth(aes(x=log(Mean),y=log(weight_dens_mt_km2))) +
-                  #geom_abline(intercept=0,slope=1,color="red") +
+                  geom_point(aes(x=Mean.log,y=log(weight_dens_mt_km2)),alpha=0.5) +
+                  geom_smooth(aes(x=Mean.log,y=log(weight_dens_mt_km2))) +
+                  geom_abline(intercept=0,slope=1,color="red") +
                   theme_bw()
+
+pred_obs_pos_resid <- ggplot(pred_obs_pos) + 
+                      geom_point(aes(x=Mean,y=resid),alpha=0.5) +
+  geom_smooth(aes(x=log(Mean),y=log(weight_dens_mt_km2))) +
+  #geom_abline(intercept=0,slope=1,color="red") +
+  theme_bw()
 
 #### MAP MAKING COMMANDS
 # Plot Limits for all samples (see Base_Map.R)
@@ -92,10 +99,10 @@ resid_pos_map <- base_map_trim +
 ## Variance parameters.
 ##########################################################
 
-sigma_plot <- ggplot() +
+kappa_plot <- ggplot() +
   geom_density(aes(pars$sigma),alpha=0.5,fill=viridis(1))+
   geom_vline(xintercept = mean(pars$sigma),linetype="dashed") +
-  xlab(expression(sigma)) +
+  xlab(expression(kappa)) +
   theme_bw()
 
 #######################################################
@@ -110,22 +117,26 @@ sigma_plot <- ggplot() +
 # Raw Data projections
 p_bin <- base_map_trim + 
   geom_point(data=dat.acoustic.bin,aes(x=lon,y=lat,color=as.factor(bin_weight_dens),
-                                       fill=as.factor(bin_weight_dens),shape=as.factor(bin_weight_dens)),alpha=0.5) +
+                                       fill=as.factor(bin_weight_dens),shape=as.factor(bin_weight_dens)),alpha=0.5,size=0.5) +
   scale_shape_manual("Occurrence",values=c(4,21)) +
   scale_color_viridis_d("Occurrence",begin=0,end=0.8) +
   scale_fill_viridis_d("Occurrence",begin=0,end=0.8) 
 p_bin
 
-LAB.pos <- c(0,10,50,100,200,400,600,800)
+
+dat.acoustic.pos$weight_dens_mt_km2_plot <- dat.acoustic.pos$weight_dens_mt_km2
+dat.acoustic.pos$weight_dens_mt_km2_plot[dat.acoustic.pos$weight_dens_mt_km2_plot<1] <- 1
+
+LAB.pos <- c(1,10,50,100,200,400,800)
 p_pos <- base_map_trim + 
-          geom_point(data=dat.acoustic.pos,aes(x=lon,y=lat,size=weight_dens_mt_km2),alpha=0.9,shape=21,fill=NA,color="red") +
-          scale_size(name=expression("Density (mt km"^-2*")"),breaks=LAB.pos,range=c(0.01,10)) 
+          geom_point(data=dat.acoustic.pos,aes(x=lon,y=lat,size=weight_dens_mt_km2_plot),alpha=0.9,shape=21,fill=NA,color="red") +
+          scale_size(name=expression("Density (mt km"^-2*")"),limits = c(1,900), breaks=LAB.pos,range=c(0.01,5)) #trans="sqrt") 
 p_pos
 
 ######################################################3
 # Smooth projections.
 ######################################################3
-SIZE = 2
+SIZE = 1.3
 STROKE = 0 
 
 lon.lab <- -126.1
@@ -163,33 +174,32 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
   p_log_D[[as.name("binom")]] <-
     base_map_trim_proj +
     geom_point(data= D_pred_bin_combined ,
-            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
     scale_color_viridis_c(name="Probability of\n Occurrence",option=OPT,limits=z.lim.bin,breaks=z.bin.breaks) +
     scale_fill_viridis_c(name="Probability of\n Occurrence",option=OPT,trans="sqrt",limits=z.lim.bin,breaks=z.bin.breaks) +
     
     theme_bw() 
   p_log_D$binom
     
-  sqrt_breaks <- c(0,25,50,100,seq(200,900,by=200))
+  sqrt_breaks <- c(0,10,50,100,seq(200,900,by=200))
   p_log_D[[as.name("pos")]] <- 
     base_map_trim_proj +
     geom_point(data= D_pred_pos_combined,
-               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
-    scale_color_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),option=OPT,trans="sqrt",breaks=sqrt_breaks) +
-    scale_fill_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),option=OPT,trans="sqrt",breaks=sqrt_breaks) +
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
+    scale_color_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),limits=c(0,900),option=OPT,trans="sqrt",breaks=sqrt_breaks,na.value=viridis(1,begin=1,end=1)) +
+    scale_fill_viridis_c(name=expression("Conditional\nDensity (mt km"^-2*")"),limits=c(0,900),option=OPT,trans="sqrt",breaks=sqrt_breaks,na.value=viridis(1,begin=1,end=1)) +
     theme_bw() 
   p_log_D$pos
   
   sqrt_breaks <- c(0,100,500,seq(1000,5000,by=1000))
-  z.lim = c(0,5050) 
+  z.lim = c(0,5200) 
   p_log_D[[as.name("uncond")]] <- 
     base_map_trim_proj +
     geom_point(data= D_pred_uncond_mt_combined ,
-               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
     scale_color_viridis_c(name=expression("Biomass (mt)"),option=OPT,trans="sqrt",breaks=sqrt_breaks,limits=z.lim) +
     scale_fill_viridis_c(name=expression("Biomass (mt)"),option=OPT,trans="sqrt",breaks=sqrt_breaks,limits=z.lim) +
     theme_bw() 
-  p_log_D$uncond
   
   #########
   
@@ -214,7 +224,7 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
   ######################################################3
   ## SD in Space
   ######################################################3
-  # SIZE = 1.5
+  # SIZE = 1.3
   # STROKE = 0 
   # 
   # z.lim = c(0,1.25) 
@@ -281,7 +291,7 @@ OPT = "plasma" # options are "viridis"(default), "magma", "plasma", "inferno"
    #z.lim.labs <- 10^z.breaks
    
    
-   SIZE = 1
+   SIZE = 1.3
    p_log_D_smoothes_only <- base_map_trim +
      # geom_point(data= D_pred_background,
      #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
@@ -338,6 +348,12 @@ pdf(file=paste("Acoustics_marginal_smoothes_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL
   print(p_marginal_smooth)
 dev.off()
 
+
+pdf(file=paste("Acoustics_kappa_plot_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".pdf",sep=""),onefile = T,height=3.5,width=5)
+print(kappa_plot)
+dev.off()
+
+
 # p_log_D
 # p_log_D_facet
 # p_log_D_SD
@@ -377,10 +393,13 @@ Acoustic.dat.figs <- list(
   pred_obs_pos_p1 = pred_obs_pos_p1,
   pred_obs_pos_p2 = pred_obs_pos_p2,
   resid_pos_map = resid_pos_map,
-  sigma_plot =sigma_plot,
+  
+  # variance
+  kappa_plot = kappa_plot,
   
   # Derived data files
   smooth.projections = smooth.projections,
+  stanMod_summary_parts = Output.acoustic$stanMod_summary_parts,
 
   # Covariates, etc needed to make spatial predictions.
   smooth.dat.pred.bin = smooth.dat.pred.bin,
@@ -393,7 +412,6 @@ Acoustic.dat.figs <- list(
   # Derived MCMC predictions.
   D_pred_bin = D_pred_bin,
   D_pred_pos = D_pred_pos,
-  D_pred_uncond = D_pred_uncond,
   D_pred_uncond_mt_combined = D_pred_uncond_mt_combined,
   D_acoustic_uncond_cum_sum = D_acoustic_uncond_cum_sum,
   D_acoustic_uncond_total_mt = D_acoustic_uncond_total_mt,
@@ -404,7 +422,6 @@ Acoustic.dat.figs <- list(
   
   # Map Plots
   p_Acoustics_lat_0.5 = p_Acoustics_lat_0.5,
-  p_Acoustics_lat_1.0 = p_Acoustics_lat_1.0,
   p_Acoustics_lat_equal = p_Acoustics_lat_equal,
   p_Acoustics_lat_base = p_log_D$uncond,
   lat.breaks = lat.breaks,
