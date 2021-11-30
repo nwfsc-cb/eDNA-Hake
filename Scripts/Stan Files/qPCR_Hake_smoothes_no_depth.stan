@@ -502,16 +502,19 @@ model {/////////////////////////////////////////////////////////////////////////
 generated quantities {
    // log_likelihoods for use with the loo package 
   vector[N_obs_bin] log_lik;
+  vector[N_obs_bin] pred_bin;
+  vector[N_obs_pos] pred_pos;
+  
   
     for(i in 1:N_obs_bin){
-     log_lik[i]  = bernoulli_logit_lpmf(bin_obs[i] | phi_0[pcr_obs_bin_idx[i]] + 
-                                                      phi_1[pcr_obs_bin_idx[i]] * (D_contam[sample_bin_idx[i]] + 
-                                                                            bin_log_dilution_obs[i])) ;
+      pred_bin[i] = phi_0[pcr_obs_bin_idx[i]] + 
+                      phi_1[pcr_obs_bin_idx[i]] * (D_contam[sample_bin_idx[i]] + bin_log_dilution_obs[i]) ;
+      log_lik[i]  = bernoulli_logit_lpmf(bin_obs[i] | pred_bin[i]) ;
     }
     for(i in 1:N_obs_pos){
-      log_lik[loo_pos_idx[i]]  = log_lik[loo_pos_idx[i]] +
-                                            student_t_lpdf(pos_obs[i] | 3, beta_0[pcr_obs_pos_idx[i]] + 
-                                                        beta_1[pcr_obs_pos_idx[i]] * (D_contam[sample_pos_idx[i]] + 
-                                                                  pos_log_dilution_obs[i]), sigma_all_samp);
+      pred_pos[i] = beta_0[pcr_obs_pos_idx[i]] + 
+                      beta_1[pcr_obs_pos_idx[i]] * (D_contam[sample_pos_idx[i]] + pos_log_dilution_obs[i]) ;
+      log_lik[loo_pos_idx[i]]  =  log_lik[loo_pos_idx[i]] + 
+                                             student_t_lpdf(pos_obs[i] |3, pred_pos[i], sigma_all_samp) ;
     }
 }
