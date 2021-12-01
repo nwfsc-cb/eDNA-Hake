@@ -228,14 +228,14 @@ MDS_function <- function(.x, .y){
                   }
 
 By.taxa.dataset.metadata %>% 
+ filter (!str_detect(taxon, "Cichlidae")) %>%
+  filter(!str_detect(eDNA.sample, "978")) %>% 
   select(eDNA.sample, rep, taxon, nReads) %>% 
  
   eDNAindex(Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads)  %>%
    left_join(Step2) -> Joined.dataset
   
-Joined.dataset %>% 
- filter (!str_detect(taxon, "Cichlidae")) %>%
-  filter(!str_detect(eDNA.sample, "978")) %>% 
+Joined.dataset
   ungroup() %>%
    # group_by(Transect) %>%
   nest() %>% 
@@ -281,22 +281,218 @@ First.analysis %>%
   scale_color_brewer( palette = "Dark2")
 ggsave(here("Presentations", "images", "MDS.plot.png"), width = 9)
 ```
+
+What if we plot the same but labelling things whether stratified or not, and only allow or below
+
+```{r}
+First.analysis %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+  
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  
+  # geom_label(aes(x = MDS1, y = MDS2, label = #glue::glue(Station, depth, .sep = "-")
+  #                                              position)) +
+  geom_point(aes(color = position, shape = groups)) +
+  facet_wrap(~groups, nrow =2) +
+  theme_linedraw() +
+  scale_color_brewer( palette = "Dark2")
+```
+
+
 ## Same disticntiviness by PA
+
+
 
 ```{r}
 First.analysis %>% 
   select(mds.pa) %>% 
   unnest() %>% 
+  
   ggplot(aes(x = MDS1, y = MDS2)) +
-  geom_point(aes(color = position)) +
+  geom_point(aes(color = position, shape = groups)) +
+  facet_wrap(~groups, nrow =2) +
+  theme_linedraw() +
+  scale_color_brewer( palette = "Dark2") +
   geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = glue::glue(Station, depth, .sep = "-")))
 ```
+A few checks
+```{r}
+By.taxa.dataset.metadata %>% 
+  select(eDNA.sample, rep, taxon, nReads) %>% 
+ filter(!str_detect(taxon, "Cichl")) %>% 
+  eDNAindex(Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads)  %>%
+   left_join(Step2) -> Joined.dataset
+
+# There are still tilapias
+Joined.dataset %>% 
+  filter(str_detect(taxon, "Cichl")) %>% 
+  semi_join(Joined.dataset, ., by = "eDNA.sample")
+
+# How many reads
+By.taxa.dataset.metadata %>%
+  filter(!str_detect(taxon, "Cichl")) %>% 
+  summarise(sum(nReads))
+
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample) %>% 
+  summarise(tot = sum( nReads), div = n_distinct(taxon)) -> sums
+
+sums %>% 
+  ggplot(aes(y =tot ,x =fct_reorder(as.character(eDNA.sample), tot))) +
+  geom_col()
+
+
+sums %>% 
+  ggplot(aes(y =div ,x =fct_reorder(as.character(eDNA.sample), tot))) +
+  geom_col()
+  
+sums %>% 
+  arrange((div))
+
+sums %>% 
+  arrange((tot))
+
+Joined.dataset %>% 
+   filter (eDNA.sample %in% c("978", "997", "1723"))
+
+Joined.dataset %>% 
+   filter (eDNA.sample %in% c("996", "80", "68")) 
+  
+
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample, taxon) %>% 
+  summarise(nReads =sum(nReads)) %>% 
+  eDNAindex(Sample_column = eDNA.sample, OTU_column = taxon, Counts_column = nReads) %>% 
+  tibble_to_matrix(sample.name =  eDNA.sample, taxon = taxon, Abundance = Normalized.reads, transformation = "") ->  all.distances
+```
+
+
+```{r}
+plots.from.distance <- function(distance.matrix){
+  
+  as_tibble(subset(reshape2::melt(as.matrix(all.distances)))) %>% 
+  filter (Var1!= Var2) %>% 
+  left_join(Step2, by = c("Var1" = "eDNA.sample")) %>% 
+  left_join(Step2, by = c("Var2" = "eDNA.sample")) ->  all.distances.melted
+  
+# First graph
+
+all.distances.melted %>% 
+   
+  mutate(Within = case_when (Station.x == Station.y ~ "Within Station",
+                             TRUE                   ~ "Different Station")) %>% 
+  group_by(Within) %>% 
+  nest() %>% 
+  mutate(plot = map2(data ,Within, function(.x, .y) .x %>% 
+                      mutate( Comparison = case_when(position.x == position.y                         ~ "within Strata",
+                                position.x == "above" & position.y == "below"    ~ "Above/Below",
+                                position.x == "below" & position.y == "above"    ~ "Above/Below",
+                                position.x == "below" & position.y == "seafloor" ~ "Below/Seafloor",
+                                position.x == "seafloor" & position.y == "below" ~ "Below/Seafloor",
+                                TRUE                                             ~ "Above/Seafloor")) %>% 
+                       ggplot() +
+                       geom_histogram (aes (fill = Comparison, x = value, after_stat(ndensity)), position = "dodge",  alpha = 0.9, bins = 50) +
+                       facet_grid( groups.x~ Comparison) +
+                       labs (x = "Pairwise dissimilarity", y = "density" ,
+                             Comparison = "Distance", title = .y) +
+                       guides (fill = "none")),
+         # Second Graph
+         plts.graphs = map2(data ,Within, function(.x, .y) .x %>% 
+                      mutate( Comparison = case_when( position.x == position.y                         ~ "within Strata",
+                                                      position.x == "seafloor"     ~ "Seafloor upwards",
+                                                      position.y == "seafloor"     ~ "Seafloor upwards",
+                                                      TRUE   ~ "Above/Below"),
+                              Distance = abs(depth.x -depth.y) + 0.1) %>% 
+                        ggplot() +
+                        geom_point(aes(x = Distance, y = value, color = groups.y)) +
+                        
+                        facet_grid( groups.x~ Comparison) +
+                        labs (x = "Distance", y = "Pairwise dissimilarity" ,
+                              Comparison = "", title = .y) +
+                        guides (fill = "none"))) -> plts
+
+## Add an MDS plot
+
+MDS_function (distance.matrix, Step2) %>% 
+  
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  
+ 
+  geom_point(aes(color = position, shape = groups)) +
+  facet_wrap(groups~Station,) +
+  theme_linedraw() +
+  scale_color_brewer( palette = "Dark2") -> plot2
+  
+ ( plts$plot[[1]] + plts$plot[[2]]) /  ( plts$plts.graphs[[1]] + plts$plts.graphs[[2]]) + plot2 +
+  plot_layout(guides = "collect")
+}
+
+```
+Second guess: bottom eDNA travels up
+
+```{r}
+plots.from.distance(all.distances)
+ 
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample, taxon) %>% 
+  summarise(nReads =sum(nReads)) -> Collapsed.by.niskin 
+  
+
+tibble_to_matrix(Collapsed.by.niskin, sample.name =  eDNA.sample, taxon = taxon, Abundance = nReads, transformation = "pa",distance = "bray") %>% 
+  plots.from.distance()
+
+
+?vegdist
+
+MDS_function(all.distances, Step2) %>% 
+  
+  ggplot(aes(x = MDS1, y = MDS2)) +
+  
+ 
+  geom_point(aes(color = position, shape = groups)) +
+  facet_wrap(~groups) +
+  theme_linedraw() +
+  scale_color_brewer( palette = "Dark2")
+
+```
+
+
+Formal Hypothesis:
+
+The difference between 
+
+```{r}
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample, taxon) %>% 
+  summarise(nReads =sum(nReads)) %>% 
+  left_join(Step2) %>% 
+  group_by(Station) %>% 
+  nest() %>% 
+  mutate(ncases= map_dbl(data, ~ n_distinct(.x$eDNA.sample))) %>% 
+   filter (ncases>2) %>% 
+  mutate(mds = map (data, ~ eDNAindex(.x, Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads)   %>% 
+                      tibble_to_matrix( sample.name =  eDNA.sample, taxon = taxon, Abundance = Normalized.reads, transformation = "pa",distance = "bray") %>% 
+                      MDS_function( Step2) %>% 
+                      ggplot(aes(x = MDS1, y = MDS2)) +
+                      geom_point(aes(color = position, shape = groups)) +
+                      facet_wrap(~groups) +
+                      theme_linedraw() +
+                      labs(title = Station) +
+                      scale_color_brewer( palette = "Dark2")
+                      )) %>% pull(mds)
+```
+
 
 #### WHat's the deal with 60-4-50
 
 ```{r}
-Joined.dataset %>% 
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample, taxon) %>% 
+  summarise(nReads =sum(nReads))  %>% 
   filter (eDNA.sample != "978") %>% 
+  eDNAindex( Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads) %>% 
+  left_join(Step2) %>% 
   ungroup() %>%
   # group_by(Transect) %>% 
   nest() %>% 
@@ -312,10 +508,13 @@ Joined.dataset %>%
              geom_point(aes(x = MDS1, y = MDS2, color = Station))
          }),
          
-         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~  position,data = .y, permutations = 9999) }),
+         PERMANOVA = map2(bc, env, function(.x, .y){
+           perm <- how(nperm = 9999)
+           setBlocks(perm) <- with(.y, Transect)
+           adonis2(formula = .x ~  position * groups,data = .y, permutations = perm) }),
          CAP_lat = map2(bc, env, function(.x,.y ){
            
-           capscale(.x~lat,data = .y)
+           capscale(.x~position,data = .y)
          })
          
         
@@ -326,6 +525,17 @@ Joined.dataset %>%
          #   
          # })
          ) -> Second.analysis
+
+Second.analysis %>% pull(PERMANOVA)
+Second.analysis %>% pull(CAP_lat) %>% map(plot) -> cap.plot
+
+as_data_frame(cap.plot[[1]]$sites) %>% 
+  mutate(eDNA.sample = as.numeric( rownames(cap.plot[[1]]$sites)) ) %>% 
+  left_join(Step2) %>% 
+  ggplot(aes(x = CAP1, y = CAP2, color = position, shape= groups)) +
+  geom_point() +
+  facet_wrap(~groups, nrow = 1)
+  
 ```
 
 
