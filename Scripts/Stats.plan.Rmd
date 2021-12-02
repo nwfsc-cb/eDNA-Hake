@@ -234,38 +234,45 @@ By.taxa.dataset.metadata %>%
  
   eDNAindex(Sample_column = eDNA.sample,OTU_column = taxon, Counts_column = nReads)  %>%
    left_join(Step2) -> Joined.dataset
-  
-Joined.dataset
-  ungroup() %>%
-   # group_by(Transect) %>%
-  nest() %>% 
-  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
-          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
-         env = map (data, ~tibble_to_env(.x, taxon = taxon, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
+
+
+#A function for doing the three things
+
+distances <- function(tibble,Abundance = nReads ){
+  Abundance = rlang::enquo(Abundance)
+  tibble %>% 
+   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon, Abundance = !!Abundance, sample.name = eDNA.sample,
+                                           distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+                                           distance = "bray",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+                                         everything()) ),
          
          mds.points = map2( bc, env, MDS_function),
+         
          mds.pa = map2(jc, env, MDS_function), 
          
          mds.plot = map(mds.points, function(.x){
            ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = Station))
-         }),
+             geom_point(aes(x = MDS1, y = MDS2, color = Station))  }),
          
-         PERMANOVA = map2(bc, env, function(.x, .y){adonis2(formula = .x ~ as.factor(Transect) +  position + groups,data = .y, permutations = 9999) }),
+         PERMANOVA = map2(bc, env, function(.x, .y){
+           adonis2(formula = .x ~ as.factor(Transect) +  position + groups,data = .y, permutations = 9999) } ),
          CAP_lat = map2(bc, env, function(.x,.y ){
-           
-           capscale(.x~lat,data = .y)
-         })
-         
-        
-         # CAP_lat = map2(Wide, env, function(.x,.y){
-         #   BiodiversityR::CAPdiscrim(formula = .x ~ Transect,dist = "bray",
-         #                             data = .y,
-         #                             permutations = 999)
-         #   
-         # })
-         ) -> First.analysis
+           capscale(.x~lat,data = .y) })
+         ) 
+    
+}
+
   
+Joined.dataset %>% 
+  ungroup() %>%
+  nest() %>% 
+  distances(Normalized.reads) -> First.analysis
+  
+
+First.analysis %>% 
+  pull(PERMANOVA)
 ```
 ```{r, message= F, warning=F}
 First.analysis %>% 
@@ -496,35 +503,7 @@ By.taxa.dataset.metadata %>%
   ungroup() %>%
   # group_by(Transect) %>% 
   nest() %>% 
-  mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "" )),
-          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon,Abundance = Normalized.reads, sample.name = eDNA.sample, distance = "bray",transformation = "pa" )),
-         env = map (data, ~tibble_to_env(.x, taxon = taxon, Abundance = Normalized.reads, sample.name = eDNA.sample, everything()) ),
-         
-         mds.points = map2( bc, env, MDS_function),
-         mds.pa = map2(jc, env, MDS_function), 
-         
-         mds.plot = map(mds.points, function(.x){
-           ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = Station))
-         }),
-         
-         PERMANOVA = map2(bc, env, function(.x, .y){
-           perm <- how(nperm = 9999)
-           setBlocks(perm) <- with(.y, Transect)
-           adonis2(formula = .x ~  position * groups,data = .y, permutations = perm) }),
-         CAP_lat = map2(bc, env, function(.x,.y ){
-           
-           capscale(.x~position,data = .y)
-         })
-         
-        
-         # CAP_lat = map2(Wide, env, function(.x,.y){
-         #   BiodiversityR::CAPdiscrim(formula = .x ~ Transect,dist = "bray",
-         #                             data = .y,
-         #                             permutations = 999)
-         #   
-         # })
-         ) -> Second.analysis
+  distances(Normalized.reads)   -> Second.analysis
 
 Second.analysis %>% pull(PERMANOVA)
 Second.analysis %>% pull(CAP_lat) %>% map(plot) -> cap.plot
@@ -535,10 +514,35 @@ as_data_frame(cap.plot[[1]]$sites) %>%
   ggplot(aes(x = CAP1, y = CAP2, color = position, shape= groups)) +
   geom_point() +
   facet_wrap(~groups, nrow = 1)
+
+## What if we work in the proportion space
+
+By.taxa.dataset.metadata %>%
+  group_by(eDNA.sample, rep) %>% 
+  mutate(tot = sum(nReads)) %>% 
+  group_by(eDNA.sample, rep, taxon) %>% 
+  summarise(prop =sum(nReads)/tot) %>% # average proportions across bottles of water
+  group_by(eDNA.sample,  taxon) %>% 
+  summarise(prop =mean(prop)) %>% 
+  ungroup() %>% 
+  filter (eDNA.sample != "978")  %>% 
+  left_join(Step2) %>% 
+  filter (position != "seafloor") %>% 
+  nest() %>% 
+  distances(prop)  -> no.seafloor
+
+
   
 ```
 
 
+# Similarity between above and below as a function of thermocline strength
+
+```{r}
+
+
+
+```
 
 
 
