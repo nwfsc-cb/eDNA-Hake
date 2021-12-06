@@ -1,0 +1,130 @@
+---
+title: "Five Figures to rule them all"
+author: "Ramon Gallego"
+date: "12/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Succint approach
+
+We have made many plots - let's put the good ones that are going to end up in the paper all here
+
+```{r cars}
+library (tidyverse)
+library (here)
+library(eDNAfuns)
+```
+
+#### Datasets
+
+We need:
+
+    * the sequence data by taxa, by technical replicate; 
+    * the metadata for each Niskin Bottle
+    * the conversion table between taxa and functional units
+    
+```{r data}
+species_by_rep <- read_csv(here("Data", "by.taxa.by.rep.csv"))
+
+metadata <- read_csv(here("Data", "Final_metadata.csv"))
+
+conversion.df <- read_csv(here("Data", "unique.sp_collapse.csv"))
+```
+
+## Figure 1
+
+This is a map of the stations where samples were collected and the rationale behind sequencing only a subset of them. I will do this, I promise
+
+## Figure 2
+
+This is an MDS plot of the differences between samples based on their species composition, after averaging proportions from each PCR replicate, highlighting the differences due to their position with respect to the thermocline (above/below/seafloor) and whether they are under upwelling or stratified
+
+```{r}
+species_by_rep %>% 
+  group_by(eDNA.sample, rep) %>% 
+  mutate(tot = sum(nReads)) %>% 
+  group_by(taxon, .add = T) %>% 
+  summarise(prop = nReads/tot) -> mid.step # For this to work, it needs to be a df full of 0s
+  
+mid.step %>% 
+  group_by(eDNA.sample) %>% 
+  expand(eDNA.sample,taxon, rep) %>% #Now this can be right_joined with mid.step
+  right_join(mid.step,.) %>% # this should have ~ 800 NAs
+  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+  mutate(prop = replace_na(prop, 0)) %>% 
+  group_by(eDNA.sample,taxon) %>% 
+  summarise(prop = mean(prop)) -> species.proportions.by.sample
+
+# Do all add up to one?
+
+species.proportions.by.sample %>% 
+  summarise(sum(prop)) # Now they do
+
+
+```
+Now use a function to generate the BC, Jaccard, using either Proportions or scaled-up proportions or p/a data
+for all pairwise comparisons. We can use this and later subset the samples of interest because the Bray-Curtis dissimilarity between two samples is not affected by any other samples present on the dataset.
+
+```{r functions}
+## MDS function takes the dissimilarity matrix and the metadata and gives out a big tibble for you to plot
+MDS_function <- function(distance, env){
+           monoMDS(distance,k = 3) -> temp
+           
+           tibble(MDS1 = temp$points[,1],
+                  MDS2 = temp$points[,2],
+                  MDS3 = temp$points[,3]) -> df
+            df$eDNA.sample <- as.numeric(dimnames(temp$points)[[1]])
+            
+            df %>% 
+              left_join(env)
+                  }
+## Takes a long table and calculates Bray-Curtis, Jaccard, metadata, Tibbles for plotting MDSs, PERMANOVA and CAP. Do transformations outside this call. It works once the tibble has been nested 
+
+distances <- function(tibble,Abundance = nReads ){
+  Abundance = rlang::enquo(Abundance)
+  tibble %>% 
+   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon, Abundance = !!Abundance, sample.name = eDNA.sample,
+                                           distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+                                           distance = "jaccard",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+                                         everything()) ),
+
+         mds.points = map2( bc, env, MDS_function),
+
+         mds.pa = map2(jc, env, MDS_function),
+
+         mds.plot = map(mds.points, function(.x){
+           ggplot(.x) +
+             geom_point(aes(x = MDS1, y = MDS2, color = Station))  }),
+         
+         PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- with(.y, Transect)
+           adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
+         CAP_lat = map2(bc, env, function(.x,.y ){
+           capscale(.x~lat,data = .y) })
+         ) 
+    
+}
+
+```
+
+Do the thing
+
+```{r}
+species.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  ungroup() %>%
+  nest %>%  
+  distances(Abundance = prop) -> Analysis.by.prop
+
+Analysis.by.prop %>% 
+  pull(PERMANOVA)
+```
+
+
