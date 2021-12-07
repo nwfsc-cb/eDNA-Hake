@@ -72,7 +72,7 @@ for all pairwise comparisons. We can use this and later subset the samples of in
 ```{r functions}
 ## MDS function takes the dissimilarity matrix and the metadata and gives out a big tibble for you to plot
 MDS_function <- function(distance, env){
-           monoMDS(distance,k = 3) -> temp
+           monoMDS(distance,k = 3, ) -> temp
            
            tibble(MDS1 = temp$points[,1],
                   MDS2 = temp$points[,2],
@@ -87,7 +87,11 @@ MDS_function <- function(distance, env){
 distances <- function(tibble,Abundance = nReads ){
   Abundance = rlang::enquo(Abundance)
   tibble %>% 
-   mutate( bc = map(data, ~tibble_to_matrix(.x, taxon = taxon, Abundance = !!Abundance, sample.name = eDNA.sample,
+   mutate( spp.matrix = map(data, ~.x %>% select(taxon, !!Abundance, eDNA.sample) %>%
+                              pivot_wider(names_from =  taxon, values_from = !!Abundance, values_fill = 0) %>% 
+                              column_to_rownames("eDNA.sample")),
+           
+           bc = map(data, ~tibble_to_matrix(.x, taxon = taxon, Abundance = !!Abundance, sample.name = eDNA.sample,
                                            distance = "bray",transformation = "" )),
           jc = map(data, ~tibble_to_matrix(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
                                            distance = "jaccard",transformation = "pa" )),
@@ -100,14 +104,16 @@ distances <- function(tibble,Abundance = nReads ){
 
          mds.plot = map(mds.points, function(.x){
            ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = Station))  }),
+             geom_point(aes(x = MDS1, y = MDS2, color = position)) +
+             facet_wrap(~groups)  }),
          
          PERMANOVA = map2(bc, env, function(.x, .y){
            perms <- how(nperm = 9999)
            setBlocks(perms) <- with(.y, Transect)
            adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
-         CAP_lat = map2(bc, env, function(.x,.y ){
-           capscale(.x~lat,data = .y) })
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
          ) 
     
 }
@@ -125,6 +131,39 @@ species.proportions.by.sample %>%
 
 Analysis.by.prop %>% 
   pull(PERMANOVA)
+
+Analysis.by.prop %>% 
+  pull(mds.plot)
+
+Analysis.by.prop %>% 
+  mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x~position * groups, data = .y, distance = "bray")
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(plot)
 ```
 
+```{r Figure2}
+
+Analysis.by.prop %>% 
+  select(mds.points) %>% 
+  unnest() %>%
+  filter (MDS1 >2) %>% select(Station, depth) -> drops
+  
+species.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  anti_join(drops) %>% 
+  ungroup() %>% 
+  nest() %>% 
+  distances(Abundance = prop) -> Analysis.by.prop.no.outliers
+
+Analysis.by.prop.no.outliers %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+  #filter(abs(Distance_to_thermocline) < 100 ) %>% 
+  ggplot() +
+   geom_point(aes(x = MDS1, y = MDS2, color = position)) +
+  facet_wrap(~groups)
+
+```
 
