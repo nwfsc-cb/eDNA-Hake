@@ -17,6 +17,7 @@ We have made many plots - let's put the good ones that are going to end up in th
 library (tidyverse)
 library (here)
 library(eDNAfuns)
+library (vegan)
 ```
 
 #### Datasets
@@ -52,7 +53,7 @@ species_by_rep %>%
   
 mid.step %>% 
   group_by(eDNA.sample) %>% 
-  expand(eDNA.sample,taxon, rep) %>% #Now this can be right_joined with mid.step
+  tidyr::expand(eDNA.sample,taxon, rep) %>% #Now this can be right_joined with mid.step
   right_join(mid.step,.) %>% # this should have ~ 800 NAs
   # group_by(is.na(prop)) %>% tally %>% # Nailed it
   mutate(prop = replace_na(prop, 0)) %>% 
@@ -140,7 +141,11 @@ Analysis.by.prop %>%
     caps <- capscale(.x~position * groups, data = .y, distance = "bray")
     sppscores(caps) <- .x
     return(caps)}
-    )) %>% pull(CAPw) %>% map(plot)
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>%mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups)) + 
+                                facet_wrap(~groups))
 ```
 
 ```{r Figure2}
@@ -166,4 +171,4 @@ Analysis.by.prop.no.outliers %>%
   facet_wrap(~groups)
 
 ```
-
+The similarity between Bray-Curtis and Jaccard with presence/absence data enforces the view that our dataset is heavily zero-inflated. A solution to this problem is to collapse
