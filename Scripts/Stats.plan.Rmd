@@ -257,7 +257,7 @@ distances <- function(tibble,Abundance = nReads ){
              geom_point(aes(x = MDS1, y = MDS2, color = Station))  }),
          
          PERMANOVA = map2(bc, env, function(.x, .y){
-           adonis2(formula = .x ~ as.factor(Transect) +  position + groups,data = .y, permutations = 9999) } ),
+           adonis2(formula = .x ~  position * groups,data = .y, permutations = 9999) } ),
          CAP_lat = map2(bc, env, function(.x,.y ){
            capscale(.x~lat,data = .y) })
          ) 
@@ -274,6 +274,7 @@ Joined.dataset %>%
 First.analysis %>% 
   pull(PERMANOVA)
 ```
+
 ```{r, message= F, warning=F}
 First.analysis %>% 
   select(mds.points) %>% 
@@ -320,8 +321,7 @@ First.analysis %>%
   geom_point(aes(color = position, shape = groups)) +
   facet_wrap(~groups, nrow =2) +
   theme_linedraw() +
-  scale_color_brewer( palette = "Dark2") +
-  geom_label(data = . %>% filter (MDS1>5), aes(x = MDS1, y = MDS2, label = glue::glue(Station, depth, .sep = "-")))
+  scale_color_brewer( palette = "Dark2") 
 ```
 A few checks
 ```{r}
@@ -450,7 +450,7 @@ tibble_to_matrix(Collapsed.by.niskin, sample.name =  eDNA.sample, taxon = taxon,
   plots.from.distance()
 
 
-?vegdist
+all.distances
 
 MDS_function(all.distances, Step2) %>% 
   
@@ -460,7 +460,8 @@ MDS_function(all.distances, Step2) %>%
   geom_point(aes(color = position, shape = groups)) +
   facet_wrap(~groups) +
   theme_linedraw() +
-  scale_color_brewer( palette = "Dark2")
+  scale_color_brewer( palette = "Dark2") +
+  geom_label(data = . %>% filter(MDS1>4), aes(x = MDS1, y = MDS2, label = glue::glue(Station, depth, .sep = "-")))
 
 ```
 
