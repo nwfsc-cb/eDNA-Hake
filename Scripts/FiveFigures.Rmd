@@ -33,7 +33,8 @@ species_by_rep <- read_csv(here("Data", "by.taxa.by.rep.csv"))
 
 metadata <- read_csv(here("Data", "Final_metadata.csv"))
 
-conversion.df <- read_csv(here("Data", "unique.sp_collapse.csv"))
+conversion.df <- read_csv(here("Data", "unique.sp_collapse.csv")) %>% 
+  select(-nReads)
 ```
 
 ## Figure 1
@@ -85,28 +86,32 @@ MDS_function <- function(distance, env){
                   }
 ## Takes a long table and calculates Bray-Curtis, Jaccard, metadata, Tibbles for plotting MDSs, PERMANOVA and CAP. Do transformations outside this call. It works once the tibble has been nested 
 
-distances <- function(tibble,Abundance = nReads ){
+
+mds.upwell <- function(.x){
+           ggplot(.x) +
+             geom_point(aes(x = MDS1, y = MDS2, color = position)) +
+             facet_wrap(~groups)  }
+
+distances <- function(tibble,Abundance = nReads, taxa =taxon ){
   Abundance = rlang::enquo(Abundance)
+  taxa      = rlang::enquo(taxa)
   tibble %>% 
-   mutate( spp.matrix = map(data, ~.x %>% select(taxon, !!Abundance, eDNA.sample) %>%
-                              pivot_wider(names_from =  taxon, values_from = !!Abundance, values_fill = 0) %>% 
+   mutate( spp.matrix = map(data, ~.x %>% select(!!taxa, !!Abundance, eDNA.sample) %>%
+                              pivot_wider(names_from =  !!taxa, values_from = !!Abundance, values_fill = 0) %>% 
                               column_to_rownames("eDNA.sample")),
            
-           bc = map(data, ~tibble_to_matrix(.x, taxon = taxon, Abundance = !!Abundance, sample.name = eDNA.sample,
+           bc = map(data, ~tibble_to_matrix(.x, taxon = !!taxa, Abundance = !!Abundance, sample.name = eDNA.sample,
                                            distance = "bray",transformation = "" )),
-          jc = map(data, ~tibble_to_matrix(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+          jc = map(data, ~tibble_to_matrix(.x, taxon = !!taxa, !!Abundance, sample.name = eDNA.sample,
                                            distance = "jaccard",transformation = "pa" )),
-         env = map (data, ~tibble_to_env(.x, taxon = taxon, !!Abundance, sample.name = eDNA.sample,
+         env = map (data, ~tibble_to_env(.x, taxon = !!taxa, !!Abundance, sample.name = eDNA.sample,
                                          everything()) ),
 
          mds.points = map2( bc, env, MDS_function),
 
          mds.pa = map2(jc, env, MDS_function),
 
-         mds.plot = map(mds.points, function(.x){
-           ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = position)) +
-             facet_wrap(~groups)  }),
+         mds.plot = map(mds.points, mds.upwell),
          
          PERMANOVA = map2(bc, env, function(.x, .y){
            perms <- how(nperm = 9999)
@@ -172,3 +177,89 @@ Analysis.by.prop.no.outliers %>%
 
 ```
 The similarity between Bray-Curtis and Jaccard with presence/absence data enforces the view that our dataset is heavily zero-inflated. A solution to this problem is to collapse
+
+
+## Figure 3
+
+These results strongly suggest that the differences are driven by rare taxa, and the effect that we want to test (upwelled water being reflected in the eDNA community from surface waters) will be clearer if we use functional units instead of spp.
+
+```{r collapse by functional}
+
+species_by_rep %>% 
+  inner_join(conversion.df, by = "taxon") %>% 
+  group_by(eDNA.sample, rep, new.morphotype) %>% 
+  summarise(nReads = sum(nReads)) -> morpho_by_rep
+
+
+morpho_by_rep %>% 
+  group_by(eDNA.sample, rep) %>% 
+  mutate(tot = sum(nReads)) %>% 
+  group_by(eDNA.sample, rep,new.morphotype, ) %>% 
+  summarise(prop = nReads/tot) -> mid.step.morph # For this to work, it needs to be a df full of 0s
+  
+mid.step.morph %>% 
+  group_by(eDNA.sample) %>% 
+  tidyr::expand(eDNA.sample,new.morphotype, rep) %>% #Now this can be right_joined with mid.step
+  right_join(mid.step.morph,.) %>% # this should have ~ 800 NAs
+  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+  mutate(prop = replace_na(prop, 0)) %>% 
+  group_by(eDNA.sample,new.morphotype) %>% 
+  summarise(prop = mean(prop)) -> morph.proportions.by.sample
+
+# Do all add up to one?
+
+morph.proportions.by.sample %>% 
+  summarise(sum(prop)) # Now they do
+```
+
+### Now the analysis
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  ungroup() %>%
+  nest %>%  
+  distances(Abundance = prop, taxa = new.morphotype) -> Analysis.by.prop
+
+Analysis.by.prop %>% 
+  pull(PERMANOVA)
+
+Analysis.by.prop %>% 
+  pull(mds.plot)
+
+Analysis.by.prop %>% 
+  select(mds.pa) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+Analysis.by.prop %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+
+Analysis.by.prop %>% 
+  mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "bray")
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups)) + 
+                                facet_wrap(~groups))
+```
+CAP with PA?
+
+```{r}
+Analysis.by.prop %>% 
+  mutate(CAPw = map2( spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "jaccard", )
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups)) + 
+                                facet_wrap(~groups))
+```
+
