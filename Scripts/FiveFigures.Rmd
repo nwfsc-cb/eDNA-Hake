@@ -105,7 +105,7 @@ MDS_function <- function(distance, env){
 mds.upwell <- function(.x, color = position){
 color = rlang::enquo(color)
              ggplot(.x) +
-             geom_point(aes(x = MDS1, y = MDS2, color = !!color)) +
+             geom_point(aes(x = MDS1, y = MDS2, color = !!color), size = 3) +
              facet_wrap(~groups)  }
 
 distances <- function(tibble,Abundance = nReads, taxa =taxon ){
@@ -165,7 +165,7 @@ Analysis.by.prop %>%
     )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
                                 rownames_to_column("eDNA.sample") %>%mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
                                 ggplot(aes(x = CAP1, y = CAP2 )) +
-                                geom_point(aes(color = position, shape = groups)) + 
+                                geom_point(aes(color = position, shape = groups, size = 3)) + 
                                 facet_wrap(~groups))
 ```
 
@@ -281,7 +281,7 @@ Analysis.by.prop.morph %>%
     )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
                                 rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
                                 ggplot(aes(x = CAP1, y = CAP2 )) +
-                                geom_point(aes(color = position, shape = groups)) + 
+                                geom_point(aes(color = position, shape = groups), size = 3) + 
                                 facet_wrap(~groups))
 ```
 CAP with PA?
@@ -295,7 +295,7 @@ Analysis.by.prop.morph %>%
     )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
                                 rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
                                 ggplot(aes(x = CAP1, y = CAP2 )) +
-                                geom_point(aes(color = position, shape = groups)) + 
+                                geom_point(aes(color = position, shape = groups), size = 3 ) + 
                                 facet_wrap(~groups))
 ```
 
