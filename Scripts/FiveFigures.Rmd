@@ -3,6 +3,8 @@ title: "Five Figures to rule them all"
 author: "Ramon Gallego"
 date: "12/2/2021"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -123,9 +125,9 @@ distances <- function(tibble,Abundance = nReads, taxa =taxon ){
 
          mds.points = map2( bc, env, MDS_function),
 
-         mds.pa = map2(jc, env, MDS_function),
-
-         mds.plot = map(mds.points, mds.upwell))
+         mds.pa = map2(jc, env, MDS_function)
+)
+         # mds.plot = map(mds.points, mds.upwell))
 }
 
 ```
@@ -494,11 +496,11 @@ kde2d.weighted <- function (x, y, w, h, n = 25, lims = c(range(x), range(y))) {
 ```{r}
 morph.proportions.by.sample %>% 
   left_join(metadata) %>% 
-  group_by(new.morphotype, groups) %>% 
+  group_by(newest, groups) %>% 
   nest() -> nester 
 nester %>%   
 pull(data) %>%
-  set_names(nester$new.morphotype) %>%
+  set_names(nester$newest) %>%
   # mutate(weighted = map(data, ~kde2d.weighted(stop, depth, prop)))
   map(~kde2d.weighted(.x$stop, .x$depth, .x$prop)) -> weights
   
@@ -510,20 +512,20 @@ weights %>%
 nester$weights = weights.dfs
 
 nester %>% 
-  pivot_wider(id_cols = new.morphotype, names_from = groups, values_from = c(data, weights)) %>% 
+  pivot_wider(id_cols = newest, names_from = groups, values_from = c(data, weights)) %>% 
   mutate(data_Mixed = map(data_Mixed, ~.x %>% mutate(groups = "Mixed")),
          data_Stratified = map(data_Stratified, ~.x %>% mutate(groups = "Stratified")),
          weights_Mixed = map(weights_Mixed, ~.x %>% mutate(groups = "Mixed")),
          weights_Stratified = map(weights_Stratified, ~.x %>% mutate(groups = "Stratified")),
          data = map2(data_Mixed, data_Stratified, bind_rows),
          weights = map2(weights_Mixed, weights_Stratified, bind_rows)) %>% 
-  select(new.morphotype, data, weights) -> nester2
+  select(newest, data, weights) -> nester2
 
 nester2 %>% 
-  mutate(plot = pmap(.l = list (a = new.morphotype, b = data, c = weights),
+  mutate(plot = pmap(.l = list (a = newest, b = data, c = weights),
                      .f = function (a,b,c){
                        b %>% 
-                       ggplot(aes(x = stop, y = depth)) +
+                       ggplot(aes(x = stop, y = Distance_to_seafloor)) +
                          geom_point (aes(size = prop)) +
                          geom_contour(aes(x=x, y=y, z=z), data= c) +
                          labs(title  = a) +
@@ -536,6 +538,46 @@ See the plots
 
 ```{r}
 plots %>% 
+  ungroup %>% 
+  slice(1:5) %>% 
   pull(plot)
 ```
 
+
+
+## Figure 4
+
+If we can detect an effect of upwelling in the eDNA communities of surface waters... would it be driven by the species that are more prevalent in deeper waters.
+
+We will start by retrieving the species that have a higher contribution to the differences bewtween surface samples in mixed and stratified sites
+
+Two possible scenarios are possible here: One is that eDNA transport is huge, and eDNA from or around the seafloor will be detectable in the surface. The other is that eDNA from water immediately below.
+
+### Within layer, between thermocline and upwelling
+
+```{r }
+Analysis.by.prop %>% 
+  mutate(PERMANOVA.within.layer  = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~ position + groups,data = .y, permutations = perms) } )) %>% pull(PERMANOVA.within.layer)
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ))
+```
+
+```{r}
+species.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  anti_join(drops) %>% 
+  group_by(position) %>% 
+  nest() %>% 
+  distances(Abundance = prop) %>% 
+  mutate(PERMANOVA.within.layer  = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           # setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~ groups,data = .y, permutations = perms) } ),
+         PERMANOVA.within.layer = map2(PERMANOVA.within.layer, position,~ set_names(.x, nm = .y))
+           ) %>% pull(PERMANOVA.within.layer)
+```
+
+
+###
