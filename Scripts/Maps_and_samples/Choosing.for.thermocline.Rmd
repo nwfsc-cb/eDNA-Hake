@@ -35,7 +35,7 @@ CTD.stations <- read_csv(file = here("Data", "cleaned_CTD_stations.csv"))
 We want to choose 8 transects that reflect the differences in latitude, strength of thermocline and its depth
 
 
-![Samples and the temperature of the surface waters](../Plots and figures/plots.for.choosing.png)
+![Samples and the temperature of the surface waters](../../Plots and figures/plots.for.choosing.png)
 
 And the winners are transects 81, 77, 67, 60, 53, 39, 35, 26. From them we will choose the stations closest to shore, the furthest and one in between
 
@@ -81,6 +81,11 @@ left_join(Samples_to_Sequence, eDNA.samples.transects %>%
 
 joined.data %>% tally_wide(rows = Transect,
                            cols = depth)
+
+joined.data %>% 
+  filter (!is.na(Transect)) -> joined.data
+
+joined.data %>% distinct(depth)
 ```
 
 

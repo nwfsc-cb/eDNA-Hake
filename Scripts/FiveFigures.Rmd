@@ -335,26 +335,32 @@ by.layer %>%
 ## Figure 3 Alt
 
 ```{r}
-species_by_rep %>% 
-  inner_join(conversion.df, by = "taxon") %>% 
-  group_by(eDNA.sample, rep, newest) %>% 
-  summarise(nReads = sum(nReads)) -> morpho_by_rep
 
-
-morpho_by_rep %>% 
-  group_by(eDNA.sample, rep) %>% 
-  mutate(tot = sum(nReads)) %>% 
-  group_by(eDNA.sample, rep,newest ) %>% 
-  summarise(prop = nReads/tot) -> mid.step.morph # For this to work, it needs to be a df full of 0s
-  
-mid.step.morph %>% 
-  group_by(eDNA.sample) %>% 
-  tidyr::expand(eDNA.sample,newest, rep) %>% #Now this can be right_joined with mid.step
-  right_join(mid.step.morph,.) %>% # this should have ~ 800 NAs
+collapse_by_morph <- function(df, morphotype){
+ morphotype = enquo(morphotype)
+   df %>% 
+     inner_join(conversion.df, by = "taxon") %>% 
+  group_by(eDNA.sample, rep, !!morphotype) %>% 
+  summarise(nReads = sum(nReads)) -> step1
+   
+   step1 %>% 
+     group_by(eDNA.sample, rep) %>% 
+     mutate(tot = sum(nReads)) %>% 
+  group_by(eDNA.sample, rep,!!morphotype ) %>% 
+  summarise(prop = nReads/tot) -> step2
+   
+   step2 %>% 
+      group_by(eDNA.sample) %>% 
+  tidyr::expand(eDNA.sample,!!morphotype, rep) %>% #Now this can be right_joined with mid.step
+  right_join(step2,.) %>% # this should have ~ 800 NAs
   # group_by(is.na(prop)) %>% tally %>% # Nailed it
   mutate(prop = replace_na(prop, 0)) %>% 
-  group_by(eDNA.sample,newest) %>% 
-  summarise(prop = mean(prop)) -> morph.proportions.by.sample
+  group_by(eDNA.sample,!!morphotype) %>% 
+  summarise(prop = mean(prop))
+   
+}
+species_by_rep %>% 
+  collapse_by_morph(newest) -> morph.proportions.by.sample
 
 # Do all add up to one?
 
@@ -580,4 +586,34 @@ species.proportions.by.sample %>%
 ```
 
 
-###
+### Figure 5
+
+How does the proportion of sequences from a particular morphotype, above and below the thermocline, in places with or without upwelling
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  mutate(above = case_when(position == "above" ~ "Above", 
+                           TRUE                ~ "Below")) %>% 
+  group_by(Station, groups, newest, above) %>%
+  summarise (avg.prop  = mean (prop, na.rm = T)) %>% 
+  # mutate(avg.prop = replace_na(avg.prop, 0)) %>% 
+  pivot_wider(names_from = above, values_from = avg.prop, values_fill = 0) %>% 
+  mutate(ratio = Above / (Above+ Below)) %>% 
+  ggplot (aes(x = groups, y = ratio)) +
+  geom_violin() +
+  facet_wrap(~newest)
+  
+```
+
+
+Average depth per species
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  group_by(Station, newest, groups) %>%
+  summarise(weight.depth = weighted.mean(depth, prop)) %>% 
+  ggplot(aes(y = weight.depth, x = groups)) + geom_boxplot() + facet_wrap(~newest)
+```
+
