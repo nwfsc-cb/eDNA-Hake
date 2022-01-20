@@ -49,32 +49,32 @@ Casts <- eDNA.new %>%
 Casts 
 ```
 ```{r}
-Casts %>% 
-  distinct(CTD_Cast) %>% 
-  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast, ".csv"),
-                              TRUE           ~ paste0(CTD_Cast, ".csv"))) %>% pull() -> casts.to.keep
-
-files.inCTD <- list.files(path = here("Data","1_converted"), pattern = "*.csv")
-
-# are u there
-
-casts.to.keep %in% files.inCTD
-
-# Change them to a tibble of full paths
-
-files.inCTD <- tibble (file = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
-                       full.path = list.files(path = here("Data","1_converted"), full.names = T,pattern = "*.csv")) %>% 
-  filter (file %in% casts.to.keep) %>% 
-  mutate (data = purrr::map(full.path, read_csv))
-  
-files.inCTD %>% 
-  mutate (data = purrr::map (data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
-          Thermocline = map_dbl (data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermoclines.new
+# Casts %>% 
+#   distinct(CTD_Cast) %>% 
+#   mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast, ".csv"),
+#                               TRUE           ~ paste0(CTD_Cast, ".csv"))) %>% pull() -> casts.to.keep
+# 
+# files.inCTD <- list.files(path = here("Data","1_converted"), pattern = "*.csv")
+# 
+# # are u there
+# 
+# casts.to.keep %in% files.inCTD
+# 
+# # Change them to a tibble of full paths
+# 
+# files.inCTD <- tibble (file = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
+#                        full.path = list.files(path = here("Data","1_converted"), full.names = T,pattern = "*.csv")) %>% 
+#   filter (file %in% casts.to.keep) %>% 
+#   mutate (data = purrr::map(full.path, read_csv))
+#   
+# files.inCTD %>% 
+#   mutate (data = purrr::map (data, ~.x %>% mutate_at (c("Temperature (degC)", "Salinity (psu)", "Oxygen (ml_per_l)", "Fluorescence (ug_per_l)"), .funs = despike)),
+#           Thermocline = map_dbl (data, ~ .x %>% summarise( thermocline = clined(`Temperature (degC)`, `Depth (m)`)) %>% pull)) -> thermoclines.new
 ```
 
 Save
 ```{r}
-thermoclines.new %>% write_rds(here("Data","Casts.Eulachon.thermoclines.rds"))
+# thermoclines.new %>% write_rds(here("Data","Casts.Eulachon.thermoclines.rds"))
 ```
 
 Calculate thermocline strength
@@ -180,12 +180,15 @@ Step2 %>%
 # See them in a map for a sec
 ```{r}
 base_plot <- read_rds (here("Data", "Hake_map.rds"))
+Transects.total <- read_csv(here("Data", "Transects.total.csv"))
 base_plot +
   geom_segment (data = Transects.total, aes (x = xstart, y = ystart,xend =  xend,yend =  yend, group = Transect), alpha = 0.2) +
   geom_text(data = Transects.total, aes (x =   xend - 0.25,y  =  yend, label = Transect), color = "yellow", fontface = "bold", alpha = 0.2) + 
   geom_point (data = Step2, aes(x = lon, y = lat, color = (Openness != "Transition")), position = position_jitter(w = 0, h = 0.1), size = 0.5) +
   guides(fill = "none", color = "none") + 
   scale_color_brewer(type = "div", palette = 5,direction = -1) -> left
+
+Step2 %>% write_csv(here("Data", "metadata_for_prop.csv"))
 
 Step2 %>% 
   mutate (Openness = fct_reorder(Openness, -lon),
