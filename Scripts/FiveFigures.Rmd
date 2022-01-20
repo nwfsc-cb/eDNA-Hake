@@ -575,9 +575,56 @@ species.proportions.by.sample %>%
            perms <- how(nperm = 9999)
            # setBlocks(perms) <- .y %>% pull(position)
           adonis2(formula = .x ~ groups,data = .y, permutations = perms) } ),
-         PERMANOVA.within.layer = map2(PERMANOVA.within.layer, position,~ set_names(.x, nm = .y))
-           ) %>% pull(PERMANOVA.within.layer)
+         PERMANOVA.within.layer =  set_names(PERMANOVA.within.layer, nm = position)) %>%
+  pull(PERMANOVA.within.layer)
 ```
 
 
-###
+### draw the Basemaps
+
+```{r}
+Step2 <- read_csv(here("Data", "metadata_for_prop.csv"))
+
+species.proportions.by.sample %>% 
+  filter (prop >0) %>% 
+  group_by(taxon) %>% 
+  tally() %>% 
+  ungroup() %>% 
+  filter (n> 10) %>% 
+  semi_join(species.proportions.by.sample, .) -> species.for.plot
+
+Step2 %>% 
+  left_join(species.for.plot) %>% 
+  
+  mutate (Openness = fct_reorder(Openness, -lon),
+          Transect = as.character(Transect)) %>% 
+  mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
+  group_by(taxon) %>% 
+  nest() %>% 
+  mutate(plot = map2(data, taxon, function(.x, .y){
+  ggplot(.x) +
+ 
+  geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
+  geom_line (aes(x = -lon, y = Thermocline_depth), color = "green") +
+  geom_point (aes(y = depth, x = -lon, size = prop, color = groups)) +
+  geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
+  facet_wrap(~fct_relevel(Transect,'81','77','67','60', '53', "39", "35", "26"), ncol = 1, scale = "free_x")+
+  theme(panel.background = element_rect(fill = "lightblue")) +
+   scale_x_reverse()+
+  # scale_y_continuous(trans = trans_reverser('log10')) +
+  scale_y_continuous(trans= ggforce::trans_reverser('log10')) +
+  scale_color_brewer(type = "div", palette = 5,direction = -1) +
+  labs (y = "Depth", x= "longitude", title = .y)}
+    )) -> with.plots
+
+with.plots %>% pull(plot)
+```
+
+
+
+Same maps for groups
+
+```{r}
+
+```
+

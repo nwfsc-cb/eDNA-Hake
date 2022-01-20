@@ -94,6 +94,7 @@ eDNA.samples %>%
             yend  = mean(lat))  -> Transects.total
 
 
+write_csv(Transects.total, here("Data", "Transects.total.csv"))
 ```
 
 
