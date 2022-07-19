@@ -1,8 +1,0 @@
-Sample_name,Locus,file1,file2
-1000.1,16S_Prey,Locus_16S_Prey_1000-1_S38_L001_R1_001.fastq,Locus_16S_Prey_1000-1_S38_L001_R2_001.fastq
-1006.1,16S_Prey,Locus_16S_Prey_1006-1_S39_L001_R1_001.fastq,Locus_16S_Prey_1006-1_S39_L001_R2_001.fastq
-1000.2,16S_Prey,Locus_16S_Prey_1000-2_S61_L001_R1_001.fastq,Locus_16S_Prey_1000-2_S61_L001_R2_001.fastq
-1006.2,16S_Prey,Locus_16S_Prey_1006-2_S62_L001_R1_001.fastq,Locus_16S_Prey_1006-2_S62_L001_R2_001.fastq
-1003.1,16S_Prey,Locus_16S_Prey_1003-1_S133_L001_R1_001.fastq,Locus_16S_Prey_1003-1_S133_L001_R2_001.fastq
-1005.1,16S_Prey,Locus_16S_Prey_1005-1_S134_L001_R1_001.fastq,Locus_16S_Prey_1005-1_S134_L001_R2_001.fastq
-1008.1,16S_Prey,Locus_16S_Prey_1008-1_S135_L001_R1_001.fastq,Locus_16S_Prey_1008-1_S135_L001_R2_001.fastq
