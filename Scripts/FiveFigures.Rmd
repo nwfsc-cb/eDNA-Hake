@@ -1,0 +1,665 @@
+---
+title: "Five Figures to rule them all"
+author: "Ramon Gallego"
+date: "12/2/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Succint approach
+
+We have made many plots - let's put the good ones that are going to end up in the paper all here
+
+```{r cars}
+library (tidyverse)
+library (here)
+library(eDNAfuns)
+library (vegan)
+```
+
+#### Datasets
+
+We need:
+
+    * the sequence data by taxa, by technical replicate; 
+    * the metadata for each Niskin Bottle
+    * the conversion table between taxa and functional units
+    
+```{r data}
+species_by_rep <- read_csv(here("Data", "by.taxa.by.rep.csv"))
+
+metadata <- read_csv(here("Data", "Final_metadata.csv"))
+
+conversion.df <- read_csv(here("Data", "unique.sp_collapse.csv")) 
+
+conversion.df %>% 
+  summarise (n_distinct(new.morphotype), n_distinct(`...13`))
+
+conversion.df %>%
+   # distinct(taxon,new.morphotype, `...13`) %>% 
+  # filter(!str_detect(`...13`, "demersal")) %>% 
+  # filter(str_detect(`...13`, "pelagic")) %>% 
+  mutate(newest = case_when(str_detect(`...13`, "demersal")~ "demersal",
+                            `...13`== "Marine; pelagic-oceanic"~ "pelagic-oceanic",
+                            str_detect(`...13`, "neritic")~ "neritic",
+                            str_detect(`...13`, "bathypelagic")~ "bathypelagic",
+                            str_detect(`...13`, "benthopelagic")~ "benthopelagic"))  -> conversion.df
+  # filter(str_detect(`...13`, "benth"))
+```
+
+## Figure 1
+
+This is a map of the stations where samples were collected and the rationale behind sequencing only a subset of them. I will do this, I promise
+
+## Figure 2
+
+This is an MDS plot of the differences between samples based on their species composition, after averaging proportions from each PCR replicate, highlighting the differences due to their position with respect to the thermocline (above/below/seafloor) and whether they are under upwelling or stratified
+
+```{r}
+species_by_rep %>% 
+  group_by(eDNA.sample, rep) %>% 
+  mutate(tot = sum(nReads)) %>% 
+  group_by(taxon, .add = T) %>% 
+  summarise(prop = nReads/tot) -> mid.step # For this to work, it needs to be a df full of 0s
+  
+mid.step %>% 
+  group_by(eDNA.sample) %>% 
+  tidyr::expand(eDNA.sample,taxon, rep) %>% #Now this can be right_joined with mid.step
+  right_join(mid.step,.) %>% # this should have ~ 800 NAs
+  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+  mutate(prop = replace_na(prop, 0)) %>% 
+  group_by(eDNA.sample,taxon) %>% 
+  summarise(prop = mean(prop)) -> species.proportions.by.sample
+
+# Do all add up to one?
+
+species.proportions.by.sample %>% 
+  summarise(sum(prop)) # Now they do
+
+
+```
+Now use a function to generate the BC, Jaccard, using either Proportions or scaled-up proportions or p/a data
+for all pairwise comparisons. We can use this and later subset the samples of interest because the Bray-Curtis dissimilarity between two samples is not affected by any other samples present on the dataset.
+
+```{r functions}
+## MDS function takes the dissimilarity matrix and the metadata and gives out a big tibble for you to plot
+MDS_function <- function(distance, env){
+           monoMDS(distance,k = 3, ) -> temp
+           
+           tibble(MDS1 = temp$points[,1],
+                  MDS2 = temp$points[,2],
+                  MDS3 = temp$points[,3]) -> df
+            df$eDNA.sample <- as.numeric(dimnames(temp$points)[[1]])
+            
+            df %>% 
+              left_join(env)
+                  }
+## Takes a long table and calculates Bray-Curtis, Jaccard, metadata, Tibbles for plotting MDSs, PERMANOVA and CAP. Do transformations outside this call. It works once the tibble has been nested 
+
+
+mds.upwell <- function(.x, color = position){
+color = rlang::enquo(color)
+             ggplot(.x) +
+             geom_point(aes(x = MDS1, y = MDS2, color = !!color), size = 3) +
+             facet_wrap(~groups)  }
+
+distances <- function(tibble,Abundance = nReads, taxa =taxon ){
+  Abundance = rlang::enquo(Abundance)
+  taxa      = rlang::enquo(taxa)
+  tibble %>% 
+   mutate( spp.matrix = map(data, ~.x %>% select(!!taxa, !!Abundance, eDNA.sample) %>%
+                              pivot_wider(names_from =  !!taxa, values_from = !!Abundance, values_fill = 0) %>% 
+                              column_to_rownames("eDNA.sample")),
+           
+           bc = map(data, ~tibble_to_matrix(.x, taxon = !!taxa, Abundance = !!Abundance, sample.name = eDNA.sample,
+                                           distance = "bray",transformation = "" )),
+          jc = map(data, ~tibble_to_matrix(.x, taxon = !!taxa, !!Abundance, sample.name = eDNA.sample,
+                                           distance = "jaccard",transformation = "pa" )),
+         env = map (data, ~tibble_to_env(.x, taxon = !!taxa, !!Abundance, sample.name = eDNA.sample,
+                                         everything()) ),
+
+         mds.points = map2( bc, env, MDS_function),
+
+         mds.pa = map2(jc, env, MDS_function)
+)
+         # mds.plot = map(mds.points, mds.upwell))
+}
+
+```
+
+Do the thing
+
+```{r}
+species.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  ungroup() %>%
+  nest %>%  
+  distances(Abundance = prop) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(Transect)
+          adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     -> Analysis.by.prop
+
+Analysis.by.prop %>% 
+  pull(PERMANOVA)
+
+Analysis.by.prop %>% 
+  pull(mds.plot)
+
+Analysis.by.prop %>% 
+  mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x~position * groups, data = .y, distance = "bray")
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>%mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups, size = 3)) + 
+                                facet_wrap(~groups))
+```
+
+```{r Figure2}
+
+Analysis.by.prop %>% 
+  select(mds.points) %>% 
+  unnest() %>%
+  filter (MDS1 >2) %>% select(Station, depth) -> drops
+  
+species.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  anti_join(drops) %>% 
+  ungroup() %>% 
+  nest() %>% 
+  distances(Abundance = prop) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(Transect)
+          adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     ->Analysis.by.prop.no.outliers
+
+Analysis.by.prop.no.outliers %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+  #filter(abs(Distance_to_thermocline) < 100 ) %>% 
+  ggplot() +
+   geom_point(aes(x = MDS1, y = MDS2, color = position)) +
+  facet_wrap(~groups)
+
+```
+The similarity between Bray-Curtis and Jaccard with presence/absence data enforces the view that our dataset is heavily zero-inflated. A solution to this problem is to collapse
+
+
+## Figure 3
+
+These results strongly suggest that the differences are driven by rare taxa, and the effect that we want to test (upwelled water being reflected in the eDNA community from surface waters) will be clearer if we use functional units instead of spp.
+
+```{r collapse by functional}
+
+species_by_rep %>% 
+  inner_join(conversion.df, by = "taxon") %>% 
+  group_by(eDNA.sample, rep, new.morphotype) %>% 
+  summarise(nReads = sum(nReads)) -> morpho_by_rep
+
+
+morpho_by_rep %>% 
+  group_by(eDNA.sample, rep) %>% 
+  mutate(tot = sum(nReads)) %>% 
+  group_by(eDNA.sample, rep,new.morphotype, ) %>% 
+  summarise(prop = nReads/tot) -> mid.step.morph # For this to work, it needs to be a df full of 0s
+  
+mid.step.morph %>% 
+  group_by(eDNA.sample) %>% 
+  tidyr::expand(eDNA.sample,new.morphotype, rep) %>% #Now this can be right_joined with mid.step
+  right_join(mid.step.morph,.) %>% # this should have ~ 800 NAs
+  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+  mutate(prop = replace_na(prop, 0)) %>% 
+  group_by(eDNA.sample,new.morphotype) %>% 
+  summarise(prop = mean(prop)) -> morph.proportions.by.sample
+
+# Do all add up to one?
+
+morph.proportions.by.sample %>% 
+  summarise(sum(prop)) # Now they do
+```
+
+### Now the analysis
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  ungroup() %>%
+  nest %>%  
+  distances(Abundance = prop, taxa = new.morphotype) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     -> Analysis.by.prop.morph
+
+Analysis.by.prop.morph %>% 
+  pull(PERMANOVA)
+
+Analysis.by.prop.morph %>% 
+  pull(mds.plot)
+
+Analysis.by.prop.morph %>% 
+  select(mds.pa) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+Analysis.by.prop.morph %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+
+Analysis.by.prop.morph %>% 
+  mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "bray")
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups), size = 3) + 
+                                facet_wrap(~groups))
+```
+CAP with PA?
+
+```{r}
+Analysis.by.prop.morph %>% 
+  mutate(CAPw = map2( spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "jaccard", )
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups), size = 3 ) + 
+                                facet_wrap(~groups))
+```
+
+### Another attempt - Changing PERMANOVA design and blocks
+
+Change the PERMANOVA to test whether samples from the surface subject to the upwelling are different to those from stratified spots
+
+```{r}
+Analysis.by.prop.morph %>% 
+  mutate(new.PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- with(.y, position)
+           adonis2(formula = .x ~  groups,data = .y, permutations = perms) } )) 
+
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  group_by(position) %>% 
+  nest() %>% 
+
+   distances(Abundance = prop, taxa = new.morphotype) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           # setBlocks(perms) <- .y %>% pull(Transect)
+          adonis2(formula = .x ~   groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     -> by.layer
+
+by.layer %>% 
+  pull(PERMANOVA)
+
+```
+
+## Figure 3 Alt
+
+```{r}
+
+collapse_by_morph <- function(df, morphotype){
+ morphotype = enquo(morphotype)
+   df %>% 
+     inner_join(conversion.df, by = "taxon") %>% 
+  group_by(eDNA.sample, rep, !!morphotype) %>% 
+  summarise(nReads = sum(nReads)) -> step1
+   
+   step1 %>% 
+     group_by(eDNA.sample, rep) %>% 
+     mutate(tot = sum(nReads)) %>% 
+  group_by(eDNA.sample, rep,!!morphotype ) %>% 
+  summarise(prop = nReads/tot) -> step2
+   
+   step2 %>% 
+      group_by(eDNA.sample) %>% 
+  tidyr::expand(eDNA.sample,!!morphotype, rep) %>% #Now this can be right_joined with mid.step
+  right_join(step2,.) %>% # this should have ~ 800 NAs
+  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+  mutate(prop = replace_na(prop, 0)) %>% 
+  group_by(eDNA.sample,!!morphotype) %>% 
+  summarise(prop = mean(prop))
+   
+}
+species_by_rep %>% 
+  collapse_by_morph(newest) -> morph.proportions.by.sample
+
+# Do all add up to one?
+
+morph.proportions.by.sample %>% 
+  summarise(sum(prop)) # Now they do
+```
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  ungroup() %>%
+  nest %>%  
+  distances(Abundance = prop, taxa = newest) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~  position * groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     -> Analysis.by.prop.morph
+
+Analysis.by.prop.morph %>% 
+  pull(PERMANOVA)
+
+Analysis.by.prop.morph %>% 
+  pull(mds.plot)
+
+Analysis.by.prop.morph %>% 
+  select(mds.pa) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+Analysis.by.prop.morph %>% 
+  select(mds.points) %>% 
+  unnest() %>% 
+ mds.upwell()
+
+
+Analysis.by.prop.morph %>% 
+  mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "bray")
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups)) + 
+                                facet_wrap(~groups))
+```
+
+```{r}
+Analysis.by.prop.morph %>% 
+  mutate(CAPw = map2( spp.matrix, env, function(.x, .y){
+    caps <- capscale(.x ~ position * groups, data = .y, distance = "jaccard", )
+    sppscores(caps) <- .x
+    return(caps)}
+    )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
+                                rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
+                                ggplot(aes(x = CAP1, y = CAP2 )) +
+                                geom_point(aes(color = position, shape = groups)) + 
+                                facet_wrap(~groups))
+```
+
+```{r}
+Analysis.by.prop.morph %>% 
+  mutate(new.PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- with(.y, position)
+           adonis2(formula = .x ~  groups,data = .y, permutations = perms) } )) 
+
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>%
+  group_by(position) %>% 
+  nest() %>% 
+
+   distances(Abundance = prop, taxa = newest) %>% 
+  mutate(PERMANOVA = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           # setBlocks(perms) <- .y %>% pull(Transect)
+          adonis2(formula = .x ~   groups,data = .y, permutations = perms) } ),
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ),
+        
+         CAP_lat = map2(spp.matrix, env, function(.x,.y ){
+           capscale(.x~depth,data = .y, distance = "bray") 
+           })
+         )     -> by.layer
+
+by.layer %>% 
+  pull(PERMANOVA)
+```
+
+### This does not show much
+
+Get which species have an effect on changing the composition of surface samples in the presence of an upwelling
+
+```{r}
+
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  filter(!is.na(newest)) %>% 
+  # mutate (nrows = ceiling(prop *100)) %>%
+  # group_by(eDNA.sample, newest) %>%
+  # nest() %>%
+  # mutate(data = map(data,  uncount, nrows)) %>%
+  # unnest(data) %>%
+  ggplot(aes(x= stop, y = Distance_to_thermocline)) +
+  geom_density_2d_filled(contour_var = "ndensity") +
+  facet_grid(groups~newest) 
+
+
+
+
+```
+
+```{r}
+kde2d.weighted <- function (x, y, w, h, n = 25, lims = c(range(x), range(y))) {
+  nx <- length(x)
+  if (length(y) != nx) 
+    stop("data vectors must be the same length")
+  if (length(w) != nx & length(w) != 1)
+    stop("weight vectors must be 1 or length of data")
+  gx <- seq(lims[1], lims[2], length = n) # gridpoints x
+  gy <- seq(lims[3], lims[4], length = n) # gridpoints y
+  if (missing(h)) 
+    h <- c(MASS::bandwidth.nrd(x), MASS::bandwidth.nrd(y));
+  if (missing(w)) 
+    w <- numeric(nx)+1;
+  h <- h/4
+  ax <- outer(gx, x, "-")/h[1] # distance of each point to each grid point in x-direction
+  ay <- outer(gy, y, "-")/h[2] # distance of each point to each grid point in y-direction
+  z <- (matrix(rep(w,n), nrow=n, ncol=nx, byrow=TRUE)*matrix(dnorm(ax), n, nx)) %*% t(matrix(dnorm(ay), n, nx))/(sum(w) * h[1] * h[2]) # z is the density
+  return(list(x = gx, y = gy, z = z))
+}
+```
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  group_by(newest, groups) %>% 
+  nest() -> nester 
+nester %>%   
+pull(data) %>%
+  set_names(nester$newest) %>%
+  # mutate(weighted = map(data, ~kde2d.weighted(stop, depth, prop)))
+  map(~kde2d.weighted(.x$stop, .x$depth, .x$prop)) -> weights
+  
+
+
+weights %>% 
+  map(~data_frame(expand.grid(x=.x$x, y=.x$y), z=as.vector(.x$z)))  -> weights.dfs
+
+nester$weights = weights.dfs
+
+nester %>% 
+  pivot_wider(id_cols = newest, names_from = groups, values_from = c(data, weights)) %>% 
+  mutate(data_Mixed = map(data_Mixed, ~.x %>% mutate(groups = "Mixed")),
+         data_Stratified = map(data_Stratified, ~.x %>% mutate(groups = "Stratified")),
+         weights_Mixed = map(weights_Mixed, ~.x %>% mutate(groups = "Mixed")),
+         weights_Stratified = map(weights_Stratified, ~.x %>% mutate(groups = "Stratified")),
+         data = map2(data_Mixed, data_Stratified, bind_rows),
+         weights = map2(weights_Mixed, weights_Stratified, bind_rows)) %>% 
+  select(newest, data, weights) -> nester2
+
+nester2 %>% 
+  mutate(plot = pmap(.l = list (a = newest, b = data, c = weights),
+                     .f = function (a,b,c){
+                       b %>% 
+                       ggplot(aes(x = stop, y = Distance_to_seafloor)) +
+                         geom_point (aes(size = prop)) +
+                         geom_contour(aes(x=x, y=y, z=z), data= c) +
+                         labs(title  = a) +
+                         facet_wrap(~groups)
+                       
+                     })) -> plots
+```
+
+See the plots
+
+```{r}
+plots %>% 
+  ungroup %>% 
+  slice(1:5) %>% 
+  pull(plot)
+```
+
+
+
+## Figure 4
+
+If we can detect an effect of upwelling in the eDNA communities of surface waters... would it be driven by the species that are more prevalent in deeper waters.
+
+We will start by retrieving the species that have a higher contribution to the differences bewtween surface samples in mixed and stratified sites
+
+Two possible scenarios are possible here: One is that eDNA transport is huge, and eDNA from or around the seafloor will be detectable in the surface. The other is that eDNA from water immediately below.
+
+### Within layer, between thermocline and upwelling
+
+```{r }
+Analysis.by.prop %>% 
+  mutate(PERMANOVA.within.layer  = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~ position + groups,data = .y, permutations = perms) } )) %>% pull(PERMANOVA.within.layer)
+           # adonis2(formula = .x ~  rlang::expr(formula) ,data = .y, permutations = perms) } ))
+```
+
+```{r}
+species.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  anti_join(drops) %>% 
+  group_by(position) %>% 
+  nest() %>% 
+  distances(Abundance = prop) %>% 
+  mutate(PERMANOVA.within.layer  = map2(bc, env, function(.x, .y){
+           perms <- how(nperm = 9999)
+           # setBlocks(perms) <- .y %>% pull(position)
+          adonis2(formula = .x ~ groups,data = .y, permutations = perms) } ),
+         PERMANOVA.within.layer =  set_names(PERMANOVA.within.layer, nm = position)) %>%
+  pull(PERMANOVA.within.layer)
+```
+
+### draw the Basemaps
+
+
+```{r}
+Step2 <- read_csv(here("Data", "metadata_for_prop.csv"))
+
+species.proportions.by.sample %>% 
+  filter (prop >0) %>% 
+  group_by(taxon) %>% 
+  tally() %>% 
+  ungroup() %>% 
+  filter (n> 10) %>% 
+  semi_join(species.proportions.by.sample, .) -> species.for.plot
+
+Step2 %>% 
+  left_join(species.for.plot) %>% 
+  
+  mutate (Openness = fct_reorder(Openness, -lon),
+          Transect = as.character(Transect)) %>% 
+  mutate(max.depth = max(bottom.depth.consensus) + 100) %>% 
+  group_by(taxon) %>% 
+  nest() %>% 
+  mutate(plot = map2(data, taxon, function(.x, .y){
+  ggplot(.x) +
+ 
+  geom_ribbon(aes(x =  - lon, ymin = max.depth, ymax = bottom.depth.consensus), fill = "firebrick3") +
+  geom_line (aes(x = -lon, y = Thermocline_depth), color = "green") +
+  geom_point (aes(y = depth, x = -lon, size = prop, color = groups)) +
+  geom_point (aes(y = depth, x = -lon), color = "black", size = 1.75, shape = 21, fill= NA) +
+  facet_wrap(~fct_relevel(Transect,'81','77','67','60', '53', "39", "35", "26"), ncol = 1, scale = "free_x")+
+  theme(panel.background = element_rect(fill = "lightblue")) +
+   scale_x_reverse()+
+  # scale_y_continuous(trans = trans_reverser('log10')) +
+  scale_y_continuous(trans= ggforce::trans_reverser('log10')) +
+  scale_color_brewer(type = "div", palette = 5,direction = -1) +
+  labs (y = "Depth", x= "longitude", title = .y)}
+    )) -> with.plots
+
+with.plots %>% pull(plot)
+```
+
+
+
+Same maps for groups
+
+### Figure 5
+
+How does the proportion of sequences from a particular morphotype, above and below the thermocline, in places with or without upwelling
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  mutate(above = case_when(position == "above" ~ "Above", 
+                           TRUE                ~ "Below")) %>% 
+  group_by(Station, groups, newest, above) %>%
+  summarise (avg.prop  = mean (prop, na.rm = T)) %>% 
+  # mutate(avg.prop = replace_na(avg.prop, 0)) %>% 
+  pivot_wider(names_from = above, values_from = avg.prop, values_fill = 0) %>% 
+  mutate(ratio = Above / (Above+ Below)) %>% 
+  ggplot (aes(x = groups, y = ratio)) +
+  geom_violin() +
+  facet_wrap(~newest)
+  
+```
+
+
+Average depth per species
+
+```{r}
+morph.proportions.by.sample %>% 
+  left_join(metadata) %>% 
+  group_by(Station, newest, groups) %>%
+  summarise(weight.depth = weighted.mean(depth, prop)) %>% 
+  ggplot(aes(y = weight.depth, x = groups)) + geom_boxplot() + facet_wrap(~newest)
+
+
+```
+

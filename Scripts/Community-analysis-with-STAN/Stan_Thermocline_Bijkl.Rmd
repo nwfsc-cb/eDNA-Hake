@@ -1,0 +1,58 @@
+---
+title: "STAN for Thermocline, estimations at replicate"
+author: "Ramon Gallego"
+date: "8/26/2021"
+output: 
+ html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Making a STAN model for hypothesis testing of metabarcoding data
+
+We have one problem with the application of metabarcoding data for hypothesis testing - we can't really be sure if the weight we are putting on number of reads, sequencing depth data transformation and algorithm to estimate sample dissimilarity are the ones driving the change and therefore could mask the real biological effect.
+I include below the libraries I used
+```{r libraries, echo=T, message=FALSE, warning=FALSE}
+library(here)
+library (tidyverse)
+library(rstan)
+```
+
+
+## The design
+
+We have sampled eDNA from locations in the Pacific Coast, at different depths. At each location and depth, we collected up to two Niskin Bottles, and each of them was amplified and sequenced twice (some of them more, some less).
+
+The idea is to get to a posterior probability of the proportion of DNA from each taxa  (*i*) at each lat,lon,depth  point (*j*), taking into account the number of PCR cycles, the primer efficiency and the stochasticity of the PCR process. 
+
+The Amount of DNA in the water from taxa *i* \(D_i\) is unknown but we can express it as function of the number of Amplicons detected \(A_i\) and the process that generates those: Amplification at the efficiency (\(\alpha\)) for a number of PCR cycles. We don't see all the amplicons we generate, only a proportion of them end up in the sequencing machine, \(\eta\).
+
+We take several samples from each *j* point, and those are the ones we sequence, so we have between 2-6 looks at each *j*. These replicates *k* are where we detect \lambda
+
+
+\begin{equation}
+log(\lambda_{ijk}) = log (\beta_{ijk}) + N_{PCR} \times log(1+\alpha) + log (\eta_{jk})
+\end{equation}
+
+And we get that these \beta_{ijk} are actually drawn from a negative binomial distribution, with a mean of the real proportion of copies of DNA in that part of the world (*C_{ij}*) and a variance of (\phi)
+\begin{equation}
+
+C_{ij} \~ NegativeBinomial(\lambda_{ijk}, \phi)
+\end{equation}
+
+
+## What this model will look like 
+
+
+### Get the data, prepare the data
+
+You remember from previous adventures how picky STAN is with regards to the structure of the data. starting with the tibbles with the metadata and the counts, and we'll move from there
+
+```{r pressure, echo=FALSE, message=F}
+abundance.table <- read_csv(here("Data",  "by.taxa.dataset.metadata.csv")) %>% mutate (Transect = as.character(Transect))
+
+metadata  <- read_csv(here("Data", "Final_metadata.csv"))
+```
+

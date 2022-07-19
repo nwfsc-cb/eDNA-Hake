@@ -1,0 +1,1721 @@
+eDNA.sample,rep,Transect,position,depth,func.group,nReads
+58,1,26,1,50,Marine; benthopelagic,206
+58,1,26,1,50,Open; demersal,162776
+58,1,26,1,50,Coastal;pelagic-neritic,0
+58,1,26,1,50,Marine; pelagic-oceanic,0
+58,1,26,1,50,Open; pelagic-neritic,0
+58,1,26,1,50,Coastal; benthopelagic,0
+58,1,26,1,50,Marine; bathypelagic,0
+58,1,26,1,50,Coastal; demersal,0
+59,1,26,1,50,Marine; benthopelagic,6088
+59,1,26,1,50,Open; demersal,85566
+59,1,26,1,50,Coastal;pelagic-neritic,0
+59,1,26,1,50,Marine; pelagic-oceanic,0
+59,1,26,1,50,Open; pelagic-neritic,0
+59,1,26,1,50,Coastal; benthopelagic,0
+59,1,26,1,50,Marine; bathypelagic,0
+59,1,26,1,50,Coastal; demersal,0
+59,2,26,1,50,Marine; benthopelagic,4734
+59,2,26,1,50,Open; demersal,35516
+59,2,26,1,50,Coastal;pelagic-neritic,5048
+59,2,26,1,50,Marine; pelagic-oceanic,406
+59,2,26,1,50,Open; pelagic-neritic,0
+59,2,26,1,50,Coastal; benthopelagic,0
+59,2,26,1,50,Marine; bathypelagic,0
+59,2,26,1,50,Coastal; demersal,0
+60,1,26,1,25,Marine; benthopelagic,0
+60,1,26,1,25,Open; demersal,26044
+60,1,26,1,25,Coastal;pelagic-neritic,73058
+60,1,26,1,25,Marine; pelagic-oceanic,0
+60,1,26,1,25,Open; pelagic-neritic,5630
+60,1,26,1,25,Coastal; benthopelagic,0
+60,1,26,1,25,Marine; bathypelagic,0
+60,1,26,1,25,Coastal; demersal,0
+60,2,26,1,25,Marine; benthopelagic,0
+60,2,26,1,25,Open; demersal,67072
+60,2,26,1,25,Coastal;pelagic-neritic,31396
+60,2,26,1,25,Marine; pelagic-oceanic,0
+60,2,26,1,25,Open; pelagic-neritic,3983
+60,2,26,1,25,Coastal; benthopelagic,40416
+60,2,26,1,25,Marine; bathypelagic,0
+60,2,26,1,25,Coastal; demersal,0
+61,1,26,1,25,Marine; benthopelagic,0
+61,1,26,1,25,Open; demersal,12233
+61,1,26,1,25,Coastal;pelagic-neritic,26880
+61,1,26,1,25,Marine; pelagic-oceanic,0
+61,1,26,1,25,Open; pelagic-neritic,873
+61,1,26,1,25,Coastal; benthopelagic,0
+61,1,26,1,25,Marine; bathypelagic,2809
+61,1,26,1,25,Coastal; demersal,0
+61,2,26,1,25,Marine; benthopelagic,0
+61,2,26,1,25,Open; demersal,225898
+61,2,26,1,25,Coastal;pelagic-neritic,106339
+61,2,26,1,25,Marine; pelagic-oceanic,0
+61,2,26,1,25,Open; pelagic-neritic,36878
+61,2,26,1,25,Coastal; benthopelagic,0
+61,2,26,1,25,Marine; bathypelagic,0
+61,2,26,1,25,Coastal; demersal,0
+61,3,26,1,25,Marine; benthopelagic,0
+61,3,26,1,25,Open; demersal,46116
+61,3,26,1,25,Coastal;pelagic-neritic,34464
+61,3,26,1,25,Marine; pelagic-oceanic,0
+61,3,26,1,25,Open; pelagic-neritic,3538
+61,3,26,1,25,Coastal; benthopelagic,0
+61,3,26,1,25,Marine; bathypelagic,0
+61,3,26,1,25,Coastal; demersal,0
+62,1,26,1,0,Marine; benthopelagic,0
+62,1,26,1,0,Open; demersal,0
+62,1,26,1,0,Coastal;pelagic-neritic,0
+62,1,26,1,0,Marine; pelagic-oceanic,31326
+62,1,26,1,0,Open; pelagic-neritic,5411
+62,1,26,1,0,Coastal; benthopelagic,0
+62,1,26,1,0,Marine; bathypelagic,2241
+62,1,26,1,0,Coastal; demersal,0
+62,2,26,1,0,Marine; benthopelagic,0
+62,2,26,1,0,Open; demersal,0
+62,2,26,1,0,Coastal;pelagic-neritic,0
+62,2,26,1,0,Marine; pelagic-oceanic,2943
+62,2,26,1,0,Open; pelagic-neritic,821
+62,2,26,1,0,Coastal; benthopelagic,0
+62,2,26,1,0,Marine; bathypelagic,1931
+62,2,26,1,0,Coastal; demersal,0
+63,1,26,1,0,Marine; benthopelagic,0
+63,1,26,1,0,Open; demersal,55070
+63,1,26,1,0,Coastal;pelagic-neritic,0
+63,1,26,1,0,Marine; pelagic-oceanic,0
+63,1,26,1,0,Open; pelagic-neritic,0
+63,1,26,1,0,Coastal; benthopelagic,0
+63,1,26,1,0,Marine; bathypelagic,0
+63,1,26,1,0,Coastal; demersal,0
+63,2,26,1,0,Marine; benthopelagic,0
+63,2,26,1,0,Open; demersal,18032
+63,2,26,1,0,Coastal;pelagic-neritic,444
+63,2,26,1,0,Marine; pelagic-oceanic,978
+63,2,26,1,0,Open; pelagic-neritic,240
+63,2,26,1,0,Coastal; benthopelagic,0
+63,2,26,1,0,Marine; bathypelagic,0
+63,2,26,1,0,Coastal; demersal,0
+64,1,26,2,150,Marine; benthopelagic,0
+64,1,26,2,150,Open; demersal,0
+64,1,26,2,150,Coastal;pelagic-neritic,0
+64,1,26,2,150,Marine; pelagic-oceanic,0
+64,1,26,2,150,Open; pelagic-neritic,140900
+64,1,26,2,150,Coastal; benthopelagic,15794
+64,1,26,2,150,Marine; bathypelagic,0
+64,1,26,2,150,Coastal; demersal,0
+64,2,26,2,150,Marine; benthopelagic,0
+64,2,26,2,150,Open; demersal,0
+64,2,26,2,150,Coastal;pelagic-neritic,0
+64,2,26,2,150,Marine; pelagic-oceanic,2
+64,2,26,2,150,Open; pelagic-neritic,154291
+64,2,26,2,150,Coastal; benthopelagic,5387
+64,2,26,2,150,Marine; bathypelagic,0
+64,2,26,2,150,Coastal; demersal,0
+65,1,26,2,150,Marine; benthopelagic,0
+65,1,26,2,150,Open; demersal,20266
+65,1,26,2,150,Coastal;pelagic-neritic,8
+65,1,26,2,150,Marine; pelagic-oceanic,0
+65,1,26,2,150,Open; pelagic-neritic,85761
+65,1,26,2,150,Coastal; benthopelagic,0
+65,1,26,2,150,Marine; bathypelagic,0
+65,1,26,2,150,Coastal; demersal,0
+65,2,26,2,150,Marine; benthopelagic,0
+65,2,26,2,150,Open; demersal,45826
+65,2,26,2,150,Coastal;pelagic-neritic,0
+65,2,26,2,150,Marine; pelagic-oceanic,0
+65,2,26,2,150,Open; pelagic-neritic,67388
+65,2,26,2,150,Coastal; benthopelagic,10408
+65,2,26,2,150,Marine; bathypelagic,0
+65,2,26,2,150,Coastal; demersal,0
+68,1,26,2,50,Marine; benthopelagic,0
+68,1,26,2,50,Open; demersal,15
+68,1,26,2,50,Coastal;pelagic-neritic,0
+68,1,26,2,50,Marine; pelagic-oceanic,0
+68,1,26,2,50,Open; pelagic-neritic,4002
+68,1,26,2,50,Coastal; benthopelagic,0
+68,1,26,2,50,Marine; bathypelagic,488
+68,1,26,2,50,Coastal; demersal,0
+69,1,26,2,50,Marine; benthopelagic,0
+69,1,26,2,50,Open; demersal,0
+69,1,26,2,50,Coastal;pelagic-neritic,0
+69,1,26,2,50,Marine; pelagic-oceanic,0
+69,1,26,2,50,Open; pelagic-neritic,47437
+69,1,26,2,50,Coastal; benthopelagic,0
+69,1,26,2,50,Marine; bathypelagic,0
+69,1,26,2,50,Coastal; demersal,0
+70,2,26,2,0,Marine; benthopelagic,0
+70,2,26,2,0,Open; demersal,20663
+70,2,26,2,0,Coastal;pelagic-neritic,0
+70,2,26,2,0,Marine; pelagic-oceanic,12964
+70,2,26,2,0,Open; pelagic-neritic,3896
+70,2,26,2,0,Coastal; benthopelagic,0
+70,2,26,2,0,Marine; bathypelagic,0
+70,2,26,2,0,Coastal; demersal,0
+71,1,26,2,0,Marine; benthopelagic,0
+71,1,26,2,0,Open; demersal,11663
+71,1,26,2,0,Coastal;pelagic-neritic,2529
+71,1,26,2,0,Marine; pelagic-oceanic,0
+71,1,26,2,0,Open; pelagic-neritic,206
+71,1,26,2,0,Coastal; benthopelagic,9
+71,1,26,2,0,Marine; bathypelagic,0
+71,1,26,2,0,Coastal; demersal,0
+71,2,26,2,0,Marine; benthopelagic,0
+71,2,26,2,0,Open; demersal,32530
+71,2,26,2,0,Coastal;pelagic-neritic,0
+71,2,26,2,0,Marine; pelagic-oceanic,93
+71,2,26,2,0,Open; pelagic-neritic,35436
+71,2,26,2,0,Coastal; benthopelagic,0
+71,2,26,2,0,Marine; bathypelagic,0
+71,2,26,2,0,Coastal; demersal,0
+72,1,26,3,500,Marine; benthopelagic,0
+72,1,26,3,500,Open; demersal,0
+72,1,26,3,500,Coastal;pelagic-neritic,0
+72,1,26,3,500,Marine; pelagic-oceanic,0
+72,1,26,3,500,Open; pelagic-neritic,26243
+72,1,26,3,500,Coastal; benthopelagic,0
+72,1,26,3,500,Marine; bathypelagic,95
+72,1,26,3,500,Coastal; demersal,0
+73,1,26,3,500,Marine; benthopelagic,0
+73,1,26,3,500,Open; demersal,0
+73,1,26,3,500,Coastal;pelagic-neritic,0
+73,1,26,3,500,Marine; pelagic-oceanic,18
+73,1,26,3,500,Open; pelagic-neritic,101614
+73,1,26,3,500,Coastal; benthopelagic,0
+73,1,26,3,500,Marine; bathypelagic,24461
+73,1,26,3,500,Coastal; demersal,0
+73,2,26,3,500,Marine; benthopelagic,0
+73,2,26,3,500,Open; demersal,0
+73,2,26,3,500,Coastal;pelagic-neritic,0
+73,2,26,3,500,Marine; pelagic-oceanic,9986
+73,2,26,3,500,Open; pelagic-neritic,0
+73,2,26,3,500,Coastal; benthopelagic,0
+73,2,26,3,500,Marine; bathypelagic,14307
+73,2,26,3,500,Coastal; demersal,0
+80,1,26,3,50,Marine; benthopelagic,0
+80,1,26,3,50,Open; demersal,0
+80,1,26,3,50,Coastal;pelagic-neritic,0
+80,1,26,3,50,Marine; pelagic-oceanic,90
+80,1,26,3,50,Open; pelagic-neritic,3270
+80,1,26,3,50,Coastal; benthopelagic,0
+80,1,26,3,50,Marine; bathypelagic,0
+80,1,26,3,50,Coastal; demersal,0
+81,1,26,3,50,Marine; benthopelagic,0
+81,1,26,3,50,Open; demersal,0
+81,1,26,3,50,Coastal;pelagic-neritic,0
+81,1,26,3,50,Marine; pelagic-oceanic,41944
+81,1,26,3,50,Open; pelagic-neritic,4787
+81,1,26,3,50,Coastal; benthopelagic,0
+81,1,26,3,50,Marine; bathypelagic,38023
+81,1,26,3,50,Coastal; demersal,0
+81,2,26,3,50,Marine; benthopelagic,0
+81,2,26,3,50,Open; demersal,22973
+81,2,26,3,50,Coastal;pelagic-neritic,0
+81,2,26,3,50,Marine; pelagic-oceanic,14913
+81,2,26,3,50,Open; pelagic-neritic,14433
+81,2,26,3,50,Coastal; benthopelagic,0
+81,2,26,3,50,Marine; bathypelagic,3727
+81,2,26,3,50,Coastal; demersal,0
+83,1,26,3,0,Marine; benthopelagic,0
+83,1,26,3,0,Open; demersal,0
+83,1,26,3,0,Coastal;pelagic-neritic,0
+83,1,26,3,0,Marine; pelagic-oceanic,111652
+83,1,26,3,0,Open; pelagic-neritic,0
+83,1,26,3,0,Coastal; benthopelagic,0
+83,1,26,3,0,Marine; bathypelagic,122044
+83,1,26,3,0,Coastal; demersal,0
+282,1,35,1,48,Marine; benthopelagic,0
+282,1,35,1,48,Open; demersal,21396
+282,1,35,1,48,Coastal;pelagic-neritic,0
+282,1,35,1,48,Marine; pelagic-oceanic,0
+282,1,35,1,48,Open; pelagic-neritic,0
+282,1,35,1,48,Coastal; benthopelagic,0
+282,1,35,1,48,Marine; bathypelagic,0
+282,1,35,1,48,Coastal; demersal,0
+282,2,35,1,48,Marine; benthopelagic,0
+282,2,35,1,48,Open; demersal,112279
+282,2,35,1,48,Coastal;pelagic-neritic,0
+282,2,35,1,48,Marine; pelagic-oceanic,1970
+282,2,35,1,48,Open; pelagic-neritic,0
+282,2,35,1,48,Coastal; benthopelagic,0
+282,2,35,1,48,Marine; bathypelagic,0
+282,2,35,1,48,Coastal; demersal,0
+283,1,35,1,48,Marine; benthopelagic,0
+283,1,35,1,48,Open; demersal,42699
+283,1,35,1,48,Coastal;pelagic-neritic,12402
+283,1,35,1,48,Marine; pelagic-oceanic,0
+283,1,35,1,48,Open; pelagic-neritic,4903
+283,1,35,1,48,Coastal; benthopelagic,0
+283,1,35,1,48,Marine; bathypelagic,0
+283,1,35,1,48,Coastal; demersal,0
+283,2,35,1,48,Marine; benthopelagic,0
+283,2,35,1,48,Open; demersal,137788
+283,2,35,1,48,Coastal;pelagic-neritic,0
+283,2,35,1,48,Marine; pelagic-oceanic,0
+283,2,35,1,48,Open; pelagic-neritic,0
+283,2,35,1,48,Coastal; benthopelagic,0
+283,2,35,1,48,Marine; bathypelagic,0
+283,2,35,1,48,Coastal; demersal,0
+284,1,35,1,25,Marine; benthopelagic,0
+284,1,35,1,25,Open; demersal,6710
+284,1,35,1,25,Coastal;pelagic-neritic,0
+284,1,35,1,25,Marine; pelagic-oceanic,3880
+284,1,35,1,25,Open; pelagic-neritic,0
+284,1,35,1,25,Coastal; benthopelagic,348
+284,1,35,1,25,Marine; bathypelagic,0
+284,1,35,1,25,Coastal; demersal,0
+284,2,35,1,25,Marine; benthopelagic,0
+284,2,35,1,25,Open; demersal,20271
+284,2,35,1,25,Coastal;pelagic-neritic,0
+284,2,35,1,25,Marine; pelagic-oceanic,0
+284,2,35,1,25,Open; pelagic-neritic,0
+284,2,35,1,25,Coastal; benthopelagic,0
+284,2,35,1,25,Marine; bathypelagic,0
+284,2,35,1,25,Coastal; demersal,0
+285,1,35,1,25,Marine; benthopelagic,0
+285,1,35,1,25,Open; demersal,69
+285,1,35,1,25,Coastal;pelagic-neritic,1716
+285,1,35,1,25,Marine; pelagic-oceanic,0
+285,1,35,1,25,Open; pelagic-neritic,0
+285,1,35,1,25,Coastal; benthopelagic,28464
+285,1,35,1,25,Marine; bathypelagic,0
+285,1,35,1,25,Coastal; demersal,0
+285,2,35,1,25,Marine; benthopelagic,0
+285,2,35,1,25,Open; demersal,13370
+285,2,35,1,25,Coastal;pelagic-neritic,0
+285,2,35,1,25,Marine; pelagic-oceanic,0
+285,2,35,1,25,Open; pelagic-neritic,0
+285,2,35,1,25,Coastal; benthopelagic,0
+285,2,35,1,25,Marine; bathypelagic,0
+285,2,35,1,25,Coastal; demersal,0
+286,1,35,1,0,Marine; benthopelagic,0
+286,1,35,1,0,Open; demersal,12178
+286,1,35,1,0,Coastal;pelagic-neritic,3550
+286,1,35,1,0,Marine; pelagic-oceanic,0
+286,1,35,1,0,Open; pelagic-neritic,20
+286,1,35,1,0,Coastal; benthopelagic,83573
+286,1,35,1,0,Marine; bathypelagic,0
+286,1,35,1,0,Coastal; demersal,0
+287,1,35,1,0,Marine; benthopelagic,0
+287,1,35,1,0,Open; demersal,19843
+287,1,35,1,0,Coastal;pelagic-neritic,41087
+287,1,35,1,0,Marine; pelagic-oceanic,8
+287,1,35,1,0,Open; pelagic-neritic,0
+287,1,35,1,0,Coastal; benthopelagic,0
+287,1,35,1,0,Marine; bathypelagic,0
+287,1,35,1,0,Coastal; demersal,9
+287,2,35,1,0,Marine; benthopelagic,0
+287,2,35,1,0,Open; demersal,17128
+287,2,35,1,0,Coastal;pelagic-neritic,30947
+287,2,35,1,0,Marine; pelagic-oceanic,0
+287,2,35,1,0,Open; pelagic-neritic,0
+287,2,35,1,0,Coastal; benthopelagic,0
+287,2,35,1,0,Marine; bathypelagic,0
+287,2,35,1,0,Coastal; demersal,0
+310,2,35,7,500,Marine; benthopelagic,0
+310,2,35,7,500,Open; demersal,7
+310,2,35,7,500,Coastal;pelagic-neritic,0
+310,2,35,7,500,Marine; pelagic-oceanic,4
+310,2,35,7,500,Open; pelagic-neritic,0
+310,2,35,7,500,Coastal; benthopelagic,0
+310,2,35,7,500,Marine; bathypelagic,119253
+310,2,35,7,500,Coastal; demersal,0
+311,1,35,7,500,Marine; benthopelagic,0
+311,1,35,7,500,Open; demersal,0
+311,1,35,7,500,Coastal;pelagic-neritic,0
+311,1,35,7,500,Marine; pelagic-oceanic,100
+311,1,35,7,500,Open; pelagic-neritic,43839
+311,1,35,7,500,Coastal; benthopelagic,0
+311,1,35,7,500,Marine; bathypelagic,43137
+311,1,35,7,500,Coastal; demersal,0
+318,1,35,7,50,Marine; benthopelagic,0
+318,1,35,7,50,Open; demersal,0
+318,1,35,7,50,Coastal;pelagic-neritic,0
+318,1,35,7,50,Marine; pelagic-oceanic,96147
+318,1,35,7,50,Open; pelagic-neritic,648
+318,1,35,7,50,Coastal; benthopelagic,0
+318,1,35,7,50,Marine; bathypelagic,0
+318,1,35,7,50,Coastal; demersal,0
+318,2,35,7,50,Marine; benthopelagic,0
+318,2,35,7,50,Open; demersal,0
+318,2,35,7,50,Coastal;pelagic-neritic,0
+318,2,35,7,50,Marine; pelagic-oceanic,67126
+318,2,35,7,50,Open; pelagic-neritic,0
+318,2,35,7,50,Coastal; benthopelagic,1503
+318,2,35,7,50,Marine; bathypelagic,0
+318,2,35,7,50,Coastal; demersal,0
+319,2,35,7,50,Marine; benthopelagic,0
+319,2,35,7,50,Open; demersal,4
+319,2,35,7,50,Coastal;pelagic-neritic,0
+319,2,35,7,50,Marine; pelagic-oceanic,66340
+319,2,35,7,50,Open; pelagic-neritic,0
+319,2,35,7,50,Coastal; benthopelagic,0
+319,2,35,7,50,Marine; bathypelagic,0
+319,2,35,7,50,Coastal; demersal,0
+320,1,35,7,0,Marine; benthopelagic,0
+320,1,35,7,0,Open; demersal,125021
+320,1,35,7,0,Coastal;pelagic-neritic,0
+320,1,35,7,0,Marine; pelagic-oceanic,0
+320,1,35,7,0,Open; pelagic-neritic,0
+320,1,35,7,0,Coastal; benthopelagic,0
+320,1,35,7,0,Marine; bathypelagic,0
+320,1,35,7,0,Coastal; demersal,0
+320,2,35,7,0,Marine; benthopelagic,0
+320,2,35,7,0,Open; demersal,138926
+320,2,35,7,0,Coastal;pelagic-neritic,0
+320,2,35,7,0,Marine; pelagic-oceanic,0
+320,2,35,7,0,Open; pelagic-neritic,0
+320,2,35,7,0,Coastal; benthopelagic,0
+320,2,35,7,0,Marine; bathypelagic,0
+320,2,35,7,0,Coastal; demersal,0
+321,1,35,7,0,Marine; benthopelagic,0
+321,1,35,7,0,Open; demersal,2936
+321,1,35,7,0,Coastal;pelagic-neritic,0
+321,1,35,7,0,Marine; pelagic-oceanic,133479
+321,1,35,7,0,Open; pelagic-neritic,0
+321,1,35,7,0,Coastal; benthopelagic,0
+321,1,35,7,0,Marine; bathypelagic,0
+321,1,35,7,0,Coastal; demersal,0
+334,1,35,11,500,Marine; benthopelagic,0
+334,1,35,11,500,Open; demersal,6
+334,1,35,11,500,Coastal;pelagic-neritic,0
+334,1,35,11,500,Marine; pelagic-oceanic,66
+334,1,35,11,500,Open; pelagic-neritic,141
+334,1,35,11,500,Coastal; benthopelagic,0
+334,1,35,11,500,Marine; bathypelagic,6960
+334,1,35,11,500,Coastal; demersal,0
+334,2,35,11,500,Marine; benthopelagic,0
+334,2,35,11,500,Open; demersal,48
+334,2,35,11,500,Coastal;pelagic-neritic,0
+334,2,35,11,500,Marine; pelagic-oceanic,10
+334,2,35,11,500,Open; pelagic-neritic,6
+334,2,35,11,500,Coastal; benthopelagic,0
+334,2,35,11,500,Marine; bathypelagic,27338
+334,2,35,11,500,Coastal; demersal,0
+335,1,35,11,500,Marine; benthopelagic,0
+335,1,35,11,500,Open; demersal,6
+335,1,35,11,500,Coastal;pelagic-neritic,0
+335,1,35,11,500,Marine; pelagic-oceanic,9
+335,1,35,11,500,Open; pelagic-neritic,72
+335,1,35,11,500,Coastal; benthopelagic,0
+335,1,35,11,500,Marine; bathypelagic,61894
+335,1,35,11,500,Coastal; demersal,0
+335,2,35,11,500,Marine; benthopelagic,0
+335,2,35,11,500,Open; demersal,15
+335,2,35,11,500,Coastal;pelagic-neritic,0
+335,2,35,11,500,Marine; pelagic-oceanic,13
+335,2,35,11,500,Open; pelagic-neritic,14
+335,2,35,11,500,Coastal; benthopelagic,0
+335,2,35,11,500,Marine; bathypelagic,0
+335,2,35,11,500,Coastal; demersal,0
+342,1,35,11,50,Marine; benthopelagic,0
+342,1,35,11,50,Open; demersal,0
+342,1,35,11,50,Coastal;pelagic-neritic,0
+342,1,35,11,50,Marine; pelagic-oceanic,68404
+342,1,35,11,50,Open; pelagic-neritic,5858
+342,1,35,11,50,Coastal; benthopelagic,0
+342,1,35,11,50,Marine; bathypelagic,63298
+342,1,35,11,50,Coastal; demersal,0
+342,2,35,11,50,Marine; benthopelagic,0
+342,2,35,11,50,Open; demersal,4813
+342,2,35,11,50,Coastal;pelagic-neritic,0
+342,2,35,11,50,Marine; pelagic-oceanic,0
+342,2,35,11,50,Open; pelagic-neritic,45
+342,2,35,11,50,Coastal; benthopelagic,0
+342,2,35,11,50,Marine; bathypelagic,0
+342,2,35,11,50,Coastal; demersal,0
+343,1,35,11,50,Marine; benthopelagic,0
+343,1,35,11,50,Open; demersal,0
+343,1,35,11,50,Coastal;pelagic-neritic,0
+343,1,35,11,50,Marine; pelagic-oceanic,0
+343,1,35,11,50,Open; pelagic-neritic,0
+343,1,35,11,50,Coastal; benthopelagic,0
+343,1,35,11,50,Marine; bathypelagic,20855
+343,1,35,11,50,Coastal; demersal,0
+343,2,35,11,50,Marine; benthopelagic,0
+343,2,35,11,50,Open; demersal,0
+343,2,35,11,50,Coastal;pelagic-neritic,0
+343,2,35,11,50,Marine; pelagic-oceanic,0
+343,2,35,11,50,Open; pelagic-neritic,1697
+343,2,35,11,50,Coastal; benthopelagic,0
+343,2,35,11,50,Marine; bathypelagic,58359
+343,2,35,11,50,Coastal; demersal,0
+344,1,35,11,0,Marine; benthopelagic,0
+344,1,35,11,0,Open; demersal,0
+344,1,35,11,0,Coastal;pelagic-neritic,0
+344,1,35,11,0,Marine; pelagic-oceanic,4430
+344,1,35,11,0,Open; pelagic-neritic,0
+344,1,35,11,0,Coastal; benthopelagic,0
+344,1,35,11,0,Marine; bathypelagic,0
+344,1,35,11,0,Coastal; demersal,0
+344,2,35,11,0,Marine; benthopelagic,0
+344,2,35,11,0,Open; demersal,0
+344,2,35,11,0,Coastal;pelagic-neritic,0
+344,2,35,11,0,Marine; pelagic-oceanic,5614
+344,2,35,11,0,Open; pelagic-neritic,1884
+344,2,35,11,0,Coastal; benthopelagic,0
+344,2,35,11,0,Marine; bathypelagic,0
+344,2,35,11,0,Coastal; demersal,0
+345,1,35,11,0,Marine; benthopelagic,0
+345,1,35,11,0,Open; demersal,0
+345,1,35,11,0,Coastal;pelagic-neritic,0
+345,1,35,11,0,Marine; pelagic-oceanic,46394
+345,1,35,11,0,Open; pelagic-neritic,4163
+345,1,35,11,0,Coastal; benthopelagic,0
+345,1,35,11,0,Marine; bathypelagic,755
+345,1,35,11,0,Coastal; demersal,0
+345,2,35,11,0,Marine; benthopelagic,0
+345,2,35,11,0,Open; demersal,0
+345,2,35,11,0,Coastal;pelagic-neritic,0
+345,2,35,11,0,Marine; pelagic-oceanic,49044
+345,2,35,11,0,Open; pelagic-neritic,4176
+345,2,35,11,0,Coastal; benthopelagic,0
+345,2,35,11,0,Marine; bathypelagic,460
+345,2,35,11,0,Coastal; demersal,0
+456,1,39,1,42,Marine; benthopelagic,554
+456,1,39,1,42,Open; demersal,13272
+456,1,39,1,42,Coastal;pelagic-neritic,6121
+456,1,39,1,42,Marine; pelagic-oceanic,0
+456,1,39,1,42,Open; pelagic-neritic,3479
+456,1,39,1,42,Coastal; benthopelagic,1720
+456,1,39,1,42,Marine; bathypelagic,0
+456,1,39,1,42,Coastal; demersal,0
+456,2,39,1,42,Marine; benthopelagic,265
+456,2,39,1,42,Open; demersal,2717
+456,2,39,1,42,Coastal;pelagic-neritic,32189
+456,2,39,1,42,Marine; pelagic-oceanic,0
+456,2,39,1,42,Open; pelagic-neritic,592
+456,2,39,1,42,Coastal; benthopelagic,0
+456,2,39,1,42,Marine; bathypelagic,346
+456,2,39,1,42,Coastal; demersal,0
+457,1,39,1,42,Marine; benthopelagic,0
+457,1,39,1,42,Open; demersal,1247
+457,1,39,1,42,Coastal;pelagic-neritic,0
+457,1,39,1,42,Marine; pelagic-oceanic,0
+457,1,39,1,42,Open; pelagic-neritic,11261
+457,1,39,1,42,Coastal; benthopelagic,0
+457,1,39,1,42,Marine; bathypelagic,0
+457,1,39,1,42,Coastal; demersal,0
+457,2,39,1,42,Marine; benthopelagic,0
+457,2,39,1,42,Open; demersal,8865
+457,2,39,1,42,Coastal;pelagic-neritic,49569
+457,2,39,1,42,Marine; pelagic-oceanic,0
+457,2,39,1,42,Open; pelagic-neritic,975
+457,2,39,1,42,Coastal; benthopelagic,0
+457,2,39,1,42,Marine; bathypelagic,0
+457,2,39,1,42,Coastal; demersal,0
+458,1,39,1,25,Marine; benthopelagic,0
+458,1,39,1,25,Open; demersal,3382
+458,1,39,1,25,Coastal;pelagic-neritic,84
+458,1,39,1,25,Marine; pelagic-oceanic,0
+458,1,39,1,25,Open; pelagic-neritic,0
+458,1,39,1,25,Coastal; benthopelagic,0
+458,1,39,1,25,Marine; bathypelagic,0
+458,1,39,1,25,Coastal; demersal,4445
+458,2,39,1,25,Marine; benthopelagic,0
+458,2,39,1,25,Open; demersal,2029
+458,2,39,1,25,Coastal;pelagic-neritic,32817
+458,2,39,1,25,Marine; pelagic-oceanic,0
+458,2,39,1,25,Open; pelagic-neritic,7838
+458,2,39,1,25,Coastal; benthopelagic,686
+458,2,39,1,25,Marine; bathypelagic,0
+458,2,39,1,25,Coastal; demersal,0
+459,1,39,1,25,Marine; benthopelagic,0
+459,1,39,1,25,Open; demersal,110
+459,1,39,1,25,Coastal;pelagic-neritic,34078
+459,1,39,1,25,Marine; pelagic-oceanic,0
+459,1,39,1,25,Open; pelagic-neritic,5513
+459,1,39,1,25,Coastal; benthopelagic,13216
+459,1,39,1,25,Marine; bathypelagic,0
+459,1,39,1,25,Coastal; demersal,0
+459,2,39,1,25,Marine; benthopelagic,0
+459,2,39,1,25,Open; demersal,0
+459,2,39,1,25,Coastal;pelagic-neritic,0
+459,2,39,1,25,Marine; pelagic-oceanic,28427
+459,2,39,1,25,Open; pelagic-neritic,9407
+459,2,39,1,25,Coastal; benthopelagic,20365
+459,2,39,1,25,Marine; bathypelagic,0
+459,2,39,1,25,Coastal; demersal,0
+462,1,39,1,0,Marine; benthopelagic,0
+462,1,39,1,0,Open; demersal,2096
+462,1,39,1,0,Coastal;pelagic-neritic,11018
+462,1,39,1,0,Marine; pelagic-oceanic,0
+462,1,39,1,0,Open; pelagic-neritic,0
+462,1,39,1,0,Coastal; benthopelagic,100
+462,1,39,1,0,Marine; bathypelagic,0
+462,1,39,1,0,Coastal; demersal,0
+462,2,39,1,0,Marine; benthopelagic,0
+462,2,39,1,0,Open; demersal,0
+462,2,39,1,0,Coastal;pelagic-neritic,0
+462,2,39,1,0,Marine; pelagic-oceanic,186983
+462,2,39,1,0,Open; pelagic-neritic,0
+462,2,39,1,0,Coastal; benthopelagic,0
+462,2,39,1,0,Marine; bathypelagic,0
+462,2,39,1,0,Coastal; demersal,0
+463,1,39,1,0,Marine; benthopelagic,0
+463,1,39,1,0,Open; demersal,0
+463,1,39,1,0,Coastal;pelagic-neritic,21951
+463,1,39,1,0,Marine; pelagic-oceanic,10454
+463,1,39,1,0,Open; pelagic-neritic,0
+463,1,39,1,0,Coastal; benthopelagic,47121
+463,1,39,1,0,Marine; bathypelagic,0
+463,1,39,1,0,Coastal; demersal,0
+463,2,39,1,0,Marine; benthopelagic,0
+463,2,39,1,0,Open; demersal,8027
+463,2,39,1,0,Coastal;pelagic-neritic,0
+463,2,39,1,0,Marine; pelagic-oceanic,0
+463,2,39,1,0,Open; pelagic-neritic,0
+463,2,39,1,0,Coastal; benthopelagic,158652
+463,2,39,1,0,Marine; bathypelagic,0
+463,2,39,1,0,Coastal; demersal,0
+478,1,39,5,500,Marine; benthopelagic,0
+478,1,39,5,500,Open; demersal,8
+478,1,39,5,500,Coastal;pelagic-neritic,0
+478,1,39,5,500,Marine; pelagic-oceanic,29
+478,1,39,5,500,Open; pelagic-neritic,103496
+478,1,39,5,500,Coastal; benthopelagic,0
+478,1,39,5,500,Marine; bathypelagic,58509
+478,1,39,5,500,Coastal; demersal,0
+478,2,39,5,500,Marine; benthopelagic,0
+478,2,39,5,500,Open; demersal,12
+478,2,39,5,500,Coastal;pelagic-neritic,0
+478,2,39,5,500,Marine; pelagic-oceanic,0
+478,2,39,5,500,Open; pelagic-neritic,34196
+478,2,39,5,500,Coastal; benthopelagic,0
+478,2,39,5,500,Marine; bathypelagic,0
+478,2,39,5,500,Coastal; demersal,0
+479,1,39,5,500,Marine; benthopelagic,0
+479,1,39,5,500,Open; demersal,0
+479,1,39,5,500,Coastal;pelagic-neritic,0
+479,1,39,5,500,Marine; pelagic-oceanic,0
+479,1,39,5,500,Open; pelagic-neritic,30081
+479,1,39,5,500,Coastal; benthopelagic,0
+479,1,39,5,500,Marine; bathypelagic,2715
+479,1,39,5,500,Coastal; demersal,0
+479,2,39,5,500,Marine; benthopelagic,0
+479,2,39,5,500,Open; demersal,0
+479,2,39,5,500,Coastal;pelagic-neritic,0
+479,2,39,5,500,Marine; pelagic-oceanic,12
+479,2,39,5,500,Open; pelagic-neritic,172094
+479,2,39,5,500,Coastal; benthopelagic,14
+479,2,39,5,500,Marine; bathypelagic,0
+479,2,39,5,500,Coastal; demersal,0
+486,1,39,5,50,Marine; benthopelagic,0
+486,1,39,5,50,Open; demersal,5349
+486,1,39,5,50,Coastal;pelagic-neritic,0
+486,1,39,5,50,Marine; pelagic-oceanic,19175
+486,1,39,5,50,Open; pelagic-neritic,2518
+486,1,39,5,50,Coastal; benthopelagic,22
+486,1,39,5,50,Marine; bathypelagic,3108
+486,1,39,5,50,Coastal; demersal,0
+486,2,39,5,50,Marine; benthopelagic,0
+486,2,39,5,50,Open; demersal,0
+486,2,39,5,50,Coastal;pelagic-neritic,0
+486,2,39,5,50,Marine; pelagic-oceanic,36732
+486,2,39,5,50,Open; pelagic-neritic,41257
+486,2,39,5,50,Coastal; benthopelagic,21674
+486,2,39,5,50,Marine; bathypelagic,43316
+486,2,39,5,50,Coastal; demersal,0
+487,1,39,5,50,Marine; benthopelagic,0
+487,1,39,5,50,Open; demersal,41
+487,1,39,5,50,Coastal;pelagic-neritic,0
+487,1,39,5,50,Marine; pelagic-oceanic,0
+487,1,39,5,50,Open; pelagic-neritic,23
+487,1,39,5,50,Coastal; benthopelagic,5
+487,1,39,5,50,Marine; bathypelagic,3525
+487,1,39,5,50,Coastal; demersal,0
+487,2,39,5,50,Marine; benthopelagic,0
+487,2,39,5,50,Open; demersal,5502
+487,2,39,5,50,Coastal;pelagic-neritic,0
+487,2,39,5,50,Marine; pelagic-oceanic,2653
+487,2,39,5,50,Open; pelagic-neritic,15748
+487,2,39,5,50,Coastal; benthopelagic,935
+487,2,39,5,50,Marine; bathypelagic,42962
+487,2,39,5,50,Coastal; demersal,0
+488,1,39,5,0,Marine; benthopelagic,0
+488,1,39,5,0,Open; demersal,0
+488,1,39,5,0,Coastal;pelagic-neritic,0
+488,1,39,5,0,Marine; pelagic-oceanic,4331
+488,1,39,5,0,Open; pelagic-neritic,23073
+488,1,39,5,0,Coastal; benthopelagic,0
+488,1,39,5,0,Marine; bathypelagic,0
+488,1,39,5,0,Coastal; demersal,0
+488,2,39,5,0,Marine; benthopelagic,0
+488,2,39,5,0,Open; demersal,0
+488,2,39,5,0,Coastal;pelagic-neritic,0
+488,2,39,5,0,Marine; pelagic-oceanic,45725
+488,2,39,5,0,Open; pelagic-neritic,33627
+488,2,39,5,0,Coastal; benthopelagic,0
+488,2,39,5,0,Marine; bathypelagic,0
+488,2,39,5,0,Coastal; demersal,0
+489,1,39,5,0,Marine; benthopelagic,0
+489,1,39,5,0,Open; demersal,0
+489,1,39,5,0,Coastal;pelagic-neritic,7
+489,1,39,5,0,Marine; pelagic-oceanic,43861
+489,1,39,5,0,Open; pelagic-neritic,0
+489,1,39,5,0,Coastal; benthopelagic,0
+489,1,39,5,0,Marine; bathypelagic,0
+489,1,39,5,0,Coastal; demersal,0
+489,2,39,5,0,Marine; benthopelagic,0
+489,2,39,5,0,Open; demersal,15
+489,2,39,5,0,Coastal;pelagic-neritic,0
+489,2,39,5,0,Marine; pelagic-oceanic,119116
+489,2,39,5,0,Open; pelagic-neritic,7
+489,2,39,5,0,Coastal; benthopelagic,245
+489,2,39,5,0,Marine; bathypelagic,0
+489,2,39,5,0,Coastal; demersal,0
+502,1,39,9,500,Marine; benthopelagic,0
+502,1,39,9,500,Open; demersal,0
+502,1,39,9,500,Coastal;pelagic-neritic,0
+502,1,39,9,500,Marine; pelagic-oceanic,7
+502,1,39,9,500,Open; pelagic-neritic,61240
+502,1,39,9,500,Coastal; benthopelagic,32
+502,1,39,9,500,Marine; bathypelagic,0
+502,1,39,9,500,Coastal; demersal,0
+503,1,39,9,500,Marine; benthopelagic,0
+503,1,39,9,500,Open; demersal,0
+503,1,39,9,500,Coastal;pelagic-neritic,0
+503,1,39,9,500,Marine; pelagic-oceanic,0
+503,1,39,9,500,Open; pelagic-neritic,18
+503,1,39,9,500,Coastal; benthopelagic,0
+503,1,39,9,500,Marine; bathypelagic,51667
+503,1,39,9,500,Coastal; demersal,0
+510,1,39,9,50,Marine; benthopelagic,0
+510,1,39,9,50,Open; demersal,4
+510,1,39,9,50,Coastal;pelagic-neritic,0
+510,1,39,9,50,Marine; pelagic-oceanic,88228
+510,1,39,9,50,Open; pelagic-neritic,35130
+510,1,39,9,50,Coastal; benthopelagic,0
+510,1,39,9,50,Marine; bathypelagic,89277
+510,1,39,9,50,Coastal; demersal,0
+510,2,39,9,50,Marine; benthopelagic,0
+510,2,39,9,50,Open; demersal,0
+510,2,39,9,50,Coastal;pelagic-neritic,0
+510,2,39,9,50,Marine; pelagic-oceanic,86348
+510,2,39,9,50,Open; pelagic-neritic,81050
+510,2,39,9,50,Coastal; benthopelagic,0
+510,2,39,9,50,Marine; bathypelagic,0
+510,2,39,9,50,Coastal; demersal,0
+511,1,39,9,50,Marine; benthopelagic,0
+511,1,39,9,50,Open; demersal,8864
+511,1,39,9,50,Coastal;pelagic-neritic,0
+511,1,39,9,50,Marine; pelagic-oceanic,47102
+511,1,39,9,50,Open; pelagic-neritic,130401
+511,1,39,9,50,Coastal; benthopelagic,0
+511,1,39,9,50,Marine; bathypelagic,8748
+511,1,39,9,50,Coastal; demersal,0
+511,2,39,9,50,Marine; benthopelagic,0
+511,2,39,9,50,Open; demersal,0
+511,2,39,9,50,Coastal;pelagic-neritic,0
+511,2,39,9,50,Marine; pelagic-oceanic,16724
+511,2,39,9,50,Open; pelagic-neritic,34299
+511,2,39,9,50,Coastal; benthopelagic,0
+511,2,39,9,50,Marine; bathypelagic,924
+511,2,39,9,50,Coastal; demersal,0
+512,1,39,9,0,Marine; benthopelagic,0
+512,1,39,9,0,Open; demersal,7244
+512,1,39,9,0,Coastal;pelagic-neritic,0
+512,1,39,9,0,Marine; pelagic-oceanic,13257
+512,1,39,9,0,Open; pelagic-neritic,83071
+512,1,39,9,0,Coastal; benthopelagic,0
+512,1,39,9,0,Marine; bathypelagic,0
+512,1,39,9,0,Coastal; demersal,0
+512,2,39,9,0,Marine; benthopelagic,0
+512,2,39,9,0,Open; demersal,13553
+512,2,39,9,0,Coastal;pelagic-neritic,0
+512,2,39,9,0,Marine; pelagic-oceanic,25816
+512,2,39,9,0,Open; pelagic-neritic,2552
+512,2,39,9,0,Coastal; benthopelagic,0
+512,2,39,9,0,Marine; bathypelagic,0
+512,2,39,9,0,Coastal; demersal,0
+513,1,39,9,0,Marine; benthopelagic,0
+513,1,39,9,0,Open; demersal,12043
+513,1,39,9,0,Coastal;pelagic-neritic,0
+513,1,39,9,0,Marine; pelagic-oceanic,22622
+513,1,39,9,0,Open; pelagic-neritic,51000
+513,1,39,9,0,Coastal; benthopelagic,0
+513,1,39,9,0,Marine; bathypelagic,0
+513,1,39,9,0,Coastal; demersal,0
+513,2,39,9,0,Marine; benthopelagic,0
+513,2,39,9,0,Open; demersal,35042
+513,2,39,9,0,Coastal;pelagic-neritic,0
+513,2,39,9,0,Marine; pelagic-oceanic,14451
+513,2,39,9,0,Open; pelagic-neritic,8107
+513,2,39,9,0,Coastal; benthopelagic,0
+513,2,39,9,0,Marine; bathypelagic,0
+513,2,39,9,0,Coastal; demersal,0
+779,1,53,1,40,Marine; benthopelagic,0
+779,1,53,1,40,Open; demersal,19168
+779,1,53,1,40,Coastal;pelagic-neritic,0
+779,1,53,1,40,Marine; pelagic-oceanic,0
+779,1,53,1,40,Open; pelagic-neritic,1411
+779,1,53,1,40,Coastal; benthopelagic,0
+779,1,53,1,40,Marine; bathypelagic,0
+779,1,53,1,40,Coastal; demersal,7342
+779,2,53,1,40,Marine; benthopelagic,0
+779,2,53,1,40,Open; demersal,56764
+779,2,53,1,40,Coastal;pelagic-neritic,0
+779,2,53,1,40,Marine; pelagic-oceanic,36189
+779,2,53,1,40,Open; pelagic-neritic,26
+779,2,53,1,40,Coastal; benthopelagic,0
+779,2,53,1,40,Marine; bathypelagic,0
+779,2,53,1,40,Coastal; demersal,21853
+780,1,53,1,40,Marine; benthopelagic,0
+780,1,53,1,40,Open; demersal,51866
+780,1,53,1,40,Coastal;pelagic-neritic,0
+780,1,53,1,40,Marine; pelagic-oceanic,0
+780,1,53,1,40,Open; pelagic-neritic,26
+780,1,53,1,40,Coastal; benthopelagic,0
+780,1,53,1,40,Marine; bathypelagic,0
+780,1,53,1,40,Coastal; demersal,0
+780,2,53,1,40,Marine; benthopelagic,0
+780,2,53,1,40,Open; demersal,43130
+780,2,53,1,40,Coastal;pelagic-neritic,0
+780,2,53,1,40,Marine; pelagic-oceanic,0
+780,2,53,1,40,Open; pelagic-neritic,2694
+780,2,53,1,40,Coastal; benthopelagic,33416
+780,2,53,1,40,Marine; bathypelagic,0
+780,2,53,1,40,Coastal; demersal,56023
+793,1,53,3,280,Marine; benthopelagic,0
+793,1,53,3,280,Open; demersal,29728
+793,1,53,3,280,Coastal;pelagic-neritic,245
+793,1,53,3,280,Marine; pelagic-oceanic,9
+793,1,53,3,280,Open; pelagic-neritic,29651
+793,1,53,3,280,Coastal; benthopelagic,0
+793,1,53,3,280,Marine; bathypelagic,90720
+793,1,53,3,280,Coastal; demersal,0
+793,2,53,3,280,Marine; benthopelagic,0
+793,2,53,3,280,Open; demersal,0
+793,2,53,3,280,Coastal;pelagic-neritic,0
+793,2,53,3,280,Marine; pelagic-oceanic,35
+793,2,53,3,280,Open; pelagic-neritic,84980
+793,2,53,3,280,Coastal; benthopelagic,0
+793,2,53,3,280,Marine; bathypelagic,100333
+793,2,53,3,280,Coastal; demersal,0
+794,1,53,3,280,Marine; benthopelagic,0
+794,1,53,3,280,Open; demersal,44216
+794,1,53,3,280,Coastal;pelagic-neritic,0
+794,1,53,3,280,Marine; pelagic-oceanic,0
+794,1,53,3,280,Open; pelagic-neritic,80577
+794,1,53,3,280,Coastal; benthopelagic,0
+794,1,53,3,280,Marine; bathypelagic,34313
+794,1,53,3,280,Coastal; demersal,0
+794,2,53,3,280,Marine; benthopelagic,0
+794,2,53,3,280,Open; demersal,68381
+794,2,53,3,280,Coastal;pelagic-neritic,0
+794,2,53,3,280,Marine; pelagic-oceanic,0
+794,2,53,3,280,Open; pelagic-neritic,119529
+794,2,53,3,280,Coastal; benthopelagic,0
+794,2,53,3,280,Marine; bathypelagic,0
+794,2,53,3,280,Coastal; demersal,0
+799,1,53,3,50,Marine; benthopelagic,0
+799,1,53,3,50,Open; demersal,86273
+799,1,53,3,50,Coastal;pelagic-neritic,0
+799,1,53,3,50,Marine; pelagic-oceanic,0
+799,1,53,3,50,Open; pelagic-neritic,2864
+799,1,53,3,50,Coastal; benthopelagic,3560
+799,1,53,3,50,Marine; bathypelagic,0
+799,1,53,3,50,Coastal; demersal,0
+799,2,53,3,50,Marine; benthopelagic,0
+799,2,53,3,50,Open; demersal,132225
+799,2,53,3,50,Coastal;pelagic-neritic,0
+799,2,53,3,50,Marine; pelagic-oceanic,0
+799,2,53,3,50,Open; pelagic-neritic,3399
+799,2,53,3,50,Coastal; benthopelagic,0
+799,2,53,3,50,Marine; bathypelagic,0
+799,2,53,3,50,Coastal; demersal,0
+800,1,53,3,50,Marine; benthopelagic,0
+800,1,53,3,50,Open; demersal,0
+800,1,53,3,50,Coastal;pelagic-neritic,0
+800,1,53,3,50,Marine; pelagic-oceanic,0
+800,1,53,3,50,Open; pelagic-neritic,110
+800,1,53,3,50,Coastal; benthopelagic,0
+800,1,53,3,50,Marine; bathypelagic,0
+800,1,53,3,50,Coastal; demersal,0
+800,2,53,3,50,Marine; benthopelagic,0
+800,2,53,3,50,Open; demersal,7386
+800,2,53,3,50,Coastal;pelagic-neritic,0
+800,2,53,3,50,Marine; pelagic-oceanic,2097
+800,2,53,3,50,Open; pelagic-neritic,19857
+800,2,53,3,50,Coastal; benthopelagic,0
+800,2,53,3,50,Marine; bathypelagic,0
+800,2,53,3,50,Coastal; demersal,0
+801,1,53,3,0,Marine; benthopelagic,0
+801,1,53,3,0,Open; demersal,50330
+801,1,53,3,0,Coastal;pelagic-neritic,14
+801,1,53,3,0,Marine; pelagic-oceanic,0
+801,1,53,3,0,Open; pelagic-neritic,0
+801,1,53,3,0,Coastal; benthopelagic,0
+801,1,53,3,0,Marine; bathypelagic,0
+801,1,53,3,0,Coastal; demersal,0
+802,1,53,3,0,Marine; benthopelagic,0
+802,1,53,3,0,Open; demersal,92545
+802,1,53,3,0,Coastal;pelagic-neritic,0
+802,1,53,3,0,Marine; pelagic-oceanic,21
+802,1,53,3,0,Open; pelagic-neritic,0
+802,1,53,3,0,Coastal; benthopelagic,0
+802,1,53,3,0,Marine; bathypelagic,0
+802,1,53,3,0,Coastal; demersal,0
+839,1,53,7,500,Marine; benthopelagic,0
+839,1,53,7,500,Open; demersal,0
+839,1,53,7,500,Coastal;pelagic-neritic,0
+839,1,53,7,500,Marine; pelagic-oceanic,16543
+839,1,53,7,500,Open; pelagic-neritic,0
+839,1,53,7,500,Coastal; benthopelagic,0
+839,1,53,7,500,Marine; bathypelagic,0
+839,1,53,7,500,Coastal; demersal,0
+840,1,53,7,500,Marine; benthopelagic,0
+840,1,53,7,500,Open; demersal,0
+840,1,53,7,500,Coastal;pelagic-neritic,0
+840,1,53,7,500,Marine; pelagic-oceanic,26465
+840,1,53,7,500,Open; pelagic-neritic,36
+840,1,53,7,500,Coastal; benthopelagic,21
+840,1,53,7,500,Marine; bathypelagic,21154
+840,1,53,7,500,Coastal; demersal,0
+848,1,53,7,50,Marine; benthopelagic,39
+848,1,53,7,50,Open; demersal,1606
+848,1,53,7,50,Coastal;pelagic-neritic,1038
+848,1,53,7,50,Marine; pelagic-oceanic,12117
+848,1,53,7,50,Open; pelagic-neritic,586
+848,1,53,7,50,Coastal; benthopelagic,121
+848,1,53,7,50,Marine; bathypelagic,5
+848,1,53,7,50,Coastal; demersal,402
+848,2,53,7,50,Marine; benthopelagic,217
+848,2,53,7,50,Open; demersal,5804
+848,2,53,7,50,Coastal;pelagic-neritic,4647
+848,2,53,7,50,Marine; pelagic-oceanic,22463
+848,2,53,7,50,Open; pelagic-neritic,1149
+848,2,53,7,50,Coastal; benthopelagic,51
+848,2,53,7,50,Marine; bathypelagic,72
+848,2,53,7,50,Coastal; demersal,555
+848,3,53,7,50,Marine; benthopelagic,289
+848,3,53,7,50,Open; demersal,7553
+848,3,53,7,50,Coastal;pelagic-neritic,2792
+848,3,53,7,50,Marine; pelagic-oceanic,31756
+848,3,53,7,50,Open; pelagic-neritic,1290
+848,3,53,7,50,Coastal; benthopelagic,0
+848,3,53,7,50,Marine; bathypelagic,205
+848,3,53,7,50,Coastal; demersal,897
+977,1,60,4,500,Marine; benthopelagic,0
+977,1,60,4,500,Open; demersal,13
+977,1,60,4,500,Coastal;pelagic-neritic,0
+977,1,60,4,500,Marine; pelagic-oceanic,28830
+977,1,60,4,500,Open; pelagic-neritic,109728
+977,1,60,4,500,Coastal; benthopelagic,0
+977,1,60,4,500,Marine; bathypelagic,46522
+977,1,60,4,500,Coastal; demersal,0
+977,2,60,4,500,Marine; benthopelagic,0
+977,2,60,4,500,Open; demersal,5
+977,2,60,4,500,Coastal;pelagic-neritic,0
+977,2,60,4,500,Marine; pelagic-oceanic,5
+977,2,60,4,500,Open; pelagic-neritic,19295
+977,2,60,4,500,Coastal; benthopelagic,0
+977,2,60,4,500,Marine; bathypelagic,30637
+977,2,60,4,500,Coastal; demersal,0
+978,1,60,4,500,Marine; benthopelagic,0
+978,1,60,4,500,Open; demersal,0
+978,1,60,4,500,Coastal;pelagic-neritic,0
+978,1,60,4,500,Marine; pelagic-oceanic,24
+978,1,60,4,500,Open; pelagic-neritic,0
+978,1,60,4,500,Coastal; benthopelagic,0
+978,1,60,4,500,Marine; bathypelagic,155661
+978,1,60,4,500,Coastal; demersal,0
+985,1,60,4,50,Marine; benthopelagic,0
+985,1,60,4,50,Open; demersal,1232
+985,1,60,4,50,Coastal;pelagic-neritic,0
+985,1,60,4,50,Marine; pelagic-oceanic,3772
+985,1,60,4,50,Open; pelagic-neritic,97397
+985,1,60,4,50,Coastal; benthopelagic,0
+985,1,60,4,50,Marine; bathypelagic,2347
+985,1,60,4,50,Coastal; demersal,0
+985,2,60,4,50,Marine; benthopelagic,0
+985,2,60,4,50,Open; demersal,49
+985,2,60,4,50,Coastal;pelagic-neritic,5
+985,2,60,4,50,Marine; pelagic-oceanic,124
+985,2,60,4,50,Open; pelagic-neritic,6471
+985,2,60,4,50,Coastal; benthopelagic,0
+985,2,60,4,50,Marine; bathypelagic,177
+985,2,60,4,50,Coastal; demersal,0
+985,3,60,4,50,Marine; benthopelagic,0
+985,3,60,4,50,Open; demersal,0
+985,3,60,4,50,Coastal;pelagic-neritic,0
+985,3,60,4,50,Marine; pelagic-oceanic,0
+985,3,60,4,50,Open; pelagic-neritic,33150
+985,3,60,4,50,Coastal; benthopelagic,0
+985,3,60,4,50,Marine; bathypelagic,0
+985,3,60,4,50,Coastal; demersal,0
+986,1,60,4,50,Marine; benthopelagic,0
+986,1,60,4,50,Open; demersal,375
+986,1,60,4,50,Coastal;pelagic-neritic,0
+986,1,60,4,50,Marine; pelagic-oceanic,38
+986,1,60,4,50,Open; pelagic-neritic,3756
+986,1,60,4,50,Coastal; benthopelagic,0
+986,1,60,4,50,Marine; bathypelagic,51
+986,1,60,4,50,Coastal; demersal,0
+986,2,60,4,50,Marine; benthopelagic,0
+986,2,60,4,50,Open; demersal,0
+986,2,60,4,50,Coastal;pelagic-neritic,0
+986,2,60,4,50,Marine; pelagic-oceanic,0
+986,2,60,4,50,Open; pelagic-neritic,17246
+986,2,60,4,50,Coastal; benthopelagic,0
+986,2,60,4,50,Marine; bathypelagic,0
+986,2,60,4,50,Coastal; demersal,0
+987,1,60,4,0,Marine; benthopelagic,0
+987,1,60,4,0,Open; demersal,968
+987,1,60,4,0,Coastal;pelagic-neritic,16
+987,1,60,4,0,Marine; pelagic-oceanic,40201
+987,1,60,4,0,Open; pelagic-neritic,38747
+987,1,60,4,0,Coastal; benthopelagic,0
+987,1,60,4,0,Marine; bathypelagic,300
+987,1,60,4,0,Coastal; demersal,0
+987,2,60,4,0,Marine; benthopelagic,0
+987,2,60,4,0,Open; demersal,1896
+987,2,60,4,0,Coastal;pelagic-neritic,0
+987,2,60,4,0,Marine; pelagic-oceanic,27815
+987,2,60,4,0,Open; pelagic-neritic,26914
+987,2,60,4,0,Coastal; benthopelagic,0
+987,2,60,4,0,Marine; bathypelagic,0
+987,2,60,4,0,Coastal; demersal,0
+988,1,60,4,0,Marine; benthopelagic,0
+988,1,60,4,0,Open; demersal,49
+988,1,60,4,0,Coastal;pelagic-neritic,0
+988,1,60,4,0,Marine; pelagic-oceanic,231011
+988,1,60,4,0,Open; pelagic-neritic,901
+988,1,60,4,0,Coastal; benthopelagic,0
+988,1,60,4,0,Marine; bathypelagic,0
+988,1,60,4,0,Coastal; demersal,0
+988,2,60,4,0,Marine; benthopelagic,0
+988,2,60,4,0,Open; demersal,7
+988,2,60,4,0,Coastal;pelagic-neritic,0
+988,2,60,4,0,Marine; pelagic-oceanic,148708
+988,2,60,4,0,Open; pelagic-neritic,892
+988,2,60,4,0,Coastal; benthopelagic,0
+988,2,60,4,0,Marine; bathypelagic,0
+988,2,60,4,0,Coastal; demersal,0
+995,1,60,2,86,Marine; benthopelagic,0
+995,1,60,2,86,Open; demersal,17388
+995,1,60,2,86,Coastal;pelagic-neritic,0
+995,1,60,2,86,Marine; pelagic-oceanic,6091
+995,1,60,2,86,Open; pelagic-neritic,7262
+995,1,60,2,86,Coastal; benthopelagic,53
+995,1,60,2,86,Marine; bathypelagic,0
+995,1,60,2,86,Coastal; demersal,0
+995,2,60,2,86,Marine; benthopelagic,0
+995,2,60,2,86,Open; demersal,0
+995,2,60,2,86,Coastal;pelagic-neritic,0
+995,2,60,2,86,Marine; pelagic-oceanic,118
+995,2,60,2,86,Open; pelagic-neritic,13372
+995,2,60,2,86,Coastal; benthopelagic,0
+995,2,60,2,86,Marine; bathypelagic,0
+995,2,60,2,86,Coastal; demersal,0
+996,1,60,2,86,Marine; benthopelagic,0
+996,1,60,2,86,Open; demersal,242
+996,1,60,2,86,Coastal;pelagic-neritic,75
+996,1,60,2,86,Marine; pelagic-oceanic,0
+996,1,60,2,86,Open; pelagic-neritic,0
+996,1,60,2,86,Coastal; benthopelagic,0
+996,1,60,2,86,Marine; bathypelagic,0
+996,1,60,2,86,Coastal; demersal,0
+997,1,60,2,50,Marine; benthopelagic,0
+997,1,60,2,50,Open; demersal,0
+997,1,60,2,50,Coastal;pelagic-neritic,45882
+997,1,60,2,50,Marine; pelagic-oceanic,0
+997,1,60,2,50,Open; pelagic-neritic,0
+997,1,60,2,50,Coastal; benthopelagic,0
+997,1,60,2,50,Marine; bathypelagic,0
+997,1,60,2,50,Coastal; demersal,0
+998,1,60,2,50,Marine; benthopelagic,0
+998,1,60,2,50,Open; demersal,1439
+998,1,60,2,50,Coastal;pelagic-neritic,256
+998,1,60,2,50,Marine; pelagic-oceanic,0
+998,1,60,2,50,Open; pelagic-neritic,0
+998,1,60,2,50,Coastal; benthopelagic,0
+998,1,60,2,50,Marine; bathypelagic,0
+998,1,60,2,50,Coastal; demersal,0
+998,2,60,2,50,Marine; benthopelagic,0
+998,2,60,2,50,Open; demersal,46370
+998,2,60,2,50,Coastal;pelagic-neritic,533
+998,2,60,2,50,Marine; pelagic-oceanic,0
+998,2,60,2,50,Open; pelagic-neritic,0
+998,2,60,2,50,Coastal; benthopelagic,72018
+998,2,60,2,50,Marine; bathypelagic,16
+998,2,60,2,50,Coastal; demersal,0
+998,3,60,2,50,Marine; benthopelagic,0
+998,3,60,2,50,Open; demersal,10920
+998,3,60,2,50,Coastal;pelagic-neritic,0
+998,3,60,2,50,Marine; pelagic-oceanic,0
+998,3,60,2,50,Open; pelagic-neritic,0
+998,3,60,2,50,Coastal; benthopelagic,29636
+998,3,60,2,50,Marine; bathypelagic,0
+998,3,60,2,50,Coastal; demersal,0
+999,1,60,2,0,Marine; benthopelagic,0
+999,1,60,2,0,Open; demersal,212013
+999,1,60,2,0,Coastal;pelagic-neritic,0
+999,1,60,2,0,Marine; pelagic-oceanic,21
+999,1,60,2,0,Open; pelagic-neritic,0
+999,1,60,2,0,Coastal; benthopelagic,28
+999,1,60,2,0,Marine; bathypelagic,0
+999,1,60,2,0,Coastal; demersal,0
+999,2,60,2,0,Marine; benthopelagic,0
+999,2,60,2,0,Open; demersal,178744
+999,2,60,2,0,Coastal;pelagic-neritic,0
+999,2,60,2,0,Marine; pelagic-oceanic,0
+999,2,60,2,0,Open; pelagic-neritic,12
+999,2,60,2,0,Coastal; benthopelagic,0
+999,2,60,2,0,Marine; bathypelagic,21
+999,2,60,2,0,Coastal; demersal,0
+1001,1,60,1,60,Marine; benthopelagic,0
+1001,1,60,1,60,Open; demersal,122594
+1001,1,60,1,60,Coastal;pelagic-neritic,0
+1001,1,60,1,60,Marine; pelagic-oceanic,26
+1001,1,60,1,60,Open; pelagic-neritic,7236
+1001,1,60,1,60,Coastal; benthopelagic,0
+1001,1,60,1,60,Marine; bathypelagic,0
+1001,1,60,1,60,Coastal; demersal,0
+1001,2,60,1,60,Marine; benthopelagic,0
+1001,2,60,1,60,Open; demersal,64077
+1001,2,60,1,60,Coastal;pelagic-neritic,64398
+1001,2,60,1,60,Marine; pelagic-oceanic,0
+1001,2,60,1,60,Open; pelagic-neritic,0
+1001,2,60,1,60,Coastal; benthopelagic,0
+1001,2,60,1,60,Marine; bathypelagic,0
+1001,2,60,1,60,Coastal; demersal,0
+1002,1,60,1,60,Marine; benthopelagic,0
+1002,1,60,1,60,Open; demersal,88000
+1002,1,60,1,60,Coastal;pelagic-neritic,10767
+1002,1,60,1,60,Marine; pelagic-oceanic,0
+1002,1,60,1,60,Open; pelagic-neritic,11051
+1002,1,60,1,60,Coastal; benthopelagic,0
+1002,1,60,1,60,Marine; bathypelagic,0
+1002,1,60,1,60,Coastal; demersal,0
+1002,2,60,1,60,Marine; benthopelagic,0
+1002,2,60,1,60,Open; demersal,76534
+1002,2,60,1,60,Coastal;pelagic-neritic,0
+1002,2,60,1,60,Marine; pelagic-oceanic,0
+1002,2,60,1,60,Open; pelagic-neritic,0
+1002,2,60,1,60,Coastal; benthopelagic,0
+1002,2,60,1,60,Marine; bathypelagic,0
+1002,2,60,1,60,Coastal; demersal,0
+1003,1,60,1,50,Marine; benthopelagic,0
+1003,1,60,1,50,Open; demersal,9951
+1003,1,60,1,50,Coastal;pelagic-neritic,122
+1003,1,60,1,50,Marine; pelagic-oceanic,0
+1003,1,60,1,50,Open; pelagic-neritic,1173
+1003,1,60,1,50,Coastal; benthopelagic,0
+1003,1,60,1,50,Marine; bathypelagic,0
+1003,1,60,1,50,Coastal; demersal,0
+1003,2,60,1,50,Marine; benthopelagic,0
+1003,2,60,1,50,Open; demersal,8291
+1003,2,60,1,50,Coastal;pelagic-neritic,61433
+1003,2,60,1,50,Marine; pelagic-oceanic,0
+1003,2,60,1,50,Open; pelagic-neritic,352
+1003,2,60,1,50,Coastal; benthopelagic,0
+1003,2,60,1,50,Marine; bathypelagic,215
+1003,2,60,1,50,Coastal; demersal,0
+1003,3,60,1,50,Marine; benthopelagic,0
+1003,3,60,1,50,Open; demersal,70504
+1003,3,60,1,50,Coastal;pelagic-neritic,58957
+1003,3,60,1,50,Marine; pelagic-oceanic,0
+1003,3,60,1,50,Open; pelagic-neritic,11668
+1003,3,60,1,50,Coastal; benthopelagic,0
+1003,3,60,1,50,Marine; bathypelagic,0
+1003,3,60,1,50,Coastal; demersal,0
+1003,4,60,1,50,Marine; benthopelagic,0
+1003,4,60,1,50,Open; demersal,27826
+1003,4,60,1,50,Coastal;pelagic-neritic,20489
+1003,4,60,1,50,Marine; pelagic-oceanic,0
+1003,4,60,1,50,Open; pelagic-neritic,3612
+1003,4,60,1,50,Coastal; benthopelagic,0
+1003,4,60,1,50,Marine; bathypelagic,1393
+1003,4,60,1,50,Coastal; demersal,0
+1004,1,60,1,50,Marine; benthopelagic,0
+1004,1,60,1,50,Open; demersal,11089
+1004,1,60,1,50,Coastal;pelagic-neritic,2633
+1004,1,60,1,50,Marine; pelagic-oceanic,0
+1004,1,60,1,50,Open; pelagic-neritic,744
+1004,1,60,1,50,Coastal; benthopelagic,0
+1004,1,60,1,50,Marine; bathypelagic,1976
+1004,1,60,1,50,Coastal; demersal,0
+1004,2,60,1,50,Marine; benthopelagic,0
+1004,2,60,1,50,Open; demersal,13929
+1004,2,60,1,50,Coastal;pelagic-neritic,2472
+1004,2,60,1,50,Marine; pelagic-oceanic,0
+1004,2,60,1,50,Open; pelagic-neritic,1983
+1004,2,60,1,50,Coastal; benthopelagic,4131
+1004,2,60,1,50,Marine; bathypelagic,1726
+1004,2,60,1,50,Coastal; demersal,0
+1005,1,60,1,25,Marine; benthopelagic,0
+1005,1,60,1,25,Open; demersal,46715
+1005,1,60,1,25,Coastal;pelagic-neritic,126
+1005,1,60,1,25,Marine; pelagic-oceanic,4
+1005,1,60,1,25,Open; pelagic-neritic,34585
+1005,1,60,1,25,Coastal; benthopelagic,0
+1005,1,60,1,25,Marine; bathypelagic,0
+1005,1,60,1,25,Coastal; demersal,0
+1005,2,60,1,25,Marine; benthopelagic,0
+1005,2,60,1,25,Open; demersal,99293
+1005,2,60,1,25,Coastal;pelagic-neritic,234
+1005,2,60,1,25,Marine; pelagic-oceanic,20
+1005,2,60,1,25,Open; pelagic-neritic,54794
+1005,2,60,1,25,Coastal; benthopelagic,0
+1005,2,60,1,25,Marine; bathypelagic,5
+1005,2,60,1,25,Coastal; demersal,0
+1205,1,67,1,45,Marine; benthopelagic,0
+1205,1,67,1,45,Open; demersal,32573
+1205,1,67,1,45,Coastal;pelagic-neritic,45041
+1205,1,67,1,45,Marine; pelagic-oceanic,0
+1205,1,67,1,45,Open; pelagic-neritic,10795
+1205,1,67,1,45,Coastal; benthopelagic,0
+1205,1,67,1,45,Marine; bathypelagic,0
+1205,1,67,1,45,Coastal; demersal,0
+1205,2,67,1,45,Marine; benthopelagic,0
+1205,2,67,1,45,Open; demersal,16807
+1205,2,67,1,45,Coastal;pelagic-neritic,39495
+1205,2,67,1,45,Marine; pelagic-oceanic,0
+1205,2,67,1,45,Open; pelagic-neritic,1343
+1205,2,67,1,45,Coastal; benthopelagic,0
+1205,2,67,1,45,Marine; bathypelagic,0
+1205,2,67,1,45,Coastal; demersal,0
+1205,3,67,1,45,Marine; benthopelagic,0
+1205,3,67,1,45,Open; demersal,231
+1205,3,67,1,45,Coastal;pelagic-neritic,533
+1205,3,67,1,45,Marine; pelagic-oceanic,0
+1205,3,67,1,45,Open; pelagic-neritic,468
+1205,3,67,1,45,Coastal; benthopelagic,0
+1205,3,67,1,45,Marine; bathypelagic,0
+1205,3,67,1,45,Coastal; demersal,0
+1205,4,67,1,45,Marine; benthopelagic,0
+1205,4,67,1,45,Open; demersal,8107
+1205,4,67,1,45,Coastal;pelagic-neritic,30923
+1205,4,67,1,45,Marine; pelagic-oceanic,0
+1205,4,67,1,45,Open; pelagic-neritic,9078
+1205,4,67,1,45,Coastal; benthopelagic,0
+1205,4,67,1,45,Marine; bathypelagic,0
+1205,4,67,1,45,Coastal; demersal,0
+1206,1,67,1,45,Marine; benthopelagic,0
+1206,1,67,1,45,Open; demersal,11384
+1206,1,67,1,45,Coastal;pelagic-neritic,29101
+1206,1,67,1,45,Marine; pelagic-oceanic,0
+1206,1,67,1,45,Open; pelagic-neritic,16
+1206,1,67,1,45,Coastal; benthopelagic,159
+1206,1,67,1,45,Marine; bathypelagic,0
+1206,1,67,1,45,Coastal; demersal,0
+1206,2,67,1,45,Marine; benthopelagic,0
+1206,2,67,1,45,Open; demersal,5833
+1206,2,67,1,45,Coastal;pelagic-neritic,26344
+1206,2,67,1,45,Marine; pelagic-oceanic,0
+1206,2,67,1,45,Open; pelagic-neritic,386
+1206,2,67,1,45,Coastal; benthopelagic,0
+1206,2,67,1,45,Marine; bathypelagic,0
+1206,2,67,1,45,Coastal; demersal,441
+1206,3,67,1,45,Marine; benthopelagic,0
+1206,3,67,1,45,Open; demersal,4597
+1206,3,67,1,45,Coastal;pelagic-neritic,11391
+1206,3,67,1,45,Marine; pelagic-oceanic,0
+1206,3,67,1,45,Open; pelagic-neritic,31
+1206,3,67,1,45,Coastal; benthopelagic,0
+1206,3,67,1,45,Marine; bathypelagic,0
+1206,3,67,1,45,Coastal; demersal,0
+1206,4,67,1,45,Marine; benthopelagic,0
+1206,4,67,1,45,Open; demersal,8197
+1206,4,67,1,45,Coastal;pelagic-neritic,55508
+1206,4,67,1,45,Marine; pelagic-oceanic,0
+1206,4,67,1,45,Open; pelagic-neritic,649
+1206,4,67,1,45,Coastal; benthopelagic,0
+1206,4,67,1,45,Marine; bathypelagic,0
+1206,4,67,1,45,Coastal; demersal,0
+1207,1,67,1,25,Marine; benthopelagic,0
+1207,1,67,1,25,Open; demersal,14144
+1207,1,67,1,25,Coastal;pelagic-neritic,27240
+1207,1,67,1,25,Marine; pelagic-oceanic,0
+1207,1,67,1,25,Open; pelagic-neritic,1644
+1207,1,67,1,25,Coastal; benthopelagic,1113
+1207,1,67,1,25,Marine; bathypelagic,4082
+1207,1,67,1,25,Coastal; demersal,0
+1207,2,67,1,25,Marine; benthopelagic,0
+1207,2,67,1,25,Open; demersal,15422
+1207,2,67,1,25,Coastal;pelagic-neritic,11225
+1207,2,67,1,25,Marine; pelagic-oceanic,0
+1207,2,67,1,25,Open; pelagic-neritic,274
+1207,2,67,1,25,Coastal; benthopelagic,0
+1207,2,67,1,25,Marine; bathypelagic,1192
+1207,2,67,1,25,Coastal; demersal,0
+1208,1,67,1,25,Marine; benthopelagic,0
+1208,1,67,1,25,Open; demersal,6388
+1208,1,67,1,25,Coastal;pelagic-neritic,21613
+1208,1,67,1,25,Marine; pelagic-oceanic,43
+1208,1,67,1,25,Open; pelagic-neritic,2109
+1208,1,67,1,25,Coastal; benthopelagic,30106
+1208,1,67,1,25,Marine; bathypelagic,0
+1208,1,67,1,25,Coastal; demersal,0
+1208,2,67,1,25,Marine; benthopelagic,0
+1208,2,67,1,25,Open; demersal,11585
+1208,2,67,1,25,Coastal;pelagic-neritic,22319
+1208,2,67,1,25,Marine; pelagic-oceanic,12373
+1208,2,67,1,25,Open; pelagic-neritic,3909
+1208,2,67,1,25,Coastal; benthopelagic,5808
+1208,2,67,1,25,Marine; bathypelagic,0
+1208,2,67,1,25,Coastal; demersal,0
+1210,1,67,1,0,Marine; benthopelagic,0
+1210,1,67,1,0,Open; demersal,61106
+1210,1,67,1,0,Coastal;pelagic-neritic,0
+1210,1,67,1,0,Marine; pelagic-oceanic,0
+1210,1,67,1,0,Open; pelagic-neritic,625
+1210,1,67,1,0,Coastal; benthopelagic,0
+1210,1,67,1,0,Marine; bathypelagic,0
+1210,1,67,1,0,Coastal; demersal,0
+1210,2,67,1,0,Marine; benthopelagic,0
+1210,2,67,1,0,Open; demersal,6039
+1210,2,67,1,0,Coastal;pelagic-neritic,75
+1210,2,67,1,0,Marine; pelagic-oceanic,16
+1210,2,67,1,0,Open; pelagic-neritic,115877
+1210,2,67,1,0,Coastal; benthopelagic,0
+1210,2,67,1,0,Marine; bathypelagic,0
+1210,2,67,1,0,Coastal; demersal,0
+1219,1,67,3,291,Marine; benthopelagic,0
+1219,1,67,3,291,Open; demersal,60784
+1219,1,67,3,291,Coastal;pelagic-neritic,0
+1219,1,67,3,291,Marine; pelagic-oceanic,0
+1219,1,67,3,291,Open; pelagic-neritic,50304
+1219,1,67,3,291,Coastal; benthopelagic,0
+1219,1,67,3,291,Marine; bathypelagic,2097
+1219,1,67,3,291,Coastal; demersal,0
+1219,2,67,3,291,Marine; benthopelagic,0
+1219,2,67,3,291,Open; demersal,0
+1219,2,67,3,291,Coastal;pelagic-neritic,0
+1219,2,67,3,291,Marine; pelagic-oceanic,0
+1219,2,67,3,291,Open; pelagic-neritic,109466
+1219,2,67,3,291,Coastal; benthopelagic,19094
+1219,2,67,3,291,Marine; bathypelagic,42650
+1219,2,67,3,291,Coastal; demersal,0
+1220,1,67,3,291,Marine; benthopelagic,0
+1220,1,67,3,291,Open; demersal,0
+1220,1,67,3,291,Coastal;pelagic-neritic,0
+1220,1,67,3,291,Marine; pelagic-oceanic,16
+1220,1,67,3,291,Open; pelagic-neritic,32485
+1220,1,67,3,291,Coastal; benthopelagic,0
+1220,1,67,3,291,Marine; bathypelagic,6025
+1220,1,67,3,291,Coastal; demersal,0
+1220,2,67,3,291,Marine; benthopelagic,0
+1220,2,67,3,291,Open; demersal,26391
+1220,2,67,3,291,Coastal;pelagic-neritic,0
+1220,2,67,3,291,Marine; pelagic-oceanic,0
+1220,2,67,3,291,Open; pelagic-neritic,114335
+1220,2,67,3,291,Coastal; benthopelagic,0
+1220,2,67,3,291,Marine; bathypelagic,11328
+1220,2,67,3,291,Coastal; demersal,0
+1225,1,67,3,50,Marine; benthopelagic,0
+1225,1,67,3,50,Open; demersal,45015
+1225,1,67,3,50,Coastal;pelagic-neritic,10344
+1225,1,67,3,50,Marine; pelagic-oceanic,0
+1225,1,67,3,50,Open; pelagic-neritic,0
+1225,1,67,3,50,Coastal; benthopelagic,0
+1225,1,67,3,50,Marine; bathypelagic,0
+1225,1,67,3,50,Coastal; demersal,0
+1228,1,67,3,0,Marine; benthopelagic,0
+1228,1,67,3,0,Open; demersal,10980
+1228,1,67,3,0,Coastal;pelagic-neritic,15
+1228,1,67,3,0,Marine; pelagic-oceanic,3116
+1228,1,67,3,0,Open; pelagic-neritic,1215
+1228,1,67,3,0,Coastal; benthopelagic,30
+1228,1,67,3,0,Marine; bathypelagic,0
+1228,1,67,3,0,Coastal; demersal,0
+1228,2,67,3,0,Marine; benthopelagic,0
+1228,2,67,3,0,Open; demersal,12693
+1228,2,67,3,0,Coastal;pelagic-neritic,0
+1228,2,67,3,0,Marine; pelagic-oceanic,795
+1228,2,67,3,0,Open; pelagic-neritic,568
+1228,2,67,3,0,Coastal; benthopelagic,0
+1228,2,67,3,0,Marine; bathypelagic,0
+1228,2,67,3,0,Coastal; demersal,0
+1265,1,67,7,500,Marine; benthopelagic,0
+1265,1,67,7,500,Open; demersal,33
+1265,1,67,7,500,Coastal;pelagic-neritic,0
+1265,1,67,7,500,Marine; pelagic-oceanic,62094
+1265,1,67,7,500,Open; pelagic-neritic,5
+1265,1,67,7,500,Coastal; benthopelagic,0
+1265,1,67,7,500,Marine; bathypelagic,0
+1265,1,67,7,500,Coastal; demersal,0
+1265,2,67,7,500,Marine; benthopelagic,0
+1265,2,67,7,500,Open; demersal,0
+1265,2,67,7,500,Coastal;pelagic-neritic,0
+1265,2,67,7,500,Marine; pelagic-oceanic,132002
+1265,2,67,7,500,Open; pelagic-neritic,0
+1265,2,67,7,500,Coastal; benthopelagic,0
+1265,2,67,7,500,Marine; bathypelagic,0
+1265,2,67,7,500,Coastal; demersal,0
+1266,1,67,7,500,Marine; benthopelagic,0
+1266,1,67,7,500,Open; demersal,11
+1266,1,67,7,500,Coastal;pelagic-neritic,0
+1266,1,67,7,500,Marine; pelagic-oceanic,0
+1266,1,67,7,500,Open; pelagic-neritic,0
+1266,1,67,7,500,Coastal; benthopelagic,0
+1266,1,67,7,500,Marine; bathypelagic,0
+1266,1,67,7,500,Coastal; demersal,0
+1273,1,67,7,50,Marine; benthopelagic,0
+1273,1,67,7,50,Open; demersal,0
+1273,1,67,7,50,Coastal;pelagic-neritic,0
+1273,1,67,7,50,Marine; pelagic-oceanic,0
+1273,1,67,7,50,Open; pelagic-neritic,0
+1273,1,67,7,50,Coastal; benthopelagic,0
+1273,1,67,7,50,Marine; bathypelagic,93922
+1273,1,67,7,50,Coastal; demersal,0
+1273,2,67,7,50,Marine; benthopelagic,0
+1273,2,67,7,50,Open; demersal,0
+1273,2,67,7,50,Coastal;pelagic-neritic,0
+1273,2,67,7,50,Marine; pelagic-oceanic,0
+1273,2,67,7,50,Open; pelagic-neritic,0
+1273,2,67,7,50,Coastal; benthopelagic,0
+1273,2,67,7,50,Marine; bathypelagic,5221
+1273,2,67,7,50,Coastal; demersal,0
+1274,1,67,7,50,Marine; benthopelagic,0
+1274,1,67,7,50,Open; demersal,0
+1274,1,67,7,50,Coastal;pelagic-neritic,0
+1274,1,67,7,50,Marine; pelagic-oceanic,0
+1274,1,67,7,50,Open; pelagic-neritic,0
+1274,1,67,7,50,Coastal; benthopelagic,0
+1274,1,67,7,50,Marine; bathypelagic,126790
+1274,1,67,7,50,Coastal; demersal,0
+1274,2,67,7,50,Marine; benthopelagic,0
+1274,2,67,7,50,Open; demersal,0
+1274,2,67,7,50,Coastal;pelagic-neritic,0
+1274,2,67,7,50,Marine; pelagic-oceanic,61976
+1274,2,67,7,50,Open; pelagic-neritic,0
+1274,2,67,7,50,Coastal; benthopelagic,0
+1274,2,67,7,50,Marine; bathypelagic,0
+1274,2,67,7,50,Coastal; demersal,0
+1535,1,77,1,0,Marine; benthopelagic,0
+1535,1,77,1,0,Open; demersal,2027
+1535,1,77,1,0,Coastal;pelagic-neritic,131
+1535,1,77,1,0,Marine; pelagic-oceanic,8062
+1535,1,77,1,0,Open; pelagic-neritic,274
+1535,1,77,1,0,Coastal; benthopelagic,51214
+1535,1,77,1,0,Marine; bathypelagic,0
+1535,1,77,1,0,Coastal; demersal,0
+1535,2,77,1,0,Marine; benthopelagic,0
+1535,2,77,1,0,Open; demersal,0
+1535,2,77,1,0,Coastal;pelagic-neritic,0
+1535,2,77,1,0,Marine; pelagic-oceanic,1369
+1535,2,77,1,0,Open; pelagic-neritic,358
+1535,2,77,1,0,Coastal; benthopelagic,48432
+1535,2,77,1,0,Marine; bathypelagic,0
+1535,2,77,1,0,Coastal; demersal,0
+1537,1,77,1,50,Marine; benthopelagic,0
+1537,1,77,1,50,Open; demersal,49515
+1537,1,77,1,50,Coastal;pelagic-neritic,3888
+1537,1,77,1,50,Marine; pelagic-oceanic,0
+1537,1,77,1,50,Open; pelagic-neritic,0
+1537,1,77,1,50,Coastal; benthopelagic,0
+1537,1,77,1,50,Marine; bathypelagic,0
+1537,1,77,1,50,Coastal; demersal,0
+1537,2,77,1,50,Marine; benthopelagic,0
+1537,2,77,1,50,Open; demersal,3046
+1537,2,77,1,50,Coastal;pelagic-neritic,0
+1537,2,77,1,50,Marine; pelagic-oceanic,0
+1537,2,77,1,50,Open; pelagic-neritic,35
+1537,2,77,1,50,Coastal; benthopelagic,0
+1537,2,77,1,50,Marine; bathypelagic,0
+1537,2,77,1,50,Coastal; demersal,0
+1538,1,77,1,50,Marine; benthopelagic,0
+1538,1,77,1,50,Open; demersal,34146
+1538,1,77,1,50,Coastal;pelagic-neritic,0
+1538,1,77,1,50,Marine; pelagic-oceanic,6048
+1538,1,77,1,50,Open; pelagic-neritic,0
+1538,1,77,1,50,Coastal; benthopelagic,1083
+1538,1,77,1,50,Marine; bathypelagic,0
+1538,1,77,1,50,Coastal; demersal,0
+1538,2,77,1,50,Marine; benthopelagic,0
+1538,2,77,1,50,Open; demersal,132534
+1538,2,77,1,50,Coastal;pelagic-neritic,10254
+1538,2,77,1,50,Marine; pelagic-oceanic,1636
+1538,2,77,1,50,Open; pelagic-neritic,434
+1538,2,77,1,50,Coastal; benthopelagic,562
+1538,2,77,1,50,Marine; bathypelagic,0
+1538,2,77,1,50,Coastal; demersal,1987
+1538,3,77,1,50,Marine; benthopelagic,0
+1538,3,77,1,50,Open; demersal,12259
+1538,3,77,1,50,Coastal;pelagic-neritic,0
+1538,3,77,1,50,Marine; pelagic-oceanic,0
+1538,3,77,1,50,Open; pelagic-neritic,0
+1538,3,77,1,50,Coastal; benthopelagic,0
+1538,3,77,1,50,Marine; bathypelagic,0
+1538,3,77,1,50,Coastal; demersal,0
+1538,4,77,1,50,Marine; benthopelagic,0
+1538,4,77,1,50,Open; demersal,55204
+1538,4,77,1,50,Coastal;pelagic-neritic,0
+1538,4,77,1,50,Marine; pelagic-oceanic,12778
+1538,4,77,1,50,Open; pelagic-neritic,0
+1538,4,77,1,50,Coastal; benthopelagic,0
+1538,4,77,1,50,Marine; bathypelagic,0
+1538,4,77,1,50,Coastal; demersal,0
+1539,1,77,1,25,Marine; benthopelagic,0
+1539,1,77,1,25,Open; demersal,7004
+1539,1,77,1,25,Coastal;pelagic-neritic,0
+1539,1,77,1,25,Marine; pelagic-oceanic,3418
+1539,1,77,1,25,Open; pelagic-neritic,1116
+1539,1,77,1,25,Coastal; benthopelagic,0
+1539,1,77,1,25,Marine; bathypelagic,0
+1539,1,77,1,25,Coastal; demersal,4850
+1539,2,77,1,25,Marine; benthopelagic,0
+1539,2,77,1,25,Open; demersal,11978
+1539,2,77,1,25,Coastal;pelagic-neritic,0
+1539,2,77,1,25,Marine; pelagic-oceanic,6881
+1539,2,77,1,25,Open; pelagic-neritic,314
+1539,2,77,1,25,Coastal; benthopelagic,5480
+1539,2,77,1,25,Marine; bathypelagic,1010
+1539,2,77,1,25,Coastal; demersal,6929
+1540,1,77,1,25,Marine; benthopelagic,0
+1540,1,77,1,25,Open; demersal,16950
+1540,1,77,1,25,Coastal;pelagic-neritic,0
+1540,1,77,1,25,Marine; pelagic-oceanic,0
+1540,1,77,1,25,Open; pelagic-neritic,0
+1540,1,77,1,25,Coastal; benthopelagic,0
+1540,1,77,1,25,Marine; bathypelagic,42
+1540,1,77,1,25,Coastal; demersal,0
+1540,2,77,1,25,Marine; benthopelagic,0
+1540,2,77,1,25,Open; demersal,23633
+1540,2,77,1,25,Coastal;pelagic-neritic,1834
+1540,2,77,1,25,Marine; pelagic-oceanic,0
+1540,2,77,1,25,Open; pelagic-neritic,747
+1540,2,77,1,25,Coastal; benthopelagic,0
+1540,2,77,1,25,Marine; bathypelagic,0
+1540,2,77,1,25,Coastal; demersal,2579
+1540,3,77,1,25,Marine; benthopelagic,0
+1540,3,77,1,25,Open; demersal,76812
+1540,3,77,1,25,Coastal;pelagic-neritic,0
+1540,3,77,1,25,Marine; pelagic-oceanic,0
+1540,3,77,1,25,Open; pelagic-neritic,0
+1540,3,77,1,25,Coastal; benthopelagic,2541
+1540,3,77,1,25,Marine; bathypelagic,287
+1540,3,77,1,25,Coastal; demersal,0
+1541,1,77,2,0,Marine; benthopelagic,0
+1541,1,77,2,0,Open; demersal,11322
+1541,1,77,2,0,Coastal;pelagic-neritic,11014
+1541,1,77,2,0,Marine; pelagic-oceanic,0
+1541,1,77,2,0,Open; pelagic-neritic,3872
+1541,1,77,2,0,Coastal; benthopelagic,0
+1541,1,77,2,0,Marine; bathypelagic,0
+1541,1,77,2,0,Coastal; demersal,0
+1543,1,77,2,143,Marine; benthopelagic,0
+1543,1,77,2,143,Open; demersal,47695
+1543,1,77,2,143,Coastal;pelagic-neritic,1232
+1543,1,77,2,143,Marine; pelagic-oceanic,0
+1543,1,77,2,143,Open; pelagic-neritic,20007
+1543,1,77,2,143,Coastal; benthopelagic,0
+1543,1,77,2,143,Marine; bathypelagic,90770
+1543,1,77,2,143,Coastal; demersal,0
+1543,2,77,2,143,Marine; benthopelagic,0
+1543,2,77,2,143,Open; demersal,23425
+1543,2,77,2,143,Coastal;pelagic-neritic,1308
+1543,2,77,2,143,Marine; pelagic-oceanic,0
+1543,2,77,2,143,Open; pelagic-neritic,26725
+1543,2,77,2,143,Coastal; benthopelagic,0
+1543,2,77,2,143,Marine; bathypelagic,122386
+1543,2,77,2,143,Coastal; demersal,0
+1544,1,77,2,143,Marine; benthopelagic,0
+1544,1,77,2,143,Open; demersal,46895
+1544,1,77,2,143,Coastal;pelagic-neritic,0
+1544,1,77,2,143,Marine; pelagic-oceanic,0
+1544,1,77,2,143,Open; pelagic-neritic,2497
+1544,1,77,2,143,Coastal; benthopelagic,5896
+1544,1,77,2,143,Marine; bathypelagic,38960
+1544,1,77,2,143,Coastal; demersal,0
+1544,2,77,2,143,Marine; benthopelagic,0
+1544,2,77,2,143,Open; demersal,17671
+1544,2,77,2,143,Coastal;pelagic-neritic,0
+1544,2,77,2,143,Marine; pelagic-oceanic,0
+1544,2,77,2,143,Open; pelagic-neritic,0
+1544,2,77,2,143,Coastal; benthopelagic,20702
+1544,2,77,2,143,Marine; bathypelagic,92657
+1544,2,77,2,143,Coastal; demersal,0
+1547,1,77,2,50,Marine; benthopelagic,0
+1547,1,77,2,50,Open; demersal,74098
+1547,1,77,2,50,Coastal;pelagic-neritic,3844
+1547,1,77,2,50,Marine; pelagic-oceanic,2744
+1547,1,77,2,50,Open; pelagic-neritic,7339
+1547,1,77,2,50,Coastal; benthopelagic,6957
+1547,1,77,2,50,Marine; bathypelagic,0
+1547,1,77,2,50,Coastal; demersal,0
+1548,1,77,2,50,Marine; benthopelagic,0
+1548,1,77,2,50,Open; demersal,3671
+1548,1,77,2,50,Coastal;pelagic-neritic,16012
+1548,1,77,2,50,Marine; pelagic-oceanic,7161
+1548,1,77,2,50,Open; pelagic-neritic,1509
+1548,1,77,2,50,Coastal; benthopelagic,1685
+1548,1,77,2,50,Marine; bathypelagic,3773
+1548,1,77,2,50,Coastal; demersal,0
+1548,2,77,2,50,Marine; benthopelagic,0
+1548,2,77,2,50,Open; demersal,50
+1548,2,77,2,50,Coastal;pelagic-neritic,0
+1548,2,77,2,50,Marine; pelagic-oceanic,26078
+1548,2,77,2,50,Open; pelagic-neritic,423
+1548,2,77,2,50,Coastal; benthopelagic,0
+1548,2,77,2,50,Marine; bathypelagic,0
+1548,2,77,2,50,Coastal; demersal,0
+1573,1,77,6,0,Marine; benthopelagic,0
+1573,1,77,6,0,Open; demersal,6408
+1573,1,77,6,0,Coastal;pelagic-neritic,0
+1573,1,77,6,0,Marine; pelagic-oceanic,14456
+1573,1,77,6,0,Open; pelagic-neritic,15509
+1573,1,77,6,0,Coastal; benthopelagic,0
+1573,1,77,6,0,Marine; bathypelagic,1006
+1573,1,77,6,0,Coastal; demersal,0
+1573,2,77,6,0,Marine; benthopelagic,0
+1573,2,77,6,0,Open; demersal,8602
+1573,2,77,6,0,Coastal;pelagic-neritic,0
+1573,2,77,6,0,Marine; pelagic-oceanic,32035
+1573,2,77,6,0,Open; pelagic-neritic,12895
+1573,2,77,6,0,Coastal; benthopelagic,0
+1573,2,77,6,0,Marine; bathypelagic,0
+1573,2,77,6,0,Coastal; demersal,0
+1574,1,77,6,0,Marine; benthopelagic,0
+1574,1,77,6,0,Open; demersal,13336
+1574,1,77,6,0,Coastal;pelagic-neritic,0
+1574,1,77,6,0,Marine; pelagic-oceanic,14324
+1574,1,77,6,0,Open; pelagic-neritic,29400
+1574,1,77,6,0,Coastal; benthopelagic,0
+1574,1,77,6,0,Marine; bathypelagic,2113
+1574,1,77,6,0,Coastal; demersal,0
+1574,2,77,6,0,Marine; benthopelagic,0
+1574,2,77,6,0,Open; demersal,12307
+1574,2,77,6,0,Coastal;pelagic-neritic,0
+1574,2,77,6,0,Marine; pelagic-oceanic,6813
+1574,2,77,6,0,Open; pelagic-neritic,7368
+1574,2,77,6,0,Coastal; benthopelagic,0
+1574,2,77,6,0,Marine; bathypelagic,0
+1574,2,77,6,0,Coastal; demersal,0
+1575,1,77,6,500,Marine; benthopelagic,0
+1575,1,77,6,500,Open; demersal,0
+1575,1,77,6,500,Coastal;pelagic-neritic,0
+1575,1,77,6,500,Marine; pelagic-oceanic,67162
+1575,1,77,6,500,Open; pelagic-neritic,112047
+1575,1,77,6,500,Coastal; benthopelagic,0
+1575,1,77,6,500,Marine; bathypelagic,0
+1575,1,77,6,500,Coastal; demersal,0
+1719,1,81,1,0,Marine; benthopelagic,0
+1719,1,81,1,0,Open; demersal,1481
+1719,1,81,1,0,Coastal;pelagic-neritic,0
+1719,1,81,1,0,Marine; pelagic-oceanic,0
+1719,1,81,1,0,Open; pelagic-neritic,54548
+1719,1,81,1,0,Coastal; benthopelagic,2415
+1719,1,81,1,0,Marine; bathypelagic,0
+1719,1,81,1,0,Coastal; demersal,0
+1719,2,81,1,0,Marine; benthopelagic,0
+1719,2,81,1,0,Open; demersal,6666
+1719,2,81,1,0,Coastal;pelagic-neritic,0
+1719,2,81,1,0,Marine; pelagic-oceanic,0
+1719,2,81,1,0,Open; pelagic-neritic,2601
+1719,2,81,1,0,Coastal; benthopelagic,0
+1719,2,81,1,0,Marine; bathypelagic,0
+1719,2,81,1,0,Coastal; demersal,0
+1723,1,81,1,25,Marine; benthopelagic,0
+1723,1,81,1,25,Open; demersal,0
+1723,1,81,1,25,Coastal;pelagic-neritic,0
+1723,1,81,1,25,Marine; pelagic-oceanic,0
+1723,1,81,1,25,Open; pelagic-neritic,0
+1723,1,81,1,25,Coastal; benthopelagic,288770
+1723,1,81,1,25,Marine; bathypelagic,0
+1723,1,81,1,25,Coastal; demersal,0
+1725,1,81,1,3,Marine; benthopelagic,0
+1725,1,81,1,3,Open; demersal,7962
+1725,1,81,1,3,Coastal;pelagic-neritic,0
+1725,1,81,1,3,Marine; pelagic-oceanic,114
+1725,1,81,1,3,Open; pelagic-neritic,3088
+1725,1,81,1,3,Coastal; benthopelagic,150237
+1725,1,81,1,3,Marine; bathypelagic,0
+1725,1,81,1,3,Coastal; demersal,0
+1725,2,81,1,3,Marine; benthopelagic,0
+1725,2,81,1,3,Open; demersal,14127
+1725,2,81,1,3,Coastal;pelagic-neritic,0
+1725,2,81,1,3,Marine; pelagic-oceanic,214
+1725,2,81,1,3,Open; pelagic-neritic,5682
+1725,2,81,1,3,Coastal; benthopelagic,258724
+1725,2,81,1,3,Marine; bathypelagic,0
+1725,2,81,1,3,Coastal; demersal,0
+1755,1,81,5,50,Marine; benthopelagic,0
+1755,1,81,5,50,Open; demersal,0
+1755,1,81,5,50,Coastal;pelagic-neritic,0
+1755,1,81,5,50,Marine; pelagic-oceanic,0
+1755,1,81,5,50,Open; pelagic-neritic,0
+1755,1,81,5,50,Coastal; benthopelagic,314
+1755,1,81,5,50,Marine; bathypelagic,130506
+1755,1,81,5,50,Coastal; demersal,0
+1755,2,81,5,50,Marine; benthopelagic,0
+1755,2,81,5,50,Open; demersal,2380
+1755,2,81,5,50,Coastal;pelagic-neritic,0
+1755,2,81,5,50,Marine; pelagic-oceanic,0
+1755,2,81,5,50,Open; pelagic-neritic,111
+1755,2,81,5,50,Coastal; benthopelagic,0
+1755,2,81,5,50,Marine; bathypelagic,112870
+1755,2,81,5,50,Coastal; demersal,0
+1756,1,81,5,50,Marine; benthopelagic,0
+1756,1,81,5,50,Open; demersal,0
+1756,1,81,5,50,Coastal;pelagic-neritic,0
+1756,1,81,5,50,Marine; pelagic-oceanic,0
+1756,1,81,5,50,Open; pelagic-neritic,0
+1756,1,81,5,50,Coastal; benthopelagic,0
+1756,1,81,5,50,Marine; bathypelagic,37725
+1756,1,81,5,50,Coastal; demersal,0
+1756,2,81,5,50,Marine; benthopelagic,0
+1756,2,81,5,50,Open; demersal,431
+1756,2,81,5,50,Coastal;pelagic-neritic,0
+1756,2,81,5,50,Marine; pelagic-oceanic,2262
+1756,2,81,5,50,Open; pelagic-neritic,0
+1756,2,81,5,50,Coastal; benthopelagic,0
+1756,2,81,5,50,Marine; bathypelagic,10187
+1756,2,81,5,50,Coastal; demersal,0
+1769,1,81,9,0,Marine; benthopelagic,0
+1769,1,81,9,0,Open; demersal,0
+1769,1,81,9,0,Coastal;pelagic-neritic,0
+1769,1,81,9,0,Marine; pelagic-oceanic,12197
+1769,1,81,9,0,Open; pelagic-neritic,15623
+1769,1,81,9,0,Coastal; benthopelagic,0
+1769,1,81,9,0,Marine; bathypelagic,0
+1769,1,81,9,0,Coastal; demersal,0
+1769,2,81,9,0,Marine; benthopelagic,0
+1769,2,81,9,0,Open; demersal,9
+1769,2,81,9,0,Coastal;pelagic-neritic,0
+1769,2,81,9,0,Marine; pelagic-oceanic,28507
+1769,2,81,9,0,Open; pelagic-neritic,20413
+1769,2,81,9,0,Coastal; benthopelagic,0
+1769,2,81,9,0,Marine; bathypelagic,52
+1769,2,81,9,0,Coastal; demersal,0
+1770,1,81,9,0,Marine; benthopelagic,0
+1770,1,81,9,0,Open; demersal,0
+1770,1,81,9,0,Coastal;pelagic-neritic,0
+1770,1,81,9,0,Marine; pelagic-oceanic,13008
+1770,1,81,9,0,Open; pelagic-neritic,19238
+1770,1,81,9,0,Coastal; benthopelagic,0
+1770,1,81,9,0,Marine; bathypelagic,0
+1770,1,81,9,0,Coastal; demersal,0
+1770,2,81,9,0,Marine; benthopelagic,0
+1770,2,81,9,0,Open; demersal,0
+1770,2,81,9,0,Coastal;pelagic-neritic,0
+1770,2,81,9,0,Marine; pelagic-oceanic,41923
+1770,2,81,9,0,Open; pelagic-neritic,16811
+1770,2,81,9,0,Coastal; benthopelagic,0
+1770,2,81,9,0,Marine; bathypelagic,0
+1770,2,81,9,0,Coastal; demersal,0
+1779,2,81,9,50,Marine; benthopelagic,0
+1779,2,81,9,50,Open; demersal,709
+1779,2,81,9,50,Coastal;pelagic-neritic,0
+1779,2,81,9,50,Marine; pelagic-oceanic,2558
+1779,2,81,9,50,Open; pelagic-neritic,0
+1779,2,81,9,50,Coastal; benthopelagic,0
+1779,2,81,9,50,Marine; bathypelagic,4399
+1779,2,81,9,50,Coastal; demersal,0
+1780,1,81,9,50,Marine; benthopelagic,0
+1780,1,81,9,50,Open; demersal,0
+1780,1,81,9,50,Coastal;pelagic-neritic,0
+1780,1,81,9,50,Marine; pelagic-oceanic,32074
+1780,1,81,9,50,Open; pelagic-neritic,0
+1780,1,81,9,50,Coastal; benthopelagic,0
+1780,1,81,9,50,Marine; bathypelagic,35667
+1780,1,81,9,50,Coastal; demersal,0
+1780,2,81,9,50,Marine; benthopelagic,0
+1780,2,81,9,50,Open; demersal,13562
+1780,2,81,9,50,Coastal;pelagic-neritic,0
+1780,2,81,9,50,Marine; pelagic-oceanic,10801
+1780,2,81,9,50,Open; pelagic-neritic,0
+1780,2,81,9,50,Coastal; benthopelagic,0
+1780,2,81,9,50,Marine; bathypelagic,9316
+1780,2,81,9,50,Coastal; demersal,0

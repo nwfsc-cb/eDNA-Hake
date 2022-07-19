@@ -96,8 +96,8 @@ grouping %>%
          TRUE       ~ final.morphotype)) -> grouping
 
 grouping %>%  distinct(final.morphotype) %>% View
-grouping %>% 
-  filter (is.na(final.morphotye))
+# grouping %>% 
+#   filter (is.na(final.morphotye))
 ```
 
 ### COllapse
@@ -108,12 +108,14 @@ By.taxa.dataset %>%
   filter(!str_detect(taxa, "Cich")) %>% 
    left_join(grouping) %>% 
   # select(eDNA.sample,  final.morphotype, nReads) %>% 
-  group_by(eDNA.sample, collapsed) %>% 
+  group_by(eDNA.sample, rep,Transect, position, depth, collapsed) %>% 
   summarise (nReads = sum(nReads)) %>% 
   filter(!is.na(collapsed )) %>% 
   pivot_wider (names_from = collapsed, values_from = nReads, values_fill = 0) -> wide.biol
 
 wide.biol %>% 
+  pivot_longer(cols = c(-eDNA.sample,-Transect, -position, -depth, -rep),  names_to = "func.group", values_to = "nReads") %>% 
+  write_csv(here("Data", "Data_for_STAN.csv"))
   #no tilapias
   left_join(metadata %>% 
               select(eDNA.sample, Transect, position, Openness, groups, depth)) %>% 

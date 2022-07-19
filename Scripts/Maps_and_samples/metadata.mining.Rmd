@@ -1,0 +1,103 @@
+---
+title: "Extracting metadata from CTD casts"
+author: "Ramon Gallego"
+date: "9/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Mining chla, temp, sal, 
+
+We have access to the CTD casts of all stations for which we collected eDNA. Let's retrieve the environmental data that we can use.
+
+```{r packages}
+library (tidyverse)
+library(here)
+
+```
+
+### Datasets
+
+We start with the metadata that has eDNAsample, CTD cast & depth
+
+```{r}
+# All eDNA samples
+eDNA.samples <- read_csv(here("Data", "eDNA hake water samples.csv")) %>% select((1:6)) %>% 
+  rename(eDNA.sample = 2, Station = 3)
+# Useful  CTD casts
+CTD.stations <- read_csv(here("Data","cleaned_CTD_stations.csv")) %>% select(Station, lat, lon, CTD_Cast)
+
+# Joined
+eDNA.samples %>% 
+  anti_join(CTD.stations) %>% 
+  distinct(Station) # Five stations without a CTD cast. Some samples without station linked to them
+
+eDNA.samples %>% 
+  inner_join(CTD.stations) -> data.to.read
+
+## But obv we only need to read it once per Station
+data.to.read %>% 
+  distinct(Station, CTD_Cast) %>% 
+  filter (!is.na(CTD_Cast)) -> CTD.to.read
+
+files.inCTD <-tibble(CTD_Cast = list.files(path = here("Data","1_converted"), pattern = "*.csv"),
+                     path = list.files(path = here("Data","1_converted"), pattern = "*.csv", full.names = T)) %>% 
+  separate(CTD_Cast, into = "CTD_Cast", sep = ".csv")
+ 
+CTD.to.read %>% 
+  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast),
+                              TRUE           ~ as.character(CTD_Cast))) -> CTD.to.read
+## Now subset those CTDs we need
+
+files.inCTD %>% 
+  semi_join(CTD.to.read) %>% 
+  mutate(data = purrr::map(path, read_csv)) -> files.inCTD
+
+# Now create a range of depths for each eDNA.sample (Average depths 2 m above and below)
+data.to.read %>% 
+  mutate(CTD_Cast = case_when(CTD_Cast < 100 ~ paste0 ("0", CTD_Cast),
+                              TRUE           ~ as.character(CTD_Cast))) %>% 
+  mutate(depth = case_when(depth == "sfc" ~ 0,
+                             Niskin== "sfc" ~ 0,
+                           TRUE         ~ as.numeric(depth))) %>% 
+  filter (!is.na(depth)) %>% 
+  group_by(CTD_Cast, eDNA.sample) %>% 
+  nest() %>% 
+  rename(ranges = data) %>% 
+  inner_join(files.inCTD) -> Combined.data
+
+Combined.data %>% 
+  mutate(subset = map2(data, ranges, ~.x %>% 
+                         filter (`Depth (m)` > (.y$depth - 5) & `Depth (m)` < (.y$depth + 2)))) -> Combined.data
+```
+
+
+```{r}
+Combined.data %>% 
+  ungroup() %>% 
+  slice(1) %>% pull(subset) %>% map(colnames)
+  
+
+Combined.data %>% 
+  mutate(summary = map (subset, ~.x %>% 
+                          summarise(Temp = mean(`Temperature (degC)`),
+                                    Salinity = mean(`Salinity (psu)`),
+                                    Conductivity = mean(`Conductivity (S_per_m)`),
+                                    Oxygen  = mean (`Oxygen (ml_per_l)`),
+                                    Fluorescence = mean (`Fluorescence (ug_per_l)`),
+                                    Turbidity = mean (`Turbidity (NTU)`, na.rm = T)))) -> Combined.data
+
+```
+```{r output.final.metadata}
+
+Combined.data %>% select(ranges, summary) %>% unnest(ranges, summary) %>% 
+  write_csv(here("Data", "metadata_with_env.csv"))
+
+Combined.data %>% 
+  select(eDNA.sample, CTD_Cast, ranges, subset, summary) %>% 
+  write_rds(here("Data", "CTD_casts_for_eDNA_samples.rds"))
+```
+

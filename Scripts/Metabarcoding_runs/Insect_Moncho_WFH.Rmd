@@ -1,0 +1,129 @@
+---
+title: "Insect"
+author: "Ramon Gallego"
+date: "1/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(tidyverse)
+library(insect)
+library(here)
+
+```
+
+## Datasets
+
+Load the ASV, metadata and Hash
+
+```{r pressure, echo=FALSE}
+
+ASV <- read_csv(here("Data","RUN2", "output_noQ2", "ASV_table.csv" ))
+hash <- readFASTA(here("Data","RUN2", "output_noQ2", "hash_key.fasta" ))
+metadata <- read_csv(here("Data","RUN2", "output_noQ2", "metadata.csv" ))
+water.samples <- read_csv(here("Data", "eDNA.samples.with.lat.lon.csv"))
+
+
+classifier1 <- read_rds(here("Data", "classifier_16S_all_node05.rds"))
+
+classifier2 <- read_rds(here("Data", "classifier_hook_and_line.rds"))
+
+Prey_16S <- read_rds(here("Data", "seqs.for.16Stree.rds"))
+
+worlds.taxonomy <- read_rds(here("Data", "all.taxonomy.rds"))
+
+Seq.names.16S <- tibble(seq.name = names(Prey_16S),
+                    
+                    Search = "16S" )
+
+Seq.names.16S %>%
+
+  separate(seq.name, into = c("Accession", "taxID"), sep = "\\|", remove = F) -> Seq.names.16S
+
+Seq.names.16S %>% 
+  left_join(worlds.taxonomy %>% 
+              mutate(taxID = as.character(taxID))) -> Seq.names.16S 
+ 
+Seq.names.16S %>% 
+   group_by(rank) %>% 
+  tally
+
+Seq.names.16S %>% 
+  filter (rank == "genus")
+
+Seq.names.16S %>% 
+  filter (rank == "no rank")
+
+Seq.names.16S %>% 
+  filter (is.na(rank))
+
+
+Seq.names.16S %>% 
+  filter(name == "Thaleichthys pacificus")
+
+```
+
+# Run Classifier 1
+
+```{r}
+class.hashes <- classify(x = hash,
+                         tree = classifier1)
+
+class.hashes.hook <- classify(x = hash, tree = classifier2)
+```
+
+### Any Eulachon for Rick, Ana and friends?
+```{r}
+class.hashes %>% 
+  filter (family == "Osmeridae") %>% 
+  pull(representative)-> osmerids
+
+hash[osmerids] %>% 
+  writeFASTA(here("Data", "Osmerids.fasta"))
+```
+
+```{r}
+class.hashes %>% 
+  filter (rank == "species") 
+
+# What has been identified NOT to species but has a match?
+
+class.hashes.hook %>% 
+  filter (is.na(score), rank != "species") %>% pull(representative) -> redo
+
+
+
+# Try without using the 100 match approach
+
+classify(hash[redo],
+         classifier1, ping = 0) -> redone
+```
+
+## BLAST of Euclachon
+
+```{r}
+class.hashes %>% 
+  filter (family == "Osmeridae") %>% 
+  filter(str_detect(representative ,"5c8b2646b|f6263de")) %>% 
+  pull(representative) -> eulachon
+```
+
+### Where where?
+
+```{r}
+ASV %>% 
+  filter(Hash %in% eulachon) %>% 
+  separate (Sample_name, into = c("eDNA.sample", "replicate"), convert = T) %>% 
+  left_join(water.samples)
+```
+
