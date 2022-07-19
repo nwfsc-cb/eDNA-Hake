@@ -326,10 +326,10 @@ survey.map
   
   
 size.regions = 3
-y.axis.text <- 12
+y.axis.text <- 9
 
 setwd(plot.dir)
-quartz(file="Hake_maps_combined_to_surface.pdf",height=7.5,width=9,dpi=900,type="pdf")
+quartz(file="Hake_maps_combined_to_surface.pdf",height=6,width=7.5,dpi=900,type="pdf")
   grid.arrange(survey.map + xlab("") +
                 geom_segment(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.min,xend=lon.max,y=lat,yend=lat),
                              linetype="dashed")+
@@ -346,7 +346,7 @@ quartz(file="Hake_maps_combined_to_surface.pdf",height=7.5,width=9,dpi=900,type=
                 geom_text(data=Output.summary.qpcr$lat.breaks$lats.rounded.1.0,aes(x=lon.lab,y=mid.lat,label=ID),nudge_x = -0.1,size=size.regions) +
                 annotate(geom="text",x=-123.3,y=48.35,label="B") +
                 ylab("") +
-                theme( legend.position = c(1.07, .55),
+                theme( legend.position = c(1.15, .55),
                        legend.justification = c("right", "top"),
                        legend.box.just = "right",
                        plot.margin = unit(c(0.1,-4,0.1,-4), "lines"),
@@ -361,7 +361,7 @@ quartz(file="Hake_maps_combined_to_surface.pdf",height=7.5,width=9,dpi=900,type=
                 ylab("") +
                 xlab("") +
                 annotate(geom="text",x=-123.3,y=48.35,label="C") +
-                theme( legend.position = c(1.10, .55),
+                theme( legend.position = c(1.23, .55),
                      legend.justification = c("right", "top"),
                      legend.box.just = "right",
                      plot.margin = unit(c(0.1,-2,0.1,-6), "lines"),
@@ -989,9 +989,9 @@ both_dist_summary <-
   )
 
 cog_plot <-
-  Output.summary.qpcr$base_map_trim_proj +
-    geom_point(data=both_dist_summary,aes(x=x.lon,y=mean.lat,color=id)) +
-    geom_errorbar(data=both_dist_summary,aes(x=x.lon,ymin=min.lat,ymax=max.lat,color=id),width=0)+
+  Acoustic.dat.figs$base_map_trim_proj +
+    geom_point(data=both_dist_summary,aes(x=x.lon,y=mean.lat,color=id),size=2) +
+    geom_errorbar(data=both_dist_summary,aes(x=x.lon,ymin=min.lat,ymax=max.lat,color=id),width=0,size=0.8)+
     scale_color_viridis_d("Center of Gravity\n   (Median)",end = 0.4)
 
 quartz(file="Hake_compare_distribution.jpeg",height=4,width=8,dpi=600,type="jpeg")
@@ -1007,23 +1007,23 @@ quartz(file="Hake_compare_distribution.jpeg",height=4,width=8,dpi=600,type="jpeg
       widths=c(1.5,1))
 dev.off()  
 
-quartz(file="Hake_compare_distribution_plus_depth.pdf",height=8,width=8,dpi=900,type="pdf")
+quartz(file="Hake_compare_distribution_plus_depth.pdf",height=6,width=6,dpi=900,type="pdf")
 grid.arrange(
-  cdf_dist_plot + labs(title="A") +
+  cdf_dist_plot + labs(subtitle="A") +
                   theme(plot.margin = unit(c(0.25,0.25,0.25,0.25), "lines"),
                         legend.position = c(0.75, .4),
-                        legend.title=element_text(size=10),
-                        plot.title = element_text(vjust=-7,hjust=0.01)),
-  cog_plot + labs(title="B") +
-    theme(plot.margin = unit(c(0.25,-4,0.25,-12), "lines"),
-          legend.position = c(1.2, .5),
-          legend.title=element_text(size=10),
-          plot.title = element_text(vjust=-7,hjust=0.02)),
-  Output.summary.qpcr$marginal_est_D_by_depth + labs(title="C") +
+                        legend.title=element_text(size=9),
+                        plot.subtitle = element_text(vjust=-7,hjust=0.01,size=9)),
+  cog_plot + labs(subtitle="B") + scale_x_continuous(breaks=c(-126,-124)) +
+    theme(plot.margin = unit(c(0.25,-0,0.25,-6.5), "lines"),
+          legend.position = c(1.4, .5),
+          legend.title=element_text(size=9),
+          plot.subtitle = element_text(vjust=-7,hjust=0.02,size=9)),
+  Output.summary.qpcr$marginal_est_D_by_depth + labs(subtitle="C") +
     theme(plot.margin = unit(c(-1,0.25,1,0.4), "lines"),
           legend.position = c(1.2, .5),
-          legend.title=element_text(size=10),
-          plot.title = element_text(vjust=-7,hjust=0.01)),
+          legend.title=element_text(size=9),
+          plot.subtitle = element_text(vjust=-7,hjust=0.01,size=9)),
   nrow=2,
   widths=c(1.5,1))
 dev.off()  

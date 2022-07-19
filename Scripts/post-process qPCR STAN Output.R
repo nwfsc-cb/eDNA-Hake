@@ -392,6 +392,20 @@ STATION.DEPTH$water.depth.cat.2 <- factor(STATION.DEPTH$water.depth.cat.2,levels
 # SP.p1
 
 
+SAMPLES %>% group_by(depth_cat) %>% 
+  summarise(MED = median(Mean),
+            M = mean(Mean),
+            MIN = min(Mean),
+            MAX = max(Mean)) 
+
+
+STATION.DEPTH %>% group_by(depth_cat) %>% 
+  summarise(MED = median(Mean),
+            M = mean(Mean),
+            MIN = min(Mean),
+            MAX = max(Mean)) 
+
+
 summary(SAMPLES$Mean)
 summary(STATION.DEPTH$Mean)
 
@@ -554,6 +568,7 @@ for(i in 1:length(DEPTH)){
   z.lim.labs <- z.breaks
   
   lon.lab <- -126.1
+  
   lat.breaks$lats.rounded.1.0 <- lat.breaks$lats.rounded.1.0 %>% 
                                       mutate(mid.lat = (lat+lat.max)/2,
                                              lon.lab = lon.lab,
@@ -993,10 +1008,10 @@ water_depth_marg$depth_range <- factor(water_depth_marg$depth_range,
 YLIM=c(0,max(water_depth_marg$x.95))
 
 marginal_est_D_by_depth <- ggplot(water_depth_marg) +
-    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),position="jitter") +
+    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),size=2,position="jitter") +
     #geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=water_depth),width=0,alpha=0.5)+
-    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=depth_range),width=0,size=1.2,alpha=0.5)+
-    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=depth_range),width=0,size=0.4,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=depth_range),width=0,size=1.3,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=depth_range),width=0,size=0.6,alpha=0.5)+
     geom_line(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),alpha=0.5) +
     scale_x_reverse("Water Depth (m)") +
     scale_y_continuous(expression("Hake DNA (copies L"^-1*")"),limits = YLIM) +
