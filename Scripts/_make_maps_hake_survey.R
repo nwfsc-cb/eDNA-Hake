@@ -13,7 +13,7 @@ library(sp)
 library(gstat)
 library(ggplot2)
 library(sf)
-library(brms)
+#library(brms)
 library(ggsci)
 library(gridExtra)
 library(cowplot)
@@ -93,10 +93,12 @@ setwd(script.dir)
 source("Base_map.R")
 
 
+
 eDNA.map.A <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(17,16)) +
   geom_point(data=dat.all,aes(x=Longitude,y=Latitude,color=as.factor(Year),shape=source),alpha=0.75) +
   scale_color_viridis_d("Year",option = "plasma", begin=0,end=0.8)
+
 
 eDNA.map.B <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(16,17)) +
@@ -115,6 +117,7 @@ setwd(plot.dir)
 dev.off()
 
 
+
 eDNA.map.C <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(17,16)) +
   geom_point(data=dat.all,aes(x=Longitude,y=Latitude,color=as.factor(Year),shape=source),alpha=0.75) +
@@ -125,4 +128,52 @@ setwd(plot.dir)
 quartz(file="Sample_map_v3.pdf",type="pdf",dpi=600,height=9,width=8)
 print(eDNA.map.C)
 dev.off()
+
+
+#### Hake samples only maps
+
+eDNA.map.hake <-  base_map_trim_proj +
+  scale_shape_manual("Source",values=c(17,16)) +
+  geom_point(data=dat.all %>% filter(source=="Hake"),
+             aes(x=Longitude,y=Latitude),alpha=0.75) +
+  coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
+  scale_color_viridis_d("Year",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~Year)
+eDNA.map.hake
+
+eDNA.map.hake.mod <-  base_map_trim_proj +
+  scale_shape_manual("Source",values=c(17,16)) +
+  geom_point(data=dat.all %>% filter(source=="Hake"),
+             aes(x=Longitude,y=Latitude),alpha=0.75) +
+  coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
+  scale_color_viridis_d("Year",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~Year)
+eDNA.map.hake.mod
+
+
+# Make MURI samples
+
+dat.station.max.depth <- Output.qpcr$dat.obs.bin %>% 
+                            dplyr::select(station,depth_cat_factor,bottom.depth) %>%
+                            mutate(depth.2 = as.numeric(as.character(depth_cat_factor))) %>%
+                            group_by(station,bottom.depth) %>%
+                            summarise(max.depth=max(depth.2,na.rm=T)) %>%
+                            rename(CTD.cast = station)
+                            
+
+dat.muri <- dat.all %>% filter(source=="Hake") %>% left_join(.,dat.station.max.depth) %>%
+                filter(Year==2019,bottom.depth>1000) 
+
+
+eDNA.map.hake.muri <-  base_map_trim_2022 +
+  geom_point(data=dat.all %>% filter(source=="Hake",Year==2019),
+             aes(x=Longitude,y=Latitude),shape=21,alpha=1,color="black") +
+  geom_point(data=dat.muri %>% filter(source=="Hake"),
+             aes(x=Longitude,y=Latitude,color=bottom.depth),alpha=0.75) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
+  scale_color_viridis_c("Depth",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~Year)
+eDNA.map.hake.muri
 

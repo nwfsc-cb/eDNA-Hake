@@ -2,9 +2,11 @@
 
 #### Plotting information
 states <- map_data("state")
+
 canada  <- map_data("world","Canada")
 mexico  <- map_data("world","Mexico")
 #canada <- subset(world, region %in% c("canada"))
+
 west_coast <- subset(states, region %in% c("california", "oregon", "washington","nevada","idaho"))
 
 # lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
@@ -29,8 +31,10 @@ base_map_trim <-ggplot(data = west_coast) +
   ylab("Latitude") +
   theme_bw()
 
-lat.lims.trim.proj <- c(38.6,48.1)
-lon.lims.trim.proj <- c(-126.55,-122.75)
+
+lat.lims.trim.proj <- c(33,48.1)
+lon.lims.trim.proj <- c(-126.55,-118)
+lon.lims.trim.proj.hake <- c(-126.55,-120.5)
 
 base_map_trim_proj <-ggplot(data = west_coast) + 
   geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
