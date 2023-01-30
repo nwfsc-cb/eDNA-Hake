@@ -210,6 +210,8 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
 dat.id.control <- dat.id %>% filter(!control == "no") %>% dplyr::select(sample,volume,control) %>% left_join(.,dat.sample.control.id)
 dat.id.samp    <- dat.id %>% filter(control == "no") %>% mutate(depth=as.numeric(as.character(depth)))
 
+#write.csv(dat.id.samp, file = "Hake_2019_samples_w_CTD.csv")
+
 ##################################################3
 ##################################################3
 # STANDARDS 

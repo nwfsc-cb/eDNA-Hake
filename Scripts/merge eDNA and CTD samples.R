@@ -7,7 +7,7 @@ library(tmap)
 library(ggplot2)
 
 library(rnaturalearth)
-library(rnaturalearthhires)
+#library(rnaturalearthhires)
 library(rnaturalearthdata)
 
 dat.ctd.raw   <- read.csv("./Data/CTD_hake_data_10-2019.csv")
