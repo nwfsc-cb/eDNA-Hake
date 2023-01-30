@@ -1,0 +1,168 @@
+---
+title: "MURI_Hake_sample_selection_2023_01"
+author: "Ole Shelton"
+date: '2023-01-27'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+### Libraries
+library(tidyverse)
+library(knitr)
+library(reshape2)
+library(viridis)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(sp)
+library(gstat)
+library(ggplot2)
+library(sf)
+#library(brms)
+library(ggsci)
+library(gridExtra)
+library(cowplot)
+
+```
+
+## Samples from 2019
+
+This is a short document identifying the samples identified for use in the first phase of the MURI project. These samples will be used in the initial application of the fish marine mammal metabarcoding primers.  We decided to begin with samples near the surface (3m and 50m depth) and to shoot for 45 individual samples as an exploratory set.
+
+```{r call_make_maps,message=FALSE,warning=FALSE,echo=FALSE}
+# pull in relevant data on samples and make maps
+source("../_make_maps_hake_survey.R")
+```
+
+```{r muri_samples,message=FALSE,warning=FALSE,echo=FALSE}
+
+
+# Make MURI samples.  Pull the data used in the final Hake model north of 46 N (WA state) from 2019
+dat.station.max.depth <- Output.qpcr$dat.obs.bin %>% 
+                            dplyr::select(station,depth_cat_factor,bottom.depth.consensus) %>%
+                            mutate(depth.2 = as.numeric(as.character(depth_cat_factor))) %>%
+                            group_by(station,bottom.depth.consensus) %>%
+                            summarise(max.depth=max(bottom.depth.consensus,na.rm=T)) %>%
+                            rename(CTD.cast = station)
+                            
+dat.muri <- dat.all %>% filter(source=="Hake") %>% left_join(.,dat.station.max.depth)
+
+# pull sample numbers out of the big data frame
+samps <- Output.qpcr$dat.obs.bin  %>% 
+        filter(year==2019,
+                    lat>46,
+                    station %in% dat.muri$CTD.cast,
+                    depth_cat %in% c(0,50)) %>%
+        group_by(sample) %>% 
+        mutate(inhibit_mean=mean(inhibit.val)) %>%
+        distinct(year,sample,station,depth_cat,inhibit_mean,dilution) %>%
+        arrange(station,depth_cat,sample) %>%
+        left_join(.,dat.muri %>% dplyr::select(station=CTD.cast,Latitude,Longitude,bottom.depth.consensus))
+                                        
+# Make a map of all the Hake stations in 2019
+eDNA.map.hake.muri <-  base_map_trim_proj +
+  geom_point(data=dat.all %>% filter(source=="Hake",Year==2019),
+             aes(x=Longitude,y=Latitude),shape=21,alpha=1,color="black") +
+  # geom_point(data=dat.muri %>% filter(source=="Hake"),
+  #            aes(x=Longitude,y=Latitude,color=bottom.depth.consensus),alpha=0.75) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
+  scale_color_viridis_c("Depth",option = "plasma", begin=0,end=0.7) +
+  facet_wrap(~Year)
+#eDNA.map.hake.muri
+
+lat.lims.trim.proj.hake.wa <- c(46,48.4)
+lon.lims.trim.proj.hake.wa <- c(lon.lims.trim.proj.hake[1],-123)
+
+# Map of all WA stations in just 0 of 50m sampling depths.
+eDNA.map.hake.muri.wa <-  base_map_trim_proj +
+  geom_point(data=samps,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+#eDNA.map.hake.muri.wa
+
+N_station <- samps %>%ungroup() %>% distinct(station) %>% nrow()
+N_station_0 <- samps %>%ungroup() %>% filter(depth_cat==0) %>% distinct(station) %>% nrow()
+N_station_50 <- samps %>%ungroup() %>% filter(depth_cat==50) %>% distinct(station) %>% nrow()
+
+```
+
+We can present all of the sample locations for 2019, 2021 and 2022 (Fig. \ref{fig:all_samples}).
+
+```{r fig_all_samples,message=FALSE,warning=FALSE,echo=FALSE,fig.cap="\\label{fig:all_samples} The locations of eDNA samples from three years of CTD collections from the hake acoustic-trawl survey.",out.height='6in'}
+# present all hake samples and maps
+print(eDNA.map.hake.mod)
+```
+
+Let's focus in on 2019 and focus in on sites north of 46 degrees latitude. There are `r N_station` stations in this area (with `r N_station_0`stations at the surface and `r N_station_50` at 50m; Fig. \ref{fig:map_0_50}). In total there are `r nrow(samps)` water samples from these sites at 0 and 50m. Many of the surface samples were diluted for use with the hake qPCR (Fig. \ref{fig:map_0_50}) with some stations having one of two replicates diluted and others having both replicates diluted. 
+
+From this set of samples, we are looking to include 90 total samples for preliminary analysis or approximately 45 from each depth. This leaves some space on a 96 well plate for controls. To trim down from `r nrow(samps)` individual water samples we will select a single water sample station which gets us to `r N_station_0 + N_station_50` samples, and leaves us remove `r N_station_0 + N_station_50 - 90` samples to get to 90. We elected to drop one station from the middle of each line.
+
+
+```{r fig.map_0_50 , echo=FALSE,fig.cap="\\label{fig:map_0_50} Samples from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not.",out.width='100%'}
+print(eDNA.map.hake.muri.wa)
+```
+
+
+```{r cull_muri_samples,message=FALSE,warning=FALSE,echo=FALSE}
+
+samps <- samps %>% mutate(keep=1) %>%
+              mutate(keep=case_when(station=="71-3"~ 0,
+                                    station=="73-4"~ 0,
+                                    station=="75-4"~ 0,
+                                    station=="77-4"~ 0,
+                                    station=="79-4"~ 0,
+                                    station=="81-3"~ 0,
+                                    station=="83-7"~ 0,
+                                    station=="85-14"~ 0,
+                                    TRUE~keep))
+                                    
+eDNA.map.hake.muri.wa.trim <-  base_map_trim_proj +
+  geom_point(data=samps,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  geom_point(data=samps %>%filter(keep==0),
+             aes(x=Longitude,y=Latitude),color="red",alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+
+samps.trim <- samps %>% filter(keep==1)
+```
+
+```{r fig.map_0_50_trim , echo=FALSE,fig.cap="\\label{fig:map_0_50_trim} Samples from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not. Red points identify stations proposed to be dropped",out.width='100%'}
+print(eDNA.map.hake.muri.wa.trim)
+```
+
+
+The dropped lines are in the middle of each transect and most fall approximately along the shelf break, generally at either 300m or 500m bottom depth. Taking one sample from each station at each depth in Fig. \ref{fig:map_0_50_trim} results in `r samps.trim %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` samples (`r samps.trim %>% filter(depth_cat==0) %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` at the surface and `r samps.trim %>% filter(depth_cat==50) %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` at 50m). Here is a plot of the chosen stations by depth.
+
+
+```{r muri_stations,message=FALSE,warning=FALSE,echo=FALSE}
+eDNA.map.hake.muri.wa.trim2 <-  base_map_trim_proj +
+  geom_point(data=samps.trim,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  # geom_point(data=samps %>%filter(keep==0),
+  #            aes(x=Longitude,y=Latitude),color="red",alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+
+```
+
+```{r fig.map_0_50_fin , echo=FALSE,fig.cap="\\label{fig:map_0_50_fin} Stations from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not. Excluded stations not shown",out.width='100%'}
+print(eDNA.map.hake.muri.wa.trim2)
+```
+
+
+Now that we have the stations identified (Fig. \ref{fig:map_0_50_fin}) we need to identify the sample to use at each station. We will use three criteria to identify these samples: 1) We will use samples that have a lot of sample remaining, so that multiple kinds of analyses can be run on a single sample; 2) We will prefer using undiluted to diluted samples because we are concerned about finding rare taxa; 3) and
