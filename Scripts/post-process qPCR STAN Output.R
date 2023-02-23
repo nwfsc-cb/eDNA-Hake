@@ -39,7 +39,7 @@ SPECIES <- "hake" # eulachon, hake
 MOD <-  "lat.long.smooth"
 
 #load(paste("qPCR 2019",SPECIES, MOD, "7_12 Fitted.RData"))
-load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu_T Base_Var Fitted.RData")
+load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu_T-FIN Base_Var Fitted NO.SURFACE= FALSE .RData")
 #save(Output.qpcr,file=paste("qPCR 2019",SPECIES, MOD, "Fitted.RData"))
 
 ### Cacluate posterior summaries and predictive surfaces
@@ -156,7 +156,7 @@ inhibit.plot <- base_map_trim +
   scale_color_viridis_d(begin=0,end=0.8)+
   facet_wrap(~inhibit_cat)
 inhibit.plot.by.depth <- base_map_trim +
-  geom_point(data=SAMPLES %>% filter(is.na(depth_cat)==F),aes(x=lon,y=lat,color=inhibit_cat),alpha=0.5) +
+  geom_point(data=SAMPLES %>% filter(is.na(depth_cat)==F) %>% mutate(depth_cat = ifelse(depth_cat==0,3,depth_cat)),aes(x=lon,y=lat,color=inhibit_cat),alpha=0.5) +
   facet_wrap(~depth_cat,nrow = 2) +
   scale_color_viridis_d("Inhibition\nCategory",begin=0,end=0.8) 
 inhibit.plot.by.depth.few <- base_map_trim +
@@ -208,7 +208,8 @@ Dens <- data.frame(X=X,DENS_mod=DENS_mod)
 PROB.DENS <- cbind(X,plnorm(X,mu_contam_l,sigma_contam_l))
 
 control.hist <- ggplot() +
-  geom_histogram(data=field.neg.summ,aes(Mean,fill=field.negative.type),breaks=BREAKS) +
+  #geom_histogram(data=field.neg.summ,aes(Mean,fill=field.negative.type),breaks=BREAKS) +
+  geom_histogram(data=field.neg.summ,aes(Mean),breaks=BREAKS) +
   xlab("Estimated copies per L") +
   scale_fill_discrete("Type")+
   ylab("Number of negative controls") +
@@ -261,7 +262,7 @@ compare.hist2 <- ggplot(dat.sum.v.control) +
 compare.hist2
 
 x.int <- data.frame(INT=c(20))
-depth.hist.facet <-  ggplot(SAMPLES) +
+depth.hist.facet <-  ggplot(SAMPLES %>% mutate(depth_cat=ifelse(depth_cat==0,3,depth_cat))) +
   geom_histogram(aes(x=Mean),alpha=0.5,fill=viridis(1)) +
   xlab("Estimated Copies/L") +
   #ylab("Number of Samples") +
@@ -391,6 +392,20 @@ STATION.DEPTH$water.depth.cat.2 <- factor(STATION.DEPTH$water.depth.cat.2,levels
 # SP.p1
 
 
+SAMPLES %>% group_by(depth_cat) %>% 
+  summarise(MED = median(Mean),
+            M = mean(Mean),
+            MIN = min(Mean),
+            MAX = max(Mean)) 
+
+
+STATION.DEPTH %>% group_by(depth_cat) %>% 
+  summarise(MED = median(Mean),
+            M = mean(Mean),
+            MIN = min(Mean),
+            MAX = max(Mean)) 
+
+
 summary(SAMPLES$Mean)
 summary(STATION.DEPTH$Mean)
 
@@ -416,12 +431,16 @@ p3 <- base_map_trim +
   facet_wrap(~depth_cat,nrow=2)
 p3
 
+
+SAMPLES.mod <- SAMPLES %>% mutate(depth_cat =ifelse(depth_cat==0,3,depth_cat))
 p4 <- base_map_trim + 
-  geom_point(data=SAMPLES,aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
-  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
-  geom_point(data=SAMPLES%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
-  scale_shape("Copies / L",solid=FALSE)+
-  scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
+  geom_point(data=SAMPLES.mod,
+             aes(x=lon,y=lat,size=Mean),shape=21,color="red") +
+  geom_point(data=SAMPLES.mod %>% filter(Mean<=lower.lim),
+             aes(x=lon,y=lat),shape="x",size=1,color="black") +
+  scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA)) +
+  scale_shape("Copies / L",solid=FALSE) +
+  #scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
   facet_wrap(~depth_cat,nrow=2)
 p4
 
@@ -467,7 +486,6 @@ q3
 #   scale_size("Copies / L",labels=LAB,breaks=LAB,range=c(0.01,10),limits=c(lower.lim,NA))+
 #   geom_point(data=SAMPLES %>% filter(depth %in% c(0,50,100,150)) %>%
 #                filter(inhibit==0,Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
-#   geom_point(data=SAMPLES %>% filter(depth %in% c(0,50,100,150)) %>% 
 #                filter(inhibit==1,Mean<=lower.lim.inhibit),aes(x=lon,y=lat),shape="x",size=1,color="black") +
 #   scale_shape("Copies / L",solid=FALSE)+
 #   scale_color_viridis_d("Wash\nCategory",begin=0,end=0.8) +
@@ -478,7 +496,7 @@ q3
 ######################################################3
 # Smooth projections.
 ######################################################3
-SIZE = 1.5
+SIZE = 1.3
 STROKE = 0 
 
 z.lim = c(20,2250) 
@@ -501,13 +519,13 @@ for(i in 1:length(DEPTH)){
   p_D[[as.name(paste0("x_",DEPTH[i]))]] <-
     base_map_trim_proj +
     geom_point(data= D_pred_combined %>% filter(depth_cat_factor == 0),
-             aes(x=lon,y=lat),size=SIZE,fill=grey(0.6),color=grey(0.6),alpha=1,stroke=STROKE,shape=22) +
+             aes(x=lon,y=lat),size=SIZE,fill=grey(0.6),color=grey(0.6),alpha=1,stroke=STROKE,shape=15) +
     geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i]),
-            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+            aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
     geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i],Mean < z.lim[1]),
-             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,color=viridis(1,begin=0,end=0.001)) +
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=15,color=viridis(1,begin=0,end=0.001)) +
     geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i],Mean > z.lim[2]),
-             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,
+             aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=15,
              color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.999,end=1)) +
     scale_color_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
     scale_fill_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
@@ -519,17 +537,17 @@ for(i in 1:length(DEPTH)){
         geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
 }  
 
-  SIZE = 1
+  SIZE = 1.3
   p_D_facet <- base_map_trim_proj +
     # geom_point(data= D_pred_background,
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
     geom_point(data= D_pred_combined ,
-               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=0.75,size=SIZE,stroke=STROKE,shape=22) +
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=0.75,size=SIZE,stroke=STROKE,shape=15) +
     geom_point(data= D_pred_combined %>% filter(Mean < z.lim[1]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=22,
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=15,
                color=viridis(1,begin=0,end=0.001),fill=viridis(1,begin=0,end=0.001)) +
     geom_point(data= D_pred_combined %>% filter(Mean > z.lim[2]),
-               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=22,
+               aes(x=lon,y=lat),alpha=0.75,size=SIZE,stroke=STROKE,shape=15,
                color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.999,end=1)) +
     scale_color_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
     scale_fill_viridis_c(option=OPT,trans="sqrt",limits=z.lim,breaks=z.breaks,labels=z.lim.labs,name=expression("DNA Copies L"^-1)) +
@@ -542,7 +560,7 @@ for(i in 1:length(DEPTH)){
   ###################
   ## Plot of sum to surface result.
   ###################
-  SIZE = 2
+  SIZE = 1.3
   STROKE = 0 
   
   z.lim = c(20,8500) 
@@ -550,6 +568,7 @@ for(i in 1:length(DEPTH)){
   z.lim.labs <- z.breaks
   
   lon.lab <- -126.1
+  
   lat.breaks$lats.rounded.1.0 <- lat.breaks$lats.rounded.1.0 %>% 
                                       mutate(mid.lat = (lat+lat.max)/2,
                                              lon.lab = lon.lab,
@@ -572,9 +591,9 @@ for(i in 1:length(DEPTH)){
     # geom_point(data= D_pred_background,
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
     geom_point(data= D_final_projected ,
-               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+               aes(x=lon,y=lat,color=Mean,fill=Mean),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
     # geom_point(data= D_final_projected %>% filter(Mean>z.lim[2]),
-    #            aes(x=lon,y=lat),alpha=1,color=viridis(1,start=0.999, end=1),size=SIZE,stroke=STROKE,shape=22) +
+    #            aes(x=lon,y=lat),alpha=1,color=viridis(1,start=0.999, end=1),size=SIZE,stroke=STROKE,shape=15) +
     scale_color_viridis_c(option=OPT,trans="sqrt",  
                           limits=z.lim,breaks=z.breaks,labels=z.lim.labs,
                           name=expression("DNA Index")) +
@@ -607,7 +626,7 @@ for(i in 1:length(DEPTH)){
   ######################################################3
   ## SD in Space
   ######################################################3
-  SIZE = 1.5
+  SIZE = 1.3
   STROKE = 0 
   
   z.lim = c(0,1.25) 
@@ -638,7 +657,7 @@ for(i in 1:length(DEPTH)){
       geom_point(data=STATION.DEPTH %>% filter(depth_cat_factor == DEPTH[i]),aes(x=lon,y=lat),col="red")
   }  
   
-  SIZE = 1.25
+  SIZE = 1.3
   p_log_D_SD_facet <- base_map_trim_proj +
     # geom_point(data= D_pred_background,
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
@@ -653,7 +672,7 @@ for(i in 1:length(DEPTH)){
   ######################################################3
   ## CV in Space
   ######################################################3
-  SIZE = 1.5
+  SIZE = 1.3
   STROKE = 0 
   
   z.lim = c(0.15,3.5) 
@@ -672,11 +691,11 @@ for(i in 1:length(DEPTH)){
     p_D_CV[[as.name(paste0("x_",DEPTH[i]))]] <-
       base_map_trim_proj +
       geom_point(data= D_pred_background,
-                 aes(x=lon,y=lat),size=SIZE,color=grey(0.6),fill=grey(0.6),alpha=1,stroke=STROKE,shape=22) +
+                 aes(x=lon,y=lat),size=SIZE,color=grey(0.6),fill=grey(0.6),alpha=1,stroke=STROKE,shape=15) +
       geom_point(data= D_pred_combined %>% filter(depth_cat_factor == DEPTH[i]),
-                 aes(x=lon,y=lat,color=CV,fill=CV),alpha=1,size=SIZE,stroke=STROKE,shape=22) +
+                 aes(x=lon,y=lat,color=CV,fill=CV),alpha=1,size=SIZE,stroke=STROKE,shape=15) +
       geom_point(data= D_pred_combined %>% filter(CV > z.lim[2],depth_cat_factor == DEPTH[i]),
-                  aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=22,
+                  aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,shape=15,
                   color=viridis(1,begin=0.999,end=1),fill=viridis(1,begin=0.99999,end=1)) +
       scale_color_viridis_c(option=OPT,limits=z.lim,trans="sqrt",
                             breaks=z.breaks,labels=round(z.breaks,2),name=expression("CV")) +
@@ -693,13 +712,15 @@ for(i in 1:length(DEPTH)){
   p_D_CV_legend_only <- cowplot::get_legend(p_D_CV$x_0)
   ggdraw(p_D_CV_legend_only)  
   
-  SIZE = 1.25
+  SIZE = 1.3
   p_D_CV_facet <- base_map_trim_proj +
     # geom_point(data= D_pred_background,
     #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
-    geom_point(data= D_pred_combined ,
+    geom_point(data= D_pred_combined %>% 
+                 mutate(depth_cat_factor=ifelse(depth_cat_factor==0,3,depth_cat_factor)),
                aes(x=lon,y=lat,color=CV),alpha=1,size=SIZE,stroke=STROKE) +
-    geom_point(data= D_pred_combined %>% filter(CV > z.lim[2]),
+    geom_point(data= D_pred_combined %>% 
+                      mutate(depth_cat_factor=ifelse(depth_cat_factor==0,3,depth_cat_factor)) %>% filter(CV > z.lim[2]),
                aes(x=lon,y=lat),alpha=1,size=SIZE,stroke=STROKE,color=viridis(1,begin=0.999999,end=1)) +
     scale_color_viridis_c(option=OPT,limits=z.lim,breaks=z.breaks,labels=round(z.breaks,2),name=expression("CV")) +
     facet_wrap(~depth_cat_factor) +
@@ -750,7 +771,7 @@ for(i in 1:length(DEPTH)){
    #z.lim.labs <- 10^z.breaks
    
    
-   SIZE = 1
+   SIZE = 1.3
    p_log_D_smoothes_only_facet <- base_map_trim_proj +
      # geom_point(data= D_pred_background,
      #            aes(x=lon,y=lat),size=SIZE,color=grey(0.6),alpha=1,stroke=STROKE) +
@@ -953,8 +974,6 @@ depth_cat_plot <- ggplot(depth_fact_summary) +
 depth_cat_plot
 
 
-
-#### Make depth profiles
 water_depth_marg <-  STATION.DEPTH %>% group_by(water.depth.cat.2,depth_cat) %>% summarise(grand.mean = mean(Mean),
                                                                       grand.median = median(Mean),
                                                                       x.05 = quantile(Mean,probs=0.05),
@@ -962,10 +981,6 @@ water_depth_marg <-  STATION.DEPTH %>% group_by(water.depth.cat.2,depth_cat) %>%
                                                                       x.75 = quantile(Mean,probs=0.75),
                                                                       x.95 = quantile(Mean,probs=0.95)
                                                                       ) %>% rename(water_depth = water.depth.cat.2)
-
-
-STATION.DEPTH %>% filter(depth_cat == 300,water.depth.cat.2==150)
-
 
 
 water_depth_marg <- water_depth_marg %>% 
@@ -993,10 +1008,10 @@ water_depth_marg$depth_range <- factor(water_depth_marg$depth_range,
 YLIM=c(0,max(water_depth_marg$x.95))
 
 marginal_est_D_by_depth <- ggplot(water_depth_marg) +
-    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),position="jitter") +
+    geom_point(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),size=2,position="jitter") +
     #geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=water_depth),width=0,alpha=0.5)+
-    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=depth_range),width=0,size=1.2,alpha=0.5)+
-    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=depth_range),width=0,size=0.4,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.25,ymax=x.75,x=depth_cat_jitt,color=depth_range),width=0,size=1.3,alpha=0.5)+
+    geom_errorbar(aes(ymin=x.05,ymax=x.95,x=depth_cat_jitt,color=depth_range),width=0,size=0.6,alpha=0.5)+
     geom_line(aes(y=grand.mean,x=depth_cat_jitt,color=depth_range),alpha=0.5) +
     scale_x_reverse("Water Depth (m)") +
     scale_y_continuous(expression("Hake DNA (copies L"^-1*")"),limits = YLIM) +
@@ -1170,6 +1185,9 @@ Output.summary.qpcr <- list(
   #Marginal of D by depth 
   marginal_est_D_by_depth = marginal_est_D_by_depth,
   
+  # Marginal smooth
+  p_marginal_smooth = p_marginal_smooth,
+  
   #Plots with maps
   p_DNA_lat_1.0 =p_DNA_lat_1.0,
   p_DNA_lat_0.5 = p_DNA_lat_0.5,
@@ -1228,7 +1246,7 @@ Output.summary.qpcr <- list(
 
 setwd(results.dir)
 #Output.summary.qpcr
-save(Output.summary.qpcr,file=paste0("./_Summarized_Output/Qpcr_summaries_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,".RData"))
+save(Output.summary.qpcr,file=paste0("./_Summarized_Output/Qpcr_summaries_",MODEL.TYPE,"_",MODEL.VAR,"_",MODEL.ID,"_NoSURF=",NO.SURFACE,".RData"))
 
 #####################################################################
 #####################################################################

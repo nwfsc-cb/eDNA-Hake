@@ -6,7 +6,7 @@ Google-Backup
 .DS_Store
 Data/FASTQ_raw/
 .RDataTmp*
-Scripts/*.html 
+Scripts/*.html
 Lab_books/*.html
 Data/*.html
 *.html
@@ -15,3 +15,7 @@ Presentations/*.html
 Data/Pipeline_output/Run1/Run1_take1/noprimers/*.fastq*
 Data/Pipeline_output/Run1/Run1_take1/noprimers/filtered/*.fastq*
 eDNA-Hake.Rproj
+writing/Versions
+Scripts/Stan Files/Output files
+References
+writing/Comments*
