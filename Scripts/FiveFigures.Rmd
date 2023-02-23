@@ -49,7 +49,7 @@ conversion.df %>%
                             str_detect(`...13`, "neritic")~ "neritic",
                             str_detect(`...13`, "bathypelagic")~ "bathypelagic",
                             str_detect(`...13`, "benthopelagic")~ "benthopelagic"))  -> conversion.df
-  # filter(str_detect(`...13`, "benth"))
+
 ```
 
 ## Figure 1
@@ -68,10 +68,10 @@ species_by_rep %>%
   summarise(prop = nReads/tot) -> mid.step # For this to work, it needs to be a df full of 0s
   
 mid.step %>% 
-  group_by(eDNA.sample) %>% 
-  tidyr::expand(eDNA.sample,taxon, rep) %>% #Now this can be right_joined with mid.step
+   group_by(eDNA.sample) %>% 
+  tidyr::expand(taxon, rep) %>% #Now this can be right_joined with mid.step
   right_join(mid.step,.) %>% # this should have ~ 800 NAs
-  # group_by(is.na(prop)) %>% tally %>% # Nailed it
+   # group_by(is.na(prop)) %>% tally %>% # Nailed it
   mutate(prop = replace_na(prop, 0)) %>% 
   group_by(eDNA.sample,taxon) %>% 
   summarise(prop = mean(prop)) -> species.proportions.by.sample
@@ -154,8 +154,6 @@ species.proportions.by.sample %>%
 Analysis.by.prop %>% 
   pull(PERMANOVA)
 
-Analysis.by.prop %>% 
-  pull(mds.plot)
 
 Analysis.by.prop %>% 
   mutate(CAPw = map2(spp.matrix, env, function(.x, .y){
@@ -165,7 +163,7 @@ Analysis.by.prop %>%
     )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
                                 rownames_to_column("eDNA.sample") %>%mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
                                 ggplot(aes(x = CAP1, y = CAP2 )) +
-                                geom_point(aes(color = position, shape = groups, size = 3)) + 
+                                geom_point(aes(color = position, shape = groups), size = 3) + 
                                 facet_wrap(~groups))
 ```
 
@@ -225,7 +223,7 @@ morpho_by_rep %>%
   
 mid.step.morph %>% 
   group_by(eDNA.sample) %>% 
-  tidyr::expand(eDNA.sample,new.morphotype, rep) %>% #Now this can be right_joined with mid.step
+  tidyr::expand(new.morphotype, rep) %>% #Now this can be right_joined with mid.step
   right_join(mid.step.morph,.) %>% # this should have ~ 800 NAs
   # group_by(is.na(prop)) %>% tally %>% # Nailed it
   mutate(prop = replace_na(prop, 0)) %>% 
@@ -410,7 +408,7 @@ Analysis.by.prop.morph %>%
     )) %>% pull(CAPw) %>% map(~scores(.x)$sites %>%as.data.frame() %>%
                                 rownames_to_column("eDNA.sample") %>% mutate(eDNA.sample = as.numeric(eDNA.sample)) %>%  left_join(metadata) %>% 
                                 ggplot(aes(x = CAP1, y = CAP2 )) +
-                                geom_point(aes(color = position, shape = groups)) + 
+                                geom_point(aes(color = position, shape = groups), size = 3)  + 
                                 facet_wrap(~groups))
 ```
 
@@ -439,7 +437,7 @@ morph.proportions.by.sample %>%
   group_by(position) %>% 
   nest() %>% 
 
-   distances(Abundance = prop, taxa = newest) %>% 
+   distances(Abundance = prop, taxa = new.morphotype) %>% 
   mutate(PERMANOVA = map2(bc, env, function(.x, .y){
            perms <- how(nperm = 9999)
            # setBlocks(perms) <- .y %>% pull(Transect)
@@ -463,7 +461,7 @@ Get which species have an effect on changing the composition of surface samples 
 
 morph.proportions.by.sample %>% 
   left_join(metadata) %>% 
-  filter(!is.na(newest)) %>% 
+  filter(!is.na(new.morphotype)) %>% 
   # mutate (nrows = ceiling(prop *100)) %>%
   # group_by(eDNA.sample, newest) %>%
   # nest() %>%
@@ -471,7 +469,7 @@ morph.proportions.by.sample %>%
   # unnest(data) %>%
   ggplot(aes(x= stop, y = Distance_to_thermocline)) +
   geom_density_2d_filled(contour_var = "ndensity") +
-  facet_grid(groups~newest) 
+  facet_grid(groups~new.morphotype) 
 
 
 
@@ -502,11 +500,11 @@ kde2d.weighted <- function (x, y, w, h, n = 25, lims = c(range(x), range(y))) {
 ```{r}
 morph.proportions.by.sample %>% 
   left_join(metadata) %>% 
-  group_by(newest, groups) %>% 
+  group_by(new.morphotype, groups) %>% 
   nest() -> nester 
 nester %>%   
 pull(data) %>%
-  set_names(nester$newest) %>%
+  set_names(nester$new.morphotype) %>%
   # mutate(weighted = map(data, ~kde2d.weighted(stop, depth, prop)))
   map(~kde2d.weighted(.x$stop, .x$depth, .x$prop)) -> weights
   
@@ -518,17 +516,17 @@ weights %>%
 nester$weights = weights.dfs
 
 nester %>% 
-  pivot_wider(id_cols = newest, names_from = groups, values_from = c(data, weights)) %>% 
+  pivot_wider(id_cols = new.morphotype, names_from = groups, values_from = c(data, weights)) %>% 
   mutate(data_Mixed = map(data_Mixed, ~.x %>% mutate(groups = "Mixed")),
          data_Stratified = map(data_Stratified, ~.x %>% mutate(groups = "Stratified")),
          weights_Mixed = map(weights_Mixed, ~.x %>% mutate(groups = "Mixed")),
          weights_Stratified = map(weights_Stratified, ~.x %>% mutate(groups = "Stratified")),
          data = map2(data_Mixed, data_Stratified, bind_rows),
          weights = map2(weights_Mixed, weights_Stratified, bind_rows)) %>% 
-  select(newest, data, weights) -> nester2
+  select(new.morphotype, data, weights) -> nester2
 
 nester2 %>% 
-  mutate(plot = pmap(.l = list (a = newest, b = data, c = weights),
+  mutate(plot = pmap(.l = list (a = new.morphotype, b = data, c = weights),
                      .f = function (a,b,c){
                        b %>% 
                        ggplot(aes(x = stop, y = Distance_to_seafloor)) +

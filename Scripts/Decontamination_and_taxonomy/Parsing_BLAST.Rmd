@@ -8,8 +8,14 @@ editor_options:
 params:
   file:
     label: 'Input dataset:'
-    value: /Users/ramon.gallegosimon/Projects/eDNA-Hake/Output/Blast_output_20210714_11_02
+    value: /Users/ramon.gallegosimon/Projects/eDNA-Hake/Data
     input: file
+  taxonomy:
+    label: 'Taxonomy in .rds format'
+    value:  /Users/ramon.gallegosimon/Projects/eDNA-Hake/Data/taxonomy.rds
+  output_folder:
+    label: 'Output folder'
+    value: /Users/ramon.gallegosimon/Projects/eDNA-Hake/
   pident:
     value: 95
   length:
@@ -29,9 +35,13 @@ library (taxonomizr)
 ## Get all the outputs
 
 ```{r Import BLAST results}
- outputFILE <- read_csv(params$file,  col_names = c("Query", "Match", "pident", "length", "mismatch", "gapopen", "sstart", "send", "evalue", "bitscore", "taxid"))
+ inputFILE <- read_table(params$file,  col_names = c("Query", "Match", "pident", "length", "mismatch", "gapopen", "qstart","qend" , "sstart", "send", "evalue", "bitscore", "taxid", "qlen"))
 
-out.folder <- dirname(params$file)
+out.folder <- here("Data")
+
+out.folder
+
+inputFILE
 ```
 
 ## Now we only need to parse 2 files
@@ -44,27 +54,27 @@ out.folder <- dirname(params$file)
 Get the taxonomy file from insect
 ```{r}
 here()
-taxonomy <- read_rds(here("Data","all.taxonomy.rds"))
+taxonomy <- read_rds(params$taxonomy)
 
-taxonomy %>% 
-  filter (str_detect(name, "Eviota") & rank == "species")
-
-taxonomy %>% 
-  filter (taxID == 166746)
-
-# Add the taxonomy of Eviota thamani
-
-max(taxonomy$taxID)
-
-# Make up a taxID for E. thamani
-
-taxonomy %>% 
-  add_case(taxID = 6000000,
-           parent_taxID = 166746,
-           rank = "species",
-           name = "Eviota thamani") -> taxoomy.2
-
-insect::get_lineage(6000000, taxoomy.2)
+# taxonomy %>% 
+#   filter (str_detect(name, "Eviota") & rank == "species")
+# 
+# taxonomy %>% 
+#   filter (taxID == 166746)
+# 
+# # Add the taxonomy of Eviota thamani
+# 
+# max(taxonomy$taxID)
+# 
+# # Make up a taxID for E. thamani
+# 
+# taxonomy %>% 
+#   add_case(taxID = 6000000,
+#            parent_taxID = 166746,
+#            rank = "species",
+#            name = "Eviota thamani") -> taxoomy.2
+# 
+# insect::get_lineage(6000000, taxoomy.2)
 
 
 
@@ -74,7 +84,7 @@ Now - get  the taxids are probably shared between them.
 
 ```{r}
 
-outputFILE %>% distinct(taxid) %>%
+inputFILE %>% distinct(taxid) %>%
   pull()-> all.taxids
 insect::get_lineage(all.taxids, taxonomy) -> all.taxonomy
 
@@ -113,8 +123,8 @@ Conversion.df %>%
 We can bring this back to the original blast outputs, keeping the real matches (>95% or >98% ) and the informative database entrances (at least Family, Genus and species)
 
 ```{r}
-left_join(outputFILE, Conversion.df) %>%
-  filter (pident >=params$pident, length > params$length) %>% # dropping unreliable blast
+left_join(inputFILE, Conversion.df) %>%
+  filter ( length > params$length) %>% # dropping unreliable blast
   unite(Family, Genus, col = "taxa", sep = "|", remove = F) %>%
   filter (taxa != "NA|NA") -> cleaned
 
@@ -135,10 +145,10 @@ cleaned %>%
     # If there are 100% matches - keep those and the 99s
     # If not, keep everything
     
-    if(max(.x$pident == 100)){
+    if(max(.x$pident > params$pident)){
       
       .x %>% 
-        filter(pident >99) %>% 
+        filter(pident > params$pident) %>% 
         select(-pident) %>% 
         condenseTaxa() %>%
       paste(., collapse = "%")
@@ -156,6 +166,6 @@ cleaned %>%
 All.Seqs.IDed %>%
   separate(consensus, into = c( "phylum","class","order" , "taxa"), extra = "merge") %>%
   rename (Hash = Query ) %>%
-    write_csv(file.path(out.folder, "Hash_classified_BLAST.csv"))
+    write_csv(file.path(out.folder, paste0("Hash_classified_BLAST_", lubridate::today(), ".csv")))
 ```
 
