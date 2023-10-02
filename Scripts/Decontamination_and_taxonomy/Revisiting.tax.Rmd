@@ -75,13 +75,67 @@ n_distinct(Swarm.conversion$Match)
 ```
 
 ```{r combine}
-
 Combine.clas <- left_join(Classification, Swarm.conversion) %>% 
   separate(Match, into = "New.Hash") %>% 
   filter (Hash == New.Hash) 
 
 n_distinct(Swarm.conversion$Match) # We had 443 Swarm OTUs
 n_distinct(Combine.clas$New.Hash)  # We found taxonomy for 368 of them
+```
+
+What do we know about those that didn't have a final ID
+
+```{r}
+anti_join(ASV.table %>% group_by(Hash) %>% summarise(nr = sum(nReads)), Classification) %>%
+  # distinct(Match) %>% separate(Match, into = c("Hash", "size"), sep = ";size=") %>%
+  inner_join(Seqs) -> not.ided
+
+BLAST_results <- read_table(here("Data", "Seqs.blasted.txt"),  col_names = c("Hash", "Match", "pident", "length", "mismatch", "gapopen", "qstart","qend" , "sstart", "send", "evalue", "bitscore", "taxid", "qlen"))
+
+
+anti_join(not.ided, BLAST_results) %>% fasta.writer(df = ., sequence = Sequence, header = Hash, file.out = here("Data" ,"unclassified.fasta"))
+
+```
+Exploring the output
+
+```{r}
+new.BLAST <- read_table(here("Data", "blast_results.txt"),  col_names = c("Hash", "Match", "pident", "length", "mismatch", "gapopen", "qstart","qend" , "sstart", "send", "evalue", "bitscore", "taxid", "qlen"))
+
+worlds.taxonomy <- read_rds(here("Data", "all.taxonomy.rds"))
+
+new.BLAST %>% 
+  distinct(taxid) %>%
+  separate_rows("taxid",sep =  ";") %>%
+  mutate_all(as.numeric) %>%
+  pull() %>% 
+  set_names(x = .,nm = .) %>% 
+  get_lineage(worlds.taxonomy) -> newtaxids
+  
+Conversion.df <- tibble (taxid = names(newtaxids),
+                         taxonomy = newtaxids) %>%
+  mutate (Phylum = map_chr(taxonomy, ~.x["phylum"]),
+          Class = map_chr(taxonomy, ~.x["class"]),
+          Order = map_chr(taxonomy, ~.x["order"]),
+          Family= map_chr(taxonomy, ~.x["family"]),
+          Genus = map_chr(taxonomy, ~.x["genus"]),
+          Species = map_chr(taxonomy, ~.x["species"])) 
+
+write_csv(Conversion.df, here("Data", "lineages_new_blast.csv"))
+
+
+new.BLAST %>% 
+  # distinct(taxid) %>%
+  separate_rows("taxid",sep =  ";") %>%
+  left_join(Conversion.df) %>% 
+  filter (Phylum == "Chordata")
+  
+```
+
+
+
+```{r combine}
+
+
 Combine.clas %>% 
   group_by(New.Hash) %>% 
   add_tally() %>% 
