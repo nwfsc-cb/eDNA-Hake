@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 When mapping the location of samples, we need to center the worldmap to the coordinates were the samples are from
@@ -15,6 +17,7 @@ library(rnaturalearth)
 library(mapdata)
 library(metR)
 library(raster)
+library(here)
 ```
 
 

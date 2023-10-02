@@ -1,0 +1,178 @@
+---
+title: "On Sodium Thiosulfate and Duplicate Water Samples"
+author: A.O. Shelton
+date: "4/5/2023"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+This file is intended to provide a quick look at two aspects of eDNA sampling methodologies explored during the hake surveys.  First we will look at the consequences of using sodium thiosulfate during the cleaning process of filter cups on qPCR results. Second, we will examine the variability within Nisking bottles using replicate samples taken from a single Niskin bottles during the 2019 hake cruise.  
+
+
+
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+# Load libraries
+library (tidyverse)
+library(cowplot)
+
+# Read in data
+setwd("..")
+dat.dup <- read.csv("../Data/2021-22/Hake2021_WithinNiskinDuplicates.csv")
+dat.NaT <- read.csv("../Data/2021-22/NaT Comparative Results.csv")
+```
+
+
+# Sodium Thiosulfate
+
+For this analysis we will use qPCR data from hake, lamprey, and eulachon.  We will look at paired samples taken from individual Niskin bottles (24 samples).  Two samples were filtered using regular cups and one was placed in a sodium thiosulfate solution to inactivate the chlorine used to sterilize the filter cups. We use the machine derived copies $\mu L^{-1}$ for these analyses. While there are a few eulachon and lamprey samples that had detectible DNA, hake was present in most samples. We plot the three pair-wise comparisons (regular 1 vs. regular 2, regular 1 vs. sodium thiosulfate, regular 2 vs. sodium thiosulfate; Fig. \ref{fig:pair_plot}). In general, there does not appear to be much of a difference between the regular cup samples, but the range of observed DNA concentrations is not particularly large.  In comparison, the sodium thiosulfate samples appear to estimate slightly lower DNA concentrations than the regular cups (Fig. \ref{fig:pair_plot}) but any effect is vanishingly small.
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+# calculate summary statistics for paired samples
+
+dat.NaT.summ <- dat.NaT %>% 
+                    dplyr::select(-hake_Ct,-eulachon_Ct,-lamprey_Ct) %>%
+                    filter(!is.na(drop.sample)) %>%
+                    pivot_longer(.,
+                          cols = c("hake_copies_ul","eulachon_copies_ul","lamprey_copies_ul"),
+                          names_to="species",values_to="copies_ul") %>%
+                    mutate(copies_ul = ifelse(is.na(copies_ul)==T,0,copies_ul)) %>%
+                    filter(inhibition_rate < 1,inhibition_rate > -1) %>%
+                    filter(comments %in% c("Regular Cups, 1st Niskin",
+                                           "Regular Cups, Repeat Niskin",
+                                           "Sodium Thiosulfate Cups",
+                                           "Sodium Thiosulfate Cups; Extra")) %>%
+                    mutate(lab= case_when(grepl("Sodium",comments) ~ "NaT",
+                                          grepl("1st",comments)~ "First",
+                                          grepl("Repeat",comments)~ "Second")) %>%
+                    group_by(CTD.cast,Niskin,lab,depth,species) %>% 
+                    summarise(copies_mean = mean(copies_ul),
+                              copies_sd=sd(copies_ul),
+                              n_rep=length(copies_ul)) %>%
+                    # filter(!is.na(Niskin)) %>%
+                    ungroup() %>%
+                      pivot_wider(.,id_cols=c("CTD.cast","Niskin","depth","species"),
+                                names_from=c("lab"),
+                                values_from = c("copies_mean","copies_sd","n_rep"))
+                                
+LIM <- c(0.1,50)
+BRK <- c(0.1,0.3,1,3,10,30,50)
+p_first_second <- ggplot(dat.NaT.summ) +#%>% filter(species=="hake_copies_ul")) +
+            geom_point(aes(x=copies_mean_First,y=copies_mean_Second,color=species)) +
+            geom_errorbar(aes(x=copies_mean_First,
+                              ymin=copies_mean_Second - copies_sd_Second,
+                              ymax=copies_mean_Second + copies_sd_Second,color=species),
+                          alpha=0.5) +
+          geom_errorbarh(aes(y=copies_mean_Second,
+                              xmin=copies_mean_First - copies_sd_First,
+                              xmax=copies_mean_First + copies_sd_First,color=species),
+                         alpha=0.5) +
+          scale_x_continuous("Regular First",trans="log",breaks=BRK) +
+          scale_y_continuous("Regular Second",trans="log",breaks=BRK) +
+          #facet_wrap(~species)+
+          coord_cartesian(xlim=LIM,ylim=LIM) +
+          geom_abline(slope=1,intercept=0,linetype="dashed") +
+          theme_bw()
+#p_first_second
+
+p_first_NaT <- ggplot(dat.NaT.summ) +#%>% filter(species=="hake_copies_ul")) +
+            geom_point(aes(x=copies_mean_First,y=copies_mean_NaT,color=species)) +
+            geom_errorbar(aes(x=copies_mean_First,
+                              ymin=copies_mean_NaT - copies_sd_NaT,
+                              ymax=copies_mean_NaT + copies_sd_NaT,color=species),
+                          alpha=0.5) +
+          geom_errorbarh(aes(y=copies_mean_NaT,
+                              xmin=copies_mean_First - copies_sd_First,
+                              xmax=copies_mean_First + copies_sd_First,color=species),
+                         alpha=0.5) +
+          scale_x_continuous("Regular First",trans="log",breaks=BRK) +
+          scale_y_continuous("Sodium Thiosulfate",trans="log",breaks=BRK) +
+          #facet_wrap(~species)+
+          coord_cartesian(xlim=LIM,ylim=LIM) +
+          geom_abline(slope=1,intercept=0,linetype="dashed") +
+          theme_bw()
+#p_first_NaT
+
+p_second_NaT <- ggplot(dat.NaT.summ) +#%>% filter(species=="hake_copies_ul")) +
+            geom_point(aes(x=copies_mean_Second,y=copies_mean_NaT,color=species)) +
+            geom_errorbar(aes(x=copies_mean_Second,
+                              ymin=copies_mean_NaT - copies_sd_NaT,
+                              ymax=copies_mean_NaT + copies_sd_NaT,color=species),
+                          alpha=0.5) +
+          geom_errorbarh(aes(y=copies_mean_NaT,
+                              xmin=copies_mean_Second - copies_sd_Second,
+                              xmax=copies_mean_Second + copies_sd_Second,color=species),
+                         alpha=0.5) +
+          scale_y_continuous("Sodium Thiosulfate",trans="log",breaks=BRK) +
+          scale_x_continuous("Regular Second", trans="log",breaks=BRK) +
+          #facet_wrap(~species)+
+          coord_cartesian(xlim=LIM,ylim=LIM) +
+          geom_abline(slope=1,intercept=0,linetype="dashed") +
+          theme_bw()
+#p_second_NaT
+
+```
+
+```{r pair_plots, echo=FALSE, message=FALSE,warning=FALSE,fig.cap="\\label{fig:pair_plot} Three pairs of estimated copy numbers niskins filted using two regular cups (top) and one regular cup and one sodium thiosulfate treated cup (middle and bottom). Means and SD shown. Note log-scale axes.",fig.height=9,fig.width=5}
+plot_grid(p_first_second,
+          p_first_NaT,
+          p_second_NaT,
+          align="hv",ncol=1)
+```
+
+\clearpage
+
+# Duplicate water samples from individual Niskins
+
+To look at the variability of replicate samples taken from a single Niskin, we can plot duplicate samples collected from 18 individual Niskin.  Each 2.5L sample was processed identically and the three qPCR replicates were performed for each tube.  These samples generally had low hake DNA concentration (eulachon and lamprey were not detected in these samples), so there is limited information about what happens at higher concentrations. That said, the two samples were clearly positively correlated ($\rho = 0.86$ on mean concentration; Fig. \ref{fig:pair_plot_dup}), but there are some samples where the standard deviations do not overlap with the 1:1 line.  There is clearly some variability arising from lab processing of samples (filtering, extraction, PCR), but I don't think this is large.  Aside: all of these samples were collect from 150m or deeper,    
+
+
+```{r within_niskin, warning=FALSE,echo=FALSE,message=FALSE}
+  dat.dup.long <- dat.dup %>% 
+              pivot_longer(.,cols=grep("copy",colnames(dat.dup)),
+                           names_to = "ID",values_to="copies") %>%
+              mutate(copies = ifelse(is.na(copies)==TRUE,0,copies))
+  dat.dup.summ <- dat.dup.long %>%
+              group_by(CTD.cast,Tube..,Niskin,depth,comments,rep) %>% 
+              summarise(Mean=mean(copies,na.rm=T),SD=sd(copies,na.rm=T)) %>%
+              pivot_wider(.,id_cols = c("CTD.cast","Niskin","depth"),
+                          names_from = "rep",values_from = c("Mean","SD")) %>%
+              mutate(err1.plus = Mean_1+SD_1,err1.minus = ifelse(Mean_1-SD_1 <0, 0,Mean_1-SD_1 ),
+                     err2.plus = Mean_2+SD_2,err2.minus = ifelse(Mean_2-SD_2 <0, 0,Mean_2-SD_2 )) %>%
+              mutate(mean.dist = abs((Mean_1 - Mean_2)/2),
+                     avg.sd = mean(SD_1,SD_2))
+    
+
+p_dup <- ggplot(dat.dup.summ) +
+    geom_point(aes(x=Mean_1,y=Mean_2)) +
+    geom_errorbar(aes(x=Mean_1 ,ymin=err2.minus,ymax=err2.plus)) +
+    geom_errorbarh(aes(y=Mean_2,xmin=err1.minus,xmax=err1.plus)) +
+    geom_abline(intercept = 0,slope=1,linetype="dashed") +
+    scale_x_continuous("First",trans="sqrt",breaks=c(0.1,1,2,3,5,10,15),limits=c(0,19)) +
+    scale_y_continuous("Second",trans="sqrt",breaks=c(0.1,1,2,3,5,10,15),limits=c(0,19)) +
+    theme_bw()
+
+p_dup_test <- ggplot(dat.dup.summ) +
+    geom_point(aes(x=mean.dist,y=avg.sd))
+
+
+
+
+```
+
+```{r pair_plot_fig, echo=FALSE, message=FALSE,warning=FALSE,fig.cap="\\label{fig:pair_plot_dup} Duplicate samples taken from individual Niskin bottles (hake DNA concetrations; Mean and SD). Note log-scale axes",fig.height=5,fig.width=5}
+print(p_dup)
+```
+
+
+
+
+
+
+
+
+
+
+
+
