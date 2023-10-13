@@ -16,10 +16,10 @@ library(loo)
 # run post-process qPCR STAN Output.R to get base maps and some other items of interest.
 
 # Working directories
-base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
-data.dir <- paste0(base.dir,"Data/acoustics 2019")
-script.dir <- paste0(base.dir,"/Scripts")
-plot.dir <- paste0(base.dir,"Plots and figures")
+base.dir <- here()
+data.dir <- here('Data','acoustics 2019')
+script.dir <- here('Scripts')
+plot.dir <- here("Plots and figures")
 
 setwd(data.dir)
 dat.acoustic.raw <- read.csv("EchoPro_un-kriged_output-05-Dec-2019_0.csv")
@@ -75,12 +75,12 @@ TRANS <- unique(dat.acoustic$transect)
 
 ### Pull in Blake's 5km grid and projection, convert lat-lon to that coordinate system.
 
-str_name <- paste0(base.dir,"Data/raster_grid_blake/fivekm_grid.tif")
+str_name <- here("Data/raster_grid_blake/fivekm_grid.tif")
 dat_raster=raster(str_name)
 dat_raster_extracted <- rasterToPoints(dat_raster)
 
 # Get depth information.
-raster_depth <- read.csv(paste0(base.dir,"Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
+raster_depth <- read.csv(here("Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
 raster_depth$depth_m <-  - raster_depth$WM_depth_m
 
 ####### 
@@ -88,11 +88,11 @@ raster_depth$depth_m <-  - raster_depth$WM_depth_m
 #######
 # Use a projection derived by Blake.
 ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
-PROJ.txt <- dat_raster@crs %>% as.character()
+PROJ.txt <- crs(dat_raster)
 proj      <- SpatialPointsDataFrame(coords = dat.acoustic %>% ungroup() %>% dplyr::select(lon,lat),
                                     data=dat.acoustic,
                                     proj4string = CRS("+proj=longlat"))
-proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+proj.utm <- spTransform(proj, CRSobj = CRS(as.character(PROJ.txt)))
 
 dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
 
