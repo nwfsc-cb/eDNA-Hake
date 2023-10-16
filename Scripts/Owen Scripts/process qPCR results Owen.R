@@ -49,7 +49,7 @@ script.dir <- here('Scripts')
 setwd(data.dir)
 dat.all <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
 dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.csv")
-dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2021-07-15 sample details.csv")
+dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2023-02-10 sample details.csv")
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
 # load and run the acoustic data. this is needed to reference the offshore-ness of 

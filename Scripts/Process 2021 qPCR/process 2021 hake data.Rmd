@@ -1,0 +1,320 @@
+---
+title: "Process 2021 eDNA Data- Hake"
+author: "Owen R. Liu"
+date: "2023-10-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(marmap)
+library(ggplot2)
+library(rstan)
+library(lubridate)
+library(gridExtra)
+library(sf)
+library(brms)
+library(loo)
+library(here)
+library(terra)
+options(dplyr.summarise.inform=FALSE)
+
+# Working directories
+# base.dir <- here()
+# data.dir <- here('Data')
+# plot.dir <- here("Plots and figures")
+# script.dir <- here('Scripts','Owen Scripts')
+```
+
+# Purpose
+
+The goal of this script is to clean processed qPCR eDNA data from the 2021 hake survey. Overall, we clean the eDNA qPCR results, join location and spatial covariate data from related datasets, and join data from the qPCR standard curves. In the second major portion of the processing, we produce forms of the data that will be used in the Stan model of hake biomass.
+
+## Pre-processing Model Choices
+
+There are choices to be made up front about the structure of the model that will be produced to fit in Stan. We keep track of those here at the top of the workflow, so that this script could  (hopefully, theoretically) be generalized for other species that were analyzed (i.e., lamprey and eulachon in addition to hake)
+
+```{r model choices}
+## DECLARED SPECIES OF INTEREST
+SP <- "hake" # options: hake, lamprey, eulachon
+###########################################################################
+# Make a choice about the kind of model to run.
+# Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
+MODEL.TYPE = "lat.long.smooth"
+###########################################################################
+# identifier
+MODEL.ID <- "4_10_fix_nu_T-FIN"
+###########################################################################
+# variance scenario # options are "Base_Var", "Linear_Var"
+MODEL.VAR <- "Base_Var" #
+###########################################################################
+NO.SURFACE <- "FALSE"
+
+#set.seed(111)
+# Construct smoothes for each 
+# define knots.
+N.knots.lon  <- 4
+N.knots.lat  <- 10
+N.knots.bd <- 5
+N.knots.depth <- 4
+
+######################################################
+if(MODEL.TYPE == "Base"){
+  TRIM.25 <- FALSE
+} 
+if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
+  TRIM.25 <- TRUE
+}  
+```
+
+# Import Data
+
+First, we import raw forms of the data.
+
+```{r import raw data}
+# Pull in qPCR data, qPCR standards, sample id information
+dat.all <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR results 10.13.2023.csv'))
+dat.stand <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR standards 10.13.2023.csv'))
+dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR sample details 10.16.2023.csv'),skip=2)
+dat.station.id <- read_csv(here('Data','CTD meta 2021.csv'))
+```
+
+Note: as of 10/16/2023, we do not yet have the acoustic data that links to these observations, so we ignore processing the acoustic data for now.
+
+# Process CTD
+
+First, process the location and sample identifier information from CTD casts.
+
+```{r clean ctd}
+# Look at the data
+glimpse(dat.station.id)
+dat.station.id <- dat.station.id %>% 
+  rename(station_id=`Station ID`,filename=`File name`,date=UTCDate, time=UTCTime,lat=Latitude,lon=Longitude) %>% 
+  mutate(year=year(date),month=month(date),day=day(date))
+# dat.station.id <- dat.station.id %>% filter(Button == "CTD at Depth" | Station.. == "49-9") %>% 
+#   mutate(lat=as.character(SciGPS.Lat), lon=as.character(SciGPS.Lon)) %>%
+#   mutate(Lat=substr(lat,1,nchar(lat)-1),Lon=substr(lon,1,nchar(lon)-1)) %>%
+#   mutate(lat.deg=as.numeric(substr(Lat,1,2)),lon.deg = as.numeric(substr(Lon,1,3)),
+#          lat.dec=as.numeric(substr(Lat,3,nchar(Lat)))/60,lon.dec=as.numeric(substr(Lon,4,nchar(Lon)))/60) %>%
+#   mutate(lat = lat.deg + lat.dec, lon= -(lon.deg + lon.dec)) %>% 
+#   dplyr::select(-Lat,-Lon,-lat.deg,-lat.dec,-lon.deg,-lon.dec)
+# 
+# # Fix CTD station data.
+# dat.station.id <- dat.station.id %>% mutate(station=as.character(Station..)) %>% 
+#   mutate(station = case_when(station=="77-0" ~ "77-MT505",
+#                              station=="78-0" ~ "78-MT506",
+#                              grepl("CTD ",station) ~ substr(station,5,nchar(station)),
+#                              grepl("CTD",station) ~ substr(station,4,nchar(station)),
+#                              TRUE ~ station) ) %>%
+#   mutate(transect=substr(station,1,2),
+#          transect=case_when(grepl("-",transect) ~ substr(transect,1,1),
+#                             TRUE ~ transect))
+# 
+# dat.station.id <- dat.station.id %>% mutate(date= as.Date(Date,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>% 
+#   rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE) 
+glimpse(dat.station.id)
+```
+
+Add a transect identifier
+```{r add transects}
+dat.station.id <- dat.station.id %>% 
+  mutate(transect=str_split_i(station_id,"_",1) %>% str_to_lower()) %>% 
+  mutate(transect=ifelse(grepl('^x',transect),str_replace(transect,"x",""),transect)) %>% 
+  mutate(transect=as.integer(transect))
+```
+
+Attach depth from NOAA bathymetry
+
+```{r bathy}
+### Go get bathymetric data from NOAA to overlay on the transects.
+limits.for.map <- dat.station.id %>% 
+  st_as_sf(coords=c('lon','lat'),crs=4326) %>% 
+  st_bbox()+c(-1,-1,1,1) #add an extra degree on each side for buffer
+  
+
+b = getNOAA.bathy(lon1 = limits.for.map["xmin"],
+          lon2 = limits.for.map[ "xmax" ],
+          lat1 = limits.for.map["ymin"],
+          lat2 = limits.for.map["ymax"],
+          resolution = 1,keep = TRUE)
+
+# THE BELOW CODE IS FOR THE ACOUSTIC TRANSECTS
+# # find the first and last lat-lons from dat.acoustic data frame for each transect.
+# dat.bathy <- dat.station.id %>% 
+#   group_by(transect) %>% 
+#   summarise(across(c("lon","lat"), .fns = list( Max = ~ max(.x)  ,
+#                            Min = ~ min(.x) ,
+#                            Mean = ~ mean(.x)))) %>% 
+#   ungroup() %>% 
+#   filter(!is.na(transect))
+# 
+# pull_transect_bathy <- function(lon_Min,lon_Max,lat_Mean,transect){
+#   dat.trans <- get.transect(b,
+#                           x1=lon_Max,x2=lon_Min,
+#                           y1=lat_Mean,y2=lat_Mean,distance=TRUE)
+#   dat.trans %>% 
+#     mutate(transect=transect) %>% 
+#     bind_rows(tibble(lon=-99,lat=-99,dist.km=0,depth=min(dat.trans$depth),transect=transect))
+# }
+# 
+# bathy.transects <- purrr::pmap_df(dplyr::select(dat.bathy,transect,lon_Min,lon_Max,lat_Mean,transect),pull_transect_bathy)
+```
+
+```{r get sample depth}
+# We can pull depth from each sample point
+stations.bathy <- get.depth(b,x=dat.station.id %>% 
+                              dplyr::select(lon,lat),locator=F) %>% 
+  rename(bathy.bottom.depth=depth) %>% 
+  distinct()
+
+dat.station.id <- dat.station.id %>% left_join(stations.bathy)
+
+# temp <- marmap::get.depth(b,
+#                           x= dat.station.id %>% dplyr::select(lon,lat),
+#                           locator = FALSE)  
+# dat.station.id$bathy.bottom.depth <-  -temp$depth
+# 
+# d.temp <- dat.station.id %>% group_by(date,year,month,day,station, transect) %>%
+#   summarise(m.lat=mean(lat),m.lon=mean(lon),
+#             m.water.depth=mean(water.depth),bathy.depth = mean(bathy.bottom.depth)) %>%
+#   rename(lat=m.lat,lon=m.lon, water.depth=m.water.depth, bathy.bottom.depth=bathy.depth)
+# # come up with consensus bottom depth
+# d.temp$bottom.depth.consensus <- d.temp$water.depth
+# d.temp <- d.temp %>% mutate(
+#   bottom.depth.consensus = ifelse(water.depth<100 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
+#   bottom.depth.consensus = ifelse(water.depth<600 & water.depth>400 & bathy.bottom.depth>1000,bathy.bottom.depth,bottom.depth.consensus),
+#   bottom.depth.consensus = ifelse(water.depth<1100 & water.depth>1000 & bathy.bottom.depth>2000,bathy.bottom.depth,bottom.depth.consensus),
+#   bottom.depth.consensus = ifelse(water.depth<0,bathy.bottom.depth,bottom.depth.consensus),
+#   bottom.depth.consensus = ifelse(water.depth>1000 & bathy.bottom.depth<200,bathy.bottom.depth,bottom.depth.consensus))
+# 
+# dat.station.id.trim <- dat.station.id %>% dplyr::select(date,year,month,day, station, transect) %>%
+#   # this combines the latitude and longitude to make a single concensus value for each Station.
+#   left_join(d.temp,.)
+# # get rid of a small number of duplicate stations in this data.frame.
+# A <- dat.station.id.trim %>% group_by(station) %>% summarise(N=length(date)) %>% filter(N>1)
+# THESE  <- A$station[A$station!=""]
+# temp   <- dat.station.id.trim %>% filter(station %in% THESE) %>% arrange(station)
+# #pull out every other row to drop duplicates.
+# temp <- temp[seq(1,nrow(temp),by=2),]
+# 
+# dat.station.id.trim <- dat.station.id.trim %>% filter(!station %in% THESE) %>% bind_rows(.,temp)
+# 
+# ##
+# dat.sample.control.id <- dat.sample.id %>% mutate(date= as.Date(Date.UTC,"%m/%d/%y"),year=year(date),month=month(date),day=day(date)) %>%
+#   dplyr::select(sample=Tube..,date,year,month,day,drop.sample,field.negative.type,volume = water.filtered.L,)
+# dat.sample.id  <- dat.sample.id %>% dplyr::select(sample=Tube..,
+#                                                   station=CTD.cast,
+#                                                   Niskin,
+#                                                   depth,
+#                                                   drop.sample,
+#                                                   field.negative.type,
+#                                                   volume = water.filtered.L,
+#                                                   Fluor,
+#                                                   Zymo=Zymo.columns)
+```
+Clean up columns of sample ID table
+
+```{r}
+dat.sample.id  <- dat.sample.id %>% 
+  dplyr::select(sample=`Tube #`,
+                station=`CTD cast`,
+                Niskin,
+                depth,
+                drop.sample,
+                field.negative.type,
+                volume = water.filtered.L)
+```
+
+# Spatial Grid Info
+
+Pull in and create spatial grid to project on.
+
+```{r}
+dat_raster=rast(here('Data','raster_grid_blake','fivekm_grid.tif'))
+
+# Get depth information.
+raster_depth <- read_csv(here('Data','raster_grid_blake','weighted_mean_NGDC_depths_for_5km_gridcells.csv')) %>% 
+  rename(depth_m=WM_depth_m)
+
+# cell numbers
+cellnums <- tibble(rastID=as.numeric(values(dat_raster))) %>% mutate(rastcell=row_number()) %>% 
+  left_join(raster_depth,by=c("rastID"="Gridcell_ID"))
+# 
+rast_depth <- setValues(dat_raster,cellnums$depth_m)
+plot(rast_depth)
+```
+Convert station ID information to Blake's custom projection
+
+```{r}
+dat.station.id.proj <- dat.station.id %>% 
+  # convert to sf object for quick and easy spatial transformation
+  st_as_sf(coords=c('lon','lat'),crs=4326,remove=F) %>% 
+  # project to the same CRS as Blake's raster
+  st_transform(crs(dat_raster)) %>% 
+  mutate(utm.lon.m=st_coordinates(.)[,1],
+         utm.lat.m=st_coordinates(.)[,2]) %>% 
+  # convert back to a non-spatial df
+  st_set_geometry(NULL)
+glimpse(dat.station.id.proj)
+```
+
+## Distance Along Transect
+
+Calculate a distance along each indicated transect
+
+```{r}
+transect_dists <- dat.station.id.proj %>% 
+  distinct(transect,utm.lon.m,utm.lat.m,.keep_all = T) %>% 
+  filter(!is.na(transect))
+
+# function to calculate this for a subset of rows representing 1 transect
+calc_transect_distance <- function(transect_df){
+  transect_sf <- transect_df %>% 
+    arrange(desc(utm.lon.m)) %>% 
+    st_as_sf(coords=c('utm.lon.m','utm.lat.m'),crs=crs(dat_raster))
+  # transect start is assumed to be the observation with the eastern-most longitude
+  transect_start <- transect_sf %>% slice_head(n=1)
+  # calculate distances in meters
+  dists <- st_distance(transect_sf,transect_start)
+  
+  # add the distances back to the transect data and return
+  transect_sf %>% 
+    mutate(transect_dist_m=dists[,1]) %>% 
+    st_set_geometry(NULL)
+}
+
+# apply
+transect_dists <- transect_dists %>% 
+  group_split(transect) %>% 
+  purrr::map_df(calc_transect_distance)
+
+# join to other samples (incl. non-transect samples like controls)
+dat.station.id.proj <- dat.station.id.proj %>% 
+  left_join(transect_dists,by=join_by(station_id, filename, date, time, lat, lon, year, month, day, transect, bathy.bottom.depth))
+```
+
+# Join Samples and Stations
+
+Join the sample ID and station ID information that we have cleaned so far
+
+```{r}
+dat.id <- dat.sample.id %>% 
+  left_join(dat.station.id,by=c("station"="station_id"))
+  
+  
+  full_join(dat.sample.id,dat.station.id) %>% 
+              mutate(station=ifelse(sample=="412","-",station)) %>%
+              mutate(control = case_when(station=="" ~ "extraction",
+                                        station=="-" ~ "field",
+                                        TRUE ~ "no")) %>%
+              mutate(depth=as.character(depth)) %>%
+              mutate(depth = case_when(depth=="-" ~ "-99",
+                                       depth=="sfc" ~ "0",
+                                       depth=="300/150" ~ "300",
+                                       depth=="" ~ "0",
+                                       TRUE ~depth))
+```
+
+
+
