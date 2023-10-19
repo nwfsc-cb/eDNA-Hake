@@ -1,5 +1,5 @@
 ---
-title: "Process 2021 eDNA Data- Hake"
+title: "Process 2021 eDNA Data- Eulachon"
 author: "Owen R. Liu"
 date: "2023-10-16"
 output: html_document
@@ -40,7 +40,7 @@ There are choices to be made up front about the structure of the model that will
 
 ```{r model choices}
 ## DECLARED SPECIES OF INTEREST
-SP <- "hake" # options: hake, lamprey, eulachon
+SP <- "eulachon" # options: hake, lamprey, eulachon
 ###########################################################################
 # Make a choice about the kind of model to run.
 # Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
@@ -86,9 +86,9 @@ dat.stand <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR standards 10.13.20
 dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR sample details 10.16.2023.csv'),skip=2)
 dat.station.id <- read_csv(here('Data','CTD meta 2021.csv'))
 
-# Acoustic trawl data
-dat.acoustic.aged <- read_csv(here('Data','Biomass','unkriged_aged_output_2021_combined_male_female.csv'),skip = 1)
-dat.acoustic.all.ages <- read_csv(here('Data','Biomass','unkriged_integrated_output_2021_combined_male_female.csv'))
+# Acoustic trawl data (DON'T NEED FOR EULACHON)
+# dat.acoustic.aged <- read_csv(here('Data','Biomass','unkriged_aged_output_2021_combined_male_female.csv'),skip = 1)
+# dat.acoustic.all.ages <- read_csv(here('Data','Biomass','unkriged_integrated_output_2021_combined_male_female.csv'))
 ```
 
 # Process CTD
@@ -351,11 +351,11 @@ dat.id <- dat.sample.id.filt %>%
 # matchcheck <- dat.id %>% group_by(sample) %>% mutate(nobs=n()) %>% filter(nobs>1)
 ```
 
-# Process Acoustic Data
+# Process Acoustic Data (SKIP FOR EULACHON)
 
 For hake, we join the cleaned acoustic trawl survey data. There are two versions of these data- one is age-structured and the other is bulk biomass estimates per grid cell. We will use the age-structured data, but bring in some covariate identifiers from the other dataset.
 
-```{r acoustic data}
+```{r acoustic data,eval=F}
 # Take a look at the data
 glimpse(dat.acoustic.aged)
 glimpse(dat.acoustic.all.ages)
@@ -395,7 +395,7 @@ glimpse(dat.acoustic.all.ages)
 #   left_join(dat.acoustic.obs.id,by= join_by(transect, lon, lat, stratum, wgt_total))
 # glimpse(dat.acoustic)
 ```
-```{r}
+```{r,eval=F}
 dat.acoustic <- dat.acoustic.all.ages %>%
   rename(transect=Transect,
          lat=Lat,
@@ -425,7 +425,7 @@ dat.acoustic <- dat.acoustic.all.ages %>%
 
 ## Distance Along Transect
 
-```{r acoustic ids}
+```{r acoustic ids,eval=F}
 # make a sample ID number ("transect_number")
 dat.acoustic <- dat.acoustic %>% 
   group_by(transect) %>% 
@@ -436,7 +436,7 @@ dat.acoustic <- dat.acoustic %>%
 
 Similar to how we did it for the eDNA samples above, calculate a distance along transect, starting form the eastern-most
 
-```{r calc transect distance}
+```{r calc transect distance,eval=F}
 # convert to Blake's CRS
 dat.acoustic.proj <- dat.acoustic %>% 
   # convert to sf object for quick and easy spatial transformation
@@ -578,7 +578,7 @@ Surface
 ```{r}
 dat.sfc <- dat.samp %>% 
   filter(depth_cat==0) %>% 
-  mutate(is_inhibited=ifelse(inhibition_rate>INHIBIT.LIMIT,"Inhibited","Non-Inhibited")) %>% 
+  mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 
   filter(!is.na(utm.lat.m))
 
 dat.sfc.sf <- dat.sfc %>% 
@@ -703,11 +703,11 @@ transects.ref.samp <- dat.samp %>%
 transects.ref.samp
 
 
-transects.ref.acoustic <- dat.acoustic %>% 
-  ggplot(aes(transect,lat))+
-  geom_point()+
-  labs(x="Transect Number",y="Latitude",title="Transect Reference, Acoustic")
-transects.ref.acoustic
+# transects.ref.acoustic <- dat.acoustic %>% 
+#   ggplot(aes(transect,lat))+
+#   geom_point()+
+#   labs(x="Transect Number",y="Latitude",title="Transect Reference, Acoustic")
+# transects.ref.acoustic
 ```
 
 ```{r}
@@ -736,7 +736,5 @@ cowplot::plot_grid(plotlist=transect.cross.sections[20:29],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[30:39],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[40:42],nrow=3)
 ```
-## With Acoustic Backdrop
 
-Haven't figured this out yet
 
