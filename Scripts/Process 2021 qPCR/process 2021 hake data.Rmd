@@ -2,7 +2,10 @@
 title: "Process 2021 eDNA Data- Hake"
 author: "Owen R. Liu"
 date: "2023-10-16"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}

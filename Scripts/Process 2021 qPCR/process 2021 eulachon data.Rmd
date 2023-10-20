@@ -2,7 +2,10 @@
 title: "Process 2021 eDNA Data- Eulachon"
 author: "Owen R. Liu"
 date: "2023-10-16"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -592,6 +595,7 @@ dat.sfc.p <- ggplot()+
   scale_color_viridis()
 dat.sfc.p
 ```
+
 50m
 
 ```{r}
@@ -611,6 +615,7 @@ dat.50.p <- ggplot()+
   scale_color_viridis()
 dat.50.p
 ```
+
 
 150m
 
@@ -632,6 +637,7 @@ dat.150.p <- ggplot()+
 dat.150.p
 ```
 
+
 200m
 
 ```{r}
@@ -652,6 +658,7 @@ dat.200.p <- ggplot()+
 dat.200.p
 ```
 
+
 300m
 
 ```{r}
@@ -671,6 +678,7 @@ dat.300.p <- ggplot()+
   scale_color_viridis()
 dat.300.p
 ```
+
 
 500m
 
@@ -701,7 +709,6 @@ transects.ref.samp <- dat.samp %>%
   geom_point()+
   labs(x="Transect Number",y="Latitude",title="Transect Reference, Samples")
 transects.ref.samp
-
 
 # transects.ref.acoustic <- dat.acoustic %>% 
 #   ggplot(aes(transect,lat))+
