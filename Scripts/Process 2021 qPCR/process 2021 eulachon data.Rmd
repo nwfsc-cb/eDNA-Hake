@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(marmap)
 library(ggplot2)
+library(ggpubr)
 library(rstan)
 library(lubridate)
 library(gridExtra)
@@ -127,6 +128,27 @@ dat.station.id <- dat.station.id %>%
 #   rename(water.depth=EK.38kHz.DepthBelowSurface.M.VALUE) 
 glimpse(dat.station.id)
 ```
+
+```{r}
+# Duplicate station IDs
+dat.station.id %>% count(station_id) %>% 
+  filter(n>1)
+
+# two "real" stations (x51_500 and x57_50) seem to have multiple samples. Look at them
+station.id.dupes <- dat.station.id %>% 
+  filter(station_id %in% c("x51_500","x57_50"))
+
+# are these going to mess up our matching?
+station.dupes.samps <- dat.sample.id %>% filter(`CTD cast`%in% c("x51_500","x57_50"))
+
+# yes, so for now just filter so we keep just the first cast
+dat.station.id <- dat.station.id %>% 
+  group_by(station_id) %>% 
+  slice(1) %>% 
+  ungroup()
+# now, all station IDs in this table are unique (1 row per station_ID)
+```
+
 
 Add a transect identifier
 ```{r add transects}
@@ -536,10 +558,6 @@ dat.samp <- dat.samp %>%
                             depth > 240 & depth <= 350 ~ 300,
                             depth > 400 & depth <= 500 ~ 500))
 
-# many-to-many here. seems like there are a few duplicate IDs?
-# just keep track of this for now
-dupe_IDs<-dat.id %>% add_count(sample)%>% filter(n==2)
-
 # no station info
 dat.noID <- dat.samp %>% filter(is.na(station))
 ```
@@ -743,5 +761,51 @@ cowplot::plot_grid(plotlist=transect.cross.sections[20:29],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[30:39],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[40:42],nrow=3)
 ```
+## Standards
+
+Plot standard curves
+
+```{r,fig.width=10,fig.height=10}
+# stand.curve.plots <- purrr::map(unique(dat.stand$qPCR),function(s){
+#   dat.stand %>% 
+#     filter(qPCR==s,Ct!=-99) %>% 
+#     ggplot(aes(log10_copies,Ct))+
+#     geom_point()+
+#     geom_smooth(method='lm',color='darkgreen')+
+#     labs(title=paste0("qPCR: ",s))+
+#     stat_regline_equation(label.x = 2, label.y = 33)
+#   
+# })
+# stand.curve.plots[[1]]
+
+stand.curve.plots <- dat.stand %>% 
+  filter(Ct!=-99) %>% 
+  ggplot(aes(log10_copies,Ct))+
+  geom_point()+
+  geom_smooth(method='lm',color='darkgreen')+
+  facet_wrap(~qPCR,nrow=7,ncol=5)+
+  stat_regline_equation(label.x = 2, label.y = 33)
+stand.curve.plots
+```
+```{r all standards}
+stand.curves.all <- dat.stand %>% 
+  filter(Ct!=-99) %>% 
+  ggplot(aes(log10_copies,Ct,color=qPCR))+
+  geom_point()+
+  guides(color='none')+
+  geom_smooth(method='lm',se=F)
+stand.curves.all
+
+# amplification success?
+qpcr_success <- dat.stand %>% 
+  ggplot(aes(x=log10_copies ,y=Ct_bin,color=qPCR))+
+  geom_jitter(alpha=0.75,width=0,height=0.05)+
+  guides(color='none')+
+  geom_smooth(method = "glm", 
+    method.args = list(family = "binomial"), 
+    se = FALSE)
+qpcr_success
+```
+
 
 
