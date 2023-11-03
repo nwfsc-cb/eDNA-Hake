@@ -17,7 +17,7 @@ library(loo)
 library(here)
 ###########################################################################
 ## DECLARED SPECIES OF INTEREST
-SP <- "hake" # options: hake, lamprey, eulachon
+SP <- "eulachon" # options: hake, lamprey, eulachon
 ###########################################################################
 # Make a choice about the kind of model to run.
 # Options are "Base", "lat.long.smooth", "lat.long.smooth.base"
