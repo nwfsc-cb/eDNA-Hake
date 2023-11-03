@@ -562,6 +562,13 @@ dat.samp <- dat.samp %>%
 dat.noID <- dat.samp %>% filter(is.na(station))
 ```
 
+## Save
+
+```{r}
+write_rds(dat.samp,here('Data','eulachon qPCR 2021 joined cleaned.rds'))
+```
+
+
 # Visualize
 
 Let's make some plots and see what we've got
@@ -608,7 +615,7 @@ dat.sfc.sf <- dat.sfc %>%
 
 dat.sfc.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.sfc.sf,aes(color=copies_ul))+
+  geom_sf(data=dat.sfc.sf,aes(size=copies_ul),shape=1)+
   facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.sfc.p
@@ -628,7 +635,7 @@ dat.50.sf <- dat.50 %>%
 
 dat.50.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.50.sf,aes(color=copies_ul))+
+  geom_sf(data=dat.50.sf,aes(size=copies_ul),shape=1)+
   facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.50.p
@@ -649,7 +656,7 @@ dat.150.sf <- dat.150 %>%
 
 dat.150.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.150.sf,aes(color=copies_ul))+
+  geom_sf(data=dat.150.sf,aes(size=copies_ul),shape=1)+
   facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.150.p
@@ -670,7 +677,7 @@ dat.200.sf <- dat.200 %>%
 
 dat.200.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.200.sf,aes(color=copies_ul))+
+  geom_sf(data=dat.200.sf,aes(size=copies_ul),shape=1)+
   facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.200.p
@@ -691,7 +698,7 @@ dat.300.sf <- dat.300 %>%
 
 dat.300.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.300.sf,aes(color=copies_ul))+
+  geom_sf(data=dat.300.sf,aes(size=copies_ul),shape=1)+
   facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.300.p
@@ -712,8 +719,9 @@ dat.500.sf <- dat.500 %>%
 
 dat.500.p <- ggplot()+
   geom_sf(data=coast,fill='gray50')+
-  geom_sf(data=dat.500.sf,aes(color=copies_ul))+
-  facet_wrap(~is_inhibited)+
+  geom_sf(data=dat.500.sf,aes(size=copies_ul),shape=1)+
+  # none inhibited
+  # facet_wrap(~is_inhibited)+
   scale_color_viridis()
 dat.500.p
 ```
@@ -741,11 +749,12 @@ plot_transect <- function(df,transect_id){
     filter(transect==transect_id) %>% 
     mutate(transect_dist_km=as.numeric(transect_dist_m/1000))
   outp <- dfsub %>% 
-    ggplot(aes(transect_dist_km,depth_cat,size=copies_ul))+
-    geom_point()+
+    ggplot(aes(transect_dist_km,depth_cat,size=log(copies_ul)))+
+    geom_point(shape=1)+
     scale_y_reverse()+
     scale_x_reverse()+
-    labs(x="Distance Along Transect",y="Depth",size="Copies (ul)",title=paste0("Transect ",transect_id))
+    # scale_size_continuous(limits=c(-6,8),breaks=seq(-6,9,by=5))+
+    labs(x="Distance Along Transect",y="Depth",size="Log Copies (ul)",title=paste0("Transect ",transect_id))
   outp
 }
 ```
@@ -759,7 +768,7 @@ cowplot::plot_grid(plotlist=transect.cross.sections[1:9],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[10:19],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[20:29],nrow=3)
 cowplot::plot_grid(plotlist=transect.cross.sections[30:39],nrow=3)
-cowplot::plot_grid(plotlist=transect.cross.sections[40:42],nrow=3)
+cowplot::plot_grid(plotlist=transect.cross.sections[40:42],nrow=1)
 ```
 ## Standards
 
@@ -808,4 +817,11 @@ qpcr_success
 ```
 
 
+# Join Other Years
+
+Join the 2019 data, which was processed in a slightly different way:
+
+```{r}
+
+```
 
