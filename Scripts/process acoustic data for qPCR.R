@@ -12,11 +12,12 @@ library(rgdal)
 library(sp)
 library(brms)
 library(loo)
+library(here)
 
 # run post-process qPCR STAN Output.R to get base maps and some other items of interest.
 
 # Working directories
-base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
+base.dir <- here()
 data.dir <- paste0(base.dir,"Data/acoustics 2019")
 script.dir <- paste0(base.dir,"/Scripts")
 plot.dir <- paste0(base.dir,"Plots and figures")
