@@ -1,0 +1,224 @@
+---
+title: "eulachon 2021 basic sdm"
+author: "Owen R. Liu"
+date: "2023-11-15"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sdmTMB)
+library(terra)
+library(tidyverse)
+library(lubridate)
+library(rnaturalearth)
+library(sf)
+library(here)
+knitr::opts_chunk$set(echo = TRUE)
+options(dplyr.summarise.inform=FALSE)
+
+plot_theme <- theme_minimal()+theme(panel.border = element_rect(color='black',fill=NA))
+theme_set(plot_theme)
+```
+
+## Purpose
+
+Beginning to test the use of sdmTMB to model the distribution of eulachon eDNA concentration. The following is a simple model that directly uses estimated copy number (from qPCR) as the dependent variable, and so skips the extra step of estimated Ct from standard curves.
+
+## Import Data
+
+Here's the eulachon qPCR data derived from the 2021 hake survey. It has been processed in a separate script to append depth, location, and otehr covariate data.
+
+```{r}
+dat <- read_rds(here('Data','eulachon qPCR 2021 joined cleaned.rds'))
+```
+
+
+```{r}
+# all unknown samples with actual data (no controls), and select appropriate columns
+dat <- dat %>% 
+  filter(task!="NTC",!is.na(date)) %>% 
+  mutate(copies_est=ifelse(Ct==-99,0,copies_ul)) %>% 
+  mutate(utm.lon.km=utm.lon.m/1000,utm.lat.km=utm.lat.m/1000)
+```
+
+## Model Setup
+
+Set up the parameters and options for sdmTMB
+
+```{r}
+# data for surface samples
+dat.sfc <- dat %>%
+  filter(depth_cat==0) %>% 
+  mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 
+  filter(!(is_inhibited=="Inhibited")) %>% 
+  filter(!is.na(utm.lat.m))
+
+# Make spde
+spde <- make_mesh(dat.sfc,xy_cols = c('utm.lon.km','utm.lat.km'), 
+                   cutoff = 20)
+# model formula
+formula <- "copies_est ~ s(bathy.bottom.depth)"
+```
+
+## Fit
+
+Fit a model for the surface samples with spatial RFs on
+
+```{r}
+fit <- sdmTMB(
+  formula=as.formula(formula),
+  data = dat.sfc,
+  mesh = spde,
+  family = tweedie(link = "log"),
+  spatial = "on"
+)
+# some summaries
+fit
+tidy(fit,conf.int = T)
+tidy(fit, effects = "ran_pars", conf.int = TRUE)
+sanity(fit)
+```
+
+
+## Predict
+
+### 5km Grid
+
+```{r}
+# Blake's raster with just grid cell ID numbers
+dat_raster=rast(here('Data','raster_grid_blake','fivekm_grid.tif'))
+
+# Depth associated with grid cell IDs
+raster_depth <- read_csv(here('Data','raster_grid_blake','weighted_mean_NGDC_depths_for_5km_gridcells.csv')) %>% 
+  rename(depth_m=WM_depth_m)
+
+# join depths to cell numbers
+cellnums <- tibble(rastID=as.numeric(values(dat_raster))) %>% 
+  mutate(rastcell=row_number()) %>% 
+  left_join(raster_depth,by=c("rastID"="Gridcell_ID"))
+
+# make bathy raster
+rast_depth <- setValues(dat_raster,cellnums$depth_m)
+plot(rast_depth)
+
+# as a tibble for prediction
+grid.pred <- as.data.frame(rast_depth,xy=T) %>% 
+  mutate(utm.lat.km=y/1000,utm.lon.km=x/1000,bathy.bottom.depth=fivekm_grid)
+# reduce to a bounding box that matches the mesh
+predbbox <- dat %>% 
+  dplyr::select(utm.lon.m,utm.lat.m) %>% 
+  st_as_sf(coords=c("utm.lon.m","utm.lat.m"),crs=crs(dat_raster)) %>% 
+  st_bbox()
+grid.pred <- grid.pred %>% 
+  st_as_sf(coords=c("x","y"),crs=crs(dat_raster),remove = F) %>% 
+  st_crop(predbbox) %>% 
+  st_set_geometry(NULL)
+
+ggplot(grid.pred)+
+  geom_point(aes(utm.lon.km,utm.lat.km),size=0.5)+
+  coord_equal()
+```
+### Surface
+
+```{r}
+# coastline background map
+coast <- ne_states(country='United States of America',returnclass = 'sf') %>% 
+  filter(name %in% c('California','Oregon','Washington','Nevada')) %>%
+  st_transform(crs = crs(dat_raster))
+```
+
+```{r}
+psfc <- predict(fit,newdata=grid.pred)
+
+# p <- p %>% mutate(est_squish=ifelse(exp(est)>400,400,exp(est)))
+glimpse(psfc)
+
+sfc.preds.plot <- ggplot() + 
+  geom_raster(data=p, aes(x,y,fill = exp(est)))+
+  geom_sf(data=coast,col=NA,fill='gray80')+
+  scale_fill_viridis_b(breaks=c(0,1,2,5,100,500))+
+  labs(x="",y="",fill="copies")+
+  xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
+sfc.preds.plot
+```
+
+### 50m
+```{r}
+# data for surface samples
+dat.50 <- dat %>%
+  filter(depth_cat==50) %>% 
+  mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 
+  filter(!(is_inhibited=="Inhibited")) %>% 
+  filter(!is.na(utm.lat.m))
+
+# Make spde
+spde50 <- make_mesh(dat.50,xy_cols = c('utm.lon.km','utm.lat.km'), 
+                   cutoff = 20)
+```
+
+```{r}
+fit50 <- sdmTMB(
+  formula=as.formula(formula),
+  data = dat.50,
+  mesh = spde50,
+  family = tweedie(link = "log"),
+  spatial = "on"
+)
+```
+
+```{r}
+p50 <- predict(fit50,newdata=grid.pred)
+
+# p50 <- p50 %>% mutate(est_squish=ifelse(exp(est)>400,400,exp(est)))
+# glimpse(p50)
+p50.preds.plot <- ggplot() + 
+  geom_raster(data=p50, aes(x,y,fill = exp(est)))+
+  geom_sf(data=coast,col=NA,fill='gray80')+
+  scale_fill_viridis_b(breaks=c(0,1,2,5,100,500))+
+  labs(x="",y="",fill="copies")+
+  xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
+p50.preds.plot
+```
+
+### 150m
+```{r}
+# data for surface samples
+dat.150 <- dat %>%
+  filter(depth_cat==150) %>% 
+  mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 
+  filter(!(is_inhibited=="Inhibited")) %>% 
+  filter(!is.na(utm.lat.m))
+
+# Make spde
+spde150 <- make_mesh(dat.150,xy_cols = c('utm.lon.km','utm.lat.km'), 
+                   cutoff = 20)
+```
+
+```{r}
+fit150 <- sdmTMB(
+  formula=as.formula(formula),
+  data = dat.150,
+  mesh = spde150,
+  family = tweedie(link = "log"),
+  spatial = "on"
+)
+```
+
+```{r}
+p150 <- predict(fit150,newdata=grid.pred)
+
+# p50 <- p50 %>% mutate(est_squish=ifelse(exp(est)>400,400,exp(est)))
+# glimpse(p50)
+
+p150.preds.plot <- ggplot() + 
+  geom_raster(data=p150, aes(x,y,fill = exp(est)))+
+  geom_sf(data=coast,col=NA,fill='gray80')+
+  scale_fill_viridis_b(breaks=c(0,1,2,5,100,500))+
+  labs(x="",y="",fill="copies",title="Eulachon eDNA concentration, 150m")+
+  xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
+p150.preds.plot
+```
