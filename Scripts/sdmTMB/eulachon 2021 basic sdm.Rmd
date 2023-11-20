@@ -141,7 +141,7 @@ sfc.preds.plot <- ggplot() +
   geom_raster(data=p, aes(x,y,fill = exp(est)))+
   geom_sf(data=coast,col=NA,fill='gray80')+
   scale_fill_viridis_b(breaks=c(0,1,2,5,100,500))+
-  labs(x="",y="",fill="copies")+
+  labs(x="",y="",fill="copies",title="Eulachon eDNA concentration, surface")+
   xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
 sfc.preds.plot
 ```
@@ -179,7 +179,7 @@ p50.preds.plot <- ggplot() +
   geom_raster(data=p50, aes(x,y,fill = exp(est)))+
   geom_sf(data=coast,col=NA,fill='gray80')+
   scale_fill_viridis_b(breaks=c(0,1,2,5,100,500))+
-  labs(x="",y="",fill="copies")+
+  labs(x="",y="",fill="copies",title="Eulachon eDNA concentration, 50m")+
   xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
 p50.preds.plot
 ```
