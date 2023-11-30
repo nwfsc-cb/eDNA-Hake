@@ -85,7 +85,7 @@ First, we import "raw" forms of the data.
 
 ```{r import raw data}
 # Pull in qPCR data, qPCR standards, sample id information
-dat.all <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2023-02-10 results.csv'))
+dat.all <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2021-01-04 results.csv'))
 dat.stand <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2020-01-04 standards.csv'))
 dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2023-02-10 sample details.csv'))
 dat.station.id <- read_csv(here('Data','CTD_hake_data_10-2019.csv'))
@@ -513,12 +513,17 @@ Count samples and make sure there are enough for each qPCR
 stand.summary <- dat.stand %>% count(qPCR,copies_ul,name="N")
 glimpse(stand.summary)
 ```
+## Save
+```{r}
+write_rds(dat.stand,here('Data','eulachon qPCR 2019 standards cleaned 11_20_2023.rds'))
+```
+
 # Process Samples
 
 Organize the actual samples, including real samples, controls, and non-template controls
 ```{r}
 dat.samp <- dat.all %>% 
-  dplyr::select(qPCR,well,sample,IPC_Ct,inhibition_rate,task,Zymo,contains(SP)) %>%
+  dplyr::select(qPCR,well,sample,IPC_Ct,inhibition_rate,dilution,task,Zymo,contains(SP)) %>%
   rename(Ct=paste0(SP,"_Ct"),copies_ul = paste0(SP,"_copies_ul")) %>%
   mutate(Ct=ifelse(Ct=="",-99,Ct),
          Ct=ifelse(Ct=="Undetermined",-99,Ct),
@@ -552,7 +557,7 @@ dat.noID <- dat.samp %>% filter(is.na(station))
 
 #
 dat.samp <- dat.samp %>% 
-  dplyr::select(date,time,lat,lon,year,month,day,transect,qPCR,well,sample,IPC_Ct,inhibition_rate,task,Zymo,Ct,copies_ul,depth,depth_cat,station,Niskin,volume,bathy.bottom.depth,utm.lon.m,utm.lat.m,transect_dist_m)
+  dplyr::select(date,time,lat,lon,year,month,day,transect,qPCR,well,sample,IPC_Ct,inhibition_rate,dilution,task,Zymo,Ct,copies_ul,depth,depth_cat,station,Niskin,volume,bathy.bottom.depth,utm.lon.m,utm.lat.m,transect_dist_m)
 ```
 
 ## Save
@@ -807,14 +812,5 @@ qpcr_success <- dat.stand %>%
     method.args = list(family = "binomial"), 
     se = FALSE)
 qpcr_success
-```
-
-
-# Join Other Years
-
-Join the 2019 data, which was processed in a slightly different way:
-
-```{r}
-
 ```
 

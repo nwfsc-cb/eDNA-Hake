@@ -524,6 +524,13 @@ Count samples and make sure there are enough for each qPCR
 stand.summary <- dat.stand %>% count(qPCR,copies_ul,name="N")
 glimpse(stand.summary)
 ```
+
+## Save
+```{r}
+write_rds(dat.stand,here('Data','eulachon qPCR 2021 standards cleaned 11_20_2023.rds'))
+```
+
+
 # Process Samples
 
 Organize the actual samples, including real samples, controls, and non-template controls

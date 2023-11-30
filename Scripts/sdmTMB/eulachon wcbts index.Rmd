@@ -1,0 +1,170 @@
+---
+title: "Eulachon WCBTS index"
+author: "Owen R. Liu"
+date: "2023-11-21"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sdmTMB)
+library(nwfscSurvey)
+library(terra)
+library(tidyverse)
+library(lubridate)
+library(rnaturalearth)
+library(sf)
+library(viridis)
+library(here)
+knitr::opts_chunk$set(echo = TRUE)
+options(dplyr.summarise.inform=FALSE)
+
+plot_theme <- theme_minimal()+theme(panel.border = element_rect(color='black',fill=NA))
+theme_set(plot_theme)
+```
+
+# Purpose
+
+Set up a quick sdmTMB-based index of spatial abundance for eulachon, utilizing WCBTS data.
+
+# Find Data
+
+Download eulachon data from the FRAM data warehouse
+
+```{r}
+# pull the data
+trawlraw <- PullCatch.fn(Name="eulachon",SurveyName = "NWFSC.Combo")
+# organize and rename some variables
+trawl <- trawlraw %>% 
+  # convert date from character to date
+  mutate(date=as_date(Date),
+         Trawl_id=as.numeric(Trawl_id)) %>% 
+  # clean up some other columns to be consistent
+  mutate(species=tolower(Common_name)) %>% 
+  rename(year=Year,depth_trawl=Depth_m) %>% 
+  dplyr::select(year,date,depth_trawl,lon=Longitude_dd,lat=Latitude_dd,cpue_kg_km2)
+```
+## Distribution of Samples
+
+```{r}
+# crop to general areas that have had positive observations at some point in the past
+trawl_crop <- trawl %>% 
+  filter(cpue_kg_km2>0)
+trawl %>%
+  sample_n(5000) %>% 
+  ggplot(aes(lon,lat))+
+  geom_point(size=0.5)+
+  coord_equal()+
+  ggtitle("Extent of All Samples")
+
+trawl_crop %>%
+  ggplot(aes(lon,lat))+
+  geom_point(size=0.5)+
+  coord_equal()+
+  ggtitle("Positive Samples")
+```
+
+
+# Model Setup
+
+Set up the parameters and options for sdmTMB
+
+## 5km Grid
+
+```{r}
+# Blake's raster with just grid cell ID numbers
+dat_raster=rast(here('Data','raster_grid_blake','fivekm_grid.tif'))
+
+# Depth associated with grid cell IDs
+raster_depth <- read_csv(here('Data','raster_grid_blake','weighted_mean_NGDC_depths_for_5km_gridcells.csv')) %>% 
+  rename(depth_m=WM_depth_m)
+
+# join depths to cell numbers
+cellnums <- tibble(rastID=as.numeric(values(dat_raster))) %>% 
+  mutate(rastcell=row_number()) %>% 
+  left_join(raster_depth,by=c("rastID"="Gridcell_ID"))
+
+# make bathy raster
+rast_depth <- setValues(dat_raster,cellnums$depth_m)
+plot(rast_depth)
+```
+
+```{r}
+# convert trawl data to sf and project to Blake's CRS
+trawlsf <- trawl %>% 
+  st_as_sf(coords=c("lon","lat"),crs=4326) %>% 
+  st_transform(crs(dat_raster))
+# add projected coords to original data
+trawl <- trawl %>% 
+  mutate(x=st_coordinates(trawlsf)[,1],y=st_coordinates(trawlsf)[,2])
+
+# as a tibble for prediction
+grid.pred <- as.data.frame(rast_depth,xy=T) %>% 
+  mutate(depth_trawl=fivekm_grid)
+# reduce to a bounding box that matches the mesh
+predbbox <- trawlsf %>%
+  st_bbox()
+
+grid.pred <- grid.pred %>% 
+  st_as_sf(coords=c("x","y"),crs=crs(dat_raster),remove = F) %>% 
+  st_crop(predbbox) %>% 
+  st_set_geometry(NULL)
+
+ggplot(grid.pred)+
+  geom_point(aes(x,y),size=0.5)+
+  coord_equal()
+```
+
+```{r}
+# Make spde
+spde <- make_mesh(trawl,xy_cols = c('x','y'), 
+                   cutoff = 20)
+# model formula
+formula <- "cpue_kg_km2 ~ s(depth_trawl)"
+```
+
+## Fit
+
+Fit a model for the surface samples with spatial RFs on
+
+```{r}
+fit <- sdmTMB(
+  formula=as.formula(formula),
+  data = trawl,
+  mesh = spde,
+  family = tweedie(link = "log"),
+  spatial = "on"
+)
+# some summaries
+fit
+tidy(fit,conf.int = T)
+tidy(fit, effects = "ran_pars", conf.int = TRUE)
+sanity(fit)
+```
+
+
+## Predict
+
+```{r}
+# coastline background map
+coast <- ne_states(country='United States of America',returnclass = 'sf') %>% 
+  filter(name %in% c('California','Oregon','Washington','Nevada')) %>%
+  st_transform(crs = crs(dat_raster))
+```
+
+```{r}
+preds <- predict(fit,newdata=grid.pred)
+
+glimpse(preds)
+
+preds.plot <- ggplot() + 
+  geom_raster(data=preds, aes(x,y,fill = exp(est_non_rf)))+
+  geom_sf(data=coast,col=NA,fill='gray80')+
+  # scale_fill_viridis_b(breaks=c(0,0.01,0.1,0.2,0.3))+
+  labs(x="",y="",fill="kg/km2",title="Eulachon density")+
+  xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
+preds.plot
+```
