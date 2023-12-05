@@ -14,6 +14,8 @@ library(rgdal)
 library(sp)
 library(brms)
 library(loo)
+options(dplyr.summarise.inform = FALSE)
+
 ###########################################################################
 ## DECLARED SPECIES OF INTEREST
 SP <- "hake" # options: hake, lamprey, eulachon
@@ -48,7 +50,9 @@ script.dir <- paste0(base.dir,"/Scripts")
 setwd(data.dir)
 dat.all <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
 dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.csv")
-dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2021-07-15 sample details.csv")
+dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2021-07-15 sample details.csv") %>%
+                      filter(!grepl("exct",Tube..)) %>%
+                      filter(!grepl("extc",Tube..))
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
 # load and run the acoustic data. this is needed to reference the offshore-ness of 
@@ -57,8 +61,8 @@ source("process acoustic data for qPCR.R",local=T)
 # dat.acoustic and dat.acoustic.binned are the relevant data frames
 
 # Pull in posterior for wash_offset derived from hake
-setwd(paste0(base.dir,"Stan Model Fits/"))
-wash_offset_hake <- read.csv("wash_offset_hake.csv") 
+# setwd(paste0(base.dir,"Stan Model Fits/"))
+# wash_offset_hake <- read.csv("wash_offset_hake.csv") 
 ######################################################
 if(MODEL.TYPE == "Base"){
   TRIM.25 <- FALSE
@@ -138,7 +142,7 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
                                                   volume = water.filtered.L,
                                                   Fluor,
                                                   Zymo=Zymo.columns)
-
+                              
   
   ##################################################3
   ##################################################3
@@ -160,11 +164,11 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
   #######
   # Use a projection derived by Blake.
     ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
-  PROJ.txt <- dat_raster@crs %>% as.character()
+  PROJ.txt <- crs(dat_raster)
   proj      <- SpatialPointsDataFrame(coords = dat.station.id.trim %>% ungroup() %>% dplyr::select(lon,lat),
                                       data=dat.station.id.trim,
                                       proj4string = CRS("+proj=longlat"))
-  proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+  proj.utm <- spTransform(proj, CRSobj = CRS(as.character(PROJ.txt)))
   
   dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
   
@@ -278,7 +282,6 @@ dat.samp <- dat.samp %>% mutate(vol.standard = volume/2.5)
 
 # drop samples that hit the bench top
 dat.samp <- dat.samp %>% filter(!drop.sample %in% c("Y","Y?"))#,!useful=="NO") 
-
 dat.samp.begin <- dat.samp %>% group_by(sample) %>% summarise(N=length(sample)) %>% as.data.frame()
 
 ### CHECK THE SAMPLES THAT HAD TROUBLE WITH WASHING (drop.sample == "30EtOH" or "30EtOHpaired")
@@ -614,6 +617,7 @@ if(MODEL.TYPE == "lat.long.smooth"){
   
   smooth.dat <- standata(brms.object)
   code.dat   <- stancode(brms.object)
+  
   # THIS IS THE MAGIC SAUCE FOR MAKING PREDICTIONS ON THE SAME SET OF BASIS FUNCTIONS.
   #    new.dat <- data.frame(Y = rep(0,3),bottom.depth = Q$bottom.depth[1:3])
   #    smooth.dat.pred <- standata(brms.object,newdata=new.dat)

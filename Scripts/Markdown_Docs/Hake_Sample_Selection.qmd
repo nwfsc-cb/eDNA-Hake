@@ -1,0 +1,570 @@
+---
+title: "MURI hake sample selection"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: A. O. Shelton
+format: 
+  html: 
+    self-contained: true
+    toc: true
+  pdf: 
+    toc: true
+    include-in-header:
+      - text: |
+          \usepackage{subfig}
+          \usepackage{pdflscape}
+          \newcommand{\blandscape}{\begin{landscape}}
+          \newcommand{\elandscape}{\end{landscape}}
+  docx:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+### Libraries
+library(tidyverse)
+library(knitr)
+library(reshape2)
+library(viridis)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(sp)
+library(gstat)
+library(ggplot2)
+library(sf)
+#library(brms)
+library(ggsci)
+library(gridExtra)
+library(cowplot)
+library(here)
+```
+
+# Initial Sample Selection (Feb. 2023)
+
+## Samples from 2019
+
+This is a short document identifying the samples identified for use in the first phase of the MURI project. These samples will be used in the initial application of the fish (MiFish) and marine mammal (D-LOOP) metabarcoding primers. We decided to begin with samples near the surface (3m and 50m depth) and to shoot for 45 individual samples at each depth as an exploratory set.
+
+```{r call_make_maps,message=FALSE,warning=FALSE,echo=FALSE}
+ramon_loc <- read.csv("ramon_locations_Final_metadata.csv")
+
+# pull in relevant data on samples and make maps
+source("../_make_maps_hake_survey.R")
+
+setwd(script.dir)
+samp_vol_2019 <- read.csv("../Data/Hake eDNA 2019 qPCR results 2023-02-10 sample details.csv")
+plate_id <- read.csv("../Data/qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
+
+```
+
+```{r muri_samples,message=FALSE,warning=FALSE,echo=FALSE}
+# Make MURI samples.  Pull the data used in the final Hake model north of 46 N (WA state) from 2019
+dat.station.max.depth <- Output.qpcr$dat.obs.bin %>% 
+                            dplyr::select(station,depth_cat_factor,bottom.depth.consensus) %>%
+                            mutate(depth.2 = as.numeric(as.character(depth_cat_factor))) %>%
+                            group_by(station,bottom.depth.consensus) %>%
+                            summarise(max.depth=max(bottom.depth.consensus,na.rm=T)) %>%
+                            rename(CTD.cast = station)
+                            
+dat.muri <- dat.all %>% filter(source=="Hake") %>% left_join(.,dat.station.max.depth)
+
+# pull sample numbers out of the big data frame
+samps <- Output.qpcr$dat.obs.bin  %>% 
+        filter(year==2019,
+                    lat>46.2,
+                    station %in% dat.muri$CTD.cast,
+                    depth_cat %in% c(0,50)) %>%
+        group_by(sample) %>% 
+        mutate(inhibit_mean=mean(inhibit.val)) %>%
+        distinct(year,sample,station,depth_cat,inhibit_mean,dilution) %>%
+        arrange(station,depth_cat,sample) %>%
+        left_join(.,dat.muri %>% dplyr::select(station=CTD.cast,Latitude,Longitude,bottom.depth.consensus))
+                                        
+#0 0Make a map of all the Hake stations in 2019
+eDNA.map.hake.muri <-  base_map_trim_2022 +
+  geom_point(data=dat.all %>% filter(source=="Hake",Year==2019),
+             aes(x=Longitude,y=Latitude),shape=21,alpha=0.5,color="black",size=0.8) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake"),
+  #            aes(x=Longitude,y=Latitude,color=bottom.depth.consensus),alpha=0.75) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
+  scale_color_viridis_c("Depth",option = "plasma", begin=0,end=0.7) +
+  facet_wrap(~Year)
+#eDNA.map.hake.muri
+
+lat.lims.trim.proj.hake.wa <- c(46,48.4)
+lon.lims.trim.proj.hake.wa <- c(lon.lims.trim.proj.hake[1],-123)
+
+# Map of all WA stations in just 0 of 50m sampling depths.
+eDNA.map.hake.muri.wa <-  base_map_trim_2022 +
+  geom_point(data=samps,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+#eDNA.map.hake.muri.wa
+
+N_station <- samps %>%ungroup() %>% distinct(station) %>% nrow()
+N_station_0 <- samps %>%ungroup() %>% filter(depth_cat==0) %>% distinct(station) %>% nrow()
+N_station_50 <- samps %>%ungroup() %>% filter(depth_cat==50) %>% distinct(station) %>% nrow()
+
+```
+
+We can present all of the sample locations for 2019, 2021 and 2022 (Fig. \ref{fig:all_samples}).
+
+```{r fig_all_samples,message=FALSE,warning=FALSE,echo=FALSE,fig.cap="\\label{fig:all_samples} The locations of eDNA samples from three years of CTD collections from the hake acoustic-trawl survey.",out.height='6in'}
+# present all hake samples and maps
+print(eDNA.map.hake.mod)
+```
+
+Let's focus in on 2019 and focus in on sites north of 46.2 degrees latitude (off Washington state). There are `r N_station` stations in this area (with `r N_station_0` stations at the surface and `r N_station_50` at 50m; Fig. \ref{fig:map_0_50}). In total there are `r nrow(samps)` water samples from these sites at 0 and 50m. Many of the surface samples were diluted for use with the hake qPCR (Fig. \ref{fig:map_0_50}) with some stations having one of two replicates diluted and others having both replicates diluted.
+
+From this set of samples, we are looking to include 90-ish total samples for preliminary analysis or approximately 45 from each depth. This leaves some space on a single plate for controls. To trim down from `r nrow(samps)` individual water samples we will select a single water sample station which gets us to `r N_station_0 + N_station_50` samples, and leaves us to remove `r N_station_0 + N_station_50 - 90` samples to get to 90. Dropping one station from the middle of each line will get us there.
+
+```{r fig.map_0_50 , echo=FALSE,fig.cap="\\label{fig:map_0_50} Samples from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not.",out.width='100%'}
+print(eDNA.map.hake.muri.wa)
+```
+
+```{r cull_muri_samples,message=FALSE,warning=FALSE,echo=FALSE}
+
+samps <- samps %>% mutate(keep=1) %>%
+              mutate(keep=case_when(station=="71-3"~ 0,
+                                    station=="73-4"~ 0,
+                                    station=="75-4"~ 0,
+                                    station=="77-4"~ 0,
+                                    station=="79-4"~ 0,
+                                    station=="81-3"~ 0,
+                                    station=="83-7"~ 0,
+                                    station=="85-14"~ 0,
+                                    TRUE~keep))
+                                    
+eDNA.map.hake.muri.wa.trim <-  base_map_trim_2022 +
+  geom_point(data=samps,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  geom_point(data=samps %>%filter(keep==0),
+             aes(x=Longitude,y=Latitude),color="red",alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+
+samps.trim <- samps %>% filter(keep==1)
+```
+
+```{r fig.map_0_50_trim , echo=FALSE,fig.cap="\\label{fig:map_0_50_trim} Samples from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not. Red points identify stations proposed to be dropped",out.width='100%'}
+print(eDNA.map.hake.muri.wa.trim)
+```
+
+The dropped lines are in the middle of each transect and most fall approximately along the shelf break, generally at either 300m or 500m bottom depth. Taking one sample from each station at each depth in Fig. \ref{fig:map_0_50_trim} results in `r samps.trim %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` samples (`r samps.trim %>% filter(depth_cat==0) %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` at the surface and `r samps.trim %>% filter(depth_cat==50) %>% ungroup() %>% distinct(station,depth_cat) %>% nrow(.)` at 50m). Here is a plot of the chosen stations by depth (Fig. \ref{fig:map_0_50_fin_ramon}). The only other person that has used substantial numbers of the 2019 samples is Ramon. I have outline in red the samples that I believe Ramon used in his metabarcoding work. There is relatively limited overlap with the proposed set of stations and depths (Fig. \ref{fig:map_0_50_fin_ramon}).
+
+Among samples that were diluted, there should be three levels of dilution - 1:2, 1:5, and 1:10. Only 1:5 dilution data were used in the 2021 hake paper, but the other dilutions should be available.
+
+```{r muri_stations,message=FALSE,warning=FALSE,echo=FALSE}
+eDNA.map.hake.muri.wa.trim2 <-  base_map_trim_2022 +
+  geom_point(data=samps.trim,
+             aes(x=Longitude,y=Latitude,color=as.factor(dilution)),alpha=0.5) +
+  # geom_point(data=samps %>%filter(keep==0),
+  #            aes(x=Longitude,y=Latitude),color="red",alpha=0.5) +
+  # geom_point(data=dat.muri %>% filter(source=="Hake",max.depth>150),
+  #            aes(x=Longitude,y=Latitude,color=max.depth),alpha=0.75,color="red") +
+  coord_fixed(xlim=lon.lims.trim.proj.hake.wa,ylim=lat.lims.trim.proj.hake.wa,ratio=1.2) +
+  scale_color_viridis_d("Dilution",option = "plasma", begin=0,end=0.8) +
+  facet_wrap(~depth_cat)
+
+```
+
+```{r ramon_stations,message=FALSE,warning=FALSE,echo=FALSE}
+ramon_loc_samp <- ramon_loc %>% dplyr::select(sample = eDNA.sample,
+                                              station = Station) %>%
+                      mutate(ramon_16S = 1)
+
+samps.trim <- samps.trim %>% mutate(sample = as.character(sample)) %>%
+                    left_join(., ramon_loc_samp %>% mutate(sample = as.character(sample))) %>%
+                    mutate(ramon_16S = ifelse(is.na(ramon_16S),0,ramon_16S))
+    
+
+eDNA.map.hake.muri.wa.trim3 <-  eDNA.map.hake.muri.wa.trim2 +
+                geom_point(data=samps.trim %>% filter(ramon_16S==1),
+                        aes(x=Longitude,y=Latitude),color="red",shape=21,alpha=0.5) 
+
+```
+
+```{r fig.map_0_50_fin_ramon , echo=FALSE,fig.cap="\\label{fig:map_0_50_fin_ramon} Stations from the 2019 hake cruise in Washington state waters at the surface and 50m depth. Colors indicate whether those samples were undiluted (1) or 1:5 diluted (0.2) in the qPCR included in hake analysis in 2019. Intermediate colors indicate that one of the replicate Niskin sample was diluted but the other was not. Excluded stations not shown. Samples used by Ramon are outlined in red.",out.width='100%'}
+print(eDNA.map.hake.muri.wa.trim3)
+```
+
+## Identifying samples
+
+Now that we have the stations identified (Fig. \ref{fig:map_0_50_fin_ramon}) we need to identify the sample to use at each station. I have been using two criteria to identify these samples: 1) We will use samples that have a lot of sample remaining, so that multiple kinds of analyses can be run on a single sample; 2) We will prefer using undiluted to diluted samples from a given station because we are concerned about finding rare taxa.
+
+This identification of samples that were used by Ramon is still tentative, but I plan on updating it as soon as I get the necessary info. The list is presented in Table 1. All of these samples putatitvely have more the 60$\mu L$ available, this does include the amount of sample used during Ramon's analysis.
+
+Abi has informed me that there are 6 additional samples from 2022 that were collected during times in which marine mammals were observed from the ship. I would suggest including those samples during the metabarcoding run as well.
+
+```{r remaining_samples,message=FALSE,warning=FALSE,echo=FALSE}
+# Add Abi's estimate of remaining sample volume after accounting for only the qPCR processing.
+samp_vol_2019 <- samp_vol_2019 %>% rename(sample=Tube..,station=CTD.cast) %>%
+                          dplyr::select(sample,station,
+                                        Vol.Used.TransferLosses,
+                                        Vol.Used.Hake.qPCR,
+                                        Vol.Used.Ramon,
+                                        Volume)
+samps.trim <- samps.trim %>% 
+                    left_join(., samp_vol_2019)
+                    
+samps.trim <- samps.trim %>%
+                rename(vol_remain_after_qPCR = Volume) %>%
+                dplyr::select(sample, dilution,
+                              station,
+                              year,
+                              depth_cat,
+                              ramon_16S,
+                              vol_remain_after_qPCR)
+
+# Find the distinct sample-depth combinations
+dist.samp.depth <- samps.trim %>% 
+                      group_by(year,station,depth_cat) %>%
+                      summarise(max.vol = max(vol_remain_after_qPCR),
+                                min.vol = min(vol_remain_after_qPCR))
+
+samps.filt <- left_join(dist.samp.depth,samps.trim) %>% 
+                  filter(max.vol==vol_remain_after_qPCR | is.na(max.vol)) %>% # Only gets rid of a few samples.
+                  ungroup() %>% mutate(sample = as.numeric(sample)) %>%
+                  group_by(year,station,depth_cat) %>%
+                  summarise(sample.keep = min(sample))
+
+samps.keep <- samps.trim %>% filter(sample %in% samps.filt$sample.keep) %>%
+                      #left_join(dist.samp.depth,.) %>% # add back in samples with NA for volumes
+                      dplyr::select(year,sample,station,depth_cat,
+                                    dilution,vol_remain =vol_remain_after_qPCR,
+                                    ramon_16S)
+```
+
+Many of the surface samples were inhibited and diluted for use in the hake qPCR assay. It is not clear whether the diluted or undiluted make more sense to use in the metabarcoding analysis, so I propose using a subset of samples in these pilot runs to explore the value of running diluted vs. undiluted DNA extract. There are currently `r samps.keep %>% filter(dilution ==0.2) %>% distinct(sample,station) %>% nrow(.)` samples in our set that are diluted. I propose using the 12 northern-most of these samples to run at both undiluted and 1:5 dilution in our first round of metabarcoding.
+
+```{r remaining_samples_2,message=FALSE,warning=FALSE,echo=FALSE}
+dup <- samps.keep %>% filter(dilution ==0.2) %>% 
+          distinct(sample,station) %>% arrange(desc(station))
+dup <- dup[1:12,]
+keepers <- samps.keep %>% filter(sample %in% c(dup$sample)) %>% mutate(dilution = 1)
+
+samps.keep <- bind_rows(samps.keep,keepers) %>% arrange(year,station,sample,dilution)
+
+write.csv(samps.keep,file="2019_hake_samples_MURI_pilot_2023-02.csv")
+
+```
+
+With these twelve samples included twice (once undiluted, once diluted 1:5), we are at `r samps.keep %>% nrow(.)` samples in total. Which is pretty close to the initial target of 90 samples. I print the samples of interest below, and in the csv ("2019_hake_samples_MURI_pilot_2023-02.csv"). Unfortunately, I do not have the location of the samples on the storage plates in this data frame, but they can be found in the file "Hake eDNA 2019 qPCR and results" in the "plates layout" tab in the google drive.
+
+### Outstanding issues and notes
+
+1.  Need to add information about other analyses that has used these samples to date, if any.
+
+\clearpage
+
+```{r make_table_remaining_samples,message=FALSE,warning=FALSE,echo=FALSE}
+kable(samps.keep,#label= "tab:samples",
+       caption = "This is a table of samples that seem like samples to target for the pilot application of the D-LOOP and MiFish primers. This includes 12 samples used twice (once undiluted, once diluted 1:5).")
+```
+
+\clearpage
+
+# Second Sample Selection (Oct. 2023)
+
+The above described the initial samples selected to examine with metabarcoding. They were run with the D-Loop, MiFish, and Ceph primers. MiFish (targeting fish) appeared to be work relatively well. D-Loop (targeting cetaceans) detected some cetaceans but also amplified a bunch of off-target species (predominantly bacteria). I haven't heard much about how the cephalopod primer worked.
+
+Anyway, we are ready to start identifying a broader set of samples with the aim of immediately applying the MiFish primer to these samples and, after some fine tuning, to apply the D-LOOP primer to these samples as well.  Based on a discussion with Kim and Megan, we proposed to identify further samples for analysis using the following criteria.
+
+1.    Focus on samples at a couple depths across spatial extent in a single year.
+2.    For a subset of stations, run samples across the range of available depths, just to have some depth profiles.
+3.    Use water from only one Niskin replicate at each station.
+
+These are just the criteria talked about.  If you have think other samples should be examined, great. Just let us know.
+
+Based on the above criteria, and the fact that we have already run some of the 2019 samples, we're going to focus on just the 2019 samples. Here is a map of the 2019 samples by depth with the samples that have already been run highlighted.
+
+```{r make_2019_plots_1,message=FALSE,warning=FALSE,echo=FALSE}
+
+lat.lims.trim.proj.hake.2019 <- c(37.5,48.4)
+
+samp.2019 <- Output.qpcr$dat.obs.bin  %>% 
+        filter(year==2019,
+                    station %in% dat.muri$CTD.cast) %>%
+        group_by(sample) %>% 
+        mutate(inhibit_mean=mean(inhibit.val)) %>%
+        distinct(year,sample,station,depth_cat,inhibit_mean,dilution) %>%
+        arrange(station,depth_cat,sample) %>%
+        left_join(.,dat.muri %>% dplyr::select(station=CTD.cast,Latitude,Longitude,bottom.depth.consensus))
+
+samp.2019 <- samps.keep %>% dplyr::select(year,sample,station,depth_cat,dilution) %>% 
+                mutate(MiFish = "Yes") %>% 
+                left_join(samp.2019,.) %>%
+                replace_na(list(MiFish="No"))
+
+eDNA.by.depth<- base_map_trim_2022 +
+                geom_point(data=samp.2019,aes(x=Longitude,y=Latitude,fill = MiFish,color=MiFish),alpha=0.3, size=1) +
+                scale_color_discrete(type=c("red","blue")) +
+                coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj.hake.2019,ratio=1.2) +
+                facet_wrap(~depth_cat,nrow=2)
+```
+
+
+```{r fig.map.by.depth , echo=FALSE, fig.height=8}
+#| label: fig-eDNA.by.depth
+#| fig-cap: "Location of samples faceted by sample depth and if a sample has already been run using the MiFish primer."
+#| 
+print(eDNA.by.depth)
+```
+
+
+And here are the sample locations that have not had any samples run as yet
+
+```{r make_2019_plots_2,message=FALSE,warning=FALSE,echo=FALSE}
+
+
+samps.keep <- samps.keep %>% mutate(depth.station = paste0(depth_cat,station))
+samp.2019.trim <- samp.2019 %>% mutate(depth.station = paste0(depth_cat,station)) %>%
+                      filter(!depth.station %in% samps.keep$depth.station)
+                
+eDNA.by.depth.unsamp<- base_map_trim_2022 +
+                geom_point(data=samp.2019.trim,
+                          aes(x=Longitude,y=Latitude,fill = MiFish,color=MiFish),alpha=0.3, size=1) +
+                scale_color_discrete(type=c("red","blue")) +
+                coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj.hake.2019,ratio=1.2) +
+                facet_wrap(~depth_cat,nrow=2)
+```
+
+```{r fig.map.by.depth.unsamp , echo=FALSE, fig.height=8}
+#| label: fig-eDNA.by.depth.unsamp
+#| fig-cap: "Location of samples faceted by sample depth. Only stations that have not been run shown."
+#| 
+print(eDNA.by.depth.unsamp)
+```
+
+```{r make_2019_n_distinct,message=FALSE,warning=FALSE,echo=FALSE}
+
+N_dist <- samp.2019.trim %>% group_by(depth_cat) %>% summarise(n_distinct(depth.station)) 
+colnames(N_dist) <- c("Depth Category (m)","Distinct Stations")
+
+kable(N_dist,#label= "tab:samples",
+       caption = "This is the number of distinct stations that remain unsampled at each depth for 2019.")
+
+```
+
+
+If we take one sample from each unsampled station at the surface, 50m, and 150m, that is `r 139+138+149` samples or about 4.5 plates (95ish wells per plate) of samples. That leaves about 50 spaces from other depths to get to 5 plates.  If we did surface, 50m, and 300m, that is `r 139+138+120` samples, leaving about 80 spaces for other depths. As predominantly a fish person, I'd lean toward using the 150m depth, but I know there is some idea that beaked whales loiter in the 200-300m depth range and so maybe we should do the 300m and about half (~75) of the 150m deep samples to get to 5 plates.
+
+Below, I made two maps of potential samples & depths to run. These are just mock-ups, so if someone wants to propose other criteria for running these samples, please let me know. Both of the scenarios below have about 475 samples.
+
+Questions:
+
+1.    Is there any reason we want to do fewer than 5 plates.
+2.    Are there economies of scale such that we should get all of the samples out at once (i.e. choose samples for each station-depth at one time even if we aren't going to run them immediately)?
+3.    Right now I haven't included any 500m deep samples.  But we could add some if there was interest.
+
+
+
+```{r make_2019_plots_3,message=FALSE,warning=FALSE,echo=FALSE}
+### Create identifiers for depth categories, way to find the west most station on a transect
+### way to filter stations by the maximum bottom depth of the transect.
+samp.2019.trim <- samp.2019.trim %>% 
+                mutate(samp.0.50.150 = if_else(depth_cat %in% c(0,50,150),"Yes","No"),
+                samp.0.50.300 = if_else(depth_cat %in% c(0,50,300),"Yes","No")) %>%
+                group_by(station) %>% mutate(max.depth = max(depth_cat) ) %>%
+                ungroup() %>% mutate(trans = substr(station,1,2)) %>% group_by(trans) %>% 
+                mutate(min.lon = min(Longitude)) %>% ungroup() %>%
+                mutate(west.station = ifelse(Longitude == min.lon,"Yes","No"))
+
+# repeat for 150
+sing.samp <- samp.2019.trim %>% filter(samp.0.50.300 =="Yes") %>%
+              group_by(station,depth_cat) %>% summarise(sample = min(sample)) %>%
+              mutate(keep = "Yes")
+
+# Choose half of the 150 stations for inclusion with the 300 meter samples,
+# Exclude sites where maximum depth <= 150m
+samp.150 <- samp.2019.trim %>% filter(max.depth>150,depth_cat==150) %>% 
+                  group_by(station,depth_cat) %>% summarise(sample = min(sample))
+
+set.seed(101)  
+THESE <- sample(nrow(samp.150),75)
+samp.150$keep = "No" 
+samp.150$keep[THESE] = "Yes"
+
+sing.samp <- rbind(sing.samp,samp.150)
+
+samp.2019.scen1 <- samp.2019.trim %>% left_join(.,sing.samp) %>%
+                      mutate(keep = if_else(is.na(keep),"0",keep)) %>%  
+                      mutate(samp.0.50.300 = if_else(keep =="Yes" ,"Yes","No")) %>%
+                      dplyr::select(-keep, -samp.0.50.150,-depth.station) %>%
+                      filter(samp.0.50.300 == "Yes")
+
+# repeat for 300
+sing.samp <- samp.2019.trim %>% filter(samp.0.50.150 =="Yes") %>%
+              group_by(station,depth_cat) %>% summarise(sample = min(sample)) %>%
+              mutate(keep = "Yes")
+
+# Choose half of the 300 stations for inclusion with the 150 meter samples
+samp.300 <- samp.2019.trim %>% filter(depth_cat==300) %>% 
+                  group_by(station,depth_cat) %>% summarise(sample = min(sample))
+
+set.seed(101)  
+THESE <- sample(nrow(samp.300),50)
+samp.300$keep = "No" 
+samp.300$keep[THESE] = "Yes"
+                     
+sing.samp <- rbind(sing.samp,samp.300)
+
+samp.2019.scen2 <- samp.2019.trim %>% left_join(.,sing.samp) %>%
+                      mutate(keep = if_else(is.na(keep),"0",keep)) %>%  
+                      mutate(samp.0.50.150 = if_else(keep =="Yes" ,"Yes","No")) %>%
+                      dplyr::select(-keep,-samp.0.50.300,-depth.station) %>% 
+                      filter(samp.0.50.150 == "Yes")
+                      
+eDNA.by.depth.2023.scen1 <- base_map_trim_2022 +
+                geom_point(data=samp.2019.scen1,
+                          aes(x=Longitude,y=Latitude,color = samp.0.50.300),alpha=0.3, size=1) +
+                scale_color_discrete("Run Sample",type=c("red")) +
+                coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj.hake.2019,ratio=1.2) +
+                facet_wrap(~depth_cat,nrow=2)
+
+eDNA.by.depth.2023.scen2 <- base_map_trim_2022 +
+                geom_point(data=samp.2019.scen2,
+                          aes(x=Longitude,y=Latitude,color = samp.0.50.150),alpha=0.3, size=1) +
+                scale_color_discrete("Run Sample",type=c("blue")) +
+                coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj.hake.2019,ratio=1.2) +
+                facet_wrap(~depth_cat,nrow=2)
+```
+
+
+```{r fig.map.by.depth.scen1 , echo=FALSE, fig.height=8}
+#| label: fig-eDNA.by.depth.scenario1
+#| fig-cap: "Scenario 1: Sample all locations at the surface, 50m and 300m, about half (75) of the stations at 150m. The samples at 150 have been arbitrarily selected in this map.  We could certainly select sample on other criteria (e.g. only take samples occuring in 300m+ deep water) if people have strong opinions"
+#| 
+print(eDNA.by.depth.2023.scen1)
+```
+
+
+```{r fig.map.by.depth.scen2 , echo=FALSE, fig.height=8}
+#| label: fig-eDNA.by.depth.scenario2
+#| fig-cap: "Scenario 2: Sample all locations at the surface, 50m and 150m, about one-third (50) of the stations at 300m. The samples at 300 have been arbitrarily selected in this map.  We could certainly select samples using additional criteria."
+#| 
+print(eDNA.by.depth.2023.scen2)
+```
+
+
+## New Scenarios (11/13/2023)
+
+After talking through the above maps with Kim, Ryan, Megan, and others, we decided to focus on the surface samples plus a set of samples where we can look at the full depth profile. So here are new maps based on the following criteria:
+
+1.    One biological replicate from each surface station. (139 samples)
+2.    One biological replicate from each 50m deep station EXCEPT those where the bottom depth is 50m (i.e. only include more offshore samples). (115 samples)
+3.    One biological replicate from a subset of station where there are samples from 150m, 300m and 500m bottom depths. This excludes samples from on the continental shelf / slope from water depths of between 150m and 300m. (~74 stations means 3 $\times$ 74 samples = 222 samples).
+4.  TOTAL SAMPLES = `r 139+115+3*74`
+
+In practice this means that we are sampling from about 70/% of the deep water sampling stations (74 of 105)
+Here's what that looks like on a map.  I right now I have just randomly selected stations to include. If you think an area of spatial interest has been missed, lemme know and we can manually select different locations that seem important (Fig. \ref{fig-eDNA.by.depth.scenario3}).
+
+
+```{r make_2019_plots_4,message=FALSE,warning=FALSE,echo=FALSE}
+
+# Merge in info on remaining sample (this only gets rid of a few samples)
+samp.2019.trim <- samp.2019.trim %>% left_join(.,samp_vol_2019) %>%
+                      group_by(station,depth_cat,year) %>% mutate(min.vol = min(Volume)) %>%
+                      filter(Volume == min.vol)
+
+# Otherwise pick first sample chronologically.
+a.0 <- samp.2019.trim %>% filter(depth_cat ==0) %>%
+              group_by(station,dilution,depth_cat) %>% summarise(sample = min(sample))
+a.50 <- samp.2019.trim %>% filter(depth_cat ==50,max.depth>50) %>%
+              group_by(station,depth_cat) %>% summarise(sample = min(sample))
+a.deep.tmp <- samp.2019.trim %>% filter(max.depth>300,depth_cat>=150)
+
+distinct.west <- a.deep.tmp %>% filter(west.station == "Yes") %>%
+                      group_by(station,depth_cat) %>% summarise(sample = min(sample))
+
+# how many in each depth: (33)
+# distinct.west %>% group_by(depth_cat) %>% summarise(length(depth_cat)) 
+
+
+# Get rid of west most stations
+a.stat    <- a.deep.tmp %>% filter(west.station == "No") %>% 
+                  group_by(station,depth_cat) %>% summarise(sample = min(sample)) %>%
+                  distinct(station)
+set.seed(91)  
+THESE <- sample(nrow(a.stat),74-33) ### 33 is the number of west most stations.
+
+a.stat <- a.stat[THESE,]
+
+a.deep <- a.deep.tmp %>% filter(west.station == "No") %>% 
+                  group_by(station,depth_cat) %>% summarise(sample = min(sample)) %>%
+                  filter(station %in% a.stat$station) %>% bind_rows(.,distinct.west)
+
+samp.2019.scen3 <- samp.2019.trim %>% filter(sample %in% c(a.0$sample,a.50$sample,a.deep$sample)) %>%
+                    mutate(scen.3 = "Yes")
+
+samp.2019.scen3 <- samp.2019.scen3 %>% mutate(sample=as.numeric(sample)) %>%
+                      arrange(sample,station,depth_cat)
+
+
+eDNA.by.depth.2023.scen3 <- base_map_trim_2022 +
+                geom_point(data=samp.2019.trim,
+                          aes(x=Longitude,y=Latitude),color="black",alpha=0.1, size=0.5) +
+                geom_point(data=samp.2019.scen3 ,
+                          aes(x=Longitude,y=Latitude),color="red",alpha=0.3, size=1.2) +              
+  #scale_color_discrete("Run Sample",type=c("red")) +
+                coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj.hake.2019,ratio=1.2) +
+                facet_wrap(~depth_cat,nrow=2)
+
+
+samp.2019.scen3.trim <- samp.2019.scen3 %>%
+                      dplyr::select(year,sample,station,depth_cat,dilution,Latitude,Longitude)
+
+write.csv(samp.2019.scen3.trim,"2023-11 sample selection.csv")
+
+```
+
+
+
+```{r fig.map.by.depth.scen3 , echo=FALSE, fig.height=8}
+#| label: fig-eDNA.by.depth.scenario3
+#| fig-cap: "Scenario 3: Sample all locations at the surface, offshore samples at 50m, about  70% of the stations at 150, 300 and 500 including the most-offshore station on each transect (33 stations). The remaining 41 deep samples have been arbitrarily selected. Red show selected stations,  small black dots show remaining, unselected stations."
+#| 
+print(eDNA.by.depth.2023.scen3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

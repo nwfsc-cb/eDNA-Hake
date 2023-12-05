@@ -88,11 +88,11 @@ raster_depth$depth_m <-  - raster_depth$WM_depth_m
 #######
 # Use a projection derived by Blake.
 ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
-PROJ.txt <- dat_raster@crs %>% as.character()
+PROJ.txt <- crs(dat_raster)
 proj      <- SpatialPointsDataFrame(coords = dat.acoustic %>% ungroup() %>% dplyr::select(lon,lat),
                                     data=dat.acoustic,
                                     proj4string = CRS("+proj=longlat"))
-proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+proj.utm <- spTransform(proj, CRSobj = CRS(as.character(PROJ.txt)))
 
 dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
 
@@ -251,9 +251,7 @@ dat_raster_fin <- left_join(dat_raster_fin,
                                        data.frame(proj.latlon@coords)%>% rename(lon=x,lat=y)))
 dat_raster_fin <- dat_raster_fin %>% mutate(x= x/1000, y=y/1000)
 
-
 ###### TRIM THE PROJECTION POINTS TO CONTRAIN THE DISTRIBUTION EXAMINED LATER.
-
 # This trims the points to include only points:
 # North of transect 25 
 # South of transect 85
