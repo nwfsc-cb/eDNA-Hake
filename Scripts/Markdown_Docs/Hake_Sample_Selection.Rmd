@@ -1,7 +1,7 @@
 ---
-title: "MURI hake sample initial selection"
+title: "MURI hake sample selection"
 author: "Ole Shelton"
-date: '2023-02-10'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 ---
 
@@ -26,6 +26,8 @@ library(gridExtra)
 library(cowplot)
 
 ```
+
+# Initial Sample Selection (Feb. 2023)
 
 ## Samples from 2019
 
@@ -262,3 +264,6 @@ With these twelve samples included twice (once undiluted, once diluted 1:5), we 
 kable(samps.keep,#label= "tab:samples",
        caption = "This is a table of samples that seem like samples to target for the pilot application of the D-LOOP and MiFish primers. This includes 12 samples used twice (once undiluted, once diluted 1:5).")
 ```
+
+# Second Sample Selection (Oct. 2023)
+
