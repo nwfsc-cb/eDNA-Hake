@@ -43,23 +43,25 @@ N.knots.depth <- 4
 base.dir <- here()
 data.dir <- here('Data')
 plot.dir <- here("Plots and figures")
-script.dir <- here('Scripts')
+script.dir <- here('Scripts/Owen Scripts')
 
 # Pull in qPCR data, qPCR standards, sample id information
 setwd(data.dir)
 dat.all <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2021-01-04 results.csv")
 dat.stand <- read.csv("./qPCR/Hake eDNA 2019 qPCR results 2020-01-04 standards.csv")
-dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2021-07-15 sample details.csv")
+dat.sample.id <- read.csv("./Hake eDNA 2019 qPCR results 2023-01-30 sample details.csv") %>% 
+  filter(!grepl('extc',Tube..)) %>% 
+  filter(!grepl('exct',Tube..))
 dat.station.id <- read.csv("./CTD_hake_data_10-2019.csv")
 
 # load and run the acoustic data. this is needed to reference the offshore-ness of 
 setwd(script.dir)
-source("process acoustic data for qPCR.R",local=T)
+source("process acoustic data for qPCR Owen.R",local=T)
 # dat.acoustic and dat.acoustic.binned are the relevant data frames
 
 # Pull in posterior for wash_offset derived from hake
-setwd(paste0(base.dir,"Stan Model Fits/"))
-wash_offset_hake <- read.csv("wash_offset_hake.csv") 
+# setwd(paste0(base.dir,"Stan Model Fits/"))
+# wash_offset_hake <- read.csv("wash_offset_hake.csv") 
 ######################################################
 if(MODEL.TYPE == "Base"){
   TRIM.25 <- FALSE
@@ -148,12 +150,12 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
   # ---- PULL IN SPATIAL DATA TO MAKE GRID ESTIMATE ON AND 
   # ---- TO PROJECT TO 
   
-  str_name <- paste0(base.dir,"Data/raster_grid_blake/fivekm_grid.tif")
+  str_name <- paste0(base.dir,"/Data/raster_grid_blake/fivekm_grid.tif")
   dat_raster=raster(str_name)
   dat_raster_extracted <- rasterToPoints(dat_raster)
   
   # Get depth information.
-  raster_depth <- read.csv(paste0(base.dir,"Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
+  raster_depth <- read.csv(paste0(base.dir,"/Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
   raster_depth$depth_m <-  - raster_depth$WM_depth_m
   
   ####### 
@@ -161,11 +163,11 @@ if(MODEL.TYPE == "lat.long.smooth"|MODEL.TYPE == "lat.long.smooth.base"){
   #######
   # Use a projection derived by Blake.
     ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
-  PROJ.txt <- dat_raster@crs %>% as.character()
+  PROJ.txt <- crs(dat_raster)
   proj      <- SpatialPointsDataFrame(coords = dat.station.id.trim %>% ungroup() %>% dplyr::select(lon,lat),
                                       data=dat.station.id.trim,
                                       proj4string = CRS("+proj=longlat"))
-  proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+  proj.utm <- spTransform(proj, CRSobj = CRS(as.character(PROJ.txt)))
   
   dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
   

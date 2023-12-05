@@ -1,0 +1,46 @@
+---
+title: "Explore Eulachon eDNA"
+output: html_document
+date: "2023-10-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(sf)
+library(here)
+plot_theme <-   theme_minimal()+
+  theme(text=element_text(family="sans",size=10,color="black"),
+        legend.text = element_text(size=10),
+        axis.title=element_text(family="sans",size=14,color="black"),
+        axis.text=element_text(family="sans",size=8,color="black"),
+        panel.grid.major = element_line(color="gray50",linetype=3))
+theme_set(plot_theme)
+
+options(dplyr.summarise.inform = FALSE,dplyr.show_col_types=FALSE)
+sf_use_s2(FALSE)
+```
+
+# Purpose
+
+Explore the eulachon (*Thaleichthys pacificus*) qPCR data from the 2019 eDNA/hake acoustic survey. This is simple, preliminary data visualization, before we get to any real modeling.
+
+# Import Data
+
+```{r}
+# qPCR results
+eul <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2021-01-04 results.csv'),col_select=1:16,col_types = 'cccccddcciddcdcd') %>% 
+  dplyr::select(qPCR,well,sample,inhibition_rate,dilution,eulachon_Ct,eulachon_copies_ul)
+# sample spatial info
+samps <- read_csv(here('Data','eDNA.samples.with.lat.lon.csv'))
+
+eul <- eul
+```
+
+# Number of Samples
+
+```{r}
+
+```
+
+
