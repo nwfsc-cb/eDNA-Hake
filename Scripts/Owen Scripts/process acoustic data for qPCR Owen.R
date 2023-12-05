@@ -8,7 +8,7 @@ library(lubridate)
 library(reshape2)
 library(geosphere)
 library(raster)
-library(rgdal)
+library(sf)
 library(sp)
 library(brms)
 library(loo)
@@ -88,11 +88,11 @@ raster_depth$depth_m <-  - raster_depth$WM_depth_m
 #######
 # Use a projection derived by Blake.
 ## "+proj=laea +lat_0=30.5 +lon_0=-122.6 +x_0=1000000 +y_0=0 +datum=WGS84 +units=m +no_defs"
-PROJ.txt <- dat_raster@crs %>% as.character()
+PROJ.txt <- dat_raster@srs #%>% as.character()
 proj      <- SpatialPointsDataFrame(coords = dat.acoustic %>% ungroup() %>% dplyr::select(lon,lat),
                                     data=dat.acoustic,
                                     proj4string = CRS("+proj=longlat"))
-proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
+proj.utm <- sp::spTransform(proj, CRSobj = CRS(PROJ.txt))
 
 dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
 
@@ -241,9 +241,11 @@ dat_raster_fin <- dat_raster_trim %>% dplyr::select(fivekm_grid,y,x) %>%
 dat_raster_fin <- left_join(dat_raster_fin,raster_depth) %>% filter(is.na(depth_m)==F,depth_m>30)
 
 # Add lat and lon to dat_raster_fin for help with plotting later
+
+PROJ.txt <- dat_raster@srs
 proj      <- SpatialPointsDataFrame(coords = dat_raster_fin %>% ungroup() %>% dplyr::select(x,y),
                                     data = dat_raster_fin,
-                                    proj4string = crs(PROJ.txt))
+                                    proj4string = CRS(as.character(PROJ.txt)))
 proj.latlon <- spTransform(proj, CRSobj = CRS("+proj=longlat"))
 
 dat_raster_fin <- left_join(dat_raster_fin,
