@@ -44,11 +44,33 @@ setwd(results.dir)
 load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu_T-FIN Base_Var Fitted NO.SURFACE= FALSE .RData")
 
 setwd(base.dir)
-# Read in the 2021 and 2022 data and Deep Sea Data
-dat.2022 <- read.csv("./Data/2021-22/2022_all_ctd_meta.csv")
-dat.2021.ctd  <-   read.csv("./Data/2021-22/sh202106_all_ctd_meta.csv")
-dat.2021.samp <-   read.csv("./Data/2021-22/2021 Hake eDNA samples.csv")
-dat.deep <- read.csv("./Data/2021-22/Deep-sea_eDNA.csv", fileEncoding="latin1")
+# Read in the 2021, 2022, 2023 data and Deep Sea Data
+dat.2023.ctd <- read.csv("./Data/2021-23/2023_ctd_stations_lat_lons.csv")
+dat.2023.samp <- read.csv("./Data/2021-23/Hake 2023 eDNA Compiled Data - 2023_eDNA.csv")
+dat.2022 <- read.csv("./Data/2021-23/2022_all_ctd_meta.csv")
+dat.2021.ctd  <-   read.csv("./Data/2021-23/sh202106_all_ctd_meta.csv")
+dat.2021.samp <-   read.csv("./Data/2021-23/2021 Hake eDNA samples.csv")
+dat.deep <- read.csv("./Data/2021-23/Deep-sea_eDNA.csv", fileEncoding="latin1")
+
+
+# Change name of the 2023 ctd data.
+dat.2023.trim <- dat.2023.ctd %>% mutate(CTD.cast = sub("z.*", "", Station.ID)  ) %>%
+                      mutate(CTD.cast = sub(" .*", "", CTD.cast))  %>%
+                      filter(!CTD.cast == "N/A") %>%
+                      distinct(CTD.cast,Latitude,Longitude) %>% mutate(Year =2023) %>%
+                      filter(!Latitude ==  34.443) %>% # get rid of early duplicate.
+                      filter(!Latitude =="?")
+            
+dat.2023.samp <- dat.2023.samp %>% filter(!Latitude %in% c("N/A"),!Station_ID %in% c("N/A")) %>%
+                  mutate(Latitude = as.numeric(Latitude)) %>%
+                  rename(CTD.cast = Station_ID) %>%
+                  distinct(CTD.cast,Latitude,Longitude) %>%
+                  dplyr::select(CTD.cast)
+                  
+dat.2023.trim <- left_join(dat.2023.trim,dat.2023.samp) %>%
+                    mutate(Latitude = as.numeric(Latitude),
+                            Longitude = as.numeric(Longitude))
+
 
 # Change name of the 2021 ctd data.
 dat.2021.ctd <- dat.2021.ctd %>% rename(CTD.cast = Station.ID)
@@ -66,13 +88,18 @@ dat.2019 <- Output.qpcr$dat.id %>% filter(!is.na(station)) %>%
                 dplyr::select(Year,CTD.cast=station,Latitude=lat,Longitude=lon)
 dat.2021 <- dat.2021 %>% dplyr::select(Year,CTD.cast,Latitude,Longitude)
 dat.2022 <- dat.2022 %>% dplyr::select(Year,CTD.cast,Latitude,Longitude)
+dat.2023.trim  <- dat.2023.trim %>% dplyr::select(Year,CTD.cast,Latitude,Longitude)
+
 dat.deep.ctd <- dat.deep %>% filter(ROV_CTD_Rosette == "CTD Rosette") %>%
                     mutate(type="CTD") %>% 
                     distinct(Year,Latitude,Longitude,type) %>% filter(!Latitude == "") %>%
                     mutate(Latitude = as.numeric(Latitude)) %>%
                     mutate(Longitude = as.numeric(Longitude))
 
+
+###
 dat.CTD <- dat.2019 %>% bind_rows(.,dat.2021) %>% bind_rows(.,dat.2022) %>%
+            bind_rows(.,dat.2023.trim) %>% 
             mutate(type="CTD",source="Hake") %>% 
             bind_rows(.,dat.deep.ctd %>% mutate(source="Deep Sea"))
 
@@ -91,8 +118,6 @@ lon <- summary(dat.all$Longitude)
 
 setwd(script.dir)
 source("Base_map.R")
-
-
 
 eDNA.map.A <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(17,16)) +
@@ -132,7 +157,7 @@ dev.off()
 
 #### Hake samples only maps
 
-eDNA.map.hake <-  base_map_trim_proj +
+eDNA.map.hake <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(17,16)) +
   geom_point(data=dat.all %>% filter(source=="Hake"),
              aes(x=Longitude,y=Latitude),alpha=0.75) +
@@ -141,13 +166,13 @@ eDNA.map.hake <-  base_map_trim_proj +
   facet_wrap(~Year)
 eDNA.map.hake
 
-eDNA.map.hake.mod <-  base_map_trim_proj +
+eDNA.map.hake.mod <-  base_map_trim_2022 +
   scale_shape_manual("Source",values=c(17,16)) +
   geom_point(data=dat.all %>% filter(source=="Hake"),
-             aes(x=Longitude,y=Latitude),alpha=0.75) +
+             aes(x=Longitude,y=Latitude),alpha=0.5,size=0.8) +
   coord_fixed(xlim=lon.lims.trim.proj.hake,ylim=lat.lims.trim.proj,ratio=1.2) +
   scale_color_viridis_d("Year",option = "plasma", begin=0,end=0.8) +
-  facet_wrap(~Year)
+  facet_wrap(~Year,nrow=1)
 eDNA.map.hake.mod
 
 
