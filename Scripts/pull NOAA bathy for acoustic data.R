@@ -12,12 +12,12 @@ b = getNOAA.bathy(lon1 = limits.for.map["lon_Max"],
 #b <- fortify(b)
 
 # find the first and last lat-lons from dat.acoustic data frame for each transect.
-dat.bathy <- dat.acoustic %>% group_by(transect) %>% filter(lon==min(lon) | lon==max(lon)) %>% 
-                    dplyr::select(transect,lon,lat) %>% arrange(transect,desc(lon)) %>%
-                    group_by(transect) %>%
+dat.bathy <- dat.acoustic %>% group_by(year,transect) %>% filter(lon==min(lon) | lon==max(lon)) %>% 
+                    dplyr::select(year,transect,lon,lat) %>% arrange(year,transect,desc(lon)) %>%
+                    group_by(year,transect) %>%
                     summarise_at(c("lon","lat"), .funs = list( Max = ~ max(.x)  ,
                                              Min = ~ min(.x) ,
-                                             Mean = ~ mean(.x))) %>% group_by(transect)
+                                             Mean = ~ mean(.x))) %>% group_by(year,transect)
 
 bathy.transects <- NULL
 for(i in 1:nrow(dat.bathy)){

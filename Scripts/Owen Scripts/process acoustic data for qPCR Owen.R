@@ -17,7 +17,7 @@ library(loo)
 
 # Working directories
 base.dir <- "/Users/ole.shelton/Github/eDNA-Hake/"
-data.dir <- paste0(base.dir,"Data/acoustics 2019")
+data.dir <- paste0(base.dir,"Data/acoustics 2019 on")
 script.dir <- paste0(base.dir,"/Scripts")
 plot.dir <- paste0(base.dir,"Plots and figures")
 

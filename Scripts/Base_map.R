@@ -7,12 +7,15 @@ canada  <- map_data("world","Canada")
 mexico  <- map_data("world","Mexico")
 #canada <- subset(world, region %in% c("canada"))
 
-west_coast <- subset(states, region %in% c("california", "oregon", "washington","nevada","idaho"))
+west_coast <- subset(states, region %in% c("california", "oregon", "washington","nevada"))
 
 # lat.lims <- c(min(dat.id$lat,na.rm=T),max(dat.id$lat,na.rm=T))
 # lon.lims <- c(min(dat.id$lon,na.rm=T),max(dat.id$lon,na.rm=T))
-lat.lims.trim <- c(38.25,48)
-lon.lims.trim <- c(-126.5,-122.5)
+lat.lims.full.trim <- c(34,54)
+lon.lims.full.trim <- c(-134,-120)
+
+lat.lims.trim <- c(37,48)
+lon.lims.trim <- c(-126.5,-121.5)
 
 lat.lims.trim.2022 <- c(38.25,48)
 lon.lims.trim.2022 <- c(-126.5,-122.5)
@@ -24,8 +27,17 @@ lon.lims.trim.2022 <- c(-126.5,-122.5)
 #   ylab("Latitude") +
 #   theme_bw()
 
+base_map_whole_coast <-ggplot(data = west_coast) + 
+  geom_polygon(data = canada,aes(x = long, y = lat, group=group), fill = grey(0.7), color = "black")+
+  geom_polygon(data = mexico,aes(x = long, y = lat, group=group), fill = grey(0.7), color = "black")+
+  geom_polygon(data = west_coast,aes(x = long, y = lat, group=group), fill = grey(0.7), color = "black")+
+  coord_fixed(xlim=lon.lims.full.trim,ylim=lat.lims.full.trim,ratio=1.2) +  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_bw()
+
 base_map_trim <-ggplot(data = west_coast) + 
   geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
+  geom_polygon(data = canada,aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
   coord_fixed(xlim=lon.lims.trim,ylim=lat.lims.trim,ratio=1.2) +
   xlab("Longitude") +
   ylab("Latitude") +
@@ -38,6 +50,7 @@ lon.lims.trim.proj.hake <- c(-126.55,-120.5)
 
 base_map_trim_proj <-ggplot(data = west_coast) + 
   geom_polygon(aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
+  geom_polygon(data = canada,aes(x = long, y = lat, group=group), fill = grey(0.5), color = "black")+
   coord_fixed(xlim=lon.lims.trim.proj,ylim=lat.lims.trim.proj,ratio=1.2) +
   xlab("Longitude") +
   ylab("Latitude") +
