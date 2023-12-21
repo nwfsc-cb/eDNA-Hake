@@ -1,0 +1,970 @@
+> compile("LinReg.cpp")
+using C++ compiler: ‘Apple clang version 14.0.0 (clang-1400.0.29.202)’
+using SDK: ‘MacOSX13.1.sdk’
+clang++ -arch x86_64 -std=gnu++17 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG -I"/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include" -I"/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include"  -DTMB_SAFEBOUNDS -DTMB_EIGEN_DISABLE_WARNINGS -DLIB_UNLOAD=R_unload_LinReg  -DTMB_LIB_INIT=R_init_LinReg  -DCPPAD_FRAMEWORK  -I/opt/R/x86_64/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c LinReg.cpp -o LinReg.o
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_abs_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_abs_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/atomic_math.hpp:515:25: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>' requested here
+                           double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
+                                             ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_abs_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_log_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_log_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_log_op<double>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_log_op<double>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_log_op<double>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/atomic_math.hpp:515:31: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_log_op<double>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs_op<double>, const Eigen::Array<double, -1, 1, 0>>>' requested here
+                           double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
+                                                   ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_log_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_product_op<double> (const double &, const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_product_op<double> (const double &, const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_product_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:206:36: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>' requested here
+      matrix<double> zero = args[0]*0.0;
+                                   ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_product_op<double> (const double &, const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<int, unsigned long> (const int &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<int, unsigned long> (const int &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<int, unsigned long>, const Eigen::Array<int, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<int, unsigned long>, const Eigen::Array<int, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<int, unsigned long>, const Eigen::Array<int, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<int, unsigned long>, const Eigen::Array<int, -1, 1, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Array<int, -1, 1, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<int, unsigned long>, const Eigen::Array<int, -1, 1, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::ArrayBase<Eigen::Array<int, -1, 1, 0>>::CastXpr<unsigned long>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/start_parallel.hpp:139:28: note: while substituting explicitly-specified template arguments into function template 'cast' 
+      vecind[i]=((H[i]->i).cast<size_t>())+((H[i]->j).cast<size_t>())*domain;
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<int, unsigned long> (const int &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_sum_op<double> (const double &, const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_sum_op<double> (const double &, const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::Matrix<double, -1, -1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::Matrix<double, -1, -1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::Matrix<double, -1, -1, 0>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:25:29: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::Matrix<double, -1, -1, 0>>' requested here
+      return Block( this->A + I );
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:245:34: note: in instantiation of member function 'atomic::Block<double>::addIdentity' requested here
+    matrix_pade E = AA.scale( c).addIdentity();
+                                 ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:272:28: note: in instantiation of function template specialization 'atomic::expm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=expm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_sum_op<double> (const double &, const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_score_coeff_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_score_coeff_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_score_coeff_op<double>, const Eigen::Block<Eigen::Block<Eigen::Block<Eigen::Map<Eigen::Matrix<double, -1, -1, 0>, 0>, -1, -1, false>, -1, 1, true>, -1, 1, false>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_score_coeff_op<double>, const Eigen::Block<Eigen::Block<Eigen::Block<Eigen::Map<Eigen::Matrix<double, -1, -1, 0>, 0>, -1, -1, false>, -1, 1, true>, -1, 1, false>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_score_coeff_op<double>, const Eigen::Block<Eigen::Block<Eigen::Block<Eigen::Map<Eigen::Matrix<double, -1, -1, 0>, 0>, -1, -1, false>, -1, 1, true>, -1, 1, false>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/LU/PartialPivLU.h:381:34: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_score_coeff_op<double>, const Eigen::Block<Eigen::Block<Eigen::Block<Eigen::Map<Eigen::Matrix<double, -1, -1, 0>, 0>, -1, -1, false>, -1, 1, true>, -1, 1, false>>' requested here
+        = lu.col(k).tail(rows-k).unaryExpr(Scoring()).maxCoeff(&row_of_biggest_in_col);
+                                 ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/LU/PartialPivLU.h:436:14: note: (skipping 11 contexts in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+      return unblocked_lu(lu, row_transpositions, nb_transpositions);
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/Matrix.h:294:22: note: in instantiation of function template specialization 'Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0>>::_init1<Eigen::Inverse<Eigen::Matrix<double, -1, -1, 0>>, Eigen::Inverse<Eigen::Matrix<double, -1, -1, 0>>>' requested here
+      Base::template _init1<T>(x);
+                     ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmbutils/vector.hpp:106:16: note: in instantiation of function template specialization 'Eigen::Matrix<double, -1, -1, 0>::Matrix<Eigen::Inverse<Eigen::Matrix<double, -1, -1, 0>>>' requested here
+  matrix(T1 x):Base(x) {}
+               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:36:21: note: in instantiation of function template specialization 'tmbutils::matrix<double>::matrix<Eigen::Inverse<Eigen::Matrix<double, -1, -1, 0>>>' requested here
+      return Block( this->A.inverse() );
+                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:257:26: note: in instantiation of member function 'atomic::Block<double>::inverse' requested here
+    matrix_pade invD = D.inverse();
+                         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:272:28: note: in instantiation of function template specialization 'atomic::expm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=expm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_score_coeff_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_quotient_op<double> (const double &, const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_quotient_op<double> (const double &, const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_quotient_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_quotient_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_quotient_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/TriangularMatrix.h:384:143: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_quotient_op<double>, const Eigen::Matrix<double, -1, -1, 0>, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<double>, const Eigen::Matrix<double, -1, -1, 0>>>' requested here
+    TriangularViewType&  operator/=(const typename internal::traits<MatrixType>::Scalar& other) { return *this = derived().nestedExpression() / other; }
+                                                                                                                                              ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:435:40: note: in instantiation of member function 'Eigen::TriangularViewImpl<Eigen::Matrix<double, -1, -1, 0>, 1, Eigen::Dense>::operator/=' requested here
+  mat.template triangularView<Lower>() /= scale;
+                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:168:7: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::compute<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      compute(matrix.derived(), options);
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:81:14: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      SAES_t saes(A);
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:375:14: note: in instantiation of member function 'atomic::Block<double>::sqrtm' requested here
+    return A.sqrtm();
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:381:28: note: in instantiation of function template specialization 'atomic::sqrtm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=sqrtm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_quotient_op<double> (const double &, const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_abs2_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_abs2_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs2_op<double>, const Eigen::Block<const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>, -1, 1, false>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs2_op<double>, const Eigen::Block<const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>, -1, 1, false>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_abs2_op<double>, const Eigen::Block<const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>, -1, 1, false>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/Dot.h:98:31: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_abs2_op<double>, const Eigen::Block<const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>, -1, 1, false>>' requested here
+  return numext::real((*this).cwiseAbs2().sum());
+                              ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Householder/Householder.h:76:60: note: (skipping 5 contexts in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+  RealScalar tailSqNorm = size()==1 ? RealScalar(0) : tail.squaredNorm();
+                                                           ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:437:13: note: in instantiation of function template specialization 'Eigen::internal::tridiagonalization_inplace<Eigen::Matrix<double, -1, -1, 0>, Eigen::Matrix<double, -1, 1, 0>, Eigen::Matrix<double, -1, 1, 0>>' requested here
+  internal::tridiagonalization_inplace(mat, diag, m_subdiag, computeEigenvectors);
+            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:168:7: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::compute<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      compute(matrix.derived(), options);
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:81:14: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      SAES_t saes(A);
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:375:14: note: in instantiation of member function 'atomic::Block<double>::sqrtm' requested here
+    return A.sqrtm();
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:381:28: note: in instantiation of function template specialization 'atomic::sqrtm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=sqrtm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_abs2_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_conj_product_op<double> (const double &, const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_conj_product_op<double> (const double &, const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_conj_product_op<double>, const Eigen::Block<Eigen::Matrix<double, -1, 1, 0>, -1, 1, false>, const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_conj_product_op<double>, const Eigen::Block<Eigen::Matrix<double, -1, 1, 0>, -1, 1, false>, const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_conj_product_op<double>, const Eigen::Block<Eigen::Matrix<double, -1, 1, 0>, -1, 1, false>, const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/Dot.h:37:23: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_conj_product_op<double>, const Eigen::Block<Eigen::Matrix<double, -1, 1, 0>, -1, 1, false>, const Eigen::Block<Eigen::Block<Eigen::Matrix<double, -1, -1, 0>, -1, 1, true>, -1, 1, false>>' requested here
+    return a.template binaryExpr<conj_prod>(b).sum();
+                      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/Dot.h:84:55: note: (skipping 4 contexts in backtrace; use -ftemplate-backtrace-limit=0 to see all)
+  return internal::dot_nocheck<Derived,OtherDerived>::run(*this, other);
+                                                      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:437:13: note: in instantiation of function template specialization 'Eigen::internal::tridiagonalization_inplace<Eigen::Matrix<double, -1, -1, 0>, Eigen::Matrix<double, -1, 1, 0>, Eigen::Matrix<double, -1, 1, 0>>' requested here
+  internal::tridiagonalization_inplace(mat, diag, m_subdiag, computeEigenvectors);
+            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:168:7: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::compute<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      compute(matrix.derived(), options);
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:81:14: note: in instantiation of function template specialization 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>' requested here
+      SAES_t saes(A);
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:375:14: note: in instantiation of member function 'atomic::Block<double>::sqrtm' requested here
+    return A.sqrtm();
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:381:28: note: in instantiation of function template specialization 'atomic::sqrtm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=sqrtm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_conj_product_op<double> (const double &, const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_sqrt_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_sqrt_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_sqrt_op<double>, const Eigen::Matrix<double, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_sqrt_op<double>, const Eigen::Matrix<double, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_sqrt_op<double>, const Eigen::Matrix<double, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:310:35: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_sqrt_op<double>, const Eigen::Matrix<double, -1, 1, 0>>' requested here
+      return m_eivec * m_eivalues.cwiseSqrt().asDiagonal() * m_eivec.adjoint();
+                                  ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:82:29: note: in instantiation of member function 'Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, -1, -1, 0>>::operatorSqrt' requested here
+      matrix<Type> X = saes.operatorSqrt();
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:375:14: note: in instantiation of member function 'atomic::Block<double>::sqrtm' requested here
+    return A.sqrtm();
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/expm.hpp:381:28: note: in instantiation of function template specialization 'atomic::sqrtm<atomic::nestedTriangle<0>>' requested here
+    if      (nargs==1) ans=sqrtm(nestedTriangle<0>(args)).bottomLeftCorner();
+                           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_sqrt_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<double>> (const CppAD::AD<double> &, const CppAD::AD<double> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_product_op<CppAD::AD<double>> (const CppAD::AD<double> &, const CppAD::AD<double> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_product_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:920:37: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>' requested here
+      ans += ( this->reportvector() * TMB_epsilon_ ).sum();
+                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1305:12: note: in instantiation of member function 'objective_function<CppAD::AD<double>>::evalUserTemplate' requested here
+    y[0]=F.evalUserTemplate();
+           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<double>> (const CppAD::AD<double> &, const CppAD::AD<double> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::MatrixBase<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>::CastXpr<CppAD::AD<double>>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/convert.hpp:114:25: note: while substituting explicitly-specified template arguments into function template 'cast' 
+   vector<Type> y = tmp.cast<Type>();
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:919:7: note: in instantiation of function template specialization 'asVector<CppAD::AD<double>>' requested here
+      PARAMETER_VECTOR( TMB_epsilon_ );
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:221:73: note: expanded from macro 'PARAMETER_VECTOR'
+vector<Type> name(TMB_OBJECTIVE_PTR -> fillShape(                       \
+                                                                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1305:12: note: in instantiation of member function 'objective_function<CppAD::AD<double>>::evalUserTemplate' requested here
+    y[0]=F.evalUserTemplate();
+           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<double>> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<double>> (const CppAD::AD<double> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<double>> (const CppAD::AD<double> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+LinReg.cpp:34:14: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>' requested here
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1308:6: note: in instantiation of member function 'objective_function<CppAD::AD<double>>::operator()' requested here
+    F(); // Run through user template (modifies reportvector)
+     ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<double>> (const CppAD::AD<double> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+LinReg.cpp:34:8: error: no viable conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<double>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>') to 'CppAD::AD<double>'
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1308:6: note: in instantiation of member function 'objective_function<CppAD::AD<double>>::operator()' requested here
+    F(); // Run through user template (modifies reportvector)
+     ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:35:7: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<double>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>') to 'const CppAD::AD<double> &' for 1st argument
+class AD {
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:162:9: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<double>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>') to 'const VecAD_reference<double> &' for 1st argument
+        inline AD(const VecAD_reference<Base> &x);
+               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:175:3: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<double>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<double>>, const Eigen::Array<CppAD::AD<double>, -1, 1, 0>>') to 'const double &' for 1st argument
+  CTOR_FROM(double)
+  ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:174:32: note: expanded from macro 'CTOR_FROM'
+#define CTOR_FROM(TYPE) inline AD(const TYPE &t);
+                               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:170:37: note: explicit constructor is not a candidate
+        template <class T> inline explicit AD(const T &t);
+                                           ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<double, double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<double, double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, double>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, double>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<double, double>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, double>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, double>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::MatrixBase<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>::CastXpr<double>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/convert.hpp:114:25: note: while substituting explicitly-specified template arguments into function template 'cast' 
+   vector<Type> y = tmp.cast<Type>();
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1183:22: note: in instantiation of function template specialization 'asVector<double>' requested here
+  vector<double> x = asVector<double>(theta);
+                     ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1869:9: note: in instantiation of function template specialization 'EvalADFunObjectTemplate<CppAD::ADFun<double>>' requested here
+        return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
+               ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<double, double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<bool, int> (const bool &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<bool, int> (const bool &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<bool, int>, const Eigen::Array<bool, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<bool, int>, const Eigen::Array<bool, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<bool, int>, const Eigen::Array<bool, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<bool, int>, const Eigen::Array<bool, -1, 1, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Array<bool, -1, 1, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<bool, int>, const Eigen::Array<bool, -1, 1, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::ArrayBase<Eigen::Array<bool, -1, 1, 0>>::CastXpr<int>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:561:55: note: while substituting explicitly-specified template arguments into function template 'cast' 
+  vector<int> tmp = (pf->RevSparseHes(n,Py)).template cast<int>();
+                                                      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1226:21: note: in instantiation of function template specialization 'HessianSparsityPattern<double>' requested here
+        PROTECT(res=asSEXP(HessianSparsityPattern(pf)));  
+                           ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:1869:9: note: in instantiation of function template specialization 'EvalADFunObjectTemplate<CppAD::ADFun<double>>' requested here
+        return EvalADFunObjectTemplate<ADFun<double> >(f,theta,control);
+               ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<bool, int> (const bool &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_opposite_op<double> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_opposite_op<double> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<double>, const Eigen::Array<double, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<double>, const Eigen::Array<double, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_opposite_op<double>, const Eigen::Array<double, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+LinReg.cpp:34:14: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<double>, const Eigen::Array<double, -1, 1, 0>>' requested here
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2031:34: note: in instantiation of member function 'objective_function<double>::operator()' requested here
+      PROTECT( res = asSEXP( pf->operator()() ) );
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_opposite_op<double> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+LinReg.cpp:34:8: error: no viable conversion from 'const Eigen::ArrayBase<Eigen::Array<double, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<double>, const Eigen::Array<double, -1, 1, 0>>') to 'double'
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2031:34: note: in instantiation of member function 'objective_function<double>::operator()' requested here
+      PROTECT( res = asSEXP( pf->operator()() ) );
+                                 ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &, const CppAD::AD<CppAD::AD<double>> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &, const CppAD::AD<CppAD::AD<double>> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:920:37: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>' requested here
+      ans += ( this->reportvector() * TMB_epsilon_ ).sum();
+                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2112:10: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::evalUserTemplate' requested here
+  y[0]=F.evalUserTemplate();
+         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &, const CppAD::AD<CppAD::AD<double>> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+LinReg.cpp:34:14: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>' requested here
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:913:20: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::operator()' requested here
+    Type ans=this->operator()();
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2112:10: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::evalUserTemplate' requested here
+  y[0]=F.evalUserTemplate();
+         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<double>>> (const CppAD::AD<CppAD::AD<double>> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+LinReg.cpp:34:8: error: no viable conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>') to 'CppAD::AD<CppAD::AD<double>>'
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:913:20: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::operator()' requested here
+    Type ans=this->operator()();
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2112:10: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::evalUserTemplate' requested here
+  y[0]=F.evalUserTemplate();
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:35:7: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>') to 'const CppAD::AD<CppAD::AD<double>> &' for 1st argument
+class AD {
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:162:9: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>') to 'const VecAD_reference<CppAD::AD<double>> &' for 1st argument
+        inline AD(const VecAD_reference<Base> &x);
+               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:175:3: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<double>>>, const Eigen::Array<CppAD::AD<CppAD::AD<double>>, -1, 1, 0>>') to 'const double &' for 1st argument
+  CTOR_FROM(double)
+  ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:174:32: note: expanded from macro 'CTOR_FROM'
+#define CTOR_FROM(TYPE) inline AD(const TYPE &t);
+                               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:170:37: note: explicit constructor is not a candidate
+        template <class T> inline explicit AD(const T &t);
+                                           ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::MatrixBase<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>::CastXpr<CppAD::AD<CppAD::AD<double>>>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/convert.hpp:114:25: note: while substituting explicitly-specified template arguments into function template 'cast' 
+   vector<Type> y = tmp.cast<Type>();
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:919:7: note: in instantiation of function template specialization 'asVector<CppAD::AD<CppAD::AD<double>>>' requested here
+      PARAMETER_VECTOR( TMB_epsilon_ );
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:221:73: note: expanded from macro 'PARAMETER_VECTOR'
+vector<Type> name(TMB_OBJECTIVE_PTR -> fillShape(                       \
+                                                                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2112:10: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<double>>>::evalUserTemplate' requested here
+  y[0]=F.evalUserTemplate();
+         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<double>>> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &, const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:33:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &, const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:149:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseBinaryOp.h:78:10: note: in instantiation of template class 'Eigen::CwiseBinaryOpImpl<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, Eigen::Dense>' requested here
+  public CwiseBinaryOpImpl<
+         ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:920:37: note: in instantiation of template class 'Eigen::CwiseBinaryOp<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>' requested here
+      ans += ( this->reportvector() * TMB_epsilon_ ).sum();
+                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2361:12: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::evalUserTemplate' requested here
+  y[0] = F.evalUserTemplate();
+           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_product_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &, const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+LinReg.cpp:34:14: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>' requested here
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+             ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:913:20: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::operator()' requested here
+    Type ans=this->operator()();
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2361:12: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::evalUserTemplate' requested here
+  y[0] = F.evalUserTemplate();
+           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+LinReg.cpp:34:8: error: no viable conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>') to 'CppAD::AD<CppAD::AD<CppAD::AD<double>>>'
+  Type nll = -dnorm(y_i, X_ij*beta, exp(ln_sigma),true) ;
+       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:913:20: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::operator()' requested here
+    Type ans=this->operator()();
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2361:12: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::evalUserTemplate' requested here
+  y[0] = F.evalUserTemplate();
+           ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:35:7: note: candidate constructor (the implicit copy constructor) not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>') to 'const CppAD::AD<CppAD::AD<CppAD::AD<double>>> &' for 1st argument
+class AD {
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:162:9: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>') to 'const VecAD_reference<CppAD::AD<CppAD::AD<double>>> &' for 1st argument
+        inline AD(const VecAD_reference<Base> &x);
+               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:175:3: note: candidate constructor not viable: no known conversion from 'const Eigen::ArrayBase<Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>::NegativeReturnType' (aka 'const CwiseUnaryOp<scalar_opposite_op<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Array<CppAD::AD<CppAD::AD<CppAD::AD<double>>>, -1, 1, 0>>') to 'const double &' for 1st argument
+  CTOR_FROM(double)
+  ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:174:32: note: expanded from macro 'CTOR_FROM'
+#define CTOR_FROM(TYPE) inline AD(const TYPE &t);
+                               ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/cppad/local/ad.hpp:170:37: note: explicit constructor is not a candidate
+        template <class T> inline explicit AD(const T &t);
+                                           ^
+In file included from LinReg.cpp:2:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/TMB.hpp:88:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/Core:367:
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/Meta.h:320:25: warning: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const double &)>' is deprecated [-Wdeprecated-declarations]
+  typedef typename std::result_of<T>::type type1;
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:21:20: note: in instantiation of template class 'Eigen::internal::result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const double &)>' requested here
+  typedef typename result_of<
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:497:56: note: in instantiation of template class 'Eigen::internal::traits<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<typename Derived, typename XprKind = typename traits<Derived>::XprKind, typename StorageKind = typename traits<Derived>::StorageKind>
+                                                       ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:95:22: note: in instantiation of default argument for 'generic_xpr_base<Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' required here
+  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/CwiseUnaryOp.h:55:29: note: in instantiation of template class 'Eigen::CwiseUnaryOpImpl<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, Eigen::Dense>' requested here
+class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+                            ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/Core/util/XprHelper.h:510:20: note: in instantiation of template class 'Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>' requested here
+  typedef typename _CastType::Scalar NewScalarType;
+                   ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:48:69: note: in instantiation of template class 'Eigen::internal::cast_return_type<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>>, const Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>>' requested here
+template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
+                                                                    ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/RcppEigen/include/Eigen/src/SparseCore/../plugins/CommonCwiseUnaryOps.h:61:1: note: in instantiation of template class 'Eigen::MatrixBase<Eigen::Map<Eigen::Matrix<double, -1, 1, 0>, 0>>::CastXpr<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>' requested here
+typename CastXpr<NewType>::Type
+^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/convert.hpp:114:25: note: while substituting explicitly-specified template arguments into function template 'cast' 
+   vector<Type> y = tmp.cast<Type>();
+                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:919:7: note: in instantiation of function template specialization 'asVector<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>' requested here
+      PARAMETER_VECTOR( TMB_epsilon_ );
+      ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:221:73: note: expanded from macro 'PARAMETER_VECTOR'
+vector<Type> name(TMB_OBJECTIVE_PTR -> fillShape(                       \
+                                                                        ^
+/Users/ole.shelton/Library/R/x86_64/4.3/library/TMB/include/tmb_core.hpp:2361:12: note: in instantiation of member function 'objective_function<CppAD::AD<CppAD::AD<CppAD::AD<double>>>>::evalUserTemplate' requested here
+  y[0] = F.evalUserTemplate();
+           ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/type_traits:4009:34: note: 'result_of<Eigen::internal::scalar_cast_op<double, CppAD::AD<CppAD::AD<CppAD::AD<double>>>> (const double &)>' has been explicitly marked deprecated here
+template <class _Callable> class _LIBCPP_DEPRECATED_IN_CXX17 result_of;
+                                 ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1066:39: note: expanded from macro '_LIBCPP_DEPRECATED_IN_CXX17'
+#  define _LIBCPP_DEPRECATED_IN_CXX17 _LIBCPP_DEPRECATED
+                                      ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config:1043:48: note: expanded from macro '_LIBCPP_DEPRECATED'
+#    define _LIBCPP_DEPRECATED __attribute__ ((deprecated))
+                                               ^
+22 warnings and 4 errors generated.
+make: *** [LinReg.o] Error 1
+Error in compile("LinReg.cpp") : Compilation failed
+In addition: Warning message:
+In readLines(file) : incomplete final line found on 'LinReg.cpp'
