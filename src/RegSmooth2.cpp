@@ -116,6 +116,8 @@ if(has_smooths){
   //vector<Type> eta_smooth_all;
   eta_smooth_all = eta_smooth_i.rowwise().sum();
 
+  //REPORT(b_smooth);     // smooth coefficients for penalized splines
+  //REPORT(ln_smooth_sigma); // standard deviations of smooth random effects, in log-space
   ADREPORT(b_smooth);     // smooth coefficients for penalized splines
   ADREPORT(ln_smooth_sigma); // standard deviations of smooth random effects, in log-space
 }

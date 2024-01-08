@@ -1,0 +1,21 @@
+---
+title: "Hake Model 2023-12"
+output: 
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    latex_engine: pdflatex
+    number_sections: no
+  word_document: default
+bibliography: eDNA_2021.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+## Hake Environmental DNA qPCR Model
+
+### Standards
+
