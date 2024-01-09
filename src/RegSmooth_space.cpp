@@ -102,28 +102,28 @@ Type objective_function<Type>::operator()()
   
   // Smooth Effects
   PARAMETER_VECTOR(bs); // smoother linear effects
-  PARAMETER_VECTOR(bs_L); // smoother linear effects for weight matrix
   
   // PARAMETER_VECTOR(ln_tau_O);    // spatial process
   // PARAMETER_ARRAY(ln_tau_Z);    // optional spatially varying covariate process
   // PARAMETER_VECTOR(ln_tau_E);    // spatio-temporal process
   // PARAMETER_ARRAY(ln_kappa);    // Matern parameter
   
-  PARAMETER(lnSigma);    // log- observation sdd
   
   // Random effects
   PARAMETER_VECTOR(b_smooth);  // P-spline smooth parameters
   PARAMETER_VECTOR(ln_smooth_sigma);  // variances of spline REs if included
 
+  PARAMETER_VECTOR(bs_L); // smoother linear effects for weight matrix
   PARAMETER_VECTOR(b_L_smooth);  // P-spline smooth parameters for L matrix
   PARAMETER_VECTOR(ln_L_smooth_sigma);  // variances of spline L REs if included
-  
-  //PARAMETER_VECTOR(ln_tau_O);    // spatial process
+  // 
+  // //PARAMETER_VECTOR(ln_tau_O);    // spatial process
   PARAMETER_VECTOR(ln_kappa);    // Matern parameter
-  
-  //Random effects
-  PARAMETER_ARRAY(omega_s);    // spatial effects; years x number of knots x number of factors 
-  
+  // 
+  // //Random effects
+  PARAMETER_MATRIX(omega_s);    // spatial effects; (number of knots x (years by number of factors)
+
+  PARAMETER(lnSigma);    // log- observation sdd
   /////// END PARAMETERS /////////
   
   // Joint Negative log-likelihood.
@@ -145,8 +145,8 @@ Type objective_function<Type>::operator()()
   //       }
   //       eta_smooth_i += Zs(s) * beta_s ; // iterate over the Zs list of smooth matrices
   //     }
-       // eta_smooth_i += Xs * bs; // only a single Xs for all of the smoothes
-  //   
+  // eta_smooth_i += Xs * bs; // only a single Xs for all of the smoothes
+  // 
   //   REPORT(b_smooth);     // smooth coefficients for penalized splines
   //   REPORT(ln_smooth_sigma); // standard deviations of smooth random effects, in log-space
   // }
@@ -180,11 +180,11 @@ if(has_smooths){
 }
 
 // ------------------ Geospatial ---------------------------------------------
-
+// 
 // Matern Range calculations
 array<Type> range(1,n_f);
   for (int f = 0; f < n_f; f++) {
-    range(f) = sqrt(Type(8.)) / exp(ln_kappa(f));
+    range(f) = sqrt(Type(8.)) / exp(ln_kappa(0));
   }
 ADREPORT(range);
 
@@ -195,12 +195,17 @@ for(int f=0; f < n_f; f++){
 }
 REPORT(tau_O);
 
-// Make spde model. 
+// Make spde model.
 Eigen::SparseMatrix<Type> Q_f; // Precision matrix for factors (one for each factor)
 
+Q_f = R_inla::Q_spde(spde, exp(ln_kappa(0)));
+
 // f = factorcombination, supplied from data (looks like 1,1,1,2,2,2,3,3,3, etc.)
-  for(int fy = 0; fy < n_fy; fy++){ // loop over 
-    Q_f = R_inla::Q_spde(spde, exp(ln_kappa(F_L_idx(fy))));
+  for(int fy = 0; fy < n_fy; fy++){ // loop over
+    
+    // CANNOT MAKE THE KAPPA LOOP OVER factors.  No idea why it doesn't work!!!!!
+    // Q_f = R_inla::Q_spde(spde, exp(ln_kappa(fy)));
+    // Q_f = R_inla::Q_spde(spde, exp(ln_kappa(F_L_idx(fy))));
     PARALLEL_REGION jnll += SCALE(GMRF(Q_f), 1. / tau_O(F_L_idx(fy)))(omega_s.col(fy));
   }
       // if (sim_re(0)) {
@@ -214,10 +219,13 @@ Eigen::SparseMatrix<Type> Q_f; // Precision matrix for factors (one for each fac
 
   // Make spatial factor matrix
   vector<matrix<Type>> L(n_y); // vector of weight matrices
-
+  for(int y = 0; y < n_y; y++){
+    L(y).setZero();
+  }
+  
   /// make L matrix from smoothes.
   for(int y = 0; y < n_y; y++){
-    matrix<Type> TMP_mat(n_d,n_f) ;
+    matrix<Type> TMP_mat(n_d,n_f) ;  
     TMP_mat.setZero();
     for(int f=0; f < n_f;f++){
       vector<Type> beta_L(Z_L(y).cols());
@@ -226,43 +234,53 @@ Eigen::SparseMatrix<Type> Q_f; // Precision matrix for factors (one for each fac
         beta_L(j) = b_L_smooth(b_L_smooth_start(y) + j);
         PARALLEL_REGION jnll -= dnorm(beta_L(j), Type(0), exp(ln_L_smooth_sigma(f)), true);
       }
-      L(y).col(f) = vector<Type>(X_L(y) * bs_L(y)) + Z_L(y) * beta_L ; 
+      TMP_mat.col(f) = matrix<Type>(vector<Type>(X_L(y) * bs_L(y)) + Z_L(y) * beta_L) ;
+      //TMP_mat.col(f) = vector<Type>(X_L(y) * bs_L(y)) + Z_L(y) * beta_L ;
+      //L(y).col(f) = vector<Type>(X_L(y) * bs_L(y)) + Z_L(y) * beta_L ;
     } // end f loop
+    //L(y) = TMP_mat ;
+   // L(1) = matrix<Type>(TMP_mat) ;
   } //end y loop
-  // 
+  
+  REPORT(L) ;
+  //   // 
+// 
+//   // Make a epsilon matrix for each year with n_d (# depth_cat) columns, n_s (# knots) rows.
+//   vector<matrix<Type>> epsilon_s(n_y);
+//    for(int y = 0; y < n_y; y++){
+//       matrix<Type> epsilon_temp(n_s,n_d);
+//       epsilon_temp.setZero() ;
+//       matrix<Type>omega_s_temp(n_s,n_f)  ;
+//       omega_s_temp =  omega_s.block(0,FY_start_idx(y),n_s,n_f) ;
+//       epsilon_temp = L(y) * omega_s_temp.transpose() ;
+//       epsilon_s(y) = epsilon_temp.transpose().matrix() ;
+//   }
+//   // 
+//   // // ------------------ INLA projections ---------------------------------------
+//   // 
+//   // Here we are projecting the spatiotemporal and spatial random effects to the
+//   // locations of the data using the INLA 'A' matrices.
+// 
+//   // Make the spatial projection from knots to station locations.
+//   vector<matrix<Type>> epsilon_i(n_y);
+//   for(int y = 0; y < n_y; y++){
+//     matrix<Type>epsilon_temp(n_i,n_d) ;
+//     for(int d=0; d<n_d; d++){
+//       epsilon_temp.col(d) = A_st * epsilon_s(y).col(d) ;
+//     }
+//     epsilon_i(y) = epsilon_temp;
+//   }
+// 
+//   vector<Type> D_i(n_i); // latent variable at the year-station-depth level for each observation.
+//   D_i =  Xf*betaf + Xs*bs + eta_smooth_all  ;  // all fixed and smooth effects.
+//    for(int i=0; i < n_i; i++){
+//      D_i(i) = D_i(i) + epsilon_i(year_idx(i))(A_ID_idx(i),depth_idx(i)); // Add spatial effects.
+//    }
+//   // 
 
-  // Make a epsilon matrix for each year with n_d (# depth_cat) columns, n_s (# knots) rows.
-  vector<matrix<Type>> epsilon_s(n_y);
-   for(int y = 0; y < n_y; y++){
-      matrix<Type> epsilon_temp(n_s,n_d);
-      epsilon_temp.setZero() ;
-      matrix<Type>omega_s_temp(n_s,n_f)  ;
-      omega_s_temp =  omega_s.block(0,FY_start_idx(y),n_s,n_f) ;
-      epsilon_temp = L(y) * omega_s_temp.transpose() ;
-      epsilon_s(y) = epsilon_temp.transpose().matrix() ;
-  }
-  // 
-  // // ------------------ INLA projections ---------------------------------------
-  // 
-  // Here we are projecting the spatiotemporal and spatial random effects to the
-  // locations of the data using the INLA 'A' matrices.
 
-  // Make the spatial projection from knots to station locations.
-  vector<matrix<Type>> epsilon_i(n_y);
-  for(int y = 0; y < n_y; y++){
-    matrix<Type>epsilon_temp(n_i,n_d) ;
-    for(int d=0; d<n_d; d++){
-      epsilon_temp.col(d) = A_st * epsilon_s(y).col(d) ;
-    }
-    epsilon_i(y) = epsilon_temp;
-  }
-
-  vector<Type> D_i(n_i); // latent variable at the year-station-depth level for each observation.
-  D_i =  Xf*betaf + Xs*bs + eta_smooth_all  ;  // all fixed and smooth effects.
-   for(int i=0; i < n_i; i++){
-     D_i(i) = D_i(i) + epsilon_i(year_idx(i))(A_ID_idx(i),depth_idx(i)); // Add spatial effects.
-   }
-  // 
+ vector<Type> D_i(n_i); // latent variable at the year-station-depth level for each observation.
+ D_i =  Xf*betaf + Xs*bs + eta_smooth_all  ;  // all fixed and smooth effects.
 
   jnll -= sum(dnorm(Y_i,  D_i , exp(lnSigma),true));
   return jnll ;

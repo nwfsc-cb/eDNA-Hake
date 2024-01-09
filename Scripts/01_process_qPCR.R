@@ -5,7 +5,7 @@
 # It will likely be called in a rMarkdown file later.
 
 rm(list=ls())
-
+#setwd('./Github/eDNA-Hake')
 # Libraries
 library(tidyverse)
 library(marmap)
@@ -31,6 +31,7 @@ INHIBIT.LIMIT <- 0.5
 
 # load and run the acoustic data. this is needed to reference the offshore-ness of 
 #setwd(script.dir)
+
 source(here('Scripts',"process acoustic data for qPCR 2019 on.R"),local=TRUE)
 # dat.acoustic and dat.acoustic.binned are the relevant data frames
 
@@ -69,7 +70,98 @@ source(here('Scripts',"plot_raw_observations.R"),local=T)
 # ------ smooth design matrices
 # ------ random effect matrices 
 
+##################################################################
+# Call raw data plotting scripts.
+source(here('Scripts',"Make_matrices.R"),local=T)
+##################################################################
 
+###################################################################
+
+library(here)
+library(TMB)
+setwd("../src")
+
+tmb_data <- list(Y_i = Y_i, 
+                 
+                 # Read in counters
+                 n_i = n_i,   # number of total observations
+                 n_f = n_f,  # number of factors per year for weight matrix L. (currently)
+                 n_d = n_d,   # number of distinct depths in model
+                 n_y = n_y,  # number of years in model
+                 n_s = n_s,  # number of knot locations (constant across )
+                 n_fy = n_fy, # number of factor-year combinations
+                 
+                 # Fixed and smoothes for the mean effect
+                 Xf =  Xf,
+                 Xs = SM$Xs,
+                 Zs = SM$Zs,
+                 n_smooth = n_smooth,
+                 has_smooths = as.integer(has_smooths),
+                 b_smooth_start = b_smooth_start,
+                 
+                 #. Indexes for observations
+                 year_idx = year_idx,
+                 depth_idx = depth_idx,
+                 
+                 # Weight Matrices and helpers
+                 b_L_smooth_start = b_L_smooth_start,
+                 Z_L = Z_L$Z_L, # [L]ist [O]f (basis function matrices) [Matrices]
+                 X_L = X_L$X_L, # smoother linear effect matrix
+                 
+                 #factor indexes for weight matrix 
+                 F_L_idx = F_L_idx, #  // integer index for years (of length n_fy)
+                 Y_L_idx = Y_L_idx,  #// integer index for years (of length n_fy)
+                 FY_start_idx = FY_start_idx, # // integer index for years (of length n_fy)
+                 
+                 # Spatial smoothers
+                 A_st =A_st, # projection from knot locations to observationss
+                 A_spatial_index = spde$sdm_spatial_id - 1L,
+                 spde = spde,
+                 A_ID_idx = A_ID_idx #station ID to match up observation and A_st output
+)
+
+tmb_params <- list(# Regression terms
+  betaf=rnorm(ncol_beta,0,0.1), 
+  # smooth terms
+  bs=rep(0,n_bs),
+  b_smooth = b_smooth,
+  ln_smooth_sigma = rep(0,n_smooth),
+  
+  # Weight terms
+  bs_L = rep(0,n_y),
+  b_L_smooth = rep(0,n_fy),
+  ln_L_smooth_sigma = rep(0,n_f),
+
+  # SPDE terms
+  ln_kappa = rep(0,n_f),
+  # Latent field
+  omega_s = matrix(0,n_s,n_fy),
+  # observation variance terms.
+  lnSigma=0
+)
+  
+tmb_random <- c("bs","b_smooth")
+
+TMB::compile("RegSmooth_space.cpp")
+dyn.load(dynlib("RegSmooth_space"))
+
+obj <- MakeADFun(data=tmb_data, 
+                 parameters=tmb_params, 
+                 random=tmb_random, 
+                 DLL="RegSmooth_space",
+                 hessian=TRUE)
+dyn.unload(dynlib("RegSmooth_space"))
+
+opt <-nlminb(obj$par,obj$fn,obj$gr)
+
+summary(sdreport(obj))
+
+rep <- obj$report()
+
+
+opt$hessian ## <-- FD hessian from optim
+obj$he()    ## <-- Analytical hessian
+sdreport(obj)
 
 
 

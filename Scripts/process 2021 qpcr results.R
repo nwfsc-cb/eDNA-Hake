@@ -1,10 +1,14 @@
 # This file is designed to be called after the 01 script and depends on arguements and data called there.
 
 # Pull in qPCR data, qPCR standards, sample id information
+# dat.all <- read_csv(here('Github','eDNA-Hake','Data','qPCR','Hake eDNA 2021 qPCR results 10.13.2023.csv'))
+# dat.stand <- read_csv(here('Github','eDNA-Hake','Data','qPCR','Hake eDNA 2021 qPCR standards 10.13.2023.csv'))
+# dat.sample.id <- read_csv(here('Github','eDNA-Hake','Data','qPCR','Hake eDNA 2021 qPCR sample details 10.16.2023.csv'),skip=2)
+            
 dat.all <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR results 10.13.2023.csv'))
 dat.stand <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR standards 10.13.2023.csv'))
 dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2021 qPCR sample details 10.16.2023.csv'),skip=2)
-
+# 
 dat.station.id <- read_csv(here('Data','CTD meta 2021.csv'))
 
 # Pull in posterior for wash_offset derived from hake
@@ -368,6 +372,7 @@ dat.samp.ok %>% nrow() #1901 .... lost 15 samples through filtering. Most are 2 
 dat.all %>% filter(sample %in% c(dat.samp.begin %>% filter(!sample %in% dat.samp.ok$sample) %>%pull(sample))) %>% as.data.frame()
 
 ### GET RID OF 25 m deep samples and 200m samples if doing smoothes by depth category.
+TRIM.25=TRUE
 if(TRIM.25 ==TRUE) {
   dat.samp <- dat.samp %>% filter(!depth_cat %in% c(25))
 }

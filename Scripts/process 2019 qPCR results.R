@@ -21,6 +21,7 @@ library(loo)
 ###########################################################################
 
 # Pull in qPCR data, qPCR standards, sample id information
+
 dat.all <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2021-01-04 results.csv'))
 dat.stand <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2020-01-04 standards.csv'))
 dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2023-02-10 sample details.csv'))
