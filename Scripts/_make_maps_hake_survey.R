@@ -45,12 +45,12 @@ load("qPCR 2019 hake lat.long.smooth 4_10_fix_nu_T-FIN Base_Var Fitted NO.SURFAC
 
 setwd(base.dir)
 # Read in the 2021, 2022, 2023 data and Deep Sea Data
-dat.2023.ctd <- read.csv("./Data/2021-23/2023_ctd_stations_lat_lons.csv")
-dat.2023.samp <- read.csv("./Data/2021-23/Hake 2023 eDNA Compiled Data - 2023_eDNA.csv")
-dat.2022 <- read.csv("./Data/2021-23/2022_all_ctd_meta.csv")
-dat.2021.ctd  <-   read.csv("./Data/2021-23/sh202106_all_ctd_meta.csv")
-dat.2021.samp <-   read.csv("./Data/2021-23/2021 Hake eDNA samples.csv")
-dat.deep <- read.csv("./Data/2021-23/Deep-sea_eDNA.csv", fileEncoding="latin1")
+dat.2023.ctd <- read.csv("./Data/qPCR/2023_ctd_stations_lat_lons.csv")
+dat.2023.samp <- read.csv("./Data/qPCR/Hake 2023 eDNA Compiled Data - 2023_eDNA.csv")
+dat.2022 <- read.csv("./Data/qPCR/2022_all_ctd_meta.csv")
+dat.2021.ctd  <-   read.csv("./Data/qPCR/sh202106_all_ctd_meta.csv")
+dat.2021.samp <-   read.csv("./Data/qPCR/2021 Hake eDNA samples.csv")
+dat.deep <- read.csv("./Data/qPCR/Deep-sea_eDNA.csv", fileEncoding="latin1")
 
 
 # Change name of the 2023 ctd data.

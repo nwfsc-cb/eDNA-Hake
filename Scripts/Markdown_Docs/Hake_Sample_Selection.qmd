@@ -471,7 +471,6 @@ Here's what that looks like on a map.  I right now I have just randomly selected
 
 
 ```{r make_2019_plots_4,message=FALSE,warning=FALSE,echo=FALSE}
-
 # Merge in info on remaining sample (this only gets rid of a few samples)
 samp.2019.trim <- samp.2019.trim %>% left_join(.,samp_vol_2019) %>%
                       group_by(station,depth_cat,year) %>% mutate(min.vol = min(Volume)) %>%
@@ -538,9 +537,64 @@ print(eDNA.by.depth.2023.scen3)
 ```
 
 
+## Sample Selection (1/9/2024)
+
+OK.  In looking through the samples, Megan found that some of the identified samples did not have enough fluid left to run for the MiFish and DLoop primers. Here we note the missing samples and then find the pair for these samples that are worth using in their stead
 
 
+```{r make_2019_plots_5,message=FALSE,warning=FALSE,echo=FALSE}
+setwd(script.dir)
+dat.miss <- read.csv("../Data/missing_samples_2019_circa_2024_01.csv")
+dat.miss <- dat.miss %>% dplyr::select(-location,-dilution,-my_plate) %>% mutate(missing = "Yes")
 
+samp.2019.scen3mod <- samp.2019.scen3 %>% left_join(.,dat.miss)
+
+these_missing <- samp.2019.scen3mod %>% filter(missing == "Yes") %>% 
+                            distinct(year,station,depth_cat) %>%
+                            mutate(depth.station = paste0(depth_cat,station))
+ 
+new_2019 <- samp.2019 %>% 
+                    mutate(depth.station = paste0(depth_cat,station)) %>%
+                    filter(depth.station %in% these_missing$depth.station) %>%
+                    left_join(.,dat.miss %>% mutate(sample=as.character(sample)))
+```
+
+
+```{r make_2019_missing_table,message=FALSE,warning=FALSE,echo=FALSE}
+A <- new_2019 %>% filter(is.na(missing)==FALSE) %>%
+  dplyr::select(year,sample,station,depth_cat,dilution,missing)
+
+kable(A,#label= "tab:samples",
+       caption = "These are the samples that Megan identified as missing")
+
+```
+
+```{r make_2019_replacement_table,message=FALSE,warning=FALSE,echo=FALSE}
+B <- new_2019 %>% filter(is.na(missing)==TRUE) %>%
+  dplyr::select(year,sample,station,depth_cat,dilution,missing)
+
+# Pick the sample with the smallest number.
+D <- B %>% group_by(station,depth_cat) %>% summarise(sample=min(sample))
+
+kable(B %>% filter(sample %in% D$sample),#label= "tab:samples",
+       caption = "These are the replacement samples.  Note that there are only 31 replacements for the 32 missing.")
+
+```
+
+
+```{r write_csv_scen4, message=FALSE,warning=FALSE,echo=FALSE}
+samp.2019.scen4 <- samp.2019.scen3mod %>% filter(is.na(missing))
+
+samp.2019.scen4 <-  new_2019 %>% 
+                    filter(sample %in% D$sample) %>%
+                    dplyr::select(year,sample,station,depth_cat,dilution,Latitude,Longitude) %>%
+                    bind_rows(samp.2019.scen4 %>% mutate(sample=as.character(sample)),.)
+
+write.csv(samp.2019.scen3.trim,"2024-01 sample selection.csv")
+
+```
+
+The samples are in "2024-01 sample selection.csv".
 
 
 
