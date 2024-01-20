@@ -292,7 +292,8 @@ dat.samp <- dat.samp %>% mutate(dilution = ifelse(is.na(dilution),1,dilution))
 ### MANUALLY CUT A COUPLE OF SAMPLES THAT ARE KILLING THE MODEL FIT and after inspection are clearly causing troubles.
 if(SP == "hake"){
   dat.samp <- dat.samp %>% 
-                        filter(!grepl("method",station)) # These are experimental stations. Ignore.
+                        filter(!grepl("method",station)) %>% # These are experimental stations. Ignore.
+                        filter(!sample ==1292) # This is a crazy outlier at 500m 
     
 }
 ######

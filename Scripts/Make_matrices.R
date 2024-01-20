@@ -2,66 +2,62 @@
 ###################################################################
 ## Dealing with standards.
 
-# Make fixed effect matrix for standards
+# Make fixed effect indices for standards
+# make indexes for the standards and the samples.
+dat.stand$plate_idx = dat.stand$plate_idx - 1
+dat.samp$plate_idx = dat.samp$plate_idx - 1
 
-n_qpcr <- nrow(PCR)
-plate_idx = PCR$plade_idx -1L
+n_plate <- nrow(PCR)
+n_stand= nrow(dat.stand)
+###################################################################
+## Make offsets 
+###################################################################
 
-dat.stand$plate_idx = dat.stand$plate_idx -1
-dat.samp$plate_idx = dat.samp$plate_idx -1
+# Dilution offset
+dat.samp <- dat.samp %>% mutate(ln_dilution = log(dilution))
 
+# Volume sampled offset
+dat.samp <- dat.samp %>% mutate(ln_vol_sample = log(vol.standard))
 
+###################################################################
+##3 MAKE BOTTLE INDEXES
+###################################################################
+bottle_all <- dat.samp %>% group_by(year,station,depth_cat,sample) %>% 
+  summarise(N=length(sample))
+bottle_all$bottle_idx <- 1:nrow(bottle_all)
 
+bottle_id <- bottle_all  %>%
+  ungroup() %>% 
+  group_by(year,station,depth_cat) %>%
+  summarise(N_bottle=length(sample))%>%
+  mutate(drop_RE=ifelse(N_bottle==1,1,0))
 
+bottle_all <- left_join(bottle_all,bottle_id) %>%
+                arrange(bottle_idx)
+bottle_all$bottle_idx <- factor(bottle_all$bottle_idx,levels=bottle_all$bottle_idx)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+dat.samp <- left_join(dat.samp,bottle_all)
 
 ###################################################################
 ###################################################################
 # Fixed effects  
-
 dat.samp <- dat.samp %>% mutate(year = as.factor(year)) %>%
                 mutate(copies_ul = ifelse(is.na(copies_ul),0,copies_ul))
 
-dat.temp <- dat.samp 
-dat.temp <- dat.temp %>% mutate(copies_ul = ifelse(is.na(copies_ul),0,copies_ul))
+# dat.temp <- dat.samp 
+# dat.temp <- dat.temp %>% mutate(copies_ul = ifelse(is.na(copies_ul),0,copies_ul))
 
-# start with year terms.
-dat.temp$year <- as.factor(dat.temp$year)
-FORM.fixed <- copies_ul ~ year 
-model_frame   <- model.frame(FORM.fixed, dat.temp)
+# start with year terms and include wash_idx as  0/1 but continuous
+dat.samp$year <- as.factor(dat.samp$year)
+model_frame   <- model.frame(FORM.fixed, dat.samp)
 # So This is the fixed effects matrix.
 Xf <- model.matrix(FORM.fixed, model_frame)
 #attr(X_f,"names") <- list(names=colnames(X_f))
 ncol_beta = ncol(Xf)
 
 # Make some indexes for year and depth categories.
-Y_i <- dat.temp$copies_ul 
-
-n_i <- length(Y_i)
+#Y_i <- dat.samp$copies_ul 
+n_i <- nrow(dat.samp)
 
 uni.year <- dat.samp %>% distinct(year) %>% arrange(year)
 year_idx <- as.numeric(factor(dat.samp$year,levels = uni.year$year)) - 1L
@@ -74,13 +70,28 @@ n_d = nrow(uni.depths)
 ###################################################################
 ###################################################################
 ###################################################################
-# Collect Offsets.
+# Don't forget about wash mistake that affected only 2019 samples.
+# make single vector that can be multiplied by a single parameter
 
-# Dilution offset
-dat.samp$log_dil <- log(dat.samp$dilution)
-# Wash Offset (only affects 2019 samples)
-# see dat.samp$wash.indicator
+###################################################################
+###################################################################
+###################################################################
+## Random effect matrix for bottles.  Soft constraint
 
+FORM.bot <- Ct ~ 0+ as.factor(bottle_idx)
+
+model_frame   <- model.frame(FORM.bot, dat.samp)
+# So This is the fixed effects matrix.
+X_bottle <- model.matrix(FORM.bot, model_frame)
+#attr(X_f,"names") <- list(names=colnames(X_f))
+ncol_bottle = ncol(X_bottle)
+
+# go through and figure out which of the samples are singletons 
+# (only one niskin included instead of two at each location)
+MAKE.ZERO <- bottle_all$bottle_idx[bottle_all$drop_RE ==1] %>% as.numeric(as.character(.))
+X_bottle[,c(MAKE.ZERO)] = 0
+
+n_bottle = ncol(X_bottle)
 ###################################################################
 ###################################################################
 ###################################################################
@@ -91,7 +102,6 @@ dat.samp$log_dil <- log(dat.samp$dilution)
 source(here("src","smoothers.R"),local=TRUE)
 
 # Model form for smoothes
-FORM.smoothes <- "copies_ul ~ s(depth_cat,by=year,k=4)" # + s(bottom.depth.consensus,by=year,k=4)"
 #FORM.smoothes <- "copies_ul ~ s(bottom.depth.consensus,by=year,k=4)"
 SM <- parse_smoothers(eval(FORM.smoothes) ,data=dat.samp)
 
@@ -126,7 +136,7 @@ inla_mesh <- fmesher::fm_mesh_2d_inla(
   max.edge = c(80, 2000), # max triangle edge length; inner and outer meshes
   offset = c(20, 20),  # inner and outer border widths
   #max.n.strict=100,#,
-  cutoff =25, # minimum triangle edge length
+  cutoff =20, # minimum triangle edge length
   min.angle=21
 )
 mesh <- make_mesh(dat.samp, c("utm.lon", "utm.lat"), mesh = inla_mesh)
@@ -155,12 +165,6 @@ A_ID_idx <- dat.samp$A_ID
 
 n_s  <- nrow(mesh$mesh$loc) # number of knot locations
 n_st <- nrow(A_st) # number of unique station locations among years
-# Define the number of spatial fields to use for each year
-n_f <- 1
-# Define the number of years
-n_y <- dat.samp %>% distinct(year) %>% pull(year) %>% length()
-# Define a vector controlling the number of spatial fields to use for each year
-n_fy <- n_f*n_y
 
 ################################################################################
 # Smooth effects for the weight matrices.
@@ -168,31 +172,46 @@ n_fy <- n_f*n_y
 # Xs are the linear effects of the smooth
 # Zs are the spline components of the smooth (a list)
 
-FORM.L <- "Y ~ s(depth_cat,k=4)"
-
 # For now, use a single basis function set for all years. Make sure 
 depth_dat <- list()
-depth_dat[["all"]] <- data.frame( Y = rep(1,length(uni.depths$depth_cat)),depth_cat=c(uni.depths$depth_cat))
-
+for(f in 1:n_f){
+  f.end <- length(uni.depths$depth_cat)
+  depth_dat[[f]] <- data.frame( Y = rep(1,f.end-f+1),depth_cat=c(uni.depths$depth_cat)[f:f.end])
+}
+# This will become a list with one value entry for each factor
 X_L <- list()
 Z_L <- list()
 b_L_smooth_start <- rep(0,n_y)
 
-temp <-parse_smoothers(eval(FORM.L), data=depth_dat[["all"]])
+L_basis_start <-parse_smoothers(eval(FORM.L), data=depth_dat[[1]])
 
-  for(i in 1:n_y){
-    X_L$X_L[[i]] <- temp$Xs
-    Z_L$Z_L[[i]] <- temp$Zs[[1]]
-    if(i < n_y){b_L_smooth_start[i+1]  <- b_L_smooth_start[i] + ncol(as.data.frame(temp$Zs))} 
-  }
-  for(i in 1:n_y){
-    X_L$col_dims[i] <- ncol(X_L$X_L[[i]])
-    Z_L$col_dims[i] <- ncol(Z_L$Z_L[[i]])
+for(f in 1:n_f){
+    L_basis  <-parse_smoothers(eval(FORM.L), data=depth_dat[[1]],
+                               newdata=depth_dat[[f]],
+                               basis_prev = L_basis_start$basis_out)
+    X_L$X_L[[f]] <- L_basis$Xs
+    Z_L$Z_L[[f]] <- L_basis$Zs[[1]]
+   if(f>1){X_L$X_L[[f]] =rbind(matrix(0,f-1,ncol(X_L$X_L[[f]])),X_L$X_L[[f]])
+           Z_L$Z_L[[f]] =rbind(matrix(0,f-1,ncol(Z_L$Z_L[[f]])),Z_L$Z_L[[f]])}
+}
+
+
+if(i < n_y){b_L_smooth_start[i+1]  <- b_L_smooth_start[i] + ncol(as.data.frame(L_basis$Zs))} 
+
+  for(f in 1:n_f){
+    X_L$col_dims[f] <- ncol(X_L$X_L[[f]])
+    Z_L$col_dims[f] <- ncol(Z_L$Z_L[[f]])
   }
 
 n_bs_L    <- sum(X_L$col_dims)
 b_L_smooth <- rep(0,sum(Z_L$col_dims)) 
 
+# Design matrix for L
+
+L_design <- matrix(1,n_d,n_f)
+for(i in 2:ncol(L_design)){
+    L_design[1:(i-1),i] <- 0
+}
 
 #// factor indexes for weight matrix 
 F_L_idx <- rep(1:n_f,n_y) -1L
@@ -204,44 +223,7 @@ FY_start_idx <- rep(0,n_y)
     if(i > 1){FY_start_idx[i] = FY_start_idx[i-1] + length(Y_L_idx[Y_L_idx ==(i-1)])}
   }
 
-
-
 # This is how you make a prediction set.
-newdepths_L <- parse_smoothers(eval(FORM.L), data=depth_dat[["all"]],
-                           newdata=data.frame(Y=1:3,depth_cat=c(0,25,50)),
-                           basis_prev = temp$basis_out)
-
-# depth_dat[["2019"]] <- data.frame( Y = rep(1,length(uni.depths$depth_cat)),depth_cat=uni.depths$depth_cat)
-# depth_dat[["2021"]] <- data.frame( Y = rep(1,length(uni.depths$depth_cat)),depth_cat=uni.depths$depth_cat)
-# 
-# X_L <- list()
-# Z_L <- list()
-# b_L_smooth_start <- rep(0,n_y)
-# 
-# for(i in 1:n_y){
-#   temp <-parse_smoothers(Y ~ s(depth_cat,k=4), data=depth_dat[[i]])
-#   X_L[[i]] <- temp$Xs
-#   Z_L[[i]] <- temp$Zs
-#   if(i < n_y){b_L_smooth_start[i+1]  <- b_L_smooth_start[i] + ncol(as.data.frame(temp$Zs))} 
-# }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+newdepths_L <- parse_smoothers(eval(FORM.L), data=depth_dat[[1]],
+                           newdata=data.frame(Y=1:3,depth_cat=c(50,100,150)),
+                           basis_prev = L_basis_start$basis_out)

@@ -14,8 +14,8 @@ west_coast <- subset(states, region %in% c("california", "oregon", "washington",
 lat.lims.full.trim <- c(34,54)
 lon.lims.full.trim <- c(-134,-120)
 
-lat.lims.trim <- c(37,48)
-lon.lims.trim <- c(-126.5,-121.5)
+lat.lims.trim <- c(35,48)
+lon.lims.trim <- c(-126.5,-120.5)
 
 lat.lims.trim.2022 <- c(38.25,48)
 lon.lims.trim.2022 <- c(-126.5,-122.5)
