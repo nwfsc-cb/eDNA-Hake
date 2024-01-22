@@ -107,7 +107,7 @@ FORM.fixed <- copies_ul ~ year
 #Smooth effects (allow a intercept for each depth category x year, add smooth effect of bottom depth.
 FORM.smoothes <- "copies_ul ~ s(depth_cat,by=year,k=4) + s(bottom.depth.NGDC,by=year,k=4)"
 # Smooth used in the weight matrix L.  basically only a factor of depth_cat
-FORM.L <- "Y ~ s(depth_cat,k=3)"
+FORM.L <- "Y ~ s(depth_cat,k=4)"
 
 # Define whether to use a Random bottle effect or not.
 RANDOM_BOTTLE = TRUE
@@ -276,7 +276,7 @@ opt <- nlminb(obj$par,obj$fn,obj$gr,
 report <- obj$report()
 summary(sdreport(obj))
 
-
+report$range
 report$omega_s
 
 
@@ -382,7 +382,6 @@ ggplot(pred.samp) +
       scale_y_continuous("Marginal effect of water depth") +
       scale_x_continuous("Depth(m)")+
       theme_bw()
-    
 
     A <- dat.samp %>% dplyr::select(year,bottom.depth.NGDC) %>% bind_cols(val=rowSums(report$eta_smooth_i[,(n_y+1):(n_y*2)]))
     B <- A %>% mutate(year=as.factor(year))
@@ -401,10 +400,7 @@ ggplot(pred.samp) +
                       distinct(year,station,sample,depth_cat,lon,lat,D_i) %>%
                       mutate(D_i_exp = exp(D_i),
                         D_mod = ifelse(D_i < -2, -2, D_i))
-    
-    ggplot(D_pred) +
-        geom_point(aes())
-    
+
     p_D_pred <- base_map_trim + 
       geom_point(data=D_pred,aes(x=lon,y=lat,fill=D_mod,color=D_mod),shape=21,alpha=0.5,size=3) +
       #scale_size("Copies / uL",labels=LAB,breaks=LAB,range=c(0.2,20),limits=c(0.5,NA))+

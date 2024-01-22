@@ -136,7 +136,7 @@ inla_mesh <- fmesher::fm_mesh_2d_inla(
   max.edge = c(80, 2000), # max triangle edge length; inner and outer meshes
   offset = c(20, 20),  # inner and outer border widths
   #max.n.strict=100,#,
-  cutoff =20, # minimum triangle edge length
+  cutoff =25, # minimum triangle edge length
   min.angle=21
 )
 mesh <- make_mesh(dat.samp, c("utm.lon", "utm.lat"), mesh = inla_mesh)
