@@ -29,8 +29,8 @@ dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2023-0
 dat.station.id <- read_csv(here('Data','CTD_hake_data_10-2019.csv'))
 
 # Pull in posterior for wash_offset derived from hake
-setwd(paste0(base.dir,"Stan Model Fits/"))
-wash_offset_hake <- read.csv("wash_offset_hake.csv") 
+# setwd(paste0(base.dir,"Stan Model Fits/"))
+# wash_offset_hake <- read.csv("wash_offset_hake.csv") 
 ######################################################
 # Drop 25m samples? 
   TRIM.25 <- TRUE
