@@ -53,6 +53,9 @@ trawl <- trawlraw %>%
 # crop to general areas that have had positive observations at some point in the past
 trawl_crop <- trawl %>% 
   filter(cpue_kg_km2>0)
+# crop to areas <= 500m depth?
+trawl_depthcrop <- trawl %>% 
+  filter(depth_trawl<=500)
 trawl %>%
   sample_n(5000) %>% 
   ggplot(aes(lon,lat))+
@@ -65,6 +68,12 @@ trawl_crop %>%
   geom_point(size=0.5)+
   coord_equal()+
   ggtitle("Positive Samples")
+
+trawl_depthcrop%>%
+  ggplot(aes(lon,lat))+
+  geom_point(size=0.5)+
+  coord_equal()+
+  ggtitle("Samples <= 500m")
 ```
 
 
@@ -80,7 +89,9 @@ dat_raster=rast(here('Data','raster_grid_blake','fivekm_grid.tif'))
 
 # Depth associated with grid cell IDs
 raster_depth <- read_csv(here('Data','raster_grid_blake','weighted_mean_NGDC_depths_for_5km_gridcells.csv')) %>% 
-  rename(depth_m=WM_depth_m)
+  rename(depth_m= WM_depth_m) %>% 
+  # make depth positive
+  mutate(depth_m= -depth_m)
 
 # join depths to cell numbers
 cellnums <- tibble(rastID=as.numeric(values(dat_raster))) %>% 
@@ -91,49 +102,53 @@ cellnums <- tibble(rastID=as.numeric(values(dat_raster))) %>%
 rast_depth <- setValues(dat_raster,cellnums$depth_m)
 plot(rast_depth)
 ```
+## Prediction Grid
 
+Use the depth-cropped trawl data to make a prediction grid
 ```{r}
 # convert trawl data to sf and project to Blake's CRS
-trawlsf <- trawl %>% 
+trawlsf <- trawl_depthcrop %>% 
   st_as_sf(coords=c("lon","lat"),crs=4326) %>% 
   st_transform(crs(dat_raster))
 # add projected coords to original data
-trawl <- trawl %>% 
-  mutate(x=st_coordinates(trawlsf)[,1],y=st_coordinates(trawlsf)[,2])
+trawlfit <- trawl_depthcrop %>% 
+  mutate(x=st_coordinates(trawlsf)[,1],y=st_coordinates(trawlsf)[,2]) %>% 
+  mutate(xkm=x/1000,ykm=y/1000)
 
 # as a tibble for prediction
 grid.pred <- as.data.frame(rast_depth,xy=T) %>% 
   mutate(depth_trawl=fivekm_grid)
 # reduce to a bounding box that matches the mesh
 predbbox <- trawlsf %>%
-  st_bbox()
+  summarise() %>% 
+  st_convex_hull()
 
 grid.pred <- grid.pred %>% 
   st_as_sf(coords=c("x","y"),crs=crs(dat_raster),remove = F) %>% 
-  st_crop(predbbox) %>% 
+  st_intersection(predbbox) %>% 
+  mutate(xkm=x/1000,ykm=y/1000) %>% 
   st_set_geometry(NULL)
 
 ggplot(grid.pred)+
-  geom_point(aes(x,y),size=0.5)+
+  geom_point(aes(xkm,ykm),size=0.5)+
   coord_equal()
 ```
 
 ```{r}
 # Make spde
-spde <- make_mesh(trawl,xy_cols = c('x','y'), 
-                   cutoff = 20)
+spde <- make_mesh(trawlfit,xy_cols = c('xkm','ykm'),cutoff=5)
 # model formula
 formula <- "cpue_kg_km2 ~ s(depth_trawl)"
 ```
+# Model: No Temporal Variation
+Fit a model for the eulachon data with spatial RFs turned on. However, we don't deal with time/spatiotemporal variation (yet).
 
 ## Fit
-
-Fit a model for the surface samples with spatial RFs on
 
 ```{r}
 fit <- sdmTMB(
   formula=as.formula(formula),
-  data = trawl,
+  data = trawlfit,
   mesh = spde,
   family = tweedie(link = "log"),
   spatial = "on"
@@ -160,11 +175,44 @@ preds <- predict(fit,newdata=grid.pred)
 
 glimpse(preds)
 
+bbox <- st_bbox(predbbox)
 preds.plot <- ggplot() + 
   geom_raster(data=preds, aes(x,y,fill = exp(est_non_rf)))+
   geom_sf(data=coast,col=NA,fill='gray80')+
-  # scale_fill_viridis_b(breaks=c(0,0.01,0.1,0.2,0.3))+
-  labs(x="",y="",fill="kg/km2",title="Eulachon density")+
-  xlim(predbbox[1],predbbox[3])+ylim(predbbox[2],predbbox[4])
+  scale_fill_viridis()+
+  coord_sf(xlim=c(bbox[1],bbox[3]),ylim=c(bbox[2],bbox[4]))+
+  # # scale_fill_viridis_b(breaks=c(0,0.01,0.1,0.2,0.3))+
+  labs(x="",y="",fill="kg/km2",title="Eulachon density")
 preds.plot
 ```
+
+Marginal effect of depth
+
+```{r}
+ggeffects::ggpredict(fit, "depth_trawl [all]") |> plot()
+```
+# Model: Spatiotemporal Variation
+Fit a model for the eulachon data with spatial RFs and S-T effects turned on, with an IID structure.
+
+```{r}
+fit_st <- sdmTMB(
+  formula=as.formula(formula),
+  data = trawlfit,
+  mesh = spde,
+  family = tweedie(link = "log"),
+  spatial = "on",
+  time='year',
+  spatiotemporal = "iid"
+)
+# some summaries
+fit_st
+tidy(fit_st,conf.int = T)
+sanity(fit_st)
+
+write_rds(fit_st,here("Output","eulachon_trawl_sdm_st.rds"))
+```
+
+```{r}
+
+```
+

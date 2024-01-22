@@ -684,7 +684,7 @@ dat.200.p
 
 300m
 
-```{r}
+```{r,eval=F}
 dat.300 <- dat.samp %>% 
   filter(depth_cat==300) %>% 
   mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 
@@ -705,7 +705,7 @@ dat.300.p
 
 500m
 
-```{r}
+```{r,eval=F}
 dat.500 <- dat.samp %>% 
   filter(depth_cat==500) %>% 
   mutate(is_inhibited=ifelse(inhibition_rate>0.5,"Inhibited","Non-Inhibited")) %>% 

@@ -1,0 +1,263 @@
+---
+title: "MiFish with Hake expansion"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(rnaturalearth)
+library(sf)
+library(scatterpie)
+library(ggsci)
+library(cowplot)
+library(viridis)
+library(here)
+knitr::opts_chunk$set(echo = FALSE,warning=FALSE)
+options(dplyr.summarise.inform=FALSE)
+
+plot_theme <- theme_minimal()+theme(panel.border = element_rect(color='black',fill=NA))
+theme_set(plot_theme)
+```
+
+# Purpose
+
+These MiFish metabarcoding data, derived from the hake acoustic trawl survey water samples, include proportional data on the relative quantitites of DNA across a range of taxa. Taking advantage of the presence of hake in these samples---for which we already have qPCR estimates of absolute DNA concentration---we can expand the proportional data into estimates of true DNA concentration for all species. Here, we take those expanded data and visualize some key spatial and compositional patterns.
+
+# Import Data
+
+```{r}
+d <- read_csv(here('Data','abs_estimates_MFU.csv')) %>% rename(`Engraulis mordax`=`Zz_Engraulis mordax`)
+glimpse(d)
+# longform for plotting
+dl <- d %>% pivot_longer(3:11,names_to="taxa",values_to="conc") %>% 
+  mutate(taxa=factor(taxa,levels=names(d)[3:11]))
+```
+The data include estimates for nine species, including Pacific herring *Clupea pallasii*, the lanternfish *Ceratoscopelus townsendi*, Pacific halibut *Hippoglossus stenolepis*, Chinook salmon *Oncorhynchus tshawytscha*, Pacific sardine *Sardinops sagax*, eulachon *Thaleichthys pacificus*, Pacific jack mackerel *Trachurus symmetricus*, and anchovy *Engraulis mordax*.
+
+```{r}
+coast <- ne_states(country='United States of America',returnclass = 'sf') %>% 
+  filter(name %in% c('California','Oregon','Washington','Nevada'))
+```
+
+# Compositional Pie Chart
+
+```{r,fig.height=10,fig.width=6}
+coast_full_pie <- ggplot()+
+  geom_sf(data=coast)+
+  geom_scatterpie(data=d,aes(x=lon,y=lat),cols=names(d)[3:11],pie_scale=3)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species")+
+  scale_fill_cosmic()
+  
+coast_full_pie
+```
+
+Some overlap here, so we can chunk up the coast by latitude to look closer.
+
+```{r,fig.width=10,fig.height=8,warning=F}
+coast_pie1 <- ggplot()+
+  geom_sf(data=coast)+
+  geom_scatterpie(data=d,aes(x=lon,y=lat),cols=names(d)[3:11],pie_scale=2)+
+  xlim(-127,-123)+ylim(45.5,49)+
+  labs(x="",y="",fill="Species")+
+  scale_fill_cosmic()+
+  guides(fill='none')
+coast_pie2 <- ggplot()+
+  geom_sf(data=coast)+
+  geom_scatterpie(data=d,aes(x=lon,y=lat),cols=names(d)[3:11],pie_scale=2)+
+  xlim(-126,-123)+ylim(44,45.5)+
+  labs(x="",y="",fill="Species")+
+  guides(fill='none')+
+  scale_fill_cosmic()
+coast_pie3 <- ggplot()+
+  geom_sf(data=coast)+
+  geom_scatterpie(data=d,aes(x=lon,y=lat),cols=names(d)[3:11],pie_scale=2)+
+  xlim(-126,-123)+ylim(41,44)+
+  labs(x="",y="",fill="Species")+
+  guides(fill='none')+
+  scale_fill_cosmic()
+coast_pie4 <- ggplot()+
+  geom_sf(data=coast)+
+  geom_scatterpie(data=d,aes(x=lon,y=lat),cols=names(d)[3:11],pie_scale=2)+
+  xlim(-126,-123)+ylim(38,41)+
+  labs(x="",y="",fill="Species")+
+  scale_fill_cosmic()
+
+plot_grid(coast_pie1,coast_pie2,coast_pie3,coast_pie4,nrow=2)
+```
+Some things to note in these maps:
+
+*   Lots of anchovy north of the Columbia, with another spot around 43.5N
+*   Hake are distributed in all samples (by design), but are not the most abundant in all samples
+*   Pacific herring distributes only in the northernmost samples around Cape Flaherty
+*   Sardine is patchy---not distributed everywhere, but dominates some samples
+*   Jack mackerel appears to have a more offshore distribution than other CPS, but is distributed all along the coast
+*   At least proportionally, only a small signal for halibut, Chinook, and the lanternfish
+
+# Distribution of Estimated eDNA Concentration
+
+Which species have the most abundant DNA in this sample?
+
+```{r,fig.height=10,fig.width=5}
+alld2 <- dl %>% 
+  ggplot(aes(log(conc),fill=taxa))+
+  geom_density(alpha=0.7,col=NA)+
+  scale_fill_cosmic(guide='none')+
+  facet_wrap(~taxa,nrow=9)
+alld2
+```
+
+One important thing I notice here is the long tails on these distributions for some species, particularly the well-known forage fishes sardine, anchovy, and herring. All of these species can have hotspots of extremely high abundance.
+
+
+# Single Species Maps
+
+Here we show the abundance/concentration of DNa for each species across the coast, based on these samples that have been collected thus far. We also include a smoothed histogram of eDNA concentration across samples. Keep in mind that these data are not complete (i.e., it is a subset of water samples).
+
+## Ceratoscopelus townsendi
+
+```{r}
+ctm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Ceratoscopelus townsendi`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Ceratoscopelus townsendi\n(Dogtooth lampfish)")+
+  coord_sf(datum=NA)
+ctd <- d %>% 
+  ggplot(aes(log(`Ceratoscopelus townsendi`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Ceratoscopelus townsendi\n(Dogtooth lampfish)")
+plot_grid(ctm,ctd,nrow=1)
+```
+
+## Clupea pallasii
+
+```{r}
+cpm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Clupea pallasii`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Clupea pallasii\n(Pacific sardine)")+
+  coord_sf(datum=NA)
+cpd <- d %>% 
+  ggplot(aes(log(`Clupea pallasii`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Clupea pallasii\n(Pacific sardine)")
+plot_grid(cpm,cpd,nrow=1)
+```
+
+## Hippoglossus stenolepis
+
+```{r}
+hsm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Hippoglossus stenolepis`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Hippoglossus stenolepis\n(Pacific halibut)")+
+  coord_sf(datum=NA)
+hsd <- d %>% 
+  ggplot(aes(log(`Hippoglossus stenolepis`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Hippoglossus stenolepis\n(Pacific halibut)")
+plot_grid(hsm,hsd,nrow=1)
+```
+
+## Merluccius productus
+
+```{r}
+mpm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Merluccius productus`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Merluccius productus\n(Pacific hake)")+
+  coord_sf(datum=NA)
+mpd <- d %>% 
+  ggplot(aes(log(`Merluccius productus`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Merluccius productus\n(Pacific hake)")
+plot_grid(mpm,mpd,nrow=1)
+```
+
+## Oncorhynchus tshawytscha
+
+```{r}
+otm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Oncorhynchus tshawytscha`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Oncorhynchus tshawytscha\n(Chinook salmon)")+
+  coord_sf(datum=NA)
+otd <- d %>% 
+  ggplot(aes(log(`Oncorhynchus tshawytscha`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Oncorhynchus tshawytscha\n(Chinook salmon)")
+plot_grid(otm,otd,nrow=1)
+```
+
+## Sardinops sagax
+
+```{r}
+ssm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Sardinops sagax`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Sardinops sagax\n(Pacific sardine)")+
+  coord_sf(datum=NA)
+ssd <- d %>% 
+  ggplot(aes(log(`Sardinops sagax`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Sardinops sagax\n(Pacific sardine)")
+plot_grid(ssm,ssd,nrow=1)
+```
+
+## Thaleichthys pacificus
+
+```{r}
+tpm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Thaleichthys pacificus`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Thaleichthys pacificus\n(Eulachon)")+
+  coord_sf(datum=NA)
+tpd <- d %>% 
+  ggplot(aes(log(`Thaleichthys pacificus`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Thaleichthys pacificus\n(Eulachon)")
+plot_grid(tpm,tpd,nrow=1)
+```
+
+## Trachurus symmetricus
+
+```{r}
+tsm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Trachurus symmetricus`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Trachurus symmetricus\n(Jack mackerel)")+
+  coord_sf(datum=NA)
+tsd <- d %>% 
+  ggplot(aes(log(`Trachurus symmetricus`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Trachurus symmetricus\n(Jack mackerel)")
+plot_grid(tsm,tsd,nrow=1)
+```
+
+## Engraulis mordax
+
+```{r}
+emm <- ggplot()+
+  geom_sf(data=coast)+
+  geom_point(data=d,aes(x=lon,y=lat,size=`Engraulis mordax`),shape=1)+
+  xlim(-127,-123)+ylim(37,49)+
+  labs(x="",y="",fill="Species",size="Copies/ul",title="Engraulis mordax\n(Anchovy)")+
+  coord_sf(datum=NA)
+emd <- d %>% 
+  ggplot(aes(log(`Engraulis mordax`)))+
+  geom_density()+
+  labs(x="Log (concentration)",title="Engraulis mordax\n(Anchovy)")
+plot_grid(emm,emd,nrow=1)
+```
