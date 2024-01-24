@@ -113,7 +113,7 @@ FORM.L <- "Y ~ s(depth_cat,k=4)"
 RANDOM_BOTTLE = TRUE
 
 # Define the number of spatial fields to use for each year
-n_f <- 2
+n_f <- 1
 # Define the number of years
 n_y <- dat.samp %>% distinct(year) %>% pull(year) %>% length()
 # Define a vector controlling the number of spatial fields to use for each year
