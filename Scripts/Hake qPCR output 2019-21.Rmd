@@ -1,0 +1,192 @@
+---
+title: "Hake 2019 Survey"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE,warning=FALSE, include=FALSE}
+rm(list=ls())
+# This calls both the qPCR results and the acoustic data.
+# define species
+SPECIES <- "hake"
+source("post-process qPCR STAN Output.R")
+```
+
+## eDNA from the 2019 Hake cruise 
+
+### Sampling and processing to date.
+
+In total we have processed qPCR for pacific hake, pacific lamprey, and eulachon from `r N.station.run` CTD stations representing `r N.station.depth.run` station-depth combinations for `r N.sample.run` individual 2.5L water samples.
+
+THESE ARE RESULTS FOR `r SPECIES`
+
+```{r,echo=FALSE,warning=FALSE, fig.height=7}
+print(sample.process.facet)
+```
+
+
+\newpage
+
+### Inhibition
+
+There were a lot of samples that show signs of inhibition. They were concentrated in the surface samples. Here are the inhibition by station-depths and depth categories.  'Completely inhibited' means zero PCR replicates from any water sample at that station-depth combination have amplified within the PCR parameters.  'Not inhibited' indicates that no PCR from that station-depth has evidence of inhibition. Insert language about non-template controls, how inhibition is identified. We used a inhibition threshold of 
+
+```{r,echo=FALSE}
+kable(inhibit.summ.dat)
+```
+
+We can look at the patterns of inhibition spatially and by depth.
+
+```{r,echo=FALSE,fig.height=8}
+print(inhibit.plot.by.depth)
+```
+
+\clearpage
+\newpage
+Here are some larger plot of just a few shallow depths.  Inhibition is clearly strongest at the surface, but beyond depth there is no obvious pattern of inhibition among the samples.  Perhaps there is a hint of inhibition in the offsore edges of the transects at the 50 and 100m depths, but it is not a strong pattern.
+
+```{r,echo=FALSE,fig.height=6}
+print(inhibit.plot.by.depth.few)
+```
+
+\newpage
+### Standards
+
+The standards used in the qPCR assay look pretty reasonable.  Each color represents a different PCR plate. They are pretty much on top of each other.
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
+print(stand.plot)
+```
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
+print(stand.plot.pres)
+```
+
+```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(stand.plot.facet)
+```
+### Dilutions
+
+For inhibited samples, we diluted the samples into three 
+
+```{r,echo=FALSE,fig.height=9,fig.width=6,warning=FALSE}
+print(Output.qpcr$dilution_plot)
+```
+
+
+
+\newpage
+### Controls
+
+There are two main types of control: field negative control and extraction controls.  The extraction controls have never produced any measurable amount of hake DNA, so we will ignore them for now.
+
+Thus far we have analyzed `r N_control_run` samples out of a total of `r N_control_total` field negative samples.  Out of the `r N_control_run`, `r N_control_positive` have detectable amounts (> `r detect.lev` Copies $L^{-1}$) of hake DNA. In general the amount of detected hake DNA is low  but is non-zero. 
+
+```{r,echo=FALSE,fig.height=3,fig.width=6,warning=FALSE}
+print(control.hist1)
+```
+
+We can look at the temporal pattern of the control values too.  This will be more informative when we have more samples analyzed. The highest levels of contamination seem to come from the Evaporated DI water controls... and occur later in the sampling season. These counts now also account for the amount of water filtered in each negative control.
+
+```{r,echo=FALSE,fig.height=3,fig.width=6,warning=FALSE}
+print(control.by.time)
+```
+
+### Ethanol wash samples
+
+For a buch of samples, the final stage of th extraction wash was conducted using a 30% Ethanol wash as opposed to a 70% ethanol wash.  This should result in some amount of DNA being lost from the samples.  To examine this, we intentionally washed one of the two Niskin bottles from 23 station-depth combinations with 30% ethanol and one with 70% ethanol with the goal of detecting what the average difference in DNA concentration between the two samples washed in DNA would be.
+
+\newpage
+## Hake eDNA
+
+We can first ask if the distribution of estimated hake DNA compare to the values present in the field samples.  The water samples are substantially larger than the controls... which is good.
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=6,warning=FALSE}
+print(compare.hist2)
+```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+
+
+We can make similar plots of the distribution of controls relative to the observed distribution of samples at each depth.
+
+Let's make some plots of the spatial distribution of hake DNA.
+
+```{r,echo=FALSE,fig.height=8,warning=FALSE}
+print(SP.p2)
+```
+
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p3)
+```
+
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p4)
+```
+
+```{r,echo=FALSE,fig.height=9,warning=FALSE}
+print(SP.p5)
+```
+
+
+```{r,echo=FALSE,fig.height=3.5,fig.width=7,warning=FALSE}
+print(depth.hist.facet)
+```
+
+```{r,echo=FALSE,fig.height=5,fig.width=7,warning=FALSE}
+p.lat.by.d 
+```
+
+```{r,echo=FALSE,fig.height=7,fig.width=7,warning=FALSE}
+p.lat.by.d.facet
+```
+
+\newpage
+## Acoustic Data.  
+
+This is a spatial plot of the biomass from the acoustic surveys. The raw data is in 0.5 nm longitudinal bins. To make things prettier for plotting, I have aggregated the data into `r 0.5*BY` nm bins. Unlike the eDNA data, the acoustic data does not currently have biomass estimated by depth strata.  It does have the mean depth associated with each 0.5 nm bin and the estimated width of the hake layer, though.  I make some of those plots later.
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(hake.acoustic.binned.p1)
+```
+
+## Acoustic and eDNA Data.  
+
+Here are a few plots from individual transects.  Coast is on the right side of the graph
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.27")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.39")
+print(SP.transect.plots[[nom]])
+```
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+nom <-as.name("Transect.53")
+print(SP.transect.plots[[nom]])
+```
+
+
+
+
+\newpage
+This is a plot of median (plus interquartile range) for hake DNA concentration by the water depth category. Shallower sites are on the shelf.  Points from individual transects are connected.  Note log2 x-axis
+
+```{r,echo=FALSE,fig.height=6,warning=FALSE}
+print(depth.p2)
+
+```
+
+

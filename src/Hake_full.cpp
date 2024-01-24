@@ -357,16 +357,16 @@ Q_f = R_inla::Q_spde(spde, exp(ln_kappa));
    // Add prior for ln_L_smooth_sigma 
     for(int y=0; y<n_y; y++){
       for(int f=0; f<n_f; f++){
-        jnll -= dnorm(exp(ln_L_smooth_sigma(f,y)), Type(0), Type(3),true);
+        jnll -= dnorm(exp(ln_L_smooth_sigma(f,y)), Type(0), Type(1),true);
       }
     }
    
-   // Add prior for ln_L_smooth_sigma 
-   for(int y=0; y<n_y; y++){
-     for(int f=0; f<n_f; f++){
-       jnll -= dnorm(bs_L(y,f), Type(0), Type(3),true);
-     }
-   }
+   // // Add prior for ln_L_smooth_sigma 
+   // for(int y=0; y<n_y; y++){
+   //   for(int f=0; f<n_f; f++){
+   //     jnll -= dnorm(bs_L(y,f), Type(0), Type(3),true);
+   //   }
+   // }
    
       
   REPORT(X_L(0));
