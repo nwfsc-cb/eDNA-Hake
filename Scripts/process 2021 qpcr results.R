@@ -111,7 +111,7 @@ proj      <- SpatialPointsDataFrame(coords = dat.station.id.trim %>% ungroup() %
                                     proj4string = CRS("+proj=longlat"))
 proj.utm <- spTransform(proj, CRSobj = CRS(as.character(PROJ.txt)))
 
-dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
+dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=coords.x1,utm.lat=coords.x2)
 
 dat.station.id.trim <- cbind(dat.station.id.trim %>% ungroup(),dat.utm)
 

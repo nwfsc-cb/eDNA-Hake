@@ -1,0 +1,2 @@
+load("/Users/ole.shelton/Github/eDNA-Hake/Data/MiFish/313_dada2_output_MFU.Rdata")
+ls()
