@@ -10,7 +10,7 @@ library(lubridate)
 library(reshape2)
 library(gridExtra)
 library(raster)
-library(rgdal)
+#library(rgdal)
 library(sp)
 library(brms)
 library(loo)
@@ -29,8 +29,8 @@ dat.sample.id <- read_csv(here('Data','qPCR','Hake eDNA 2019 qPCR results 2023-0
 dat.station.id <- read_csv(here('Data','CTD_hake_data_10-2019.csv'))
 
 # Pull in posterior for wash_offset derived from hake
-setwd(paste0(base.dir,"Stan Model Fits/"))
-wash_offset_hake <- read.csv("wash_offset_hake.csv") 
+# setwd(paste0(base.dir,"Stan Model Fits/"))
+# wash_offset_hake <- read.csv("wash_offset_hake.csv") 
 ######################################################
 # Drop 25m samples? 
   TRIM.25 <- TRUE
@@ -63,7 +63,7 @@ wash_offset_hake <- read.csv("wash_offset_hake.csv")
   
   ### HERE ADD SCRIPT FOR PULLING DEPTH FROM bathy
   setwd(script.dir)
-  source("pull NOAA bathy for acoustic data.R",local=T)
+  source(here("Scripts","pull NOAA bathy for acoustic data.R"),local=T)
  
   temp <- marmap::get.depth(b,
                     x= dat.station.id %>% dplyr::select(lon,lat),
@@ -137,7 +137,7 @@ wash_offset_hake <- read.csv("wash_offset_hake.csv")
                                       proj4string = CRS("+proj=longlat"))
   proj.utm <- spTransform(proj, CRSobj = CRS(PROJ.txt))
   
-  dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=lon,utm.lat=lat)
+  dat.utm <- (proj.utm@coords / 1000) %>% as.data.frame() %>% rename(utm.lon=coords.x1,utm.lat=coords.x2)
   
   dat.station.id.trim <- cbind(dat.station.id.trim %>% ungroup(),dat.utm)
   

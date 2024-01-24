@@ -18,7 +18,7 @@ library(raster)
 #library(rgdal)
 library(sp)
 library(brms)
-library(sdmTMB)
+#library(sdmTMB)
 library(loo)
 library(here)
 

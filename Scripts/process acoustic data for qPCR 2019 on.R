@@ -24,9 +24,9 @@ data.dir <- paste0(base.dir,"Data/acoustics 2019 on")
 script.dir <- paste0(base.dir,"/Scripts")
 plot.dir <- paste0(base.dir,"Plots and figures")
 
-setwd(data.dir)
-dat.acoustic.raw2019 <- read.csv("EchoPro_un-kriged_output-05-Dec-2019_0.csv")
-dat.acoustic.raw2021 <- read.csv("EchoPro_un-kriged_output-04-Dec-2021_0.csv")
+
+dat.acoustic.raw2019 <- read.csv(here("Data","acoustics 2019 on","EchoPro_un-kriged_output-05-Dec-2019_0.csv"))
+dat.acoustic.raw2021 <- read.csv(here("Data","acoustics 2019 on","EchoPro_un-kriged_output-04-Dec-2021_0.csv"))
 
 dat.acoustic.raw2019 <- dat.acoustic.raw2019 %>% mutate(year=2019)
 dat.acoustic.raw2021 <- dat.acoustic.raw2021 %>% mutate(year=2021)
@@ -90,12 +90,11 @@ TRANS <- dat.acoustic %>% distinct(year,transect)
 
 ### Pull in Blake's 5km grid and projection, convert lat-lon to that coordinate system.
 
-str_name <- paste0(base.dir,"Data/raster_grid_blake/fivekm_grid.tif")
-dat_raster=raster(str_name)
+dat_raster=raster(here("Data","raster_grid_blake","fivekm_grid.tif"))
 dat_raster_extracted <- rasterToPoints(dat_raster)
 
 # Get depth information.
-raster_depth <- read.csv(paste0(base.dir,"Data/raster_grid_blake/weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
+raster_depth <- read.csv(here("Data","raster_grid_blake","weighted_mean_NGDC_depths_for_5km_gridcells.csv"))
 raster_depth$depth_m <-  - raster_depth$WM_depth_m
 
 ####### 
@@ -172,7 +171,7 @@ lon.lims.trim <- c(-126.5501,-122.5)
 
 # Call Base_map.R
 setwd(script.dir)
-source("Base_map.R",local=T)
+source(here("Scripts","Base_map.R"),local=T)
   
 # Make some basic plots of lat-longs of biomass
 lower.lim = 1

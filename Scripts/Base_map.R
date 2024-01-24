@@ -44,8 +44,8 @@ base_map_trim <-ggplot(data = west_coast) +
   theme_bw()
 
 
-lat.lims.trim.proj <- c(33,48.1)
-lon.lims.trim.proj <- c(-126.55,-118)
+lat.lims.trim.proj <- c(38,48.1)
+lon.lims.trim.proj <- c(-126.55,-122)
 lon.lims.trim.proj.hake <- c(-126.55,-120.5)
 
 base_map_trim_proj <-ggplot(data = west_coast) + 
