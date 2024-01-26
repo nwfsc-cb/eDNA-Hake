@@ -18,7 +18,7 @@ library(raster)
 #library(rgdal)
 library(sp)
 library(brms)
-#library(sdmTMB)
+library(sdmTMB)
 library(loo)
 library(here)
 
@@ -105,15 +105,16 @@ source(here('Scripts',"plot_raw_observations.R"),local=T)
 # Fixed effects (basically, just year)
 FORM.fixed <- copies_ul ~ year
 #Smooth effects (allow a intercept for each depth category x year, add smooth effect of bottom depth.
-FORM.smoothes <- "copies_ul ~ s(depth_cat,by=year,k=4) + s(bottom.depth.NGDC,by=year,k=4)"
+FORM.smoothes <- "copies_ul ~ s(depth_cat,by=year,k=4)" #+ s(bottom.depth.NGDC,k=4)"
+                                                        #+ s(bottom.depth.NGDC,by=year,k=4)"
 # Smooth used in the weight matrix L.  basically only a factor of depth_cat
-FORM.L <- "Y ~ s(depth_cat,k=4)"
+FORM.L <- "Y ~ s(depth_cat,k=3)"
 
 # Define whether to use a Random bottle effect or not.
 RANDOM_BOTTLE = TRUE
 
 # Define the number of spatial fields to use for each year
-n_f <- 1
+n_f <- 2
 # Define the number of years
 n_y <- dat.samp %>% distinct(year) %>% pull(year) %>% length()
 # Define a vector controlling the number of spatial fields to use for each year
@@ -172,7 +173,17 @@ tmb_data <- list(#Y_i = Y_i,
                 
                 # Random effect for bottle Design matrix.
                 X_bottle = X_bottle,
-                 
+                bottle_trim_idx = bottle_trim$bottle_trim_idx,
+                
+                # Smooth of depth_cat SD for bottle RE
+                Xs_ln_tau = TAU$Xs %>% as.vector()  ,
+                Zs_ln_tau  = TAU$Zs %>% as.vector() ,
+                #n_tau_smooth = n_tau_smooth,
+                tau_has_smooths = as.integer(tau_has_smooths),
+                #b_tau_smooth_start = b_tau_smooth_start,
+                Xs_ln_tau_sm = TAU_sm$Xs %>% as.vector(),
+                Zs_ln_tau_sm  = TAU_sm$Zs %>% as.vector(),
+
                  #. Indexes for observations
                  year_idx = year_idx,
                  depth_idx = depth_idx,
@@ -216,68 +227,79 @@ tmb_params <- list(# Regression terms
   
   std_phi_0 = rep(0.1,n_plate),
   std_phi_1 = rep(-2,n_plate),
-  std_beta_0 = rep(30,n_plate) ,
+  std_beta_0 = rep(40,n_plate) ,
   std_beta_1 = rep(-1.3,n_plate),
   
   # observation variance term (Ct scale) intercept and slope
-  ln_std_tau = c(0,-0.1),
+  ln_std_tau = c(1,-0.1),
   
   # fixed effect terms.
-  betaf=rnorm(ncol_beta,0,0.1), 
+  betaf=rnorm(ncol_beta,1,0.1), 
   
   # wash_cov
   gamma_wash = 0,
   #random effect of bottle
-  # gamma_bottle = rep(0,n_bottle),
-  # ln_sigma_bottle = 0,
-  # smooth terms
+  gamma_bottle = rep(0,n_bottle),
+  ln_tau_bottle = c(-2,rep(0,n_tau-1)),
+  #ln_tau_bottle_test =0,
+  
+  # smooth terms for covariates.
   bs=rep(0,n_bs),
   b_smooth = b_smooth,
   ln_smooth_sigma = runif(n_smooth,-0.1,0.1),
   
   # Weight terms
-  bs_L = matrix(0,n_y,n_f),
-  b_L_smooth = array(0,dim=c(n_y,n_f,ncol(Z_L$Z_L[[1]]))),
-  ln_L_smooth_sigma = matrix(runif(n_y*n_f,-0.1,0.1),n_f,n_y),
+  bs_L = matrix(0,n_f,1),
+  b_L_smooth = array(0,dim=c(n_f,ncol(Z_L$Z_L[[1]]))),
+  ln_L_smooth_sigma = c(0),#matrix(runif(n_f,-0.1,0.1),n_f,1),
 
+  # Extra obs varaition,
+  #ln_sample_tau = -4,
+  
   # SPDE terms
-  ln_kappa = 0,
+  ln_kappa = -4,
   
   # Latent field
   omega_s = matrix(rnorm(n_s*n_f,-0.1,0.1),n_s,n_fy)
   
 )
   
-tmb_random <- c("bs",
+tmb_random <- c(#"bs",
                 "b_smooth",
                 "std_beta_0",
                 "std_beta_1",
                 "std_phi_0",
                 "std_phi_1",
-                "bs_L",
+                #"bs_L",
                 "b_L_smooth",
-                "omega_s")#,
-                #"gamma_bottle")
+                "omega_s",
+                "gamma_bottle")
 
-# Compile the model, load to make it accessible to the optimier.
+# Compile the model, load to make it accessible to the optimizer.
 TMB::compile("Hake_full.cpp")
 dyn.load(dynlib("Hake_full"))
-# dyn.unload(dynlib("Hake_full"))
+# dyn.unload(dynlib("Hake_full")) 
 
 # makethe objective function with the data
 obj <- MakeADFun(data=tmb_data, 
                  parameters=tmb_params, 
                  random=tmb_random, 
                  DLL="Hake_full",
+                 #profile="gamma_bottle",
                  hessian=TRUE)
 
-opt <- nlminb(obj$par,obj$fn,obj$gr, 
-              control=list(eval.max=10000,iter.max=8000))
-report <- obj$report()
+opt <- nlminb(obj$par,obj$fn,obj$gr)
+              #control=list(eval.max=10000,iter.max=8000))
+report <- obj$report() 
 summary(sdreport(obj))
 
+report$jnll
 report$range
 report$omega_s
+report$ln_std_tau
+report$tau_bottle_sm
+report$gamma_bottle
+
 
 
 opt$hessian ## <-- FD hessian from optim
@@ -402,7 +424,7 @@ ggplot(pred.samp) +
                         D_mod = ifelse(D_i < -2, -2, D_i))
 
     p_D_pred <- base_map_trim + 
-      geom_point(data=D_pred,aes(x=lon,y=lat,fill=D_mod,color=D_mod),shape=21,alpha=0.5,size=3) +
+      geom_point(data=D_pred,aes(x=lon,y=lat,fill=D_i,color=D_i),shape=21,alpha=0.5,size=3) +
       #scale_size("Copies / uL",labels=LAB,breaks=LAB,range=c(0.2,20),limits=c(0.5,NA))+
       # geom_point(data=SAMPLES%>% filter(Mean<=lower.lim),aes(x=lon,y=lat),shape="x",size=1,color="black") +
       # scale_shape("Copies / uL",solid=FALSE)+
@@ -410,6 +432,8 @@ ggplot(pred.samp) +
       scale_color_viridis_c("Estimated\n log(DNA conc.)",option="plasma",begin=0,end=0.8) +
       scale_fill_viridis_c("Estimated\n log(DNA conc.)",option="plasma",begin=0,end=0.8) +
       facet_grid(year~depth_cat)
+    
+    p_D_pred
     
     ### Spatial Fields
     

@@ -32,9 +32,18 @@ bottle_id <- bottle_all  %>%
   summarise(N_bottle=length(sample))%>%
   mutate(drop_RE=ifelse(N_bottle==1,1,0))
 
+
+
 bottle_all <- left_join(bottle_all,bottle_id) %>%
-                arrange(bottle_idx)
-bottle_all$bottle_idx <- factor(bottle_all$bottle_idx,levels=bottle_all$bottle_idx)
+                arrange(bottle_idx) 
+
+bottle_trim <- bottle_all %>% filter(drop_RE==0)
+bottle_trim$bottle_trim_idx <- 1:nrow(bottle_trim)
+
+bottle_all <- bottle_all %>% left_join(.,bottle_trim %>% dplyr::select(bottle_idx,bottle_trim_idx))
+bottle_all <- bottle_all %>% mutate(bottle_trim_idx = ifelse(is.na(bottle_trim_idx),-99,bottle_trim_idx))
+
+bottle_all$bottle_trim_idx <- factor(bottle_all$bottle_trim_idx,levels=c(-99,bottle_trim$bottle_trim_idx))
 
 dat.samp <- left_join(dat.samp,bottle_all)
 
@@ -76,25 +85,6 @@ n_d = nrow(uni.depths)
 ###################################################################
 ###################################################################
 ###################################################################
-## Random effect matrix for bottles.  Soft constraint
-
-FORM.bot <- Ct ~ 0+ as.factor(bottle_idx)
-
-model_frame   <- model.frame(FORM.bot, dat.samp)
-# So This is the fixed effects matrix.
-X_bottle <- model.matrix(FORM.bot, model_frame)
-#attr(X_f,"names") <- list(names=colnames(X_f))
-ncol_bottle = ncol(X_bottle)
-
-# go through and figure out which of the samples are singletons 
-# (only one niskin included instead of two at each location)
-MAKE.ZERO <- bottle_all$bottle_idx[bottle_all$drop_RE ==1] %>% as.numeric(as.character(.))
-X_bottle[,c(MAKE.ZERO)] = 0
-
-n_bottle = ncol(X_bottle)
-###################################################################
-###################################################################
-###################################################################
 # Smooth effects for observations.
 # This section defines smooths that act on all of the observations 
 # Xs are the linear effects of the smooth
@@ -117,7 +107,57 @@ new_smooth_pred <- parse_smoothers(eval(FORM.smoothes),data=dat.samp,
                                     #newdata= NEWDATA,
                                     basis_prev = SM$basis_out)
 
+###################################################################
+## Random effect matrix for bottles.  
+###################################################################
+tau_has_smooths <- 1 # 0 for yes, 1 for no.
+n_tau = ifelse(tau_has_smooths == 0,3,2)
 
+# First calculate depth-varying SD.
+FORM.bot.tau <- Ct ~ 0+ s(depth_cat,k=3)
+# This is for making the random effect of bottle a function of depth_category.
+TAU <- parse_smoothers(eval(FORM.bot.tau) ,data=bottle_trim)
+
+# Files needed in TMB
+n_tau_bs     <- ncol(TAU$Xs)
+b_tau_smooth_start <- TAU$b_tau_smooth_start
+n_tau_smooth <- length(b_tau_smooth_start)
+b_tau_smooth <- if (TAU$has_smooths) rep(0,sum(TAU$sm_dims)) else array(0) 
+
+TAU$Zs <- as.matrix(TAU$Zs[[1]])
+
+
+# This is for making precitions to new data.
+new_tau_smooth_pred <- parse_smoothers(eval(FORM.bot.tau),data=bottle_trim,
+                                   #newdata= NEWDATA,
+                                   basis_prev = TAU$basis_out)
+
+# make a small version of the tau_bottle matrices for giggles.
+TAU_sm <- parse_smoothers(eval(FORM.bot.tau) ,data=bottle_trim,
+                            newdata=uni.depths,
+                            basis_prev = TAU$basis_out)
+TAU_sm$Zs <- as.matrix(TAU_sm$Zs[[1]])
+
+### Make design matrices for random bottle effects
+### Only include stations that have replicate bottles.
+
+FORM.bot <- Ct ~ 0+ as.factor(bottle_trim_idx)
+
+model_frame   <- model.frame(FORM.bot, dat.samp)
+# So This is the fixed effects matrix.
+X_bottle <- model.matrix(FORM.bot, model_frame)
+# get rid of first column (-99 factor)
+X_bottle <- X_bottle[,-c(1)]
+
+# go through and figure out which of the samples are singletons 
+# (only one niskin included instead of two at each location)
+n_bottle = ncol(X_bottle)
+
+# Fix indexing so it starts at 0
+bottle_trim$bottle_trim_idx <- bottle_trim$bottle_trim_idx -1L
+bottle_all$bottle_trim_idx <- as.numeric(as.character(bottle_all$bottle_trim_idx)) -1
+###################################################################
+###################################################################
 ####################################################################
 #### SPATIAL FIELD
 #### OK. Make a nice mesh for the observed sample locations.
@@ -133,11 +173,11 @@ inla_mesh <- fmesher::fm_mesh_2d_inla(
   #loc=locs[,c("utm.lon","utm.lat")],
   loc.domain = domain, # coordinates
   boundary=domain,
-  max.edge = c(80, 2000), # max triangle edge length; inner and outer meshes
-  offset = c(20, 20),  # inner and outer border widths
+  max.edge = c(80, 1000), # max triangle edge length; inner and outer meshes
+  offset = c(25, 20),  # inner and outer border widths
   #max.n.strict=100,#,
-  cutoff =25, # minimum triangle edge length
-  min.angle=21
+  cutoff =45, # minimum triangle edge length
+  min.angle=20
 )
 mesh <- make_mesh(dat.samp, c("utm.lon", "utm.lat"), mesh = inla_mesh)
 mesh$mesh$n
@@ -209,8 +249,10 @@ b_L_smooth <- rep(0,sum(Z_L$col_dims))
 # Design matrix for L
 
 L_design <- matrix(1,n_d,n_f)
-for(i in 2:ncol(L_design)){
+if(n_f>1){
+  for(i in 2:ncol(L_design)){
     L_design[1:(i-1),i] <- 0
+  }
 }
 
 #// factor indexes for weight matrix 
