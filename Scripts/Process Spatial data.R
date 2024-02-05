@@ -41,35 +41,53 @@ dat_raster_A <- NULL
 dat_raster_trim <- dat_raster_trim %>% as.data.frame()
 dat_raster_trim$y.km <- dat_raster_trim$y/1000
 dat_raster_trim$x.km <- dat_raster_trim$x/1000
-for(i in 2:nrow(acoustic.lims)){
-  filt.temp <-  acoustic.lims[(i-1):i,] %>% arrange(mean.lat.utm)
-  temp <- dat_raster_trim %>% filter(y.km >= filt.temp$mean.lat.utm[1], 
+
+# Keep the point in bounds for each year and then make a master list of points included for all years.
+ac.lims <- list()
+yrs <- unique(acoustic.lims$year)
+
+for(j in 1:length(yrs)){
+  NOM <- as.name(yrs[j])
+  ac.lims[[NOM]] <- NULL
+  ac.tmp <- acoustic.lims %>% filter(year == yrs[j])
+  
+  
+  for(i in 2:nrow(ac.tmp)){
+    filt.temp <-  ac.tmp[(i-1):i,] %>% arrange(mean.lat.utm)
+    temp <- dat_raster_trim %>% filter(y.km >= filt.temp$mean.lat.utm[1], 
                                           y.km < filt.temp$mean.lat.utm[2])
-  uni.lat <- unique(temp$y.km) 
+    uni.lat <- unique(temp$y.km) 
   
-  SLOPE.min <-    (filt.temp$min.lon.utm[2] - filt.temp$min.lon.utm[1]) /
-    (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
-  SLOPE.max <-    (filt.temp$max.lon.utm[2] - filt.temp$max.lon.utm[1]) /
-    (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
+    SLOPE.min <-    (filt.temp$min.lon.utm[2] - filt.temp$min.lon.utm[1]) /
+      (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
+    SLOPE.max <-    (filt.temp$max.lon.utm[2] - filt.temp$max.lon.utm[1]) /
+      (filt.temp$mean.lat.utm[2] - filt.temp$mean.lat.utm[1])
+    
+    uni.lat <- uni.lat %>% as.data.frame() %>% rename(y.km = ".") %>% 
+      mutate(lon.min = SLOPE.min * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$min.lon.utm[1]) %>%
+      mutate(lon.max = SLOPE.max * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$max.lon.utm[1])
   
-  uni.lat <- uni.lat %>% as.data.frame() %>% rename(y.km = ".") %>% 
-    mutate(lon.min = SLOPE.min * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$min.lon.utm[1]) %>%
-    mutate(lon.max = SLOPE.max * (y.km -  filt.temp$mean.lat.utm[1]) + filt.temp$max.lon.utm[1])
-  
-  temp <- left_join(temp,uni.lat,by="y.km") %>% filter(x.km > lon.min,x.km < lon.max)
-  dat_raster_A <- bind_rows(dat_raster_A,temp)
+    temp <- left_join(temp,uni.lat,by="y.km") %>% filter(x.km > lon.min,x.km < lon.max)
+    ac.lims[[NOM]] <- bind_rows(ac.lims[[NOM]],temp)
+  }
 }
+  
+dat_raster_A <- ac.lims[[1]]
+for(i in 2:length(yrs)){
+  dat_raster_A <- rbind(dat_raster_A,ac.lims[[i]])
+}
+
+dat_raster_trim <- dat_raster_A %>% distinct(Gridcell_ID) %>% 
+            left_join(.,dat_raster_trim)
 
 ggplot(acoustic.lims) + 
   geom_point(aes(x=min.lon.utm,y=mean.lat.utm)) +
   geom_point(aes(x=max.lon.utm,y=mean.lat.utm),col=2) +
-  geom_point(data=dat_raster_A, aes(x=x.km,y=y.km),col="blue") +
+  geom_point(data=dat_raster_trim, aes(x=x.km,y=y.km),col="blue") +
   facet_wrap(~year)
 
-dat_raster_trim <- dat_raster_A
 
-# Add lat and lon to dat_raster_fin for help with plotting later
-
+# Add lat and lon to dat_raster for help with plotting later
 PROJ.txt <- dat_raster@srs
 proj      <- SpatialPointsDataFrame(coords = dat_raster_trim %>% ungroup() %>% dplyr::select(x,y),
                                     data = dat_raster_trim,

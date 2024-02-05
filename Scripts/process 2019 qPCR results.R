@@ -430,11 +430,80 @@ if(TRIM.25 ==TRUE) {
   dat.samp <- dat.samp %>% filter(!depth_cat %in% c(25,200))
 }
 
+##################################################################################
+# Make a new column that combines samples that were taken from the same Niskin
+##################################################################################
+dat.samp <- dat.samp %>% rename(sample.orig =sample)
+
+A <- dat.samp %>% group_by(year,station,depth_cat,sample.orig,Niskin) %>% 
+  summarise(N=length(sample))
+
+B <- A  %>%
+  ungroup() %>% 
+  group_by(year,station,depth_cat) %>%
+  summarise(N_bottle=length(sample.orig))%>%
+  ungroup() %>%
+  mutate(station_idx = 1:length(year)) # add 1 or 2 for each bottle_pair
+
+A <- left_join(A,B) %>%
+  arrange(station_idx) %>%
+  group_by(year,station_idx) %>%
+  mutate(bot_indicator = 1:length(year)) 
+
+THESE <- A %>% filter(bot_indicator>2) %>% 
+  ungroup() %>%
+  filter(!Niskin =="sfc") %>% # don't match by through hull...
+  distinct(year,station,depth_cat,Niskin) %>% 
+  mutate(flag = 1)
+
+D <- left_join(dat.samp,THESE) %>% filter(flag==1) %>% 
+  distinct(sample.orig,Niskin,depth,depth_cat,station) %>%
+  group_by(Niskin,depth_cat,station) %>%
+  arrange(sample.orig) %>%
+  mutate(sample = paste0(sample.orig,collapse="_"))
+
+dat.samp <- left_join(dat.samp,D) %>%
+  mutate(sample=ifelse(is.na(sample),sample.orig,sample))
+
+#### THESE ARE SAMPLES WHERE THERE WERE NISKINS AND THROUGHT HULL TAKEN AT THE SURFACE.
+#### CULL OUT NON-SFC samples to ensure comparability
+
+ST <- c("27-1","29-1","33-1","39-1","69-1","73-1","80-1","81-1")
+A <-  dat.samp %>% filter(station %in% ST)
+B <- A %>% filter(Niskin == "sfc")
+D <- A %>% filter(!depth_cat==0)
+
+E <- rbind(B,D)
+
+dat.samp <- dat.samp %>% filter(!station %in% ST)
+dat.samp <- rbind(dat.samp,E)
+
+### TWO REMAINING SAMPLES WITH MORE THAN 2 niskins!
+A <- dat.samp %>% filter(year==2019,station=="85-0")
+# keep 
+B <- A %>% filter(Niskin %in% c(3,6),depth_cat==150)
+D <- A %>% filter(!depth_cat ==150)
+E <- rbind(B,D)
+
+dat.samp <- dat.samp %>% filter(!station == "85-0") %>% rbind(.,E)
+
+A <- dat.samp %>% filter(year==2019,station=="60-1")
+# keep 
+B <- A %>% filter(depth==50)
+D <- A %>% filter(!depth_cat ==50)
+E <- rbind(B,D)
+
+dat.samp <- dat.samp %>% filter(!station == "60-1") %>% rbind(.,E)
+
 
 ## make clear that these are 2019 specific objects
 dat.samp <- dat.samp %>% dplyr::select(-useful,-Zymo.x,-Zymo.y,-Fluor,-water.depth)
+
 COL <- names(dat.samp)
-THESE <- c(which(COL=="year"),which(COL!="year"))
+THESE <- c(which(COL %in% c("year")),
+           which(COL %in% c("sample","sample.orig")),
+           which(!COL %in% c("year","sample","sample.orig")))
+
 # reorder columns.
 dat.samp.2019 <- dat.samp %>% dplyr::select(COL[THESE])
 

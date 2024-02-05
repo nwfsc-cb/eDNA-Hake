@@ -368,9 +368,9 @@ B <- dat.samp %>% group_by(qPCR,dilution) %>% summarise(N=length(dilution))  %>%
 dat.samp.ok <- dat.samp %>% group_by(sample,inhibit.bin) %>% summarise(N=length(sample)) %>% as.data.frame()
 
 dat.samp.begin %>% nrow() #1916
-dat.samp.ok %>% nrow() #1901 .... lost 15 samples through filtering. Most are 2 transect 25 and most ar e due to inhibition... weird.
+dat.samp.ok %>% nrow() #1876 .... lost 15 samples through filtering. Most are 2 transect 25 and most ar e due to inhibition... weird.
 
-dat.all %>% filter(sample %in% c(dat.samp.begin %>% filter(!sample %in% dat.samp.ok$sample) %>%pull(sample))) %>% as.data.frame()
+#dat.all %>% filter(sample %in% c(dat.samp.begin %>% filter(!sample %in% dat.samp.ok$sample) %>%pull(sample))) %>% as.data.frame()
 
 ### GET RID OF 25 m deep samples and 200m samples if doing smoothes by depth category.
 TRIM.25=TRUE
@@ -378,9 +378,46 @@ if(TRIM.25 ==TRUE) {
   dat.samp <- dat.samp %>% filter(!depth_cat %in% c(25))
 }
 
+
+# Make a new column that combines samples that were taken from the same Niskin
+dat.samp <- dat.samp %>% rename(sample.orig =sample)
+
+A <- dat.samp %>% group_by(year,station,depth_cat,sample.orig,Niskin) %>% 
+  summarise(N=length(sample))
+
+B <- A  %>%
+  ungroup() %>% 
+  group_by(year,station,depth_cat) %>%
+  summarise(N_bottle=length(sample.orig))%>%
+  ungroup() %>%
+  mutate(station_idx = 1:length(year)) # add 1 or 2 for each bottle_pair
+
+A <- left_join(A,B) %>%
+  arrange(station_idx) %>%
+  group_by(year,station_idx) %>%
+  mutate(bot_indicator = 1:length(year)) 
+
+THESE <- A %>% filter(bot_indicator>2) %>% 
+              ungroup() %>%
+              distinct(year,station,depth_cat,Niskin) %>% 
+              mutate(flag = 1)
+
+D <- left_join(dat.samp,THESE) %>% filter(flag==1) %>% 
+        distinct(sample.orig,Niskin,depth,depth_cat,station) %>%
+        group_by(Niskin,depth_cat,station) %>%
+        arrange(sample.orig) %>%
+        mutate(sample = paste0(sample.orig,collapse="_"))
+  
+dat.samp <- left_join(dat.samp,D) %>%
+              mutate(sample=ifelse(is.na(sample),sample.orig,sample))
+
+
 ## make clear that these are 2021 specific objects
 COL <- names(dat.samp)
-THESE <- c(which(COL=="year"),which(COL!="year"))
+THESE <- c(which(COL %in% c("year")),
+           which(COL %in% c("sample","sample.orig")),
+           which(!COL %in% c("year","sample","sample.orig")))
+
 dat.samp.2021 <- dat.samp %>% dplyr::select(COL[THESE])
 
 # Make the columns in the same order as 2019
